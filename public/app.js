@@ -1,6 +1,9 @@
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
 const targetDateInput = document.querySelector("#target-date");
+const eventScaleSelect = document.querySelector("#event-scale");
+const usageThresholdInput = document.querySelector("#usage-threshold");
+const confidenceInput = document.querySelector("#confidence");
 const maxPagesInput = document.querySelector("#max-pages");
 const viewModeSelect = document.querySelector("#view-mode");
 const setSortSelect = document.querySelector("#set-sort");
@@ -9,6 +12,7 @@ const useCacheInput = document.querySelector("#use-cache");
 const refreshCacheInput = document.querySelector("#refresh-cache");
 const sourcesInput = document.querySelector("#sources");
 const statusEl = document.querySelector("#status");
+const samplingSummaryEl = document.querySelector("#sampling-summary");
 const environmentSummaryEl = document.querySelector("#environment-summary");
 const summaryEl = document.querySelector("#summary");
 const deckSummaryEl = document.querySelector("#deck-summary");
@@ -25,6 +29,29 @@ let defaultSources = {};
 let lastGroups = [];
 let lastObjects = [];
 let checkedObjects = readCheckedObjects();
+
+const eventScaleProfiles = {
+  spotlight: {
+    threshold: 1,
+    confidence: 95,
+    label: "大型オープンで、一般的に構築で使われる1%以上の発生源を拾う想定"
+  },
+  premier: {
+    threshold: 0.5,
+    confidence: 95,
+    label: "PT/RC級で、かなり薄い0.5%以上の発生源まで拾う想定"
+  },
+  medium: {
+    threshold: 2,
+    confidence: 95,
+    label: "中規模競技で、2%以上の発生源を拾う想定"
+  },
+  local: {
+    threshold: 5,
+    confidence: 95,
+    label: "店舗/小規模で、5%以上の発生源を拾う想定"
+  }
+};
 
 function readCheckedObjects() {
   try {
@@ -44,6 +71,58 @@ function objectKey(object) {
 
 function setStatus(message) {
   statusEl.textContent = message;
+}
+
+function recommendedDeckCount(usagePercent, confidencePercent) {
+  const p = Number(usagePercent) / 100;
+  const confidence = Number(confidencePercent) / 100;
+  if (!Number.isFinite(p) || !Number.isFinite(confidence) || p <= 0 || p >= 1 || confidence <= 0 || confidence >= 1) {
+    return 0;
+  }
+  return Math.ceil(Math.log(1 - confidence) / Math.log(1 - p));
+}
+
+function updateSamplingRecommendation({ applyDeckCount = false } = {}) {
+  const recommended = recommendedDeckCount(usageThresholdInput.value, confidenceInput.value);
+  const maxAllowed = Number(maxPagesInput.max || recommended);
+  const current = Number(maxPagesInput.value || 0);
+  const profile = eventScaleProfiles[eventScaleSelect.value];
+
+  if (applyDeckCount && recommended) {
+    maxPagesInput.value = String(Math.min(recommended, maxAllowed));
+  }
+
+  const actualCurrent = Number(maxPagesInput.value || 0);
+  const capped = recommended > maxAllowed;
+  const status = actualCurrent >= recommended ? "足りています" : "不足しています";
+  const cappedText = capped ? `。ただし現在の上限は${maxAllowed}件です` : "";
+  samplingSummaryEl.replaceChildren();
+
+  const headline = document.createElement("div");
+  headline.className = "sampling-headline";
+  headline.textContent = `おすすめ検索数: ${recommended}デッキ`;
+  samplingSummaryEl.append(headline);
+
+  const currentLine = document.createElement("div");
+  currentLine.className = actualCurrent >= recommended ? "sampling-ok" : "sampling-warn";
+  currentLine.textContent = `現在の設定: ${actualCurrent}デッキ（${status}）${cappedText}`;
+  samplingSummaryEl.append(currentLine);
+
+  const explanation = document.createElement("div");
+  explanation.className = "sampling-explanation";
+  explanation.textContent = `${profile?.label || "手動設定"}。この数を見ると、使用率${usageThresholdInput.value}%以上のトークン発生源を${confidenceInput.value}%以上の確率で見つけられる想定です。`;
+  samplingSummaryEl.append(explanation);
+}
+
+function applyEventScaleProfile() {
+  const profile = eventScaleProfiles[eventScaleSelect.value];
+  if (!profile) {
+    updateSamplingRecommendation();
+    return;
+  }
+  usageThresholdInput.value = String(profile.threshold);
+  confidenceInput.value = String(profile.confidence);
+  updateSamplingRecommendation({ applyDeckCount: true });
 }
 
 function sourceLines() {
@@ -379,6 +458,7 @@ async function init() {
   const response = await fetch("/api/default-sources");
   defaultSources = await response.json();
   updateSourcesForFormat();
+  applyEventScaleProfile();
 }
 
 async function clearCache() {
@@ -396,6 +476,16 @@ async function clearCache() {
 }
 
 formatSelect.addEventListener("change", updateSourcesForFormat);
+eventScaleSelect.addEventListener("change", applyEventScaleProfile);
+usageThresholdInput.addEventListener("input", () => {
+  eventScaleSelect.value = "custom";
+  updateSamplingRecommendation();
+});
+confidenceInput.addEventListener("input", () => {
+  eventScaleSelect.value = "custom";
+  updateSamplingRecommendation();
+});
+maxPagesInput.addEventListener("input", () => updateSamplingRecommendation());
 setSortSelect.addEventListener("change", renderCurrentResults);
 viewModeSelect.addEventListener("change", renderCurrentResults);
 hideCheckedInput.addEventListener("change", renderCurrentResults);

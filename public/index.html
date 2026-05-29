@@ -28,8 +28,26 @@
             <input id="target-date" type="date" value="2026-05-30">
           </label>
           <label>
+            大会規模
+            <select id="event-scale">
+              <option value="spotlight" selected>Spotlight / 大型オープン</option>
+              <option value="premier">PT / RC級</option>
+              <option value="medium">中規模競技</option>
+              <option value="local">店舗/小規模</option>
+              <option value="custom">手動</option>
+            </select>
+          </label>
+          <label>
+            一般採用ライン
+            <input id="usage-threshold" type="number" min="0.1" max="10" step="0.1" value="1">
+          </label>
+          <label>
+            検出信頼度
+            <input id="confidence" type="number" min="80" max="99.9" step="0.1" value="95">
+          </label>
+          <label>
             検索デッキ/リスト数
-            <input id="max-pages" type="number" min="20" max="300" value="200">
+            <input id="max-pages" type="number" min="20" max="600" value="300">
           </label>
           <label>
             表示
@@ -70,6 +88,7 @@
 
       <section class="status" id="status">フォーマットを選んで検索できます。</section>
 
+      <section class="sampling-summary" id="sampling-summary"></section>
       <section class="environment-summary" id="environment-summary" hidden></section>
       <section class="summary" id="summary" hidden></section>
       <section class="deck-summary" id="deck-summary" hidden></section>

@@ -19,6 +19,9 @@ const relatedCache = new Map();
 
 const defaultSources = {
   standard: [
+    "https://www.hareruyamtg.com/ja/deck/",
+    "https://article.hareruyamtg.com/article/?s=%E3%82%B9%E3%82%BF%E3%83%B3%E3%83%80%E3%83%BC%E3%83%89",
+    "https://mtg-jp.com/coverage/",
     "https://www.mtggoldfish.com/metagame/standard",
     "https://mtgdecks.net/Standard/decklists",
     "https://magic.gg/decklists",
@@ -27,6 +30,9 @@ const defaultSources = {
     "https://mtgazone.com/decks/standard/"
   ],
   pioneer: [
+    "https://www.hareruyamtg.com/ja/deck/",
+    "https://article.hareruyamtg.com/article/?s=%E3%83%91%E3%82%A4%E3%82%AA%E3%83%8B%E3%82%A2",
+    "https://mtg-jp.com/coverage/",
     "https://www.mtggoldfish.com/metagame/pioneer",
     "https://mtgdecks.net/Pioneer/decklists",
     "https://magic.gg/decklists",
@@ -35,6 +41,9 @@ const defaultSources = {
     "https://mtgazone.com/decks/pioneer/"
   ],
   modern: [
+    "https://www.hareruyamtg.com/ja/deck/",
+    "https://article.hareruyamtg.com/article/?s=%E3%83%A2%E3%83%80%E3%83%B3",
+    "https://mtg-jp.com/coverage/",
     "https://www.mtggoldfish.com/metagame/modern",
     "https://mtgdecks.net/Modern/decklists",
     "https://magic.gg/decklists",
@@ -43,6 +52,9 @@ const defaultSources = {
     "https://mtgazone.com/decks/modern/"
   ],
   legacy: [
+    "https://www.hareruyamtg.com/ja/deck/",
+    "https://article.hareruyamtg.com/article/?s=%E3%83%AC%E3%82%AC%E3%82%B7%E3%83%BC",
+    "https://mtg-jp.com/coverage/",
     "https://www.mtggoldfish.com/metagame/legacy",
     "https://mtgdecks.net/Legacy/decklists",
     "https://magic.gg/decklists",
@@ -337,6 +349,15 @@ function extractLinks(html, baseUrl) {
     if (lower.includes("mtgo.com/decklists")) return true;
     if (lower.includes("mtgazone.com/deck/")) return true;
     if (lower.includes("mtgazone.com/decks/")) return true;
+    if (lower.includes("hareruyamtg.com/ja/deck/")) return true;
+    if (lower.includes("hareruyamtg.com/en/deck/")) return true;
+    if (lower.includes("article.hareruyamtg.com/article/")) return true;
+    if (lower.includes("mtg-jp.com/coverage/")) return true;
+    if (lower.includes("melee.gg/decklist/")) return true;
+    if (lower.includes("melee.gg/tournament/view/")) return true;
+    if (lower.includes("melee.gg/tournament/")) return true;
+    if (lower.includes("spellbinder.gg/events/")) return true;
+    if (lower.includes("spellbinder.gg/decks/")) return true;
     return false;
   });
 }
@@ -613,22 +634,22 @@ function findCardMentions(cards, pages) {
 }
 
 function makeVirtualObject(sourceCard, kind, name, note) {
+  const category = name.includes("Copy") ? "コピー" : kind === "Emblem" ? "紋章" : "裏向き";
   return {
     id: `${sourceCard.id}-${kind.toLowerCase()}-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     name,
     japaneseName: "",
     kind,
-    category: kind === "Emblem" ? "紋章" : "コピー/補助",
+    category,
     typeLine: `${kind} helper`,
     set: sourceCard.set,
-    setName: `${sourceCard.setName} / 補助`,
+    setName: sourceCard.setName,
     releasedAt: sourceCard.releasedAt || "",
     image: imageFor(sourceCard),
     scryfallUri: sourceCard.scryfallUri,
     note
   };
 }
-
 async function objectsForSource(source) {
   const produced = [];
   const parts = source.raw.all_parts || [];
@@ -766,7 +787,7 @@ async function handleTokenCards(req, res) {
   const sourceUrls = Array.isArray(body.sources) && body.sources.length
     ? body.sources
     : defaultSources[format] || defaultSources.standard;
-  const maxChildPages = Math.min(Number(body.maxChildPages || 200), 300);
+  const maxChildPages = Math.min(Number(body.maxChildPages || 300), 600);
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
   const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
