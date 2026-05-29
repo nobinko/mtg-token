@@ -1,9 +1,11 @@
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
 
 const root = resolve(".");
 const publicDir = join(root, "public");
+const cacheDir = join(root, ".cache", "pages");
 const port = Number(process.env.PORT || 5177);
 
 const jsonHeaders = { "content-type": "application/json; charset=utf-8" };
@@ -19,22 +21,62 @@ const defaultSources = {
   standard: [
     "https://www.mtggoldfish.com/metagame/standard",
     "https://mtgdecks.net/Standard/decklists",
-    "https://magic.gg/decklists"
+    "https://magic.gg/decklists",
+    "https://mtgtop8.com/format?f=ST",
+    "https://www.mtgo.com/decklists",
+    "https://mtgazone.com/decks/standard/"
   ],
   pioneer: [
     "https://www.mtggoldfish.com/metagame/pioneer",
     "https://mtgdecks.net/Pioneer/decklists",
-    "https://magic.gg/decklists"
+    "https://magic.gg/decklists",
+    "https://mtgtop8.com/format?f=PI",
+    "https://www.mtgo.com/decklists",
+    "https://mtgazone.com/decks/pioneer/"
   ],
   modern: [
     "https://www.mtggoldfish.com/metagame/modern",
     "https://mtgdecks.net/Modern/decklists",
-    "https://magic.gg/decklists"
+    "https://magic.gg/decklists",
+    "https://mtgtop8.com/format?f=MO",
+    "https://www.mtgo.com/decklists",
+    "https://mtgazone.com/decks/modern/"
   ],
   legacy: [
     "https://www.mtggoldfish.com/metagame/legacy",
     "https://mtgdecks.net/Legacy/decklists",
-    "https://magic.gg/decklists"
+    "https://magic.gg/decklists",
+    "https://mtgtop8.com/format?f=LE",
+    "https://www.mtgo.com/decklists"
+  ]
+};
+
+const formatEnvironmentEvents = {
+  standard: [
+    {
+      date: "2025-07-25",
+      affectsFormat: true,
+      type: "rotation",
+      title: "2025 Standard rotation at Edge of Eternities prerelease",
+      reason: "Edge of Eternities prerelease caused Standard rotation for tabletop play.",
+      sourceUrl: "https://magic.gg/news/metagame-mentor-the-winners-and-losers-from-standards-2025-rotation"
+    },
+    {
+      date: "2026-04-24",
+      affectsFormat: true,
+      type: "set-release",
+      title: "Secrets of Strixhaven tabletop release",
+      reason: "Secrets of Strixhaven became Standard legal, adding a new Standard-legal set.",
+      sourceUrl: "https://magic.wizards.com/en/news/feature/collecting-secrets-of-strixhaven"
+    },
+    {
+      date: "2026-05-18",
+      affectsFormat: false,
+      type: "banned-restricted",
+      title: "Banned and Restricted Announcement - May 18, 2026",
+      reason: "The latest B&R announcement did not change Standard, so it is shown as context but does not reset the environment start.",
+      sourceUrl: "https://magic.wizards.com/en/news/announcements/banned-and-restricted-may-18-2026"
+    }
   ]
 };
 
@@ -60,15 +102,67 @@ async function readBody(req) {
   return Buffer.concat(chunks).toString("utf8");
 }
 
-async function fetchText(url) {
+function cacheFileForUrl(url) {
+  const hash = createHash("sha256").update(url).digest("hex");
+  return join(cacheDir, `${hash}.json`);
+}
+
+async function readCachedPage(url) {
   if (pageCache.has(url)) return pageCache.get(url);
+  try {
+    const raw = await readFile(cacheFileForUrl(url), "utf8");
+    const cached = JSON.parse(raw);
+    if (cached?.url === url && cached.html) {
+      pageCache.set(url, cached);
+      return cached;
+    }
+  } catch {
+    // Cache miss.
+  }
+  return null;
+}
+
+async function writeCachedPage(entry) {
+  await mkdir(cacheDir, { recursive: true });
+  await writeFile(cacheFileForUrl(entry.url), JSON.stringify(entry), "utf8");
+  pageCache.set(entry.url, entry);
+}
+
+async function fetchPage(url, options = {}) {
+  const useCache = options.useCache !== false;
+  const refreshCache = options.refreshCache === true;
+  const cached = useCache && !refreshCache ? await readCachedPage(url) : null;
+  if (cached) return { ...cached, fromCache: true, staleCache: false };
+
   const response = await fetch(url, {
     headers: { "user-agent": userAgent, accept: "text/html,text/plain,*/*" }
+  }).catch(async (error) => {
+    const fallback = useCache ? await readCachedPage(url) : null;
+    if (fallback) return { fallback, error };
+    throw error;
   });
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-  const text = await response.text();
-  pageCache.set(url, text);
-  return text;
+
+  if (response.fallback) {
+    return { ...response.fallback, fromCache: true, staleCache: true };
+  }
+
+  if (!response.ok) {
+    const fallback = useCache ? await readCachedPage(url) : null;
+    if (fallback) return { ...fallback, fromCache: true, staleCache: true };
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+
+  const html = await response.text();
+  const entry = {
+    url,
+    title: extractTitle(html, url),
+    publishedDate: extractPublishedDate(html),
+    html,
+    text: normalizeText(html),
+    fetchedAt: new Date().toISOString()
+  };
+  await writeCachedPage(entry);
+  return { ...entry, fromCache: false, staleCache: false };
 }
 
 async function fetchJson(url) {
@@ -96,6 +190,70 @@ function extractTitle(html, url) {
   return normalizeText(match[1]).trim() || url;
 }
 
+function toIsoDate(value) {
+  if (!value) return "";
+  const direct = String(value).match(/\d{4}-\d{2}-\d{2}/)?.[0];
+  if (direct) return direct;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toISOString().slice(0, 10);
+}
+
+function extractPublishedDate(html) {
+  const patterns = [
+    /publishedDate:"([^"]+)"/i,
+    /"publishedDate":"([^"]+)"/i,
+    /property="article:published_time"\s+content="([^"]+)"/i,
+    /name="date"\s+content="([^"]+)"/i
+  ];
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    const date = toIsoDate(match?.[1]);
+    if (date) return date;
+  }
+  return "";
+}
+
+function isDateInEnvironment(date, environmentStartDate, targetDate) {
+  if (!date) return true;
+  const target = new Date(`${targetDate}T00:00:00Z`);
+  const start = new Date(`${environmentStartDate}T00:00:00Z`);
+  const current = new Date(`${date}T00:00:00Z`);
+  if (Number.isNaN(target.getTime()) || Number.isNaN(start.getTime()) || Number.isNaN(current.getTime())) return true;
+  return current >= start && current <= target;
+}
+
+function formatEnvironmentInfo(format, targetDate) {
+  const events = formatEnvironmentEvents[format] || [];
+  const applicable = events
+    .filter((event) => event.date <= targetDate)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  const resetEvent = [...applicable].reverse().find((event) => event.affectsFormat);
+  const contextEvents = applicable
+    .filter((event) => !event.affectsFormat && event.date >= (resetEvent?.date || "0000-00-00"))
+    .slice(-3);
+
+  if (!resetEvent) {
+    return {
+      format,
+      targetDate,
+      startDate: "",
+      reason: "環境開始日を自動判定できませんでした。日付の取れるデッキは大会日以前として扱います。",
+      resetEvent: null,
+      contextEvents
+    };
+  }
+
+  return {
+    format,
+    targetDate,
+    startDate: resetEvent.date,
+    reason: `${resetEvent.date} の ${resetEvent.title} により現在の${format.toUpperCase()}環境が始まったものとして扱います。`,
+    resetEvent,
+    contextEvents
+  };
+}
+
 function isDeckResultPage(url, sourceUrls) {
   const lower = url.toLowerCase();
   const sourceSet = new Set(sourceUrls.map((source) => source.toLowerCase()));
@@ -105,10 +263,49 @@ function isDeckResultPage(url, sourceUrls) {
   return sourceSet.has(lower) && !/\/metagame\/|\/decklists\/?$/i.test(lower);
 }
 
-function deckResultsFromPages(pages, sourceUrls) {
-  const deckPages = pages
-    .filter((page) => isDeckResultPage(page.url, sourceUrls))
-    .map((page) => ({ title: page.title, url: page.url }));
+function decodeEmbeddedDeckMarkup(html) {
+  return html
+    .replace(/\\u003C/g, "<")
+    .replace(/\\u003E/g, ">")
+    .replace(/\\u002F/g, "/")
+    .replace(/\\"/g, "\"")
+    .replace(/&quot;/g, "\"")
+    .replace(/&amp;/g, "&");
+}
+
+function extractDeckEntries(html, pageUrl, pageTitle, sourceUrls, pageDate = "") {
+  const decoded = decodeEmbeddedDeckMarkup(html);
+  const entries = [];
+  const pattern = /<deck-list\b([^>]*)>([\s\S]*?)<\/deck-list>/gi;
+  let match;
+  let index = 0;
+
+  while ((match = pattern.exec(decoded))) {
+    const attrs = match[1];
+    const body = match[2] || "";
+    const title = attrs.match(/\bdeck-title="([^"]+)"/i)?.[1]?.trim() || `Deck ${index + 1}`;
+    const subtitle = attrs.match(/\bsubtitle="([^"]+)"/i)?.[1]?.trim() || "";
+    const eventDate = toIsoDate(attrs.match(/\bevent-date="([^"]+)"/i)?.[1]) || pageDate;
+    entries.push({
+      title: subtitle ? `${title} - ${subtitle}` : title,
+      url: `${pageUrl}#deck-${index + 1}`,
+      pageTitle,
+      pageUrl,
+      eventDate,
+      text: normalizeText(body)
+    });
+    index += 1;
+  }
+
+  if (!entries.length && isDeckResultPage(pageUrl, sourceUrls)) {
+    entries.push({ title: pageTitle, url: pageUrl, pageTitle, pageUrl, eventDate: pageDate, text: normalizeText(html) });
+  }
+
+  return entries;
+}
+
+function deckResultsFromPages(pages) {
+  const deckPages = pages.flatMap((page) => page.deckEntries || []);
   const unique = new Map(deckPages.map((page) => [page.url, page]));
   return [...unique.values()];
 }
@@ -134,28 +331,53 @@ function extractLinks(html, baseUrl) {
     if (lower.includes("mtgdecks.net/modern/")) return true;
     if (lower.includes("mtgdecks.net/legacy/")) return true;
     if (lower.includes("magic.gg/decklists/")) return true;
+    if (lower.includes("mtgtop8.com/event")) return true;
+    if (lower.includes("mtgtop8.com/format")) return true;
+    if (lower.includes("mtgo.com/decklist/")) return true;
+    if (lower.includes("mtgo.com/decklists")) return true;
+    if (lower.includes("mtgazone.com/deck/")) return true;
+    if (lower.includes("mtgazone.com/decks/")) return true;
     return false;
   });
 }
 
-async function crawlSources(sourceUrls, maxChildPages) {
+async function crawlSources(sourceUrls, maxDecks, options = {}) {
   const pages = [];
   const errors = [];
+  const cacheStats = { hits: 0, staleHits: 0, network: 0 };
   const queue = [...new Set(sourceUrls.filter(Boolean))];
   const seen = new Set();
+  const targetDate = options.targetDate || new Date().toISOString().slice(0, 10);
+  const environmentStartDate = options.environmentStartDate || "2026-04-24";
+  let deckEntryCount = 0;
 
-  while (queue.length && pages.length < maxChildPages + sourceUrls.length) {
+  while (queue.length && deckEntryCount < maxDecks) {
     const url = queue.shift();
     if (!url || seen.has(url)) continue;
     seen.add(url);
 
     try {
-      const html = await fetchText(url);
-      pages.push({ url, title: extractTitle(html, url), text: normalizeText(html) });
+      const page = await fetchPage(url, options);
+      const allDeckEntries = extractDeckEntries(page.html, url, page.title, sourceUrls, page.publishedDate || "");
+      const deckEntries = allDeckEntries.filter((deck) => isDateInEnvironment(deck.eventDate, environmentStartDate, targetDate));
+      pages.push({
+        url,
+        title: page.title,
+        publishedDate: page.publishedDate || "",
+        text: page.text,
+        fetchedAt: page.fetchedAt,
+        fromCache: page.fromCache,
+        staleCache: page.staleCache,
+        deckEntries
+      });
+      deckEntryCount += deckEntries.length;
+      if (page.fromCache) cacheStats.hits += 1;
+      else cacheStats.network += 1;
+      if (page.staleCache) cacheStats.staleHits += 1;
 
       if (pages.length <= sourceUrls.length) {
-        for (const link of extractLinks(html, url).slice(0, maxChildPages)) {
-          if (!seen.has(link) && queue.length < maxChildPages * 2) queue.push(link);
+        for (const link of extractLinks(page.html, url).slice(0, maxDecks)) {
+          if (!seen.has(link) && queue.length < maxDecks * 2) queue.push(link);
         }
       }
     } catch (error) {
@@ -163,7 +385,7 @@ async function crawlSources(sourceUrls, maxChildPages) {
     }
   }
 
-  return { pages, errors };
+  return { pages, errors, cacheStats, deckEntryCount };
 }
 
 async function fetchFinderCandidates(format) {
@@ -263,6 +485,22 @@ function objectCategory(item) {
   return item.kind === "Emblem" ? "紋章" : "トークン";
 }
 
+function displayCategory(item) {
+  const haystack = `${item.name} ${item.typeLine}`.toLowerCase();
+  if (haystack.includes("emblem")) return "紋章";
+  if (haystack.includes("copy")) return "コピー";
+  if (haystack.includes("treasure")) return "宝物";
+  if (haystack.includes("food")) return "食物";
+  if (haystack.includes("clue")) return "手掛かり";
+  if (haystack.includes("blood")) return "血";
+  if (haystack.includes("map")) return "地図";
+  if (haystack.includes("incubator")) return "培養器";
+  if (haystack.includes("role")) return "役割";
+  if (haystack.includes("army")) return "軍団";
+  if (haystack.includes("manifest") || haystack.includes("cloak") || haystack.includes("disguise")) return "裏向き";
+  return item.kind === "Emblem" ? "紋章" : "トークン";
+}
+
 function tokenHints(card) {
   const text = cardText(card);
   const hints = [];
@@ -311,24 +549,45 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function findNameInText(names, text) {
+  return names.some((name) => {
+    const pattern = new RegExp(`(^|[^a-z0-9])${escapeRegex(name.toLowerCase())}([^a-z0-9]|$)`, "i");
+    return pattern.test(text);
+  });
+}
+
 function findCardMentions(cards, pages) {
   const pageTexts = pages.map((page) => page.text.toLowerCase());
+  const deckEntries = pages.flatMap((page) => page.deckEntries || []);
   const results = [];
 
   for (const card of cards) {
     const names = [card.name, ...(card.card_faces || []).map((face) => face.name)].filter(Boolean);
     const mentionedSources = [];
+    const mentionedDecks = [];
 
-    for (let index = 0; index < pages.length; index += 1) {
-      const text = pageTexts[index];
-      const found = names.some((name) => {
-        const pattern = new RegExp(`(^|[^a-z0-9])${escapeRegex(name.toLowerCase())}([^a-z0-9]|$)`, "i");
-        return pattern.test(text);
-      });
-      if (found) mentionedSources.push(pages[index].url);
+    for (const deck of deckEntries) {
+      if (findNameInText(names, String(deck.text || "").toLowerCase())) {
+        mentionedDecks.push({
+          title: deck.title,
+          url: deck.url,
+          pageTitle: deck.pageTitle,
+          pageUrl: deck.pageUrl
+        });
+        mentionedSources.push(deck.pageUrl);
+      }
+    }
+
+    if (!mentionedDecks.length) {
+      for (let index = 0; index < pages.length; index += 1) {
+        if (findNameInText(names, pageTexts[index])) {
+          mentionedSources.push(pages[index].url);
+        }
+      }
     }
 
     if (mentionedSources.length) {
+      const uniqueDecks = [...new Map(mentionedDecks.map((deck) => [deck.url, deck])).values()];
       results.push({
         id: card.id,
         raw: card,
@@ -343,6 +602,8 @@ function findCardMentions(cards, pages) {
         oracleText: card.oracle_text || card.card_faces?.map((face) => `${face.name}: ${face.oracle_text}`).join("\n\n") || "",
         scryfallUri: card.scryfall_uri,
         tokenHints: tokenHints(card),
+        deckCount: uniqueDecks.length || mentionedSources.length,
+        decks: uniqueDecks.slice(0, 24),
         sources: [...new Set(mentionedSources)].slice(0, 8)
       });
     }
@@ -391,7 +652,7 @@ async function objectsForSource(source) {
         scryfallUri: related.scryfall_uri || source.scryfallUri,
         note: ""
       };
-      item.category = objectCategory(item);
+      item.category = displayCategory(item);
       item.japaneseName = await fetchJapaneseName(item.name);
       produced.push(item);
     } catch {
@@ -412,6 +673,13 @@ async function objectsForSource(source) {
     produced.push(makeVirtualObject(source, "Marker", "Face-down / Manifest helper", "予示・偽装・変装など。必要なら裏向き用の補助カードを用意。"));
   }
 
+  for (const item of produced) {
+    item.category = displayCategory(item);
+    if (item.name === "Copy token / copy marker") item.note = "コピー系。汎用コピー・トークンや空白トークンを探す。";
+    if (item.name.endsWith(" Emblem")) item.note = "紋章。該当プレインズウォーカーの紋章を探す。";
+    if (item.name === "Face-down / Manifest helper") item.note = "予示・偽装・変装など。必要なら裏向き用の補助カードを用意。";
+  }
+
   return produced;
 }
 
@@ -425,16 +693,22 @@ async function buildBulkObjects(matchedCards) {
       if (!byKey.has(key)) {
         byKey.set(key, {
           ...object,
+          deckCount: 0,
+          decks: [],
           sources: [],
           sourceCards: []
         });
       }
 
       const existing = byKey.get(key);
+      existing.deckCount += source.deckCount || 0;
+      existing.decks.push(...(source.decks || []));
       existing.sources.push(...source.sources);
       existing.sourceCards.push({
         name: source.name,
         japaneseName: source.japaneseName || "",
+        deckCount: source.deckCount || 0,
+        decks: source.decks || [],
         set: source.set,
         setName: source.setName,
         releasedAt: source.releasedAt,
@@ -443,6 +717,8 @@ async function buildBulkObjects(matchedCards) {
         image: source.image,
         hints: source.tokenHints
       });
+      existing.decks = [...new Map(existing.decks.map((deck) => [deck.url, deck])).values()].slice(0, 36);
+      existing.deckCount = existing.decks.length || existing.deckCount;
       existing.sources = [...new Set(existing.sources)].slice(0, 12);
     }
   }
@@ -490,11 +766,17 @@ async function handleTokenCards(req, res) {
   const sourceUrls = Array.isArray(body.sources) && body.sources.length
     ? body.sources
     : defaultSources[format] || defaultSources.standard;
-  const maxChildPages = Math.min(Number(body.maxChildPages || 24), 48);
+  const maxChildPages = Math.min(Number(body.maxChildPages || 200), 300);
+  const useCache = body.useCache !== false;
+  const refreshCache = body.refreshCache === true;
+  const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
+  const environment = formatEnvironmentInfo(format, targetDate);
+  const environmentStartDate = toIsoDate(body.environmentStartDate) || environment.startDate || "0000-00-00";
+  environment.startDate = environmentStartDate;
 
   const [candidates, crawl] = await Promise.all([
     fetchFinderCandidates(format),
-    crawlSources(sourceUrls, maxChildPages)
+    crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate, environmentStartDate })
   ]);
 
   const matched = findCardMentions(candidates, crawl.pages);
@@ -503,13 +785,17 @@ async function handleTokenCards(req, res) {
   }
 
   const objects = await buildBulkObjects(matched.slice(0, 100));
-  const deckResults = deckResultsFromPages(crawl.pages, sourceUrls);
+  const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
 
   sendJson(res, 200, {
     format,
+    targetDate,
+    environmentStartDate,
+    environment,
     sourceUrls,
     scannedPages: crawl.pages.map((page) => page.url),
     errors: crawl.errors,
+    cacheStats: crawl.cacheStats,
     searchedDecks: deckResults,
     searchedDeckCount: deckResults.length,
     candidateCount: candidates.length,
@@ -544,6 +830,13 @@ const server = createServer(async (req, res) => {
   try {
     if (req.method === "GET" && req.url === "/api/default-sources") {
       sendJson(res, 200, defaultSources);
+      return;
+    }
+
+    if (req.method === "POST" && req.url === "/api/cache/clear") {
+      await rm(cacheDir, { recursive: true, force: true });
+      pageCache.clear();
+      sendJson(res, 200, { ok: true });
       return;
     }
 

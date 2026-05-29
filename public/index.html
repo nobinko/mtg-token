@@ -11,7 +11,7 @@
       <section class="toolbar" aria-label="検索条件">
         <div>
           <h1>MTG Token Finder</h1>
-          <p>デッキリストから、バルクのトークン束で探す現物をエキスパンションごとに出します。</p>
+          <p>デッキリストから、バルクのトークン束で探す現物を抜き出すための準備表です。</p>
         </div>
         <form id="search-form" class="controls">
           <label>
@@ -24,8 +24,19 @@
             </select>
           </label>
           <label>
-            巡回ページ数
-            <input id="max-pages" type="number" min="4" max="48" value="24">
+            大会日
+            <input id="target-date" type="date" value="2026-05-30">
+          </label>
+          <label>
+            検索デッキ/リスト数
+            <input id="max-pages" type="number" min="20" max="300" value="200">
+          </label>
+          <label>
+            表示
+            <select id="view-mode">
+              <option value="set" selected>エキスパンション順</option>
+              <option value="kind">種類別</option>
+            </select>
           </label>
           <label>
             エキスパンション順
@@ -34,7 +45,21 @@
               <option value="asc">発売日 古い順</option>
             </select>
           </label>
+          <label class="check-control">
+            <input id="hide-checked" type="checkbox">
+            未チェックだけ
+          </label>
+          <label class="check-control">
+            <input id="use-cache" type="checkbox" checked>
+            巡回キャッシュを使う
+          </label>
+          <label class="check-control">
+            <input id="refresh-cache" type="checkbox">
+            今回は再取得
+          </label>
           <button id="search-button" type="submit">検索</button>
+          <button id="print-button" type="button">印刷</button>
+          <button id="clear-cache-button" type="button">キャッシュ削除</button>
         </form>
       </section>
 
@@ -45,6 +70,7 @@
 
       <section class="status" id="status">フォーマットを選んで検索できます。</section>
 
+      <section class="environment-summary" id="environment-summary" hidden></section>
       <section class="summary" id="summary" hidden></section>
       <section class="deck-summary" id="deck-summary" hidden></section>
 
@@ -66,6 +92,10 @@
 
     <template id="object-template">
       <article class="card">
+        <label class="picked-control">
+          <input class="picked-checkbox" type="checkbox">
+          <span>抜いた</span>
+        </label>
         <a class="image-link" target="_blank" rel="noreferrer">
           <img alt="" loading="lazy">
         </a>
@@ -78,8 +108,13 @@
             <span class="kind"></span>
           </div>
           <p class="type"></p>
+          <div class="object-meta">
+            <span class="deck-count"></span>
+            <span class="set-pill"></span>
+          </div>
           <p class="note"></p>
           <div class="hints"></div>
+          <div class="source-preview"></div>
           <details>
             <summary>これを出すカード / 採用元</summary>
             <ul class="source-card-list"></ul>
