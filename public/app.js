@@ -576,7 +576,7 @@ async function runSearch(event) {
   deckSummaryEl.hidden = true;
   deckSummaryEl.replaceChildren();
   resultsEl.replaceChildren();
-  setStatus("検索中。200件規模だとScryfall照合、関連トークン取得、各サイト巡回でしばらく時間がかかります。");
+  setStatus("検索中。数百件規模だとScryfall照合、関連トークン取得、各サイト巡回でしばらく時間がかかります。");
 
   try {
     const response = await fetch("/api/token-cards", {
