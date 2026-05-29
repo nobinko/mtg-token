@@ -15,6 +15,8 @@ const statusEl = document.querySelector("#status");
 const samplingSummaryEl = document.querySelector("#sampling-summary");
 const environmentSummaryEl = document.querySelector("#environment-summary");
 const summaryEl = document.querySelector("#summary");
+const archetypeSummaryEl = document.querySelector("#archetype-summary");
+const tokenSummaryEl = document.querySelector("#token-summary");
 const deckSummaryEl = document.querySelector("#deck-summary");
 const resultsEl = document.querySelector("#results");
 const searchButton = document.querySelector("#search-button");
@@ -28,6 +30,8 @@ const checkedStorageKey = "mtg-token-finder.checked";
 let defaultSources = {};
 let lastGroups = [];
 let lastObjects = [];
+let showAllDecks = false;
+let lastSearchedDeckCount = 0;
 let checkedObjects = readCheckedObjects();
 
 const eventScaleProfiles = {
@@ -110,7 +114,7 @@ function updateSamplingRecommendation({ applyDeckCount = false } = {}) {
 
   const explanation = document.createElement("div");
   explanation.className = "sampling-explanation";
-  explanation.textContent = `${profile?.label || "手動設定"}。この数を見ると、使用率${usageThresholdInput.value}%以上のトークン発生源を${confidenceInput.value}%以上の確率で見つけられる想定です。`;
+  explanation.textContent = `${profile?.label || "手動設定"}。この数を見ると、使用率${usageThresholdInput.value}%以上のトークン発生源を${confidenceInput.value}%以上の確率で見つけられる想定です。上限600は、0.5%以上のかなり薄い採用まで95%で拾う目安に合わせています。`;
   samplingSummaryEl.append(explanation);
 }
 
@@ -175,15 +179,16 @@ function renderEnvironmentSummary(environment) {
 function renderDeckSummary(decks) {
   deckSummaryEl.hidden = false;
   deckSummaryEl.replaceChildren();
+  const visibleDecks = showAllDecks ? decks : decks.slice(0, 48);
 
   const heading = document.createElement("div");
   heading.className = "deck-summary-heading";
-  heading.textContent = `検索したデッキ/リスト: ${decks.length}件`;
+  heading.textContent = `検索したデッキ/リスト: ${decks.length}件（表示 ${visibleDecks.length}件）`;
   deckSummaryEl.append(heading);
 
   const list = document.createElement("div");
   list.className = "deck-chip-list";
-  for (const deck of decks.slice(0, 48)) {
+  for (const deck of visibleDecks) {
     const link = document.createElement("a");
     link.className = "deck-chip";
     link.href = deck.pageUrl || deck.url;
@@ -193,6 +198,129 @@ function renderDeckSummary(decks) {
     list.append(link);
   }
   deckSummaryEl.append(list);
+
+  if (decks.length > 48) {
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "deck-toggle";
+    toggle.textContent = showAllDecks ? "先頭48件だけ表示" : `全${decks.length}件を表示`;
+    toggle.addEventListener("click", () => {
+      showAllDecks = !showAllDecks;
+      renderDeckSummary(decks);
+    });
+    deckSummaryEl.append(toggle);
+  }
+}
+
+function renderArchetypeSummary(archetypes) {
+  archetypeSummaryEl.hidden = false;
+  archetypeSummaryEl.replaceChildren();
+  const sortedArchetypes = [...(archetypes || [])].sort((a, b) => (b.count || 0) - (a.count || 0) || String(a.name).localeCompare(String(b.name)));
+
+  const heading = document.createElement("div");
+  heading.className = "deck-summary-heading";
+  heading.textContent = "メタ傾向";
+  archetypeSummaryEl.append(heading);
+
+  const chartWrap = document.createElement("div");
+  chartWrap.className = "meta-chart-wrap";
+  chartWrap.append(renderMetaChart(sortedArchetypes));
+
+  const list = document.createElement("div");
+  list.className = "archetype-list";
+  for (const item of sortedArchetypes.slice(0, 10)) {
+    const row = document.createElement("div");
+    row.className = "archetype-row";
+    const color = archetypeColor(item.name);
+    row.innerHTML = `<i style="background:${color}"></i><span>${item.name}</span><strong>${item.percent}%</strong><em>${item.count} decks</em>`;
+    list.append(row);
+  }
+  chartWrap.append(list);
+  archetypeSummaryEl.append(chartWrap);
+}
+
+function renderTokenSummary(objects) {
+  tokenSummaryEl.hidden = false;
+  tokenSummaryEl.replaceChildren();
+
+  const heading = document.createElement("div");
+  heading.className = "deck-summary-heading";
+  heading.textContent = "トークン頻度";
+  tokenSummaryEl.append(heading);
+
+  const list = document.createElement("div");
+  list.className = "token-rank-list";
+  for (const object of sortObjects(objects).slice(0, 12)) {
+    const priority = tokenPriority(object);
+    const row = document.createElement("div");
+    row.className = `token-rank-row ${priority.className}`;
+    row.innerHTML = `<span>${object.name}</span><strong>${priority.percent.toFixed(1)}%</strong><em>${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks</em><b>${priority.label}</b>`;
+    list.append(row);
+  }
+  tokenSummaryEl.append(list);
+}
+
+function archetypeColor(name) {
+  const palette = ["#176a63", "#b7791f", "#6d5bd0", "#c2410c", "#2563eb", "#7f1d1d", "#4d7c0f", "#be185d", "#0f766e", "#64748b", "#9a3412"];
+  let hash = 0;
+  for (const char of String(name)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return palette[hash % palette.length];
+}
+
+function polarToCartesian(cx, cy, r, angle) {
+  const radians = (angle - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(radians), y: cy + r * Math.sin(radians) };
+}
+
+function donutSegment(cx, cy, r, startAngle, endAngle) {
+  const start = polarToCartesian(cx, cy, r, endAngle);
+  const end = polarToCartesian(cx, cy, r, startAngle);
+  const largeArc = endAngle - startAngle <= 180 ? 0 : 1;
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y}`;
+}
+
+function renderMetaChart(archetypes) {
+  const svgNs = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("class", "meta-chart");
+  svg.setAttribute("viewBox", "0 0 220 220");
+  svg.setAttribute("role", "img");
+
+  const top = archetypes.slice(0, 10);
+  const total = top.reduce((sum, item) => sum + item.count, 0) || 1;
+  let angle = 0;
+  for (const item of top) {
+    const span = item.count / total * 360;
+    const path = document.createElementNS(svgNs, "path");
+    path.setAttribute("d", donutSegment(110, 110, 82, angle, angle + span));
+    path.setAttribute("stroke", archetypeColor(item.name));
+    path.setAttribute("stroke-width", "36");
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke-linecap", "butt");
+    const title = document.createElementNS(svgNs, "title");
+    title.textContent = `${item.name}: ${item.percent}%`;
+    path.append(title);
+    svg.append(path);
+    angle += span;
+  }
+
+  const center = document.createElementNS(svgNs, "text");
+  center.setAttribute("x", "110");
+  center.setAttribute("y", "105");
+  center.setAttribute("text-anchor", "middle");
+  center.setAttribute("class", "meta-chart-main");
+  center.textContent = `${archetypes.length}`;
+  svg.append(center);
+
+  const sub = document.createElementNS(svgNs, "text");
+  sub.setAttribute("x", "110");
+  sub.setAttribute("y", "128");
+  sub.setAttribute("text-anchor", "middle");
+  sub.setAttribute("class", "meta-chart-sub");
+  sub.textContent = "types";
+  svg.append(sub);
+
+  return svg;
 }
 
 function renderTags(container, labels) {
@@ -224,6 +352,13 @@ function sortObjects(objects) {
     if (categoryOrder) return categoryOrder;
     return a.name.localeCompare(b.name);
   });
+}
+
+function tokenPriority(object) {
+  const percent = lastSearchedDeckCount ? (object.deckCount || 0) / lastSearchedDeckCount * 100 : 0;
+  if (percent >= 10) return { label: "よく出る", className: "priority-high", percent };
+  if (percent >= 3) return { label: "注意", className: "priority-mid", percent };
+  return { label: "念のため", className: "priority-low", percent };
 }
 
 function visibleObjects(objects) {
@@ -273,9 +408,16 @@ function renderSourcePreview(container, sourceCards) {
       img.alt = "";
       img.loading = "lazy";
       link.append(img);
+      const preview = document.createElement("img");
+      preview.className = "source-mini-preview";
+      preview.src = card.image;
+      preview.alt = "";
+      preview.loading = "lazy";
+      link.append(preview);
     }
     const span = document.createElement("span");
-    span.textContent = card.name;
+    const archetypeText = (card.archetypes || []).slice(0, 2).map((item) => item.name).join(", ");
+    span.textContent = archetypeText ? `${card.name} / ${archetypeText}` : card.name;
     link.append(span);
     container.append(link);
   }
@@ -321,12 +463,20 @@ function renderObject(object) {
   jp.textContent = object.japaneseName || "日本語名未取得";
   kind.textContent = object.category || object.kind;
   type.textContent = object.typeLine;
-  deckCount.textContent = `${object.deckCount || 0} decks`;
+  const priority = tokenPriority(object);
+  deckCount.textContent = `${priority.label}: ${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks (${priority.percent.toFixed(1)}%)`;
+  deckCount.classList.add(priority.className);
   setPill.textContent = `${object.set}${object.releasedAt ? ` / ${object.releasedAt}` : ""}`;
   note.textContent = object.note || "";
   note.hidden = !object.note;
 
   renderTags(hints, [object.kind, object.category].filter(Boolean));
+  const bar = document.createElement("div");
+  bar.className = "token-frequency";
+  const fill = document.createElement("span");
+  fill.style.width = `${Math.min(priority.percent, 100)}%`;
+  bar.append(fill);
+  hints.append(bar);
   renderSourcePreview(sourcePreview, object.sourceCards);
 
   for (const sourceCard of object.sourceCards || []) {
@@ -419,6 +569,10 @@ async function runSearch(event) {
   environmentSummaryEl.hidden = true;
   environmentSummaryEl.replaceChildren();
   summaryEl.hidden = true;
+  archetypeSummaryEl.hidden = true;
+  archetypeSummaryEl.replaceChildren();
+  tokenSummaryEl.hidden = true;
+  tokenSummaryEl.replaceChildren();
   deckSummaryEl.hidden = true;
   deckSummaryEl.replaceChildren();
   resultsEl.replaceChildren();
@@ -442,9 +596,13 @@ async function runSearch(event) {
 
     lastGroups = data.groups || [];
     lastObjects = data.objects || [];
+    lastSearchedDeckCount = data.searchedDeckCount || 0;
+    showAllDecks = false;
     setStatus("検索完了。チェックしながら、バルクのエキスパンション順または種類別で探せます。");
     renderEnvironmentSummary(data.environment || {});
     renderSummary(data);
+    renderArchetypeSummary(data.archetypes || []);
+    renderTokenSummary(lastObjects);
     renderDeckSummary(data.searchedDecks || []);
     renderCurrentResults();
   } catch (error) {

@@ -17,6 +17,82 @@ const japaneseCache = new Map();
 const pageCache = new Map();
 const relatedCache = new Map();
 
+const tokenJapaneseNameMap = new Map([
+  ["Treasure", "宝物"],
+  ["Food", "食物"],
+  ["Clue", "手掛かり"],
+  ["Blood", "血"],
+  ["Map", "地図"],
+  ["Powerstone", "パワーストーン"],
+  ["Copy", "コピー"],
+  ["Copy token / copy marker", "コピー・トークン/コピー用マーカー"],
+  ["Face-down / Manifest helper", "裏向き/予示用補助"],
+  ["Drone", "ドローン"],
+  ["Lander", "着陸船"],
+  ["Faerie", "フェアリー"],
+  ["Scion of the Deep", "深海の末裔"],
+  ["Kithkin", "キスキン"],
+  ["Detective", "探偵"],
+  ["Skeleton Pirate", "スケルトン・海賊"],
+  ["Skeleton", "スケルトン"],
+  ["Ox", "雄牛"],
+  ["Fractal", "フラクタル"],
+  ["Inkling", "墨獣"],
+  ["Mutagen", "ミュータジェン"],
+  ["Golem", "ゴーレム"],
+  ["Gnome", "ノーム"],
+  ["Rat", "ネズミ"],
+  ["Elf Warrior", "エルフ・戦士"],
+  ["Army", "軍団"],
+  ["Incubator", "培養器"],
+  ["Fish", "魚"],
+  ["Otter", "カワウソ"],
+  ["Monk", "モンク"],
+  ["Robot", "ロボット"],
+  ["Drake", "ドレイク"],
+  ["Soldier", "兵士"],
+  ["Human Soldier", "人間・兵士"],
+  ["Pilot", "操縦士"],
+  ["Vehicle", "機体"],
+  ["Ally", "同盟者"],
+  ["Bat", "コウモリ"],
+  ["Rabbit", "兎"],
+  ["Wall", "壁"],
+  ["Horror", "ホラー"],
+  ["Toy", "玩具"],
+  ["Warrior", "戦士"],
+  ["Knight", "騎士"],
+  ["Wizard", "ウィザード"],
+  ["Rogue", "ならず者"],
+  ["Samurai", "侍"],
+  ["Ninja", "忍者"],
+  ["Shark", "サメ"],
+  ["Demon", "デーモン"],
+  ["Angel", "天使"],
+  ["Dragon", "ドラゴン"],
+  ["Insect", "昆虫"],
+  ["Saproling", "苗木"],
+  ["Citizen", "市民"],
+  ["Mercenary", "傭兵"],
+  ["Mouse", "ハツカネズミ"],
+  ["Raccoon", "アライグマ"],
+  ["Lizard", "トカゲ"],
+  ["Frog", "カエル"],
+  ["Glimmer", "光霊"],
+  ["Zombie", "ゾンビ"],
+  ["Spirit", "スピリット"],
+  ["Goblin", "ゴブリン"],
+  ["Thopter", "飛行機械"],
+  ["Bird", "鳥"],
+  ["Cat", "猫"],
+  ["Dog", "犬"],
+  ["Beast", "ビースト"],
+  ["Elemental", "エレメンタル"],
+  ["Dinosaur", "恐竜"],
+  ["Vampire", "吸血鬼"],
+  ["Phyrexian", "ファイレクシアン"]
+]);
+
 const defaultSources = {
   standard: [
     "https://www.hareruyamtg.com/ja/deck/",
@@ -285,6 +361,52 @@ function decodeEmbeddedDeckMarkup(html) {
     .replace(/&amp;/g, "&");
 }
 
+function extractDeckCardNames(deckText) {
+  const names = [];
+  const lines = String(deckText || "").split(/\r?\n/);
+  for (const line of lines) {
+    const clean = line
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\\u002F/g, "/")
+      .replace(/\s+/g, " ")
+      .trim();
+    const match = clean.match(/^\d+\s+(.+)$/);
+    if (!match) continue;
+    const name = match[1].replace(/\s+\(.+\)$/g, "").trim();
+    if (name) names.push(name);
+  }
+  return [...new Set(names)];
+}
+
+const archetypeRules = [
+  { name: "Izzet Prowess", cards: ["Slickshot Show-Off", "Stormchaser's Talent", "Monstrous Rage", "Sleight of Hand", "Opt"] },
+  { name: "Izzet Spells", cards: ["Eddymurk Crab", "Hearth Elemental", "Prismari Charm", "Opt"] },
+  { name: "Mono-Green Landfall", cards: ["Mossborn Hydra", "Sazh's Chocobo", "Traveling Chocobo", "Llanowar Elves"] },
+  { name: "Dimir Midrange", cards: ["Kaito, Bane of Nightmares", "Deep-Cavern Bat", "Faerie Mastermind", "Go for the Throat"] },
+  { name: "Esper Pixie", cards: ["Nurturing Pixie", "Hopeless Nightmare", "Stormchaser's Talent", "This Town Ain't Big Enough"] },
+  { name: "Domain Overlords", cards: ["Overlord of the Hauntwoods", "Overlord of the Mistmoors", "Leyline Binding", "Zur, Eternal Schemer"] },
+  { name: "Jeskai Control", cards: ["Jeskai Revelation", "Stock Up", "Day of Judgment", "Get Lost"] },
+  { name: "Four-Color Control", cards: ["Jeskai Revelation", "Stock Up", "Get Lost", "Herd Migration"] },
+  { name: "Golgari Midrange", cards: ["Mosswood Dreadknight", "Glissa Sunslayer", "Cut Down", "Go for the Throat"] },
+  { name: "Azorius Control", cards: ["Temporary Lockdown", "No More Lies", "Sunfall", "Get Lost"] },
+  { name: "Boros Convoke", cards: ["Knight-Errant of Eos", "Voldaren Epicure", "Gleeful Demolition", "Imodane's Recruiter"] },
+  { name: "Mono-Red Aggro", cards: ["Monastery Swiftspear", "Slickshot Show-Off", "Burst Lightning", "Lightning Strike"] }
+];
+
+function inferArchetypeFromCards(cards, fallbackName) {
+  const cardSet = new Set(cards);
+  let best = { name: "", hits: 0, ratio: 0 };
+  for (const rule of archetypeRules) {
+    const hits = rule.cards.filter((card) => cardSet.has(card)).length;
+    const ratio = hits / rule.cards.length;
+    if (hits > best.hits || (hits === best.hits && ratio > best.ratio)) {
+      best = { name: rule.name, hits, ratio };
+    }
+  }
+  if (best.hits >= 2 || best.ratio >= 0.5) return best.name;
+  return fallbackName;
+}
+
 function extractDeckEntries(html, pageUrl, pageTitle, sourceUrls, pageDate = "") {
   const decoded = decodeEmbeddedDeckMarkup(html);
   const entries = [];
@@ -295,25 +417,45 @@ function extractDeckEntries(html, pageUrl, pageTitle, sourceUrls, pageDate = "")
   while ((match = pattern.exec(decoded))) {
     const attrs = match[1];
     const body = match[2] || "";
+    const cards = extractDeckCardNames(body);
     const title = attrs.match(/\bdeck-title="([^"]+)"/i)?.[1]?.trim() || `Deck ${index + 1}`;
     const subtitle = attrs.match(/\bsubtitle="([^"]+)"/i)?.[1]?.trim() || "";
+    const archetype = inferArchetypeFromCards(cards, subtitle || inferArchetype(title, pageTitle));
     const eventDate = toIsoDate(attrs.match(/\bevent-date="([^"]+)"/i)?.[1]) || pageDate;
     entries.push({
       title: subtitle ? `${title} - ${subtitle}` : title,
+      archetype,
       url: `${pageUrl}#deck-${index + 1}`,
       pageTitle,
       pageUrl,
       eventDate,
+      cards,
       text: normalizeText(body)
     });
     index += 1;
   }
 
   if (!entries.length && isDeckResultPage(pageUrl, sourceUrls)) {
-    entries.push({ title: pageTitle, url: pageUrl, pageTitle, pageUrl, eventDate: pageDate, text: normalizeText(html) });
+    const cards = extractDeckCardNames(html);
+    entries.push({ title: pageTitle, archetype: inferArchetypeFromCards(cards, inferArchetype(pageTitle, pageTitle)), url: pageUrl, pageTitle, pageUrl, eventDate: pageDate, cards, text: normalizeText(html) });
   }
 
   return entries;
+}
+
+function inferArchetype(title, fallback = "") {
+  const value = `${title || ""} ${fallback || ""}`;
+  if (/platinum|mythic|rank player|magic play|晴れる屋|hareruya|イベントカバレージ|coverage/i.test(value)) return "Unknown";
+  const cleaned = value
+    .replace(/\b(top|rank|player|decklist|decklists|standard|pioneer|modern|legacy|event|championship|regional|spotlight)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const separators = [" - ", " – ", " — ", " | ", ":"];
+  for (const separator of separators) {
+    const parts = cleaned.split(separator).map((part) => part.trim()).filter(Boolean);
+    if (parts.length > 1) return parts[parts.length - 1];
+  }
+  return cleaned || "Unknown";
 }
 
 function deckResultsFromPages(pages) {
@@ -453,6 +595,28 @@ async function fetchFinderCandidates(format) {
 async function fetchJapaneseName(cardName) {
   if (japaneseCache.has(cardName)) return japaneseCache.get(cardName);
 
+  if (tokenJapaneseNameMap.has(cardName)) {
+    const mapped = tokenJapaneseNameMap.get(cardName);
+    japaneseCache.set(cardName, mapped);
+    return mapped;
+  }
+
+  for (const [english, japanese] of tokenJapaneseNameMap.entries()) {
+    const pattern = new RegExp(`(^|[^A-Za-z])${escapeRegex(english)}([^A-Za-z]|$)`, "i");
+    if (pattern.test(cardName)) {
+      japaneseCache.set(cardName, japanese);
+      return japanese;
+    }
+  }
+
+  if (/ Emblem$/i.test(cardName)) {
+    const baseName = cardName.replace(/ Emblem$/i, "");
+    const baseJapanese = await fetchJapaneseName(baseName);
+    const mapped = baseJapanese ? `${baseJapanese}の紋章` : `${baseName}の紋章`;
+    japaneseCache.set(cardName, mapped);
+    return mapped;
+  }
+
   await sleep(scryfallDelayMs);
   const q = `!"${cardName}" lang:ja`;
   const url = `https://api.scryfall.com/cards/search?unique=prints&include_multilingual=true&q=${encodeURIComponent(q)}`;
@@ -475,6 +639,50 @@ async function fetchRelatedCard(part) {
   const card = await fetchJson(part.uri);
   relatedCache.set(part.uri, card);
   return card;
+}
+
+async function fetchJapanesePrint(cardName) {
+  const cacheKey = `print:${cardName}`;
+  if (japaneseCache.has(cacheKey)) return japaneseCache.get(cacheKey);
+  await sleep(scryfallDelayMs);
+  const q = `!"${cardName}" lang:ja`;
+  const url = `https://api.scryfall.com/cards/search?unique=prints&include_multilingual=true&q=${encodeURIComponent(q)}`;
+  try {
+    const data = await fetchJson(url);
+    const card = data.data?.find((item) => item.lang === "ja") || null;
+    japaneseCache.set(cacheKey, card);
+    return card;
+  } catch {
+    japaneseCache.set(cacheKey, null);
+    return null;
+  }
+}
+
+function relatedPartKey(part) {
+  return `${part.name || ""}|${part.type_line || ""}`.toLowerCase();
+}
+
+async function fetchJapaneseRelatedObjectName(sourceName, relatedObject) {
+  const sourceJa = await fetchJapanesePrint(sourceName);
+  const relatedParts = sourceJa?.all_parts || [];
+  const targetKey = relatedPartKey(relatedObject);
+  const targetName = String(relatedObject.name || "").toLowerCase();
+  const targetType = String(relatedObject.type_line || "").toLowerCase();
+  const match = relatedParts.find((part) => {
+    const partKey = relatedPartKey(part);
+    if (partKey === targetKey) return true;
+    const partName = String(part.name || "").toLowerCase();
+    const partType = String(part.type_line || "").toLowerCase();
+    return partName === targetName && partType === targetType;
+  });
+
+  if (!match?.uri) return "";
+  try {
+    const jaRelated = await fetchRelatedCard(match);
+    return jaRelated?.printed_name || jaRelated?.name || "";
+  } catch {
+    return "";
+  }
 }
 
 function cardText(card) {
@@ -577,6 +785,12 @@ function findNameInText(names, text) {
   });
 }
 
+function findNameInDeck(names, deck) {
+  const cardNames = deck.cards || [];
+  if (cardNames.some((cardName) => names.some((name) => cardName.toLowerCase() === name.toLowerCase()))) return true;
+  return findNameInText(names, String(deck.text || "").toLowerCase());
+}
+
 function findCardMentions(cards, pages) {
   const pageTexts = pages.map((page) => page.text.toLowerCase());
   const deckEntries = pages.flatMap((page) => page.deckEntries || []);
@@ -588,9 +802,10 @@ function findCardMentions(cards, pages) {
     const mentionedDecks = [];
 
     for (const deck of deckEntries) {
-      if (findNameInText(names, String(deck.text || "").toLowerCase())) {
+      if (findNameInDeck(names, deck)) {
         mentionedDecks.push({
           title: deck.title,
+          archetype: deck.archetype || "Unknown",
           url: deck.url,
           pageTitle: deck.pageTitle,
           pageUrl: deck.pageUrl
@@ -674,7 +889,7 @@ async function objectsForSource(source) {
         note: ""
       };
       item.category = displayCategory(item);
-      item.japaneseName = await fetchJapaneseName(item.name);
+      item.japaneseName = await fetchJapaneseRelatedObjectName(source.name, related) || await fetchJapaneseName(item.name);
       produced.push(item);
     } catch {
       // Keep going if Scryfall omits a related object.
@@ -696,6 +911,7 @@ async function objectsForSource(source) {
 
   for (const item of produced) {
     item.category = displayCategory(item);
+    if (!item.japaneseName) item.japaneseName = await fetchJapaneseName(item.name);
     if (item.name === "Copy token / copy marker") item.note = "コピー系。汎用コピー・トークンや空白トークンを探す。";
     if (item.name.endsWith(" Emblem")) item.note = "紋章。該当プレインズウォーカーの紋章を探す。";
     if (item.name === "Face-down / Manifest helper") item.note = "予示・偽装・変装など。必要なら裏向き用の補助カードを用意。";
@@ -730,6 +946,7 @@ async function buildBulkObjects(matchedCards) {
         japaneseName: source.japaneseName || "",
         deckCount: source.deckCount || 0,
         decks: source.decks || [],
+        archetypes: archetypeStats(source.decks || []),
         set: source.set,
         setName: source.setName,
         releasedAt: source.releasedAt,
@@ -740,6 +957,7 @@ async function buildBulkObjects(matchedCards) {
       });
       existing.decks = [...new Map(existing.decks.map((deck) => [deck.url, deck])).values()].slice(0, 36);
       existing.deckCount = existing.decks.length || existing.deckCount;
+      existing.archetypes = archetypeStats(existing.decks);
       existing.sources = [...new Set(existing.sources)].slice(0, 12);
     }
   }
@@ -751,6 +969,32 @@ async function buildBulkObjects(matchedCards) {
     if (categoryOrder) return categoryOrder;
     return a.name.localeCompare(b.name);
   });
+}
+
+function archetypeStats(decks) {
+  const counts = new Map();
+  for (const deck of decks || []) {
+    const name = deck.archetype || "Unknown";
+    if (name === "Unknown") continue;
+    counts.set(name, (counts.get(name) || 0) + 1);
+  }
+  const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
+  return [...counts.entries()]
+    .map(([name, count]) => ({
+      name,
+      count,
+      percent: total ? Math.round((count / total) * 1000) / 10 : 0
+    }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+function overallArchetypeStats(decks) {
+  const stats = archetypeStats(decks);
+  const total = decks.length || 1;
+  return stats.map((item) => ({
+    ...item,
+    percent: Math.round((item.count / total) * 1000) / 10
+  }));
 }
 
 function groupObjectsBySet(objects) {
@@ -807,6 +1051,7 @@ async function handleTokenCards(req, res) {
 
   const objects = await buildBulkObjects(matched.slice(0, 100));
   const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
+  const archetypes = overallArchetypeStats(deckResults);
 
   sendJson(res, 200, {
     format,
@@ -819,6 +1064,7 @@ async function handleTokenCards(req, res) {
     cacheStats: crawl.cacheStats,
     searchedDecks: deckResults,
     searchedDeckCount: deckResults.length,
+    archetypes,
     candidateCount: candidates.length,
     cards: matched.map(({ raw, ...card }) => card),
     objects,
