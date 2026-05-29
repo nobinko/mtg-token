@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MTG Token Finder</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <section class="toolbar" aria-label="検索条件">
+        <div>
+          <h1>MTG Token Finder</h1>
+          <p>デッキリストから、バルクのトークン束で探す現物をエキスパンションごとに出します。</p>
+        </div>
+        <form id="search-form" class="controls">
+          <label>
+            フォーマット
+            <select id="format">
+              <option value="standard" selected>Standard</option>
+              <option value="pioneer">Pioneer</option>
+              <option value="modern">Modern</option>
+              <option value="legacy">Legacy</option>
+            </select>
+          </label>
+          <label>
+            巡回ページ数
+            <input id="max-pages" type="number" min="4" max="48" value="24">
+          </label>
+          <label>
+            エキスパンション順
+            <select id="set-sort">
+              <option value="desc" selected>発売日 新しい順</option>
+              <option value="asc">発売日 古い順</option>
+            </select>
+          </label>
+          <button id="search-button" type="submit">検索</button>
+        </form>
+      </section>
+
+      <section class="sources">
+        <label for="sources">巡回元URL</label>
+        <textarea id="sources" spellcheck="false"></textarea>
+      </section>
+
+      <section class="status" id="status">フォーマットを選んで検索できます。</section>
+
+      <section class="summary" id="summary" hidden></section>
+      <section class="deck-summary" id="deck-summary" hidden></section>
+
+      <section class="results" id="results" aria-live="polite"></section>
+    </main>
+
+    <template id="set-template">
+      <section class="set-group">
+        <header class="set-header">
+          <div>
+            <p class="set-code"></p>
+            <h2></h2>
+          </div>
+          <span class="count"></span>
+        </header>
+        <div class="object-grid"></div>
+      </section>
+    </template>
+
+    <template id="object-template">
+      <article class="card">
+        <a class="image-link" target="_blank" rel="noreferrer">
+          <img alt="" loading="lazy">
+        </a>
+        <div class="card-body">
+          <div class="card-heading">
+            <div>
+              <h3></h3>
+              <p class="jp"></p>
+            </div>
+            <span class="kind"></span>
+          </div>
+          <p class="type"></p>
+          <p class="note"></p>
+          <div class="hints"></div>
+          <details>
+            <summary>これを出すカード / 採用元</summary>
+            <ul class="source-card-list"></ul>
+            <ul class="source-list"></ul>
+          </details>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
