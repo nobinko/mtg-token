@@ -5,5 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.4",
+    "hono": "^4.12.23"
   }
 }

@@ -32,6 +32,13 @@ http://localhost:5177
 - 直近環境内のデッキリストを巡回
 - デッキ内で使われているトークン生成カードを抽出
 - トークン、紋章、コピー、裏向き補助を候補化
+- 出来事（Adventure）・龍兆（Omen）カードのフェイス名を表示
+- 計画（Plot）カードを除外ゾーン追跡マーカーとして候補化
+- エンジン始動（Start Your Engines! / DFT）カードを対応
+- 昼夜変身（Daybound/Nightbound）マーカーを候補化
+- Impending（時間カウンター待機）カードを候補化
+- TDR: Endure（Spiritトークン）・Mobilize（Warriorトークン）・Behold（宝物）に対応
+- FIN: Job Select（Heroトークン）に対応
 - エキスパンション順と種類別を切り替え
 - 発売日の昇順/降順で並べ替え
 - 採用デッキ数を表示
@@ -106,7 +113,9 @@ n >= log(1 - confidence) / log(1 - p)
 2. 含まれない場合、既知の代表カードルールとの一致から推定する。
 3. それでも決まらないデッキは、同じ巡回結果の中でアーキタイプ名が付いたデッキから学習したプロファイルと照合する。
 
-3のプロファイルは、アーキタイプ名が付いたデッキを集計して「そのアーキタイプで40%以上のデッキに入っているカード」をコアカードとして抽出したものです。コアカードの30%以上かつ3枚以上が一致したアーキタイプに割り当てます。これにより、タグが付いていないデッキも実データから分類できます。
+3のプロファイルは、アーキタイプ名が付いたデッキを集計して「そのアーキタイプで40%以上のデッキに入っているカード」をコアカードとして抽出したものです。コアカードの25%以上かつ2枚以上が一致したアーキタイプに割り当てます。これにより、タグが付いていないデッキも実データから分類できます。
+
+アーキタイプ名の推定では、サイトのブランド名（晴れる屋・MTGGoldfish等）をタイトルから除去したうえで、Izzet/Dimiといったカラーワードや Aggro/Midrangeといった戦略ワードを含むセグメントを優先して抽出します。これにより、晴れる屋など日本語ソースのデッキ名も正しくアーキタイプとして認識されます。
 
 どのアーキタイプにも一致しないデッキは `Unknown` として扱いますが、メタ傾向のデッキ数には含めます。そのため、メタ傾向の合計デッキ数は検索デッキ数と一致します。
 
@@ -123,6 +132,25 @@ n >= log(1 - confidence) / log(1 - p)
 `.cache/` はGit管理しません。
 
 ## 更新履歴
+
+### 2026-05-30
+
+- サーバーを Hono + `@hono/node-server` に移行
+- `app.onError()` でエラーをJSON形式で返すよう統一
+- `lib/config.js` に `maxMatchedCards`・`scryfallCacheTtlMs` 定数を追加
+- Scryfall in-memory キャッシュに4時間TTLを追加
+- Standard環境イベント定義を `data/environment-events.json` に外部化（コード変更なしで更新可能）
+- `lib/crawl.js` のハードコードされた環境開始日を削除
+- `server.mjs` の静的ファイル配信 root を絶対パスから計算するよう修正
+- アーキタイプ推定（`inferArchetype`）を刷新: サイトブランド名を除去してカラー/戦略ワードで最良セグメントを選択。晴れる屋など日本語ソースでも正しく機能するように
+- アーキタイプ分類しきい値を `score>=0.25 && matches>=2` に緩和
+- Scryfall 候補クエリに Adventure・Omen・Start Your Engines!・Exhaust・Plot・Endure・Mobilize・Behold・Impending・Daybound/Nightbound・Job Select を追加
+- 計画（Plot）カードを除外ゾーン追跡マーカーとして候補化
+- 昼夜変身（Daybound/Nightbound）を夜昼マーカーとして候補化
+- Impending カードを時間カウンター待機マーカーとして候補化
+- 出来事（Adventure）・龍兆（Omen）のフェイス名を hints に表示
+- `displayCategory` に夜昼マーカー・計画マーカー・待機カウンター・龍兆・ジョブセレクトを追加
+- `.gitignore` に `node_modules/` を追加
 
 ### 2026-05-29
 
@@ -147,19 +175,26 @@ n >= log(1 - confidence) / log(1 - p)
 
 ## 開発
 
-サーバー側は `server.mjs`（HTTPルーティングのみ）と、責務ごとに分割した `lib/` で構成します。
+サーバー側は `server.mjs`（[Hono](https://hono.dev/) によるHTTPルーティング）と、責務ごとに分割した `lib/` で構成します。
+
+```
+npm install   # hono / @hono/node-server のみ
+npm start
+```
 
 | ファイル | 役割 |
 | --- | --- |
-| `lib/config.js` | ポート・パス・MIMEなどの定数 |
-| `lib/data.js` | トークン和名表、巡回元、環境イベントの静的データ |
+| `server.mjs` | Hono ルーティング・静的ファイル配信 |
+| `lib/config.js` | ポート・パス・定数（`maxMatchedCards`・`scryfallCacheTtlMs`） |
+| `lib/data.js` | トークン和名表・巡回元。環境イベントは `data/environment-events.json` を読み込む |
+| `data/environment-events.json` | Standard 環境イベント（B&R・ローテーション等）の定義。コード変更なしで更新可能 |
 | `lib/util.js` | 汎用ユーティリティ（日付・正規表現・画像URL・セット名） |
 | `lib/html.js` | HTMLからのタイトル・日付抽出とテキスト正規化 |
 | `lib/cache.js` | ページキャッシュ、`fetchPage` / `fetchJson` |
 | `lib/environment.js` | 環境開始日の判定 |
 | `lib/archetype.js` | アーキタイプ推定・プロファイル学習・集計 |
 | `lib/deck.js` | デッキリストとリンクの抽出 |
-| `lib/scryfall.js` | Scryfall API（候補取得・日本語名・関連カード） |
+| `lib/scryfall.js` | Scryfall API（候補取得・日本語名・関連カード）。in-memoryキャッシュに4時間TTL |
 | `lib/tokens.js` | トークン/紋章/コピー等の現物オブジェクト構築 |
 | `lib/search.js` | カード言及検索とデッキ集計 |
 | `lib/crawl.js` | 巡回元のクロール |

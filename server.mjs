@@ -1,7 +1,8 @@
-import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
-import { extname, resolve } from "node:path";
-import { port, jsonHeaders, mimeTypes, publicDir } from "./lib/config.js";
+import { relative } from "node:path";
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Hono } from "hono";
+import { port, publicDir, maxMatchedCards } from "./lib/config.js";
 import { defaultSources } from "./lib/data.js";
 import { toIsoDate } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
@@ -12,23 +13,21 @@ import { buildBulkObjects, groupObjectsBySet } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
 import { crawlSources } from "./lib/crawl.js";
 
-function sendJson(res, status, body) {
-  res.writeHead(status, jsonHeaders);
-  res.end(JSON.stringify(body));
-}
+const app = new Hono();
 
-async function readBody(req) {
-  const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
-  return Buffer.concat(chunks).toString("utf8");
-}
+app.get("/api/default-sources", (c) => c.json(defaultSources));
 
-async function handleTokenCards(req, res) {
-  const body = JSON.parse(await readBody(req) || "{}");
+app.post("/api/cache/clear", async (c) => {
+  await clearPageCache();
+  return c.json({ ok: true });
+});
+
+app.post("/api/token-cards", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
   const format = String(body.format || "standard").toLowerCase();
   const sourceUrls = Array.isArray(body.sources) && body.sources.length
     ? body.sources
-    : defaultSources[format] || defaultSources.standard;
+    : defaultSources[format] ?? defaultSources.standard;
   const maxChildPages = Math.min(Number(body.maxChildPages || 300), 600);
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
@@ -42,24 +41,24 @@ async function handleTokenCards(req, res) {
     crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate, environmentStartDate })
   ]);
 
-  const allDeckEntries = crawl.pages.flatMap((page) => page.deckEntries || []);
+  const allDeckEntries = crawl.pages.flatMap((page) => page.deckEntries ?? []);
   const profiles = buildArchetypeProfiles(allDeckEntries);
   for (const deck of allDeckEntries) {
     if (!deck.archetype || deck.archetype === "Unknown") {
-      deck.archetype = classifyByProfile(deck.cards || [], profiles);
+      deck.archetype = classifyByProfile(deck.cards ?? [], profiles);
     }
   }
 
   const matched = findCardMentions(candidates, crawl.pages);
-  for (const card of matched.slice(0, 100)) {
+  for (const card of matched.slice(0, maxMatchedCards)) {
     card.japaneseName = await fetchJapaneseName(card.name);
   }
 
-  const objects = await buildBulkObjects(matched.slice(0, 100));
+  const objects = await buildBulkObjects(matched.slice(0, maxMatchedCards));
   const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
   const archetypes = overallArchetypeStats(deckResults);
 
-  sendJson(res, 200, {
+  return c.json({
     format,
     targetDate,
     environmentStartDate,
@@ -72,54 +71,19 @@ async function handleTokenCards(req, res) {
     searchedDeckCount: deckResults.length,
     archetypes,
     candidateCount: candidates.length,
-    cards: matched.map(({ raw, ...card }) => card),
+    cards: matched.map(({ raw: _raw, ...card }) => card),
     objects,
     groups: groupObjectsBySet(objects)
   });
-}
-
-async function serveStatic(req, res) {
-  const requestPath = new URL(req.url, `http://localhost:${port}`).pathname;
-  const safePath = requestPath === "/" ? "/index.html" : requestPath;
-  const filePath = resolve(publicDir, `.${safePath}`);
-
-  if (!filePath.startsWith(publicDir)) {
-    res.writeHead(403);
-    res.end("Forbidden");
-    return;
-  }
-
-  try {
-    const content = await readFile(filePath);
-    res.writeHead(200, { "content-type": mimeTypes[extname(filePath)] || "application/octet-stream" });
-    res.end(content);
-  } catch {
-    res.writeHead(404);
-    res.end("Not found");
-  }
-}
-
-const server = createServer(async (req, res) => {
-  try {
-    if (req.method === "GET" && req.url === "/api/default-sources") {
-      sendJson(res, 200, defaultSources);
-      return;
-    }
-    if (req.method === "POST" && req.url === "/api/cache/clear") {
-      await clearPageCache();
-      sendJson(res, 200, { ok: true });
-      return;
-    }
-    if (req.method === "POST" && req.url === "/api/token-cards") {
-      await handleTokenCards(req, res);
-      return;
-    }
-    await serveStatic(req, res);
-  } catch (error) {
-    sendJson(res, 500, { error: error.message });
-  }
 });
 
-server.listen(port, () => {
+app.use("/*", serveStatic({ root: relative(process.cwd(), publicDir) }));
+
+app.onError((err, c) => {
+  console.error(err);
+  return c.json({ error: err.message }, 500);
+});
+
+serve({ fetch: app.fetch, port }, () => {
   console.log(`MTG Token Finder running at http://localhost:${port}`);
 });
