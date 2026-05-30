@@ -7,7 +7,7 @@ import { defaultSources } from "./lib/data.js";
 import { toIsoDate } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
-import { buildArchetypeProfiles, classifyByProfile, overallArchetypeStats } from "./lib/archetype.js";
+import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats } from "./lib/archetype.js";
 import { fetchFinderCandidates, fetchJapaneseName } from "./lib/scryfall.js";
 import { buildBulkObjects, groupObjectsBySet } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
@@ -38,14 +38,29 @@ app.post("/api/token-cards", async (c) => {
 
   const [candidates, crawl] = await Promise.all([
     fetchFinderCandidates(format),
-    crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate, environmentStartDate })
+    crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate, environmentStartDate, format })
   ]);
 
   const allDeckEntries = crawl.pages.flatMap((page) => page.deckEntries ?? []);
+  const { knownArchetypes } = crawl;
+
+  // パス1: カード構成プロファイルによる再分類
   const profiles = buildArchetypeProfiles(allDeckEntries);
   for (const deck of allDeckEntries) {
     if (!deck.archetype || deck.archetype === "Unknown") {
       deck.archetype = classifyByProfile(deck.cards ?? [], profiles);
+    }
+  }
+
+  // パス2: メタゲームページから収集した既知アーキタイプ名でタイトル照合
+  // "Unknown" だけでなく、knownArchetypes に含まれない値（プレイヤー名混じりなど）も対象にする
+  if (knownArchetypes.size > 0) {
+    for (const deck of allDeckEntries) {
+      if (!deck.archetype || deck.archetype === "Unknown" || !knownArchetypes.has(deck.archetype)) {
+        const matched = matchKnownArchetype(deck.title, knownArchetypes)
+          ?? matchKnownArchetype(deck.pageTitle, knownArchetypes);
+        if (matched) deck.archetype = matched;
+      }
     }
   }
 
