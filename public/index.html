@@ -63,6 +63,13 @@
               <option value="asc">発売日 古い順</option>
             </select>
           </label>
+          <div class="lang-toggle" role="group" aria-label="カード画像言語">
+            <span class="lang-toggle-label">画像言語</span>
+            <div class="lang-toggle-buttons">
+              <button type="button" class="lang-btn lang-btn-active" data-lang="en">EN</button>
+              <button type="button" class="lang-btn" data-lang="ja">JA</button>
+            </div>
+          </div>
           <label class="check-control">
             <input id="hide-checked" type="checkbox">
             未チェックだけ
@@ -144,6 +151,21 @@
         </div>
       </article>
     </template>
+
+    <!-- ログパネル -->
+    <div id="log-panel" class="log-panel">
+      <div class="log-panel-header" id="log-panel-header">
+        <span class="log-panel-title">
+          <span class="log-dot" id="log-dot"></span>
+          ログ
+        </span>
+        <span class="log-panel-actions">
+          <button type="button" id="log-clear-btn" class="log-action-btn">クリア</button>
+          <button type="button" id="log-toggle-btn" class="log-action-btn log-toggle-icon">▼</button>
+        </span>
+      </div>
+      <div id="log-content" class="log-content" aria-live="polite"></div>
+    </div>
 
     <script src="/app.js" type="module"></script>
   </body>

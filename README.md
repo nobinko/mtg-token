@@ -59,19 +59,22 @@ http://localhost:5177
 - 「抜いた」チェックと未チェックのみ表示
 - 印刷用表示
 - 巡回ページのローカルキャッシュ
+- **カード画像の日英切替**: EN/JA トグルでトークン・発生源カードの画像を一括切り替え
+- **ホバーズーム**: トークン画像にマウスオーバーで拡大プレビューを表示
+- **リアルタイムログパネル**: 巡回・Scryfall照合の進捗をページ下部のパネルにリアルタイム表示
 
 ## 巡回元
 
 初期URLには以下を入れています。起点はすべてメタゲームページ（条件で絞り込み済み）です。
 
 - 晴れる屋メタゲームページ（フォーマット別: Standard=1, Pioneer=20, Modern=2, Legacy=3）
-- MTGGoldfish メタゲームページ（フォーマット別）
-- magic.gg Decklists（フォーマット名がURLに入るイベントだけ辿る）
 - MTGTop8（フォーマット別フォーマットページ）
+- magic.gg Decklists（フォーマット名がURLに入るイベントだけ辿る）
 - MTGO公式Decklists（フォーマット名がURLに入るものだけ辿る）
 
 以下は**除外**しています。
 
+- MTGGoldfish — Cloudflareによるアクセス制限で頻繁にブロックされるため
 - 晴れる屋記事 (`article.hareruyamtg.com`) — 記事は日付に関係なく全期間が混在するため
 - mtg-jp Coverage — 同上
 - 晴れる屋デッキ一覧 (`/ja/deck/`) — 全フォーマット・全期間混在のため
@@ -146,6 +149,45 @@ n >= log(1 - confidence) / log(1 - p)
 `.cache/` はGit管理しません。
 
 ## 更新履歴
+
+### 2026-05-30 (3)
+
+**巡回の並列化・安定化**
+
+- 巡回を直列ループから並列バッチ処理（最大5件同時）に変更。1件が詰まっても後続がブロックされなくなった
+- `fetchPage` / `fetchJson` に15秒タイムアウトを追加。ハングするサイトで全体が止まらなくなった
+- `fetchTimeoutMs` を `lib/config.js` に移動し、コードベース全体で一元管理
+- MTGGoldfishをデフォルト巡回元から除外（Cloudflareによるアクセス制限が頻繁に発生するため）
+- `pageCache`（サーバー内メモリキャッシュ）に上限1000件を設定し、古い順に削除するよう変更
+
+**カード画像の日英切替**
+
+- ツールバーに EN/JA トグルを追加
+- トークン・発生源カードの日本語版画像を Scryfall から取得し `imageJa` として保持
+- EN/JA 切替時に全カード画像を一括更新。日本語版がない場合は英語版にフォールバック
+- Scryfall の `fetchJapaneseName` + `fetchJapanesePrint` の二重呼び出しを統合し、API 呼び出しを最大100回削減
+
+**ホバーズーム**
+
+- トークン画像にマウスオーバーすると 280px の拡大プレビューをカーソル横に表示
+- カーソルに追従し、画面端では自動的に反対側へ回り込む
+- `pointer-events: none` のため下のUIを妨げない
+
+**リアルタイムログパネル**
+
+- `console.log` / `console.error` を横取りし、接続中の全ブラウザに SSE でリアルタイム配信
+- `GET /api/logs` SSE エンドポイントを追加
+- 起動後のログを最大600行バッファし、新しく接続したブラウザにも過去分を一括送信
+- ログ種別（crawl・network・error等）で色分け表示
+- ページ下部に固定ログパネル（ターミナル風）。ヘッダークリックで折り畳み可能
+- 接続が切れた場合は5秒後に自動再接続
+
+**その他修正**
+
+- `server.mjs` の `util.js` 重複インポートを統合
+- SSE 切断済み writer を `broadcast` で自動削除（メモリリーク修正）
+- `hoverPreview.src = ""` を `removeAttribute("src")` に変更（不要な空URLリクエスト防止）
+- フォーム `submit` リスナーと `searchButton` click リスナーの重複を解消
 
 ### 2026-05-30 (2)
 
@@ -225,7 +267,7 @@ npm start
 | ファイル | 役割 |
 | --- | --- |
 | `server.mjs` | Hono ルーティング・静的ファイル配信 |
-| `lib/config.js` | ポート・パス・定数（`maxMatchedCards`・`scryfallCacheTtlMs`） |
+| `lib/config.js` | ポート・パス・定数（`maxMatchedCards`・`scryfallCacheTtlMs`・`fetchTimeoutMs`） |
 | `lib/data.js` | トークン和名表・巡回元。環境イベントは `data/environment-events.json` を読み込む |
 | `data/environment-events.json` | Standard 環境イベント（B&R・ローテーション等）の定義。コード変更なしで更新可能 |
 | `lib/util.js` | 汎用ユーティリティ（日付・正規表現・画像URL・セット名） |

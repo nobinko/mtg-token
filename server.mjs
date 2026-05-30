@@ -2,20 +2,69 @@ import { relative } from "node:path";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
+import { streamSSE } from "hono/streaming";
 import { port, publicDir, maxMatchedCards } from "./lib/config.js";
 import { defaultSources } from "./lib/data.js";
-import { toIsoDate } from "./lib/util.js";
+import { toIsoDate, imageFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats } from "./lib/archetype.js";
-import { fetchFinderCandidates, fetchJapaneseName } from "./lib/scryfall.js";
+import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint } from "./lib/scryfall.js";
 import { buildBulkObjects, groupObjectsBySet } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
 import { crawlSources } from "./lib/crawl.js";
 
+// ---- ログブロードキャスト ----
+const sseClients = new Set();
+const logBuffer = [];
+const LOG_BUFFER_MAX = 600;
+
+const _origLog = console.log;
+const _origError = console.error;
+
+function broadcast(line) {
+  logBuffer.push(line);
+  if (logBuffer.length > LOG_BUFFER_MAX) logBuffer.shift();
+  for (const writer of sseClients) {
+    try { writer(line); } catch { sseClients.delete(writer); }
+  }
+}
+
+console.log = (...args) => {
+  _origLog(...args);
+  broadcast(args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" "));
+};
+
+console.error = (...args) => {
+  _origError(...args);
+  broadcast("[ERROR] " + args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" "));
+};
+
 const app = new Hono();
 
 app.get("/api/default-sources", (c) => c.json(defaultSources));
+
+app.get("/api/logs", (c) => {
+  return streamSSE(c, async (stream) => {
+    // 既存バッファを一括送信
+    for (const line of logBuffer) {
+      await stream.writeSSE({ data: line });
+    }
+    const writer = async (line) => {
+      try { await stream.writeSSE({ data: line }); } catch { /* disconnected */ }
+    };
+    sseClients.add(writer);
+    try {
+      // ping で接続を維持（15秒ごと）
+      while (true) {
+        await stream.sleep(15_000);
+        await stream.writeSSE({ event: "ping", data: "" });
+      }
+    } finally {
+      sseClients.delete(writer);
+    }
+  });
+});
 
 app.post("/api/cache/clear", async (c) => {
   await clearPageCache();
@@ -66,7 +115,11 @@ app.post("/api/token-cards", async (c) => {
 
   const matched = findCardMentions(candidates, crawl.pages);
   for (const card of matched.slice(0, maxMatchedCards)) {
-    card.japaneseName = await fetchJapaneseName(card.name);
+    // fetchJapanesePrint 1回で画像URLと日本語名を両方取得し、Scryfall呼び出しを半減させる。
+    // jaPrint が null の場合（日本語版未存在）は fetchJapaneseName のフォールバックを使う。
+    const jaPrint = await fetchJapanesePrint(card.name);
+    card.imageJa = jaPrint ? imageFor(jaPrint) : "";
+    card.japaneseName = jaPrint?.printed_name || await fetchJapaneseName(card.name);
   }
 
   const objects = await buildBulkObjects(matched.slice(0, maxMatchedCards));

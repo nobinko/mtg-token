@@ -25,6 +25,8 @@ const clearCacheButton = document.querySelector("#clear-cache-button");
 const setTemplate = document.querySelector("#set-template");
 const objectTemplate = document.querySelector("#object-template");
 
+const langBtns = document.querySelectorAll(".lang-btn");
+
 const checkedStorageKey = "mtg-token-finder.checked";
 
 let defaultSources = {};
@@ -33,6 +35,39 @@ let lastObjects = [];
 let showAllDecks = false;
 let lastSearchedDeckCount = 0;
 let checkedObjects = readCheckedObjects();
+let cardLang = "en"; // "en" | "ja"
+
+// ---- ホバーズーム用グローバルプレビュー ----
+const hoverPreview = document.createElement("img");
+hoverPreview.className = "hover-preview";
+hoverPreview.hidden = true;
+hoverPreview.alt = "";
+document.body.append(hoverPreview);
+
+document.addEventListener("mousemove", (e) => {
+  if (hoverPreview.hidden) return;
+  const gap = 20;
+  const pw = 280;
+  const ph = 390; // 488/680 ratio approx
+  let x = e.clientX + gap;
+  let y = e.clientY - ph / 2;
+  if (x + pw > window.innerWidth) x = e.clientX - pw - gap;
+  if (y < 0) y = 0;
+  if (y + ph > window.innerHeight) y = window.innerHeight - ph;
+  hoverPreview.style.left = `${x}px`;
+  hoverPreview.style.top = `${y}px`;
+});
+
+function showHoverPreview(src) {
+  if (!src) return;
+  hoverPreview.src = src;
+  hoverPreview.hidden = false;
+}
+
+function hideHoverPreview() {
+  hoverPreview.hidden = true;
+  hoverPreview.removeAttribute("src");
+}
 
 const eventScaleProfiles = {
   spotlight: {
@@ -403,14 +438,17 @@ function renderSourcePreview(container, sourceCards) {
     link.target = "_blank";
     link.rel = "noreferrer";
     if (card.image) {
+      const miniSrc = (cardLang === "ja" && card.imageJa) ? card.imageJa : card.image;
+      link.dataset.imageEn = card.image;
+      link.dataset.imageJa = card.imageJa || "";
       const img = document.createElement("img");
-      img.src = card.image;
+      img.src = miniSrc;
       img.alt = "";
       img.loading = "lazy";
       link.append(img);
       const preview = document.createElement("img");
       preview.className = "source-mini-preview";
-      preview.src = card.image;
+      preview.src = miniSrc;
       preview.alt = "";
       preview.loading = "lazy";
       link.append(preview);
@@ -443,6 +481,8 @@ function renderObject(object) {
   const key = objectKey(object);
 
   article.dataset.objectKey = key;
+  article.dataset.imageEn = object.image || "";
+  article.dataset.imageJa = object.imageJa || "";
   article.classList.toggle("is-checked", checkedObjects.has(key));
   picked.checked = checkedObjects.has(key);
   picked.addEventListener("change", () => {
@@ -457,8 +497,11 @@ function renderObject(object) {
   });
 
   imageLink.href = object.scryfallUri;
-  img.src = object.image;
+  const activeSrc = (cardLang === "ja" && object.imageJa) ? object.imageJa : object.image;
+  img.src = activeSrc;
   img.alt = object.name;
+  imageLink.addEventListener("mouseenter", () => showHoverPreview(img.src));
+  imageLink.addEventListener("mouseleave", hideHoverPreview);
   title.textContent = object.name;
   jp.textContent = object.japaneseName || "日本語名未取得";
   kind.textContent = object.category || object.kind;
@@ -612,11 +655,90 @@ async function runSearch(event) {
   }
 }
 
+// ---- ログパネル ----
+const logPanel = document.querySelector("#log-panel");
+const logContent = document.querySelector("#log-content");
+const logDot = document.querySelector("#log-dot");
+const logClearBtn = document.querySelector("#log-clear-btn");
+const logToggleBtn = document.querySelector("#log-toggle-btn");
+const logPanelHeader = document.querySelector("#log-panel-header");
+
+let logCollapsed = false;
+
+const appEl = document.querySelector(".app");
+
+function setLogCollapsed(collapsed) {
+  logCollapsed = collapsed;
+  logPanel.classList.toggle("log-panel-collapsed", collapsed);
+  logToggleBtn.textContent = collapsed ? "▲" : "▼";
+  appEl.style.paddingBottom = collapsed ? "60px" : "290px";
+  if (!collapsed) logContent.scrollTop = logContent.scrollHeight;
+}
+
+logPanelHeader.addEventListener("click", (e) => {
+  if (e.target === logClearBtn) return;
+  setLogCollapsed(!logCollapsed);
+});
+
+logClearBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  logContent.replaceChildren();
+});
+
+function classifyLog(line) {
+  if (line.startsWith("[ERROR]")) return "log-error";
+  if (line.includes("✗")) return "log-warn";
+  if (line.includes("cache=miss") || line.includes("network=")) return "log-network";
+  if (line.includes("[crawl] batch")) return "log-batch";
+  if (line.includes("[crawl]")) return "log-crawl";
+  if (line.includes("[scryfall]") || line.includes("scryfall")) return "log-scryfall";
+  return "log-default";
+}
+
+function appendLog(line) {
+  if (!line || line === "") return;
+  const MAX_LINES = 400;
+  const now = new Date();
+  const ts = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+  const row = document.createElement("div");
+  row.className = `log-row ${classifyLog(line)}`;
+  const timeEl = document.createElement("span");
+  timeEl.className = "log-ts";
+  timeEl.textContent = ts;
+  const textEl = document.createElement("span");
+  textEl.className = "log-text";
+  textEl.textContent = line;
+  row.append(timeEl, textEl);
+  logContent.append(row);
+  // 行数上限
+  while (logContent.children.length > MAX_LINES) {
+    logContent.firstElementChild.remove();
+  }
+  if (!logCollapsed) {
+    logContent.scrollTop = logContent.scrollHeight;
+  }
+  // 活動インジケーター点滅
+  logDot.classList.add("log-dot-active");
+  clearTimeout(logDot._timer);
+  logDot._timer = setTimeout(() => logDot.classList.remove("log-dot-active"), 800);
+}
+
+function initLogStream() {
+  const es = new EventSource("/api/logs");
+  es.onmessage = (e) => appendLog(e.data);
+  es.onerror = () => {
+    appendLog("[接続エラー。5秒後に再接続します]");
+    es.close();
+    setTimeout(initLogStream, 5000);
+  };
+}
+
 async function init() {
   const response = await fetch("/api/default-sources");
   defaultSources = await response.json();
   updateSourcesForFormat();
   applyEventScaleProfile();
+  initLogStream();
 }
 
 async function clearCache() {
@@ -631,6 +753,35 @@ async function clearCache() {
   } finally {
     clearCacheButton.disabled = false;
   }
+}
+
+function applyCardLang(lang) {
+  cardLang = lang;
+  for (const btn of langBtns) {
+    btn.classList.toggle("lang-btn-active", btn.dataset.lang === lang);
+  }
+  // 表示中のカード画像を切り替え
+  for (const article of resultsEl.querySelectorAll(".card")) {
+    const img = article.querySelector(".image-link img");
+    if (!img) continue;
+    const src = (lang === "ja" && article.dataset.imageJa) ? article.dataset.imageJa : article.dataset.imageEn;
+    if (src) img.src = src;
+  }
+  // source-mini 画像も切り替え
+  for (const link of resultsEl.querySelectorAll(".source-mini")) {
+    const enSrc = link.dataset.imageEn;
+    const jaSrc = link.dataset.imageJa;
+    if (!enSrc) continue;
+    const src = (lang === "ja" && jaSrc) ? jaSrc : enSrc;
+    const thumb = link.querySelector("img:not(.source-mini-preview)");
+    const preview = link.querySelector(".source-mini-preview");
+    if (thumb) thumb.src = src;
+    if (preview) preview.src = src;
+  }
+}
+
+for (const btn of langBtns) {
+  btn.addEventListener("click", () => applyCardLang(btn.dataset.lang));
 }
 
 formatSelect.addEventListener("change", updateSourcesForFormat);
@@ -648,7 +799,6 @@ setSortSelect.addEventListener("change", renderCurrentResults);
 viewModeSelect.addEventListener("change", renderCurrentResults);
 hideCheckedInput.addEventListener("change", renderCurrentResults);
 form.addEventListener("submit", runSearch);
-searchButton.addEventListener("click", runSearch);
 printButton.addEventListener("click", () => window.print());
 clearCacheButton.addEventListener("click", clearCache);
 init().catch((error) => setStatus(`初期化エラー: ${error.message}`));
