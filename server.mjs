@@ -8,7 +8,7 @@ import { defaultSources } from "./lib/data.js";
 import { toIsoDate, imageFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
-import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats } from "./lib/archetype.js";
+import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype } from "./lib/archetype.js";
 import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint } from "./lib/scryfall.js";
 import { buildBulkObjects, groupObjectsBySet } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
@@ -93,16 +93,14 @@ app.post("/api/token-cards", async (c) => {
   const allDeckEntries = crawl.pages.flatMap((page) => page.deckEntries ?? []);
   const { knownArchetypes } = crawl;
 
-  // パス1: カード構成プロファイルによる再分類
-  const profiles = buildArchetypeProfiles(allDeckEntries);
-  for (const deck of allDeckEntries) {
-    if (!deck.archetype || deck.archetype === "Unknown") {
-      deck.archetype = classifyByProfile(deck.cards ?? [], profiles);
-    }
-  }
+  // アーキタイプ分類パイプライン:
+  //  deck.js 抽出時点 ── archetypeRules（カード一致）＋タイトル推定で初期ラベル付与
+  //  パス1（ここ）────── knownArchetypes: 巡回で集めたメタゲームページの正確な名前で照合
+  //  パス2（ここ）────── buildArchetypeProfiles: 正しくラベルが付いたデッキ群からコアカードを学習し Unknown を再分類
+  //  パス3（ここ）────── inferFallbackArchetype: 土地色＋戦略シグナルで大枠ラベルを付与。真のローグのみ残る
 
-  // パス2: メタゲームページから収集した既知アーキタイプ名でタイトル照合
-  // "Unknown" だけでなく、knownArchetypes に含まれない値（プレイヤー名混じりなど）も対象にする
+  // パス1: 巡回で取得したメタゲームページの正確なアーキタイプ名でタイトル照合
+  // "Unknown" だけでなく、正規の名前でないデッキ（プレイヤー名混じりなど）も対象にする
   if (knownArchetypes.size > 0) {
     for (const deck of allDeckEntries) {
       if (!deck.archetype || deck.archetype === "Unknown" || !knownArchetypes.has(deck.archetype)) {
@@ -110,6 +108,23 @@ app.post("/api/token-cards", async (c) => {
           ?? matchKnownArchetype(deck.pageTitle, knownArchetypes);
         if (matched) deck.archetype = matched;
       }
+    }
+  }
+
+  // パス2: カード構成プロファイルによる再分類
+  // パス1後の正確なラベルをもとにコアカードを学習し、まだ Unknown のデッキを分類する
+  const profiles = buildArchetypeProfiles(allDeckEntries);
+  for (const deck of allDeckEntries) {
+    if (!deck.archetype || deck.archetype === "Unknown") {
+      deck.archetype = classifyByProfile(deck.cards ?? [], profiles);
+    }
+  }
+
+  // パス3: 土地色＋戦略シグナルによる最終フォールバック
+  // 上記すべてで Unknown のままのデッキに "Izzet Midrange" 等の大枠ラベルを付ける。
+  for (const deck of allDeckEntries) {
+    if (!deck.archetype || deck.archetype === "Unknown") {
+      deck.archetype = inferFallbackArchetype(deck.cards ?? []);
     }
   }
 
