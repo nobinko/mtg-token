@@ -135,6 +135,7 @@ app.post("/api/token-cards", async (c) => {
     scannedPages: crawl.pages.map((page) => page.url),
     errors: crawl.errors,
     cacheStats: crawl.cacheStats,
+    siteStats: crawl.siteStats,
     searchedDecks: deckResults,
     searchedDeckCount: deckResults.length,
     archetypes,

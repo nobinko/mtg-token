@@ -356,6 +356,31 @@ textarea {
   font-weight: 900;
 }
 
+.site-stats {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.site-stats-label {
+  color: #888;
+  font-weight: 600;
+}
+
+.site-stat-chip {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #eef3f8;
+  border: 1px solid #c5d3e0;
+  color: #2b5278;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: default;
+}
+
 .deck-chip-list {
   display: flex;
   flex-wrap: wrap;

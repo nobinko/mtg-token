@@ -178,10 +178,38 @@ function updateSourcesForFormat() {
 
 function renderSummary(data) {
   summaryEl.hidden = false;
-  const failed = data.errors.length ? ` / 巡回失敗 ${data.errors.length}件` : "";
+  summaryEl.replaceChildren();
+
   const cache = data.cacheStats || { hits: 0, network: 0, staleHits: 0 };
   const checkedCount = lastObjects.filter((object) => checkedObjects.has(objectKey(object))).length;
-  summaryEl.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物 ${data.objects.length}種類を検出。チェック済み ${checkedCount}/${data.objects.length}。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failed}。`;
+  const botBlocked = (data.errors || []).filter((e) => e.message === "bot-challenge").length;
+  const realErrors = (data.errors || []).filter((e) => e.message !== "bot-challenge").length;
+  const failedText = realErrors ? ` / 巡回失敗 ${realErrors}件` : "";
+  const blockedText = botBlocked ? ` / JSブロック ${botBlocked}件` : "";
+
+  const mainLine = document.createElement("div");
+  mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物 ${data.objects.length}種類を検出。チェック済み ${checkedCount}/${data.objects.length}。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}。`;
+  summaryEl.append(mainLine);
+
+  // サイト別統計
+  const siteStats = data.siteStats || {};
+  const sites = Object.entries(siteStats).sort((a, b) => b[1].decks - a[1].decks || b[1].pages - a[1].pages);
+  if (sites.length > 0) {
+    const siteTable = document.createElement("div");
+    siteTable.className = "site-stats";
+    const header = document.createElement("span");
+    header.className = "site-stats-label";
+    header.textContent = "サイト別: ";
+    siteTable.append(header);
+    for (const [domain, stat] of sites) {
+      const chip = document.createElement("span");
+      chip.className = "site-stat-chip";
+      chip.textContent = `${domain} ${stat.pages}p / ${stat.decks}d`;
+      chip.title = `${domain}: ${stat.pages}ページ巡回、${stat.decks}デッキ取得`;
+      siteTable.append(chip);
+    }
+    summaryEl.append(siteTable);
+  }
 }
 
 function renderEnvironmentSummary(environment) {
