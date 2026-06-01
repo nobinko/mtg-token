@@ -287,7 +287,9 @@ n >= log(1 - confidence) / log(1 - p)
 **カード画像の日英切替**
 
 - ツールバーに EN/JA トグルを追加
-- トークン・発生源カードの日本語版画像を Scryfall から取得し `imageJa` として保持
+- 画像取得は「公式トークンバルクから現物を抜くための見本」として扱う。Wizards公式ギャラリーの確認済みURLを `officialImageOverrides` に登録したものを最優先し、`multiverse_ids` があるカードは Gatherer 公式DB画像を優先、足りないトークン画像のみ Scryfall fallback を使う
+- トークン・発生源カードの日本語版画像を取得し `imageJa` として保持。日本語画像も同じ優先順位で公式URLを探す
+- 画面上に `画像:Wizards公式DB` / `画像:Scryfall fallback` を表示し、放送準備前に fallback を目視確認できるようにした
 - EN/JA 切替時に全カード画像を一括更新。日本語版がない場合は英語版にフォールバック
 - Scryfall の `fetchJapaneseName` + `fetchJapanesePrint` の二重呼び出しを統合し、API 呼び出しを最大100回削減
 

@@ -547,6 +547,21 @@ function tokenPriority(object) {
   return { label: "念のため", className: "priority-low", percent };
 }
 
+function activeImageSource(item) {
+  if (cardLang === "ja" && item.imageJa) {
+    return {
+      label: item.imageJaSourceLabel || "日本語画像",
+      source: item.imageJaSource || "",
+      url: item.imageJaSourceUrl || ""
+    };
+  }
+  return {
+    label: item.imageSourceLabel || "画像",
+    source: item.imageSource || "",
+    url: item.imageSourceUrl || ""
+  };
+}
+
 function visibleObjects(objects) {
   if (!hideCheckedInput.checked) return objects;
   return objects.filter((object) => !checkedObjects.has(objectKey(object)));
@@ -590,17 +605,22 @@ function renderSourcePreview(container, sourceCards) {
     link.rel = "noreferrer";
     if (card.image) {
       const miniSrc = (cardLang === "ja" && card.imageJa) ? card.imageJa : card.image;
+      const imageSource = activeImageSource(card);
       link.dataset.imageEn = card.image;
       link.dataset.imageJa = card.imageJa || "";
+      link.dataset.imageSourceLabel = card.imageSourceLabel || "";
+      link.dataset.imageJaSourceLabel = card.imageJaSourceLabel || "";
       const img = document.createElement("img");
       img.src = miniSrc;
       img.alt = "";
+      img.title = `画像:${imageSource.label}`;
       img.loading = "lazy";
       link.append(img);
       const preview = document.createElement("img");
       preview.className = "source-mini-preview";
       preview.src = miniSrc;
       preview.alt = "";
+      preview.title = `画像:${imageSource.label}`;
       preview.loading = "lazy";
       link.append(preview);
     }
@@ -634,6 +654,10 @@ function renderObject(object) {
   article.dataset.objectKey = key;
   article.dataset.imageEn = object.image || "";
   article.dataset.imageJa = object.imageJa || "";
+  article.dataset.imageSourceLabel = object.imageSourceLabel || "";
+  article.dataset.imageSourceUrl = object.imageSourceUrl || "";
+  article.dataset.imageJaSourceLabel = object.imageJaSourceLabel || "";
+  article.dataset.imageJaSourceUrl = object.imageJaSourceUrl || "";
   article.classList.toggle("is-checked", checkedObjects.has(key));
   picked.checked = checkedObjects.has(key);
   picked.addEventListener("change", () => {
@@ -649,8 +673,10 @@ function renderObject(object) {
 
   imageLink.href = object.scryfallUri;
   const activeSrc = (cardLang === "ja" && object.imageJa) ? object.imageJa : object.image;
+  const imageSource = activeImageSource(object);
   img.src = activeSrc;
   img.alt = object.name;
+  img.title = imageSource.label;
   imageLink.addEventListener("mouseenter", () => showHoverPreview(img.src));
   imageLink.addEventListener("mouseleave", hideHoverPreview);
   title.textContent = object.name;
@@ -664,7 +690,7 @@ function renderObject(object) {
   note.textContent = object.note || "";
   note.hidden = !object.note;
 
-  renderTags(hints, [object.kind, object.category].filter(Boolean));
+  renderTags(hints, [object.kind, object.category, `画像:${imageSource.label}`].filter(Boolean));
   const bar = document.createElement("div");
   bar.className = "token-frequency";
   const fill = document.createElement("span");
@@ -676,10 +702,18 @@ function renderObject(object) {
   for (const sourceCard of object.sourceCards || []) {
     const item = document.createElement("li");
     item.className = "source-card-item";
+    item.dataset.imageEn = sourceCard.image || "";
+    item.dataset.imageJa = sourceCard.imageJa || "";
+    item.dataset.imageSourceLabel = sourceCard.imageSourceLabel || "";
+    item.dataset.imageSourceUrl = sourceCard.imageSourceUrl || "";
+    item.dataset.imageJaSourceLabel = sourceCard.imageJaSourceLabel || "";
+    item.dataset.imageJaSourceUrl = sourceCard.imageJaSourceUrl || "";
     if (sourceCard.image) {
+      const sourceCardImageSource = activeImageSource(sourceCard);
       const thumb = document.createElement("img");
-      thumb.src = sourceCard.image;
+      thumb.src = (cardLang === "ja" && sourceCard.imageJa) ? sourceCard.imageJa : sourceCard.image;
       thumb.alt = "";
+      thumb.title = `画像:${sourceCardImageSource.label}`;
       thumb.loading = "lazy";
       item.append(thumb);
     }
@@ -888,6 +922,7 @@ async function init() {
   const response = await fetch("/api/default-sources");
   defaultSources = await response.json();
   updateSourcesForFormat();
+  applyCardLang(cardLang);
   applyEventScaleProfile();
   initLogStream();
 }
@@ -910,24 +945,48 @@ function applyCardLang(lang) {
   cardLang = lang;
   for (const btn of langBtns) {
     btn.classList.toggle("lang-btn-active", btn.dataset.lang === lang);
+    btn.setAttribute("aria-pressed", btn.dataset.lang === lang ? "true" : "false");
   }
+
+  if (lastObjects.length) {
+    renderCurrentResults();
+    return;
+  }
+
   // 表示中のカード画像を切り替え
   for (const article of resultsEl.querySelectorAll(".card")) {
     const img = article.querySelector(".image-link img");
-    if (!img) continue;
     const src = (lang === "ja" && article.dataset.imageJa) ? article.dataset.imageJa : article.dataset.imageEn;
-    if (src) img.src = src;
+    if (img && src) img.src = src;
+    if (img) {
+      const label = (lang === "ja" && article.dataset.imageJa)
+        ? article.dataset.imageJaSourceLabel
+        : article.dataset.imageSourceLabel;
+      img.title = label || "";
+    }
   }
   // source-mini 画像も切り替え
   for (const link of resultsEl.querySelectorAll(".source-mini")) {
     const enSrc = link.dataset.imageEn;
     const jaSrc = link.dataset.imageJa;
-    if (!enSrc) continue;
     const src = (lang === "ja" && jaSrc) ? jaSrc : enSrc;
     const thumb = link.querySelector("img:not(.source-mini-preview)");
     const preview = link.querySelector(".source-mini-preview");
+    const label = (lang === "ja" && jaSrc) ? link.dataset.imageJaSourceLabel : link.dataset.imageSourceLabel;
     if (thumb) thumb.src = src;
     if (preview) preview.src = src;
+    if (thumb) thumb.title = label ? `画像:${label}` : "";
+    if (preview) preview.title = label ? `画像:${label}` : "";
+  }
+  // 詳細欄の発生源サムネイルも切り替え
+  for (const item of resultsEl.querySelectorAll(".source-card-item")) {
+    const enSrc = item.dataset.imageEn;
+    const jaSrc = item.dataset.imageJa;
+    const img = item.querySelector("img");
+    const src = (lang === "ja" && jaSrc) ? jaSrc : enSrc;
+    const label = (lang === "ja" && jaSrc) ? item.dataset.imageJaSourceLabel : item.dataset.imageSourceLabel;
+    if (img) img.src = src;
+    if (img) img.title = label ? `画像:${label}` : "";
   }
 }
 

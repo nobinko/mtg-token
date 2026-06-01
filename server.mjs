@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { port, publicDir, maxMatchedCards } from "./lib/config.js";
 import { defaultSources } from "./lib/data.js";
-import { toIsoDate, imageFor } from "./lib/util.js";
+import { toIsoDate, imageRefFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
@@ -145,7 +145,11 @@ app.post("/api/token-cards", async (c) => {
     // fetchJapanesePrint 1回で画像URLと日本語名を両方取得し、Scryfall呼び出しを半減させる。
     // jaPrint が null の場合（日本語版未存在）は fetchJapaneseName のフォールバックを使う。
     const jaPrint = await fetchJapanesePrint(card.name);
-    card.imageJa = jaPrint ? imageFor(jaPrint) : "";
+    const imageJaRef = jaPrint ? imageRefFor(jaPrint) : null;
+    card.imageJa = imageJaRef?.url || "";
+    card.imageJaSource = imageJaRef?.source || "none";
+    card.imageJaSourceLabel = imageJaRef?.sourceLabel || "日本語画像なし";
+    card.imageJaSourceUrl = imageJaRef?.sourceUrl || "";
     card.japaneseName = jaPrint?.printed_name || await fetchJapaneseName(card.name);
   }
 
