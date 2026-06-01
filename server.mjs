@@ -8,7 +8,7 @@ import { defaultSources } from "./lib/data.js";
 import { toIsoDate, imageFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
-import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype } from "./lib/archetype.js";
+import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
 import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint } from "./lib/scryfall.js";
 import { buildBulkObjects, groupObjectsBySet } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
@@ -128,6 +128,18 @@ app.post("/api/token-cards", async (c) => {
     }
   }
 
+  // パス4: 日本語圏のデッキ名称を保持する ArchetypeIdentity に昇格。
+  // 例: "Izzet Prowess" は "イゼット果敢" として表示しつつ、macroPlan / engineTags を保持する。
+  for (const deck of allDeckEntries) {
+    const identity = resolveArchetypeIdentity(deck.archetype, { confidence: 0.95, matchedBy: "normalized-name" })
+      || resolveArchetypeIdentityFromCards(deck.cards ?? [])
+      || fallbackArchetypeIdentity(deck.archetype, deck.cards ?? []);
+    if (identity) {
+      deck.archetypeIdentity = identity;
+      deck.archetype = identity.displayName;
+    }
+  }
+
   const matched = findCardMentions(candidates, crawl.pages);
   for (const card of matched.slice(0, maxMatchedCards)) {
     // fetchJapanesePrint 1回で画像URLと日本語名を両方取得し、Scryfall呼び出しを半減させる。
@@ -151,6 +163,7 @@ app.post("/api/token-cards", async (c) => {
     errors: crawl.errors,
     cacheStats: crawl.cacheStats,
     siteStats: crawl.siteStats,
+    unparsedDeckCount: crawl.unparsedDeckCount || 0,
     searchedDecks: deckResults,
     searchedDeckCount: deckResults.length,
     archetypes,
@@ -164,7 +177,7 @@ app.post("/api/token-cards", async (c) => {
 app.use("/*", serveStatic({ root: relative(process.cwd(), publicDir) }));
 
 app.onError((err, c) => {
-  console.error(err);
+  console.error(err?.stack || err?.message || err);
   return c.json({ error: err.message }, 500);
 });
 

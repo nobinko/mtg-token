@@ -186,9 +186,10 @@ function renderSummary(data) {
   const realErrors = (data.errors || []).filter((e) => e.message !== "bot-challenge").length;
   const failedText = realErrors ? ` / 巡回失敗 ${realErrors}件` : "";
   const blockedText = botBlocked ? ` / JSブロック ${botBlocked}件` : "";
+  const unparsedText = data.unparsedDeckCount ? ` / 抽出失敗デッキ ${data.unparsedDeckCount}件` : "";
 
   const mainLine = document.createElement("div");
-  mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物 ${data.objects.length}種類を検出。チェック済み ${checkedCount}/${data.objects.length}。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}。`;
+  mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物 ${data.objects.length}種類を検出。チェック済み ${checkedCount}/${data.objects.length}。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}${unparsedText}。`;
   summaryEl.append(mainLine);
 
   // サイト別統計
@@ -295,11 +296,133 @@ function renderArchetypeSummary(archetypes) {
     const row = document.createElement("div");
     row.className = "archetype-row";
     const color = archetypeColor(item.name);
-    row.innerHTML = `<i style="background:${color}"></i><span>${item.name}</span><strong>${item.percent}%</strong><em>${item.count} decks</em>`;
+
+    const dot = document.createElement("i");
+    dot.style.background = color;
+
+    const main = document.createElement("div");
+    main.className = "archetype-main";
+    const name = document.createElement("span");
+    name.className = "archetype-name";
+    name.textContent = item.identity?.displayName || item.name;
+    main.append(name);
+
+    const details = archetypeIdentityLine(item.identity);
+    if (details) {
+      const sub = document.createElement("small");
+      sub.textContent = details;
+      main.append(sub);
+    }
+
+    const percent = document.createElement("strong");
+    percent.textContent = `${item.percent}%`;
+
+    const count = document.createElement("em");
+    count.textContent = `${item.count} decks`;
+
+    row.append(dot, main, percent, count);
     list.append(row);
+
+    const tags = archetypeIdentityTags(item.identity);
+    if (tags.length) {
+      const tagRow = document.createElement("div");
+      tagRow.className = "archetype-tag-row";
+      for (const tag of tags.slice(0, 8)) {
+        const chip = document.createElement("span");
+        chip.textContent = tag;
+        tagRow.append(chip);
+      }
+      list.append(tagRow);
+    }
   }
   chartWrap.append(list);
   archetypeSummaryEl.append(chartWrap);
+}
+
+function macroPlanLabel(value) {
+  const labels = {
+    aggro: "アグロ",
+    midrange: "ミッドレンジ",
+    control: "コントロール",
+    combo: "コンボ",
+    ramp: "ランプ",
+    tempo: "テンポ",
+    unknown: "不明"
+  };
+  return labels[String(value || "").toLowerCase()] || value || "";
+}
+
+function archetypeIdentityLine(identity) {
+  if (!identity) return "";
+  const parts = [];
+  if (identity.colors?.length) parts.push(identity.colors.join(""));
+  if (identity.macroPlan) parts.push(macroPlanLabel(identity.macroPlan));
+  if (identity.canonicalName && identity.canonicalName !== identity.displayName) parts.push(identity.canonicalName);
+  return parts.join(" / ");
+}
+
+function archetypeIdentityTags(identity) {
+  if (!identity) return [];
+  return [
+    ...(identity.engineTags || []).map(engineTagLabel),
+    ...(identity.tokenRiskTags || []).map((tag) => `準備:${tokenRiskTagLabel(tag)}`)
+  ];
+}
+
+function engineTagLabel(tag) {
+  const labels = {
+    prowess: "果敢",
+    spells: "呪文連打",
+    tempo: "テンポ",
+    lessons: "講義",
+    "graveyard-threshold": "墓地条件",
+    control: "コントロール",
+    elemental: "エレメンタル",
+    graveyard: "墓地利用",
+    "signature-creature": "キーカード型",
+    landfall: "上陸",
+    counters: "カウンター",
+    creatures: "クリーチャー",
+    fliers: "飛行",
+    lifelink: "絆魂",
+    interaction: "妨害",
+    sweepers: "全体除去",
+    "card-draw": "ドロー",
+    midrange: "ミッドレンジ",
+    value: "継続的アドバンテージ",
+    removal: "除去",
+    reanimator: "リアニメイト",
+    combo: "コンボ",
+    "big-spell": "大型呪文",
+    rhythm: "律動",
+    mobilize: "動員",
+    tokens: "トークン",
+    "go-wide": "横並び",
+    aggro: "アグロ",
+    burn: "火力",
+    discard: "手札破壊"
+  };
+  return labels[tag] || tag;
+}
+
+function tokenRiskTagLabel(tag) {
+  const labels = {
+    "prowess-token-check": "果敢系トークン確認",
+    "plot-check": "計画カード確認",
+    "lesson-engine-check": "講義エンジン確認",
+    "spells-engine-check": "呪文系補助確認",
+    "signature-engine-check": "キーカード由来を確認",
+    "counter-dice-ok": "カウンターはダイス管理",
+    "signature-token-check": "専用トークン確認",
+    "low-token-risk": "現物リスク低",
+    "emblem-check": "紋章確認",
+    "value-engine-check": "継続効果確認",
+    "graveyard-engine-check": "墓地系補助確認",
+    "combo-piece-check": "コンボ部品確認",
+    "creature-token-check": "クリーチャー・トークン確認",
+    "warrior-token-high": "戦士トークン優先"
+  };
+  return labels[tag] || tag;
 }
 
 function renderTokenSummary(objects) {

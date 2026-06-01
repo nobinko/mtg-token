@@ -251,6 +251,45 @@ textarea {
   white-space: nowrap;
 }
 
+.archetype-main {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.archetype-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 900;
+}
+
+.archetype-main small {
+  overflow: hidden;
+  color: #5d6668;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archetype-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: -3px 0 2px 18px;
+}
+
+.archetype-tag-row span {
+  padding: 2px 6px;
+  border: 1px solid #cdc4b6;
+  border-radius: 4px;
+  background: #fffdf8;
+  color: #5d4d38;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .archetype-row strong {
   color: #176a63;
 }
