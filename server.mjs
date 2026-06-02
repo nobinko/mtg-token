@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { relative } from "node:path";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
@@ -18,26 +19,46 @@ import { crawlSources } from "./lib/crawl.js";
 const sseClients = new Set();
 const logBuffer = [];
 const LOG_BUFFER_MAX = 600;
+const logContext = new AsyncLocalStorage();
 
 const _origLog = console.log;
 const _origError = console.error;
 
+function serializeLogArg(arg) {
+  if (typeof arg === "string") return arg;
+  try {
+    return JSON.stringify(arg);
+  } catch {
+    return String(arg);
+  }
+}
+
+function normalizeLogRunId(value) {
+  const runId = String(value || "").trim();
+  return /^[a-zA-Z0-9_-]{1,96}$/.test(runId) ? runId : "";
+}
+
 function broadcast(line) {
-  logBuffer.push(line);
+  const entry = {
+    line,
+    runId: logContext.getStore()?.runId || "",
+    at: new Date().toISOString()
+  };
+  logBuffer.push(entry);
   if (logBuffer.length > LOG_BUFFER_MAX) logBuffer.shift();
   for (const writer of sseClients) {
-    try { writer(line); } catch { sseClients.delete(writer); }
+    try { writer(entry); } catch { sseClients.delete(writer); }
   }
 }
 
 console.log = (...args) => {
   _origLog(...args);
-  broadcast(args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" "));
+  broadcast(args.map(serializeLogArg).join(" "));
 };
 
 console.error = (...args) => {
   _origError(...args);
-  broadcast("[ERROR] " + args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" "));
+  broadcast("[ERROR] " + args.map(serializeLogArg).join(" "));
 };
 
 const app = new Hono();
@@ -55,11 +76,11 @@ app.get("/api/formats", (c) => c.json(formatOptions));
 app.get("/api/logs", (c) => {
   return streamSSE(c, async (stream) => {
     // 既存バッファを一括送信
-    for (const line of logBuffer) {
-      await stream.writeSSE({ data: line });
+    for (const entry of logBuffer) {
+      await stream.writeSSE({ data: JSON.stringify(entry) });
     }
-    const writer = async (line) => {
-      try { await stream.writeSSE({ data: line }); } catch { /* disconnected */ }
+    const writer = async (entry) => {
+      try { await stream.writeSSE({ data: JSON.stringify(entry) }); } catch { /* disconnected */ }
     };
     sseClients.add(writer);
     try {
@@ -81,6 +102,8 @@ app.post("/api/cache/clear", async (c) => {
 
 app.post("/api/token-cards", async (c) => {
   const body = await c.req.json().catch(() => ({}));
+  const logRunId = normalizeLogRunId(body.logRunId);
+  return logContext.run({ runId: logRunId }, async () => {
   const format = normalizeFormat(body.format);
   const sourceUrls = Array.isArray(body.sources) && body.sources.length
     ? body.sources
@@ -94,6 +117,7 @@ app.post("/api/token-cards", async (c) => {
     return c.json({ error: environment.reason, environment }, 422);
   }
   const environmentStartDate = environment.startDate;
+  console.log(`[search] start format=${format} target=${targetDate} decks=${maxChildPages}`);
 
   const [candidates, crawl] = await Promise.all([
     fetchFinderCandidates(format),
@@ -154,8 +178,10 @@ app.post("/api/token-cards", async (c) => {
   const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false });
   const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
   const archetypes = overallArchetypeStats(deckResults);
+  console.log(`[search] done decks=${deckResults.length} sourceCards=${matched.length} objects=${objects.length}`);
 
   return c.json({
+    logRunId,
     format,
     targetDate,
     environmentStartDate,
@@ -178,10 +204,13 @@ app.post("/api/token-cards", async (c) => {
     groups: groupObjectsBySet(objects),
     assetsDeferred: true
   });
+  });
 });
 
 app.post("/api/enrich-card-assets", async (c) => {
   const body = await c.req.json().catch(() => ({}));
+  const logRunId = normalizeLogRunId(body.logRunId);
+  return logContext.run({ runId: logRunId }, async () => {
   const sourceCards = Array.isArray(body.sourceCards) ? body.sourceCards.slice(0, 120) : [];
   const objects = Array.isArray(body.objects) ? body.objects.slice(0, 160) : [];
   const sourceInputByName = new Map(sourceCards.map((source) => [String(source.name || ""), source]));
@@ -241,7 +270,8 @@ app.post("/api/enrich-card-assets", async (c) => {
     });
   }
 
-  return c.json({ sourceCards: sourceResults, objects: objectResults });
+  return c.json({ logRunId, sourceCards: sourceResults, objects: objectResults });
+  });
 });
 
 app.use("/*", serveStatic({ root: relative(process.cwd(), publicDir) }));

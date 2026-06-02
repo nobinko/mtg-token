@@ -39,6 +39,8 @@ let lastSearchedDeckCount = 0;
 let checkedObjects = readCheckedObjects();
 let cardLang = "en"; // "en" | "ja"
 let searchRunId = 0;
+const logSessionId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+let activeLogRunId = "";
 
 // ---- ホバーズーム用グローバルプレビュー ----
 const hoverPreview = document.createElement("img");
@@ -881,12 +883,14 @@ function mergeEnrichedAssets(enrichment) {
 
 async function enrichCurrentAssets(runId) {
   if (!lastObjects.length) return;
+  const logRunId = activeLogRunId;
   try {
     setStatus("検索結果を表示しました。日本語画像とカード名を裏で補完しています。");
     const response = await fetch("/api/enrich-card-assets", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
+        logRunId,
         sourceCards: uniqueSourceCards(lastObjects),
         objects: objectAssetRequests(lastObjects)
       })
@@ -908,6 +912,7 @@ async function runSearch(event) {
   event.preventDefault();
   const runId = searchRunId + 1;
   searchRunId = runId;
+  activeLogRunId = `${logSessionId}-${runId}`;
   const button = searchButton;
   button.disabled = true;
   environmentSummaryEl.hidden = true;
@@ -920,6 +925,8 @@ async function runSearch(event) {
   deckSummaryEl.hidden = true;
   deckSummaryEl.replaceChildren();
   resultsEl.replaceChildren();
+  logContent.replaceChildren();
+  appendLog({ line: "この検索のログだけを表示します。", runId: activeLogRunId }, { force: true });
   setStatus("検索中。数百件規模だとScryfall照合、関連トークン取得、各サイト巡回でしばらく時間がかかります。");
 
   try {
@@ -927,6 +934,7 @@ async function runSearch(event) {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
+        logRunId: activeLogRunId,
         format: formatSelect.value,
         targetDate: targetDateInput.value,
         sources: sourceLines(),
@@ -967,7 +975,7 @@ const logClearBtn = document.querySelector("#log-clear-btn");
 const logToggleBtn = document.querySelector("#log-toggle-btn");
 const logPanelHeader = document.querySelector("#log-panel-header");
 
-let logCollapsed = false;
+let logCollapsed = true;
 
 const appEl = document.querySelector(".app");
 
@@ -975,7 +983,7 @@ function setLogCollapsed(collapsed) {
   logCollapsed = collapsed;
   logPanel.classList.toggle("log-panel-collapsed", collapsed);
   logToggleBtn.textContent = collapsed ? "▲" : "▼";
-  appEl.style.paddingBottom = collapsed ? "60px" : "290px";
+  appEl.style.paddingBottom = collapsed ? "72px" : "290px";
   if (!collapsed) logContent.scrollTop = logContent.scrollHeight;
 }
 
@@ -999,8 +1007,22 @@ function classifyLog(line) {
   return "log-default";
 }
 
-function appendLog(line) {
+function parseLogEntry(data) {
+  if (typeof data !== "string") return data;
+  try {
+    const parsed = JSON.parse(data);
+    if (parsed && typeof parsed.line === "string") return parsed;
+  } catch {
+    // Older servers and local client messages can still be plain strings.
+  }
+  return { line: data, runId: "" };
+}
+
+function appendLog(data, { force = false } = {}) {
+  const entry = parseLogEntry(data);
+  const line = String(entry?.line || "");
   if (!line || line === "") return;
+  if (!force && (!activeLogRunId || entry.runId !== activeLogRunId)) return;
   const MAX_LINES = 400;
   const now = new Date();
   const ts = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
@@ -1031,7 +1053,7 @@ function initLogStream() {
   const es = new EventSource("/api/logs");
   es.onmessage = (e) => appendLog(e.data);
   es.onerror = () => {
-    appendLog("[接続エラー。5秒後に再接続します]");
+    appendLog({ line: "[接続エラー。5秒後に再接続します]", runId: activeLogRunId }, { force: true });
     es.close();
     setTimeout(initLogStream, 5000);
   };
