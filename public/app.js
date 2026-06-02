@@ -908,7 +908,7 @@ async function runSearch(event) {
   event.preventDefault();
   const runId = searchRunId + 1;
   searchRunId = runId;
-  const button = form.querySelector("button");
+  const button = searchButton;
   button.disabled = true;
   environmentSummaryEl.hidden = true;
   environmentSummaryEl.replaceChildren();

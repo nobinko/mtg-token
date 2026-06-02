@@ -42,6 +42,12 @@ console.error = (...args) => {
 
 const app = new Hono();
 
+function normalizeRequestedDeckCount(value, fallback = 300) {
+  const parsed = Number(value);
+  const count = Number.isFinite(parsed) ? parsed : fallback;
+  return Math.max(20, Math.min(Math.trunc(count), 600));
+}
+
 app.get("/api/default-sources", (c) => c.json(defaultSources));
 
 app.get("/api/formats", (c) => c.json(formatOptions));
@@ -79,7 +85,7 @@ app.post("/api/token-cards", async (c) => {
   const sourceUrls = Array.isArray(body.sources) && body.sources.length
     ? body.sources
     : defaultSources[format] ?? defaultSources.standard;
-  const maxChildPages = Math.min(Number(body.maxChildPages || 300), 600);
+  const maxChildPages = normalizeRequestedDeckCount(body.maxChildPages);
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
   const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
