@@ -4,7 +4,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { port, publicDir, maxMatchedCards } from "./lib/config.js";
-import { defaultSources } from "./lib/data.js";
+import { defaultSources, formatOptions, normalizeFormat } from "./lib/data.js";
 import { toIsoDate, imageRefFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
@@ -44,6 +44,8 @@ const app = new Hono();
 
 app.get("/api/default-sources", (c) => c.json(defaultSources));
 
+app.get("/api/formats", (c) => c.json(formatOptions));
+
 app.get("/api/logs", (c) => {
   return streamSSE(c, async (stream) => {
     // 既存バッファを一括送信
@@ -73,7 +75,7 @@ app.post("/api/cache/clear", async (c) => {
 
 app.post("/api/token-cards", async (c) => {
   const body = await c.req.json().catch(() => ({}));
-  const format = String(body.format || "standard").toLowerCase();
+  const format = normalizeFormat(body.format);
   const sourceUrls = Array.isArray(body.sources) && body.sources.length
     ? body.sources
     : defaultSources[format] ?? defaultSources.standard;
@@ -82,8 +84,10 @@ app.post("/api/token-cards", async (c) => {
   const refreshCache = body.refreshCache === true;
   const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
   const environment = formatEnvironmentInfo(format, targetDate);
-  const environmentStartDate = toIsoDate(body.environmentStartDate) || environment.startDate || "0000-00-00";
-  environment.startDate = environmentStartDate;
+  if (!environment.resolved || !environment.startDate) {
+    return c.json({ error: environment.reason, environment }, 422);
+  }
+  const environmentStartDate = environment.startDate;
 
   const [candidates, crawl] = await Promise.all([
     fetchFinderCandidates(format),
@@ -155,6 +159,9 @@ app.post("/api/token-cards", async (c) => {
     errors: crawl.errors,
     cacheStats: crawl.cacheStats,
     siteStats: crawl.siteStats,
+    requestedDeckCount: maxChildPages,
+    searchedDeckLimitReached: crawl.deckEntryCount >= maxChildPages,
+    sourceExhausted: crawl.sourceExhausted,
     unparsedDeckCount: crawl.unparsedDeckCount || 0,
     searchedDecks: deckResults,
     searchedDeckCount: deckResults.length,

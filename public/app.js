@@ -31,6 +31,7 @@ const checkedStorageKey = "mtg-token-finder.checked";
 const initialDeckSummaryCount = 10;
 
 let defaultSources = {};
+let formatOptions = [];
 let lastGroups = [];
 let lastObjects = [];
 let showAllDecks = false;
@@ -178,6 +179,19 @@ function updateSourcesForFormat() {
   sourcesInput.value = urls.join("\n");
 }
 
+function populateFormatSelect(formats) {
+  if (!Array.isArray(formats) || !formats.length) return;
+  const current = formatSelect.value || formats[0].key;
+  formatSelect.replaceChildren();
+  for (const format of formats) {
+    const option = document.createElement("option");
+    option.value = format.key;
+    option.textContent = format.label || format.key;
+    formatSelect.append(option);
+  }
+  formatSelect.value = formats.some((format) => format.key === current) ? current : formats[0].key;
+}
+
 function renderSummary(data) {
   summaryEl.hidden = false;
   summaryEl.replaceChildren();
@@ -193,6 +207,13 @@ function renderSummary(data) {
   const mainLine = document.createElement("div");
   mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物 ${data.objects.length}種類を検出。チェック済み ${checkedCount}/${data.objects.length}。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}${unparsedText}。`;
   summaryEl.append(mainLine);
+
+  if (data.sourceExhausted && data.requestedDeckCount && data.searchedDeckCount < data.requestedDeckCount) {
+    const exhaustedLine = document.createElement("div");
+    exhaustedLine.className = "sampling-warn";
+    exhaustedLine.textContent = `要求 ${data.requestedDeckCount}デッキに対して、現在の環境期間内で取得できたデッキは ${data.searchedDeckCount}件です。古いデッキで水増しせず、この件数で集計しています。`;
+    summaryEl.append(exhaustedLine);
+  }
 
   // サイト別統計
   const siteStats = data.siteStats || {};
@@ -236,7 +257,7 @@ function renderEnvironmentSummary(environment) {
     link.href = event.sourceUrl;
     link.target = "_blank";
     link.rel = "noreferrer";
-    link.textContent = `${event.date}: ${event.title}${event.affectsFormat ? "" : "（Standard変更なし）"}`;
+    link.textContent = `${event.date}: ${event.title}${event.affectsFormat ? "" : "（このフォーマットは変更なし）"}`;
     list.append(link);
   }
   environmentSummaryEl.append(list);
@@ -1017,8 +1038,13 @@ function initLogStream() {
 }
 
 async function init() {
-  const response = await fetch("/api/default-sources");
-  defaultSources = await response.json();
+  const [formatsResponse, sourcesResponse] = await Promise.all([
+    fetch("/api/formats"),
+    fetch("/api/default-sources")
+  ]);
+  formatOptions = await formatsResponse.json();
+  defaultSources = await sourcesResponse.json();
+  populateFormatSelect(formatOptions);
   updateSourcesForFormat();
   applyCardLang(cardLang);
   applyEventScaleProfile();

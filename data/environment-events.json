@@ -1,28 +1,42 @@
 {
-  "standard": [
+  "events": [
     {
       "date": "2025-07-25",
-      "affectsFormat": true,
       "type": "rotation",
       "title": "2025 Standard rotation at Edge of Eternities prerelease",
-      "reason": "Edge of Eternities prerelease caused Standard rotation for tabletop play.",
-      "sourceUrl": "https://magic.gg/news/metagame-mentor-the-winners-and-losers-from-standards-2025-rotation"
+      "sourceUrl": "https://magic.gg/news/metagame-mentor-the-winners-and-losers-from-standards-2025-rotation",
+      "formatsAffected": ["standard"],
+      "changes": {
+        "standard": "Edge of Eternities prerelease caused Standard rotation for tabletop play."
+      }
     },
     {
       "date": "2026-04-24",
-      "affectsFormat": true,
       "type": "set-release",
       "title": "Secrets of Strixhaven tabletop release",
-      "reason": "Secrets of Strixhaven became Standard legal, adding a new Standard-legal set.",
-      "sourceUrl": "https://magic.wizards.com/en/news/feature/collecting-secrets-of-strixhaven"
+      "sourceUrl": "https://magic.wizards.com/en/news/feature/collecting-secrets-of-strixhaven",
+      "formatsAffected": ["standard", "pioneer", "modern", "legacy"],
+      "changes": {
+        "standard": "Secrets of Strixhaven became Standard legal, adding a new Standard-legal set.",
+        "pioneer": "Secrets of Strixhaven became legal in Pioneer.",
+        "modern": "Secrets of Strixhaven became legal in Modern.",
+        "legacy": "Secrets of Strixhaven became legal in Legacy."
+      }
     },
     {
       "date": "2026-05-18",
-      "affectsFormat": false,
       "type": "banned-restricted",
       "title": "Banned and Restricted Announcement - May 18, 2026",
-      "reason": "The latest B&R announcement did not change Standard, so it is shown as context but does not reset the environment start.",
-      "sourceUrl": "https://magic.wizards.com/en/news/announcements/banned-and-restricted-may-18-2026"
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/banned-and-restricted-may-18-2026",
+      "formatsAffected": ["pioneer", "modern", "legacy"],
+      "formatsUnchanged": ["standard"],
+      "changes": {
+        "standard": "No changes.",
+        "pioneer": "Cori-Steel Cutter was banned in Pioneer.",
+        "modern": "Phlage, Titan of Fire's Fury and Lotus Field were banned in Modern; Violent Outburst and Umezawa's Jitte were unbanned.",
+        "legacy": "Undercity Informer was banned in Legacy."
+      },
+      "nextAnnouncementDate": "2026-06-30"
     }
   ]
 }
