@@ -9,8 +9,8 @@ import { toIsoDate, imageRefFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
-import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint } from "./lib/scryfall.js";
-import { buildBulkObjects, groupObjectsBySet } from "./lib/tokens.js";
+import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
+import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
 import { crawlSources } from "./lib/crawl.js";
 
@@ -140,20 +140,8 @@ app.post("/api/token-cards", async (c) => {
     }
   }
 
-  const matched = findCardMentions(candidates, crawl.pages);
-  for (const card of matched.slice(0, maxMatchedCards)) {
-    // fetchJapanesePrint 1回で画像URLと日本語名を両方取得し、Scryfall呼び出しを半減させる。
-    // jaPrint が null の場合（日本語版未存在）は fetchJapaneseName のフォールバックを使う。
-    const jaPrint = await fetchJapanesePrint(card.name);
-    const imageJaRef = jaPrint ? imageRefFor(jaPrint) : null;
-    card.imageJa = imageJaRef?.url || "";
-    card.imageJaSource = imageJaRef?.source || "none";
-    card.imageJaSourceLabel = imageJaRef?.sourceLabel || "日本語画像なし";
-    card.imageJaSourceUrl = imageJaRef?.sourceUrl || "";
-    card.japaneseName = jaPrint?.printed_name || await fetchJapaneseName(card.name);
-  }
-
-  const objects = await buildBulkObjects(matched.slice(0, maxMatchedCards));
+  const matched = findCardMentions(candidates, crawl.pages).slice(0, maxMatchedCards);
+  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false });
   const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
   const archetypes = overallArchetypeStats(deckResults);
 
@@ -174,8 +162,73 @@ app.post("/api/token-cards", async (c) => {
     candidateCount: candidates.length,
     cards: matched.map(({ raw: _raw, ...card }) => card),
     objects,
-    groups: groupObjectsBySet(objects)
+    groups: groupObjectsBySet(objects),
+    assetsDeferred: true
   });
+});
+
+app.post("/api/enrich-card-assets", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const sourceCards = Array.isArray(body.sourceCards) ? body.sourceCards.slice(0, 120) : [];
+  const objects = Array.isArray(body.objects) ? body.objects.slice(0, 160) : [];
+  const sourceInputByName = new Map(sourceCards.map((source) => [String(source.name || ""), source]));
+
+  const sourceResults = [];
+  for (const source of sourceCards) {
+    const name = String(source.name || "");
+    if (!name) continue;
+    const set = String(source.set || "");
+    const jaPrint = await fetchJapanesePrint(name);
+    const officialJa = await fetchOfficialJapaneseCard(name, { set });
+    const imageJaRef = jaPrint ? imageRefFor(jaPrint) : null;
+    sourceResults.push({
+      name,
+      japaneseName: printedNameFor(jaPrint) || officialJa?.japaneseName || await fetchJapaneseName(name),
+      imageJa: imageJaRef?.url || "",
+      imageJaSource: imageJaRef?.source || "none",
+      imageJaSourceLabel: imageJaRef?.sourceLabel || "日本語画像なし",
+      imageJaSourceUrl: imageJaRef?.sourceUrl || ""
+    });
+  }
+  const sourceJapaneseByName = new Map(sourceResults.map((source) => [source.name, source.japaneseName || ""]));
+
+  const objectResults = [];
+  for (const object of objects) {
+    const name = String(object.name || "");
+    const kind = String(object.kind || "");
+    const typeLine = String(object.typeLine || "");
+    if (!name) continue;
+    const sourceNames = Array.isArray(object.sourceNames) ? object.sourceNames.filter(Boolean) : [];
+    let japaneseName = "";
+    for (const sourceName of sourceNames.slice(0, 4)) {
+      const sourceSet = String(sourceInputByName.get(sourceName)?.set || "");
+      japaneseName = await fetchJapaneseRelatedObjectName(sourceName, { name, type_line: typeLine }, { set: sourceSet });
+      if (japaneseName) break;
+    }
+    if (/emblem/i.test(kind) || /emblem/i.test(typeLine) || /emblem/i.test(name)) {
+      const sourceName = sourceNames[0] || "";
+      japaneseName = japaneseEmblemNameFromSource(sourceName, sourceJapaneseByName.get(sourceName) || "", name);
+    }
+    japaneseName = japaneseName
+      || japaneseNameFromTypeLine({ name, typeLine })
+      || await fetchJapaneseName(name)
+      || japaneseOperationalName({ name, typeLine, kind });
+
+    const jaCard = await fetchJapanesePrint(name, { objectKind: kind });
+    const imageJaRef = jaCard ? imageRefFor(jaCard) : null;
+    objectResults.push({
+      key: String(object.key || ""),
+      name,
+      typeLine,
+      japaneseName,
+      imageJa: imageJaRef?.url || "",
+      imageJaSource: imageJaRef?.source || "none",
+      imageJaSourceLabel: imageJaRef?.sourceLabel || "日本語画像なし",
+      imageJaSourceUrl: imageJaRef?.sourceUrl || ""
+    });
+  }
+
+  return c.json({ sourceCards: sourceResults, objects: objectResults });
 });
 
 app.use("/*", serveStatic({ root: relative(process.cwd(), publicDir) }));

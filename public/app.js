@@ -28,6 +28,7 @@ const objectTemplate = document.querySelector("#object-template");
 const langBtns = document.querySelectorAll(".lang-btn");
 
 const checkedStorageKey = "mtg-token-finder.checked";
+const initialDeckSummaryCount = 10;
 
 let defaultSources = {};
 let lastGroups = [];
@@ -36,6 +37,7 @@ let showAllDecks = false;
 let lastSearchedDeckCount = 0;
 let checkedObjects = readCheckedObjects();
 let cardLang = "en"; // "en" | "ja"
+let searchRunId = 0;
 
 // ---- ホバーズーム用グローバルプレビュー ----
 const hoverPreview = document.createElement("img");
@@ -243,12 +245,15 @@ function renderEnvironmentSummary(environment) {
 function renderDeckSummary(decks) {
   deckSummaryEl.hidden = false;
   deckSummaryEl.replaceChildren();
-  const visibleDecks = showAllDecks ? decks : decks.slice(0, 48);
+  const visibleDecks = showAllDecks ? decks : decks.slice(0, initialDeckSummaryCount);
 
-  const heading = document.createElement("div");
+  const details = document.createElement("details");
+  details.className = "summary-disclosure";
+
+  const heading = document.createElement("summary");
   heading.className = "deck-summary-heading";
   heading.textContent = `検索したデッキ/リスト: ${decks.length}件（表示 ${visibleDecks.length}件）`;
-  deckSummaryEl.append(heading);
+  details.append(heading);
 
   const list = document.createElement("div");
   list.className = "deck-chip-list";
@@ -261,19 +266,21 @@ function renderDeckSummary(decks) {
     link.textContent = deck.title || deck.url;
     list.append(link);
   }
-  deckSummaryEl.append(list);
+  details.append(list);
 
-  if (decks.length > 48) {
+  if (decks.length > initialDeckSummaryCount) {
     const toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "deck-toggle";
-    toggle.textContent = showAllDecks ? "先頭48件だけ表示" : `全${decks.length}件を表示`;
+    toggle.textContent = showAllDecks ? `先頭${initialDeckSummaryCount}件だけ表示` : `全${decks.length}件を表示`;
     toggle.addEventListener("click", () => {
       showAllDecks = !showAllDecks;
       renderDeckSummary(decks);
     });
-    deckSummaryEl.append(toggle);
+    details.append(toggle);
   }
+
+  deckSummaryEl.append(details);
 }
 
 function renderArchetypeSummary(archetypes) {
@@ -281,10 +288,13 @@ function renderArchetypeSummary(archetypes) {
   archetypeSummaryEl.replaceChildren();
   const sortedArchetypes = [...(archetypes || [])].sort((a, b) => (b.count || 0) - (a.count || 0) || String(a.name).localeCompare(String(b.name)));
 
-  const heading = document.createElement("div");
+  const details = document.createElement("details");
+  details.className = "summary-disclosure";
+
+  const heading = document.createElement("summary");
   heading.className = "deck-summary-heading";
-  heading.textContent = "メタ傾向";
-  archetypeSummaryEl.append(heading);
+  heading.textContent = `メタ傾向: ${sortedArchetypes.length}タイプ`;
+  details.append(heading);
 
   const chartWrap = document.createElement("div");
   chartWrap.className = "meta-chart-wrap";
@@ -336,7 +346,8 @@ function renderArchetypeSummary(archetypes) {
     }
   }
   chartWrap.append(list);
-  archetypeSummaryEl.append(chartWrap);
+  details.append(chartWrap);
+  archetypeSummaryEl.append(details);
 }
 
 function macroPlanLabel(value) {
@@ -587,6 +598,28 @@ function groupsByKind(objects) {
   return [...byKind.values()];
 }
 
+function groupsBySetClient(objects) {
+  const groups = [];
+  const bySet = new Map();
+
+  for (const object of objects) {
+    const key = `${object.set}|${object.setName}`;
+    if (!bySet.has(key)) {
+      const group = { set: object.set, setName: object.setName, releasedAt: object.releasedAt || "", count: 0, objects: [] };
+      bySet.set(key, group);
+      groups.push(group);
+    }
+    const group = bySet.get(key);
+    group.objects.push(object);
+    group.count += 1;
+    if (!group.releasedAt || (object.releasedAt && object.releasedAt < group.releasedAt)) {
+      group.releasedAt = object.releasedAt;
+    }
+  }
+
+  return groups;
+}
+
 function renderSourcePreview(container, sourceCards) {
   container.replaceChildren();
   const cards = sortObjects(sourceCards || []).slice(0, 4);
@@ -680,7 +713,7 @@ function renderObject(object) {
   imageLink.addEventListener("mouseenter", () => showHoverPreview(img.src));
   imageLink.addEventListener("mouseleave", hideHoverPreview);
   title.textContent = object.name;
-  jp.textContent = object.japaneseName || "日本語名未取得";
+  jp.textContent = object.japaneseName || `名称確認: ${object.category || "トークン"}`;
   kind.textContent = object.category || object.kind;
   type.textContent = object.typeLine;
   const priority = tokenPriority(object);
@@ -786,12 +819,74 @@ function renderGroups(groups) {
 }
 
 function renderCurrentResults() {
-  const groups = viewModeSelect.value === "kind" ? groupsByKind(lastObjects) : lastGroups;
+  const groups = viewModeSelect.value === "kind" ? groupsByKind(lastObjects) : groupsBySetClient(lastObjects);
   renderGroups(groups);
+}
+
+function uniqueSourceCards(objects) {
+  const byName = new Map();
+  for (const object of objects) {
+    for (const card of object.sourceCards || []) {
+      if (card.name && !byName.has(card.name)) byName.set(card.name, { name: card.name, set: card.set });
+    }
+  }
+  return [...byName.values()];
+}
+
+function objectAssetRequests(objects) {
+  return objects.map((object) => ({
+    key: objectKey(object),
+    name: object.name,
+    kind: object.kind,
+    typeLine: object.typeLine,
+    sourceNames: (object.sourceCards || []).map((card) => card.name).filter(Boolean)
+  }));
+}
+
+function mergeEnrichedAssets(enrichment) {
+  const sourceByName = new Map((enrichment.sourceCards || []).map((card) => [card.name, card]));
+  const objectByKey = new Map((enrichment.objects || []).map((object) => [object.key, object]));
+
+  lastObjects = lastObjects.map((object) => {
+    const enrichedObject = objectByKey.get(objectKey(object));
+    const nextObject = enrichedObject ? { ...object, ...enrichedObject } : { ...object };
+    nextObject.sourceCards = (nextObject.sourceCards || []).map((card) => {
+      const enrichedCard = sourceByName.get(card.name);
+      return enrichedCard ? { ...card, ...enrichedCard } : card;
+    });
+    return nextObject;
+  });
+}
+
+async function enrichCurrentAssets(runId) {
+  if (!lastObjects.length) return;
+  try {
+    setStatus("検索結果を表示しました。日本語画像とカード名を裏で補完しています。");
+    const response = await fetch("/api/enrich-card-assets", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        sourceCards: uniqueSourceCards(lastObjects),
+        objects: objectAssetRequests(lastObjects)
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "画像補完に失敗しました。");
+    if (runId !== searchRunId) return;
+    mergeEnrichedAssets(data);
+    renderTokenSummary(lastObjects);
+    renderCurrentResults();
+    setStatus("検索完了。日本語画像とカード名の補完も反映しました。");
+  } catch (error) {
+    if (runId !== searchRunId) return;
+    setStatus(`検索結果を表示しました。画像/日本語名の補完は未完了です: ${error.message}`);
+  }
 }
 
 async function runSearch(event) {
   event.preventDefault();
+  const runId = searchRunId + 1;
+  searchRunId = runId;
   const button = form.querySelector("button");
   button.disabled = true;
   environmentSummaryEl.hidden = true;
@@ -833,6 +928,9 @@ async function runSearch(event) {
     renderTokenSummary(lastObjects);
     renderDeckSummary(data.searchedDecks || []);
     renderCurrentResults();
+    if (data.assetsDeferred) {
+      enrichCurrentAssets(runId);
+    }
   } catch (error) {
     setStatus(`エラー: ${error.message}`);
   } finally {

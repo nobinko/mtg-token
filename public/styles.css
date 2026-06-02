@@ -395,6 +395,16 @@ textarea {
   font-weight: 900;
 }
 
+.summary-disclosure {
+  display: grid;
+  gap: 10px;
+}
+
+.summary-disclosure > summary {
+  cursor: pointer;
+  user-select: none;
+}
+
 .site-stats {
   margin-top: 6px;
   display: flex;
