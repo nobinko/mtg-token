@@ -975,7 +975,7 @@ const logClearBtn = document.querySelector("#log-clear-btn");
 const logToggleBtn = document.querySelector("#log-toggle-btn");
 const logPanelHeader = document.querySelector("#log-panel-header");
 
-let logCollapsed = true;
+let logCollapsed = false;
 
 const appEl = document.querySelector(".app");
 

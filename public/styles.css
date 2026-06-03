@@ -16,7 +16,7 @@ body {
 .app {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 24px 24px 72px; /* 下は折りたたみログパネル分の余白 */
+  padding: 24px 24px 290px; /* 下は展開ログパネル分の余白 */
 }
 
 .legal-note {
@@ -911,7 +911,7 @@ summary {
 
 @media (max-width: 720px) {
   .app {
-    padding: 16px 16px 72px;
+    padding: 16px 16px 290px;
   }
 
   .toolbar {
