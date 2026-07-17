@@ -488,7 +488,15 @@ function renderTokenSummary(objects) {
     const priority = tokenPriority(object);
     const row = document.createElement("div");
     row.className = `token-rank-row ${priority.className}`;
-    row.innerHTML = `<span>${object.name}</span><strong>${priority.percent.toFixed(1)}%</strong><em>${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks</em><b>${priority.label}</b>`;
+    const name = document.createElement("span");
+    name.textContent = object.name;
+    const percent = document.createElement("strong");
+    percent.textContent = `${priority.percent.toFixed(1)}%`;
+    const count = document.createElement("em");
+    count.textContent = `${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks`;
+    const label = document.createElement("b");
+    label.textContent = priority.label;
+    row.append(name, percent, count, label);
     list.append(row);
   }
   tokenSummaryEl.append(list);
@@ -876,7 +884,8 @@ function objectAssetRequests(objects) {
     name: object.name,
     kind: object.kind,
     typeLine: object.typeLine,
-    sourceNames: (object.sourceCards || []).map((card) => card.name).filter(Boolean)
+    // サーバー側は和名解決に先頭4件しか使わないため、送信もそれに合わせる
+    sourceNames: (object.sourceCards || []).map((card) => card.name).filter(Boolean).slice(0, 4)
   }));
 }
 
@@ -895,29 +904,75 @@ function mergeEnrichedAssets(enrichment) {
   });
 }
 
+// サーバー側 /api/enrich-card-assets の受け付け上限（server.mjs の slice と一致させる）。
+// 超える分は複数リクエストに分けて全件補完する。
+const ENRICH_SOURCE_LIMIT = 120;
+const ENRICH_OBJECT_LIMIT = 160;
+
+function buildEnrichRequests(objects) {
+  const allSources = uniqueSourceCards(objects);
+  const allObjects = objectAssetRequests(objects);
+  const sourceByName = new Map(allSources.map((source) => [source.name, source]));
+  const sentSources = new Set();
+  const requests = [];
+
+  // 紋章の和名解決は同一リクエスト内の発生源情報に依存するため、
+  // 現物チャンクには、その現物が参照する発生源をできるだけ同梱する。
+  for (let i = 0; i < allObjects.length; i += ENRICH_OBJECT_LIMIT) {
+    const chunk = allObjects.slice(i, i + ENRICH_OBJECT_LIMIT);
+    const sourceCards = [];
+    for (const object of chunk) {
+      if (sourceCards.length >= ENRICH_SOURCE_LIMIT) break;
+      for (const name of object.sourceNames) {
+        if (sourceCards.length >= ENRICH_SOURCE_LIMIT) break;
+        if (sentSources.has(name)) continue;
+        const source = sourceByName.get(name);
+        if (source) {
+          sentSources.add(name);
+          sourceCards.push(source);
+        }
+      }
+    }
+    requests.push({ objects: chunk, sourceCards });
+  }
+
+  // どのチャンクにも載らなかった発生源は、現物なしのリクエストで補完する
+  const leftovers = allSources.filter((source) => !sentSources.has(source.name));
+  for (let i = 0; i < leftovers.length; i += ENRICH_SOURCE_LIMIT) {
+    requests.push({ objects: [], sourceCards: leftovers.slice(i, i + ENRICH_SOURCE_LIMIT) });
+  }
+  return requests;
+}
+
 async function enrichCurrentAssets(runId) {
   if (!lastObjects.length) return;
   const logRunId = activeLogRunId;
+  const requests = buildEnrichRequests(lastObjects);
+  let merged = 0;
   try {
-    setStatus("検索結果を表示しました。日本語画像とカード名を裏で補完しています。");
-    const response = await fetch("/api/enrich-card-assets", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        logRunId,
-        sourceCards: uniqueSourceCards(lastObjects),
-        objects: objectAssetRequests(lastObjects)
-      })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "画像補完に失敗しました。");
-    if (runId !== searchRunId) return;
-    mergeEnrichedAssets(data);
+    for (const [index, payload] of requests.entries()) {
+      const progress = requests.length > 1 ? ` (${index + 1}/${requests.length})` : "";
+      setStatus(`検索結果を表示しました。日本語画像とカード名を裏で補完しています${progress}。`);
+      const response = await fetch("/api/enrich-card-assets", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ logRunId, ...payload })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "画像補完に失敗しました。");
+      if (runId !== searchRunId) return;
+      mergeEnrichedAssets(data);
+      merged += 1;
+    }
     renderTokenSummary(lastObjects);
     renderCurrentResults();
     setStatus("検索完了。日本語画像とカード名の補完も反映しました。");
   } catch (error) {
     if (runId !== searchRunId) return;
+    if (merged > 0) {
+      renderTokenSummary(lastObjects);
+      renderCurrentResults();
+    }
     setStatus(`検索結果を表示しました。画像/日本語名の補完は未完了です: ${error.message}`);
   }
 }
