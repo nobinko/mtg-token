@@ -2,6 +2,12 @@
 
 実装の詳細設計は [architecture.md](architecture.md)、巡回元の実測は [decklist-sources.md](decklist-sources.md) を参照してください。
 
+## 2026-07-17
+
+- 環境イベント表に Marvel Super Heroes 発売（2026-06-26、standard/pioneer/modern/legacy）と禁止改定（2026-06-29、Legacy: Candelabra of Tawnos 禁止、次回改定 2026-08-10）を追記。
+- MTGO の大会名（Challenge 64 / League 等）がアーキタイプ名として表示される問題を修正。イベント語彙・日付をタイトル推定のノイズ扱いにし、MTGO デッキのタイトル由来フォールバックを Unknown に固定して土地色フォールバックへ委ねるようにした。
+- 現物の採用デッキ数が表示用デッキ一覧の切り詰め（36件）で頭打ちになるバグを修正。集計を一意デッキURL＋切り詰めあふれ分の加算に分離し、回帰テストを追加。
+
 ## 2026-06-02
 
 ### 監査対応
