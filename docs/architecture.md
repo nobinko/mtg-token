@@ -49,7 +49,12 @@ Scryfallから候補カード母集団を取得
 
 ## 環境判定
 
-単純な「直近N日」ではなく、現在の各フォーマット環境が始まった日から大会日までを対象にします。環境開始日は `data/environment-events.json` の公式イベント表から解決します。
+単純な「直近N日」ではなく、現在の各フォーマット環境が始まった日から大会日までを対象にします。環境イベントは2系統を統合して解決します。
+
+- **セット発売**: Scryfall `/sets` から自動生成（`lib/set-events.js`、24時間キャッシュ）。通常セット（expansion / core、紙）のみを全構築フォーマットの環境イベントとして扱います。未発売セットも含まれるため、発売日を過ぎた大会日を指定すると自動的に新環境起点になります。
+- **禁止改定・ローテーション**: `data/environment-events.json` に手書き（CIの自動検知にも支えられる。「自動化」の節を参照）。
+
+同じ日付・同種のイベントは手書き側を正とします。Scryfall に到達できない場合は期限切れキャッシュ→手書きイベントのみ、と段階的に縮退します。
 
 検索APIは、環境開始日を解決できない場合、古いデッキを混ぜる代わりに検索を実行しません。
 
@@ -110,8 +115,11 @@ Scryfall APIは `User-Agent` と `Accept` を付けて呼び出し、検索系�
 | `server.mjs` | Honoルーティング、静的ファイル配信、検索API、日本語名/画像の後追い補完API |
 | `lib/config.js` | ポート、パス、検索上限、キャッシュTTL、fetchタイムアウト |
 | `lib/data.js` | トークン和名表、巡回元、公式確認済み日本語名/画像上書き表、フォーマット定義 |
-| `data/environment-events.json` | 環境イベント定義。コード変更なしで更新可能 |
-| `lib/environment.js` | 大会日から環境開始日を解決 |
+| `data/environment-events.json` | 禁止改定・ローテーションの手書きイベント（セット発売は自動解決） |
+| `data/freshness-snapshot.json` | 鮮度チェックの検知ベースライン（CIが更新） |
+| `lib/environment.js` | 手書き＋自動イベントの統合と、大会日からの環境開始日解決 |
+| `lib/set-events.js` | Scryfall /sets からセット発売イベントを自動生成 |
+| `scripts/freshness-check.mjs` | 禁止改定・新セット・新キーワードの検知（CIから日次実行） |
 | `lib/cache.js` | ページキャッシュ、HTML/JSONのHTTP取得、HTTPエラー時の期限切れページキャッシュ代替 |
 | `lib/crawl.js` | 巡回元のクロール、サイト別統計、JS/WAFブロック検出 |
 | `lib/deck.js` | デッキリスト抽出、リンク抽出、フォーマット外リンク除外 |
@@ -130,10 +138,21 @@ Scryfall APIは `User-Agent` と `Accept` を付けて呼び出し、検索系�
 
 検索品質は次の鮮度依存データに支えられている。新セット発売や禁止改定のたびに確認する。
 
-1. `data/environment-events.json` — 発売・改定イベントを追記する（コード変更不要。これが古いと環境開始日の判定が古くなり、旧環境のデッキが混ざる）。
+1. `data/environment-events.json` — 手書きするのは禁止改定とローテーションのみ（セット発売は Scryfall から自動解決）。禁止改定はCIが日次で自動検知・追記するが、検知日は発表日と最大1日ずれ、「変更なし」の発表は検知されないため、Issue が立ったら `nextAnnouncementDate` を含めて確認する。
 2. `lib/scryfall.js` の候補クエリ — 新メカニズムがカード状の現物や除外追跡を必要とするなら語彙を追加し、`candidateQueryVersion` を上げる。カウンター管理のみのメカニズムは追加しない。
 3. `lib/archetype.js` の `archetypeRules` / `archetypeLexicon` — 現行Standardのメタゲームに合わせて更新する（他フォーマットは土地色フォールバックで縮退する設計）。
 4. `lib/data.js` の `tokenJapaneseNameMap` と `lib/archetype.js` の `LAND_COLOR_MAP` — 新しいトークン種の和名、新しい2色以上ランドを追加する。
+
+## 自動化
+
+`.github/workflows/freshness.yml` が毎朝 06:00 JST に `scripts/freshness-check.mjs` を実行します。
+
+- Scryfall のリーガリティ差分（`banned:{format}` の前回スナップショット比較）から禁止/解禁を検知し、環境イベント表へ自動追記して main へコミットします（`npm test` 通過が条件）。ローテーションで `not_legal` になったカードを「解禁」と誤検知しないよう、現在 `legal` であることを確認してから解禁扱いにします。
+- 予告された禁止改定日を過ぎてもイベントが無い場合は Issue を起票します。
+- 新しい通常セットや新キーワードを検知したら `mechanics-audit` ラベルの Issue を起票します。「現物が要るか」の判断は自動化せず、監査（人またはAIエージェント）とPRレビューに委ねます。
+- 検知のベースラインは `data/freshness-snapshot.json` に保持し、CIがコミットします。
+
+public リポジトリの scheduled workflow は、リポジトリに60日間活動が無いと自動停止される点に注意してください。
 
 ## 変更時のチェック
 
