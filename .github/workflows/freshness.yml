@@ -1,0 +1,74 @@
+# 鮮度チェック（毎朝 06:00 JST）。
+# - 禁止/解禁を検知したら環境イベント表を更新し、テストが通ったら main へ直接コミットする
+# - 改定予定日の超過と、新セット・新キーワード（メカニズム監査が必要）は Issue にする
+# 注意: public リポジトリの scheduled workflow は、リポジトリに60日間活動がないと自動停止する。
+name: freshness
+
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: freshness
+  cancel-in-progress: false
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run freshness check
+        run: node scripts/freshness-check.mjs
+
+      - name: Run tests (gate for auto commits)
+        run: npm test
+
+      - name: Commit data updates
+        run: |
+          if ! git diff --quiet -- data; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data
+            git commit -m "chore: 環境イベント表と鮮度スナップショットを自動更新"
+            git push
+          else
+            echo "data/ に変更なし"
+          fi
+
+      - name: Open issues from report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          stale_msg=$(jq -r '.staleAnnouncement.message // empty' freshness-report.json)
+          if [ -n "$stale_msg" ]; then
+            title="環境イベント表: 禁止改定の予定日を過ぎています"
+            if [ -z "$(gh issue list --state open --search "in:title $title" --json number --jq '.[0].number')" ]; then
+              gh issue create --title "$title" --body "$stale_msg"
+            fi
+          fi
+
+          new_sets=$(jq -r '[.newSets[]? | "- \(.code) \(.name) (\(.releasedAt))"] | join("\n")' freshness-report.json)
+          new_keywords=$(jq -r '[.newKeywords[]?] | join(", ")' freshness-report.json)
+          if [ -n "$new_sets" ] || [ -n "$new_keywords" ]; then
+            gh label create mechanics-audit --description "新メカニズムの現物監査が必要" --color 1d76db 2>/dev/null || true
+            codes=$(jq -r '[.newSets[]?.code] | join(", ")' freshness-report.json)
+            title="メカニズム監査: ${codes:-新キーワード検知}"
+            if [ -z "$(gh issue list --state open --label mechanics-audit --json number --jq '.[0].number')" ]; then
+              body=$(printf '新しいセットまたはキーワードを検知しました。docs/architecture.md の「定期メンテナンス」に沿って、盤面の現物・除外追跡が必要なメカニズムがあるか公式情報で監査してください。\n\n## 新セット\n%s\n\n## 新キーワード\n%s\n\n監査の結果、現物が必要なメカニズムがあれば lib/scryfall.js の候補クエリと lib/tokens.js の補助生成に追加し、candidateQueryVersion を上げて、テスト付きでPRを作成してください。' "${new_sets:-なし}" "${new_keywords:-なし}")
+              gh issue create --title "$title" --label mechanics-audit --body "$body"
+            fi
+          fi
