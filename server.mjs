@@ -112,7 +112,7 @@ app.post("/api/token-cards", async (c) => {
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
   const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
-  const environment = formatEnvironmentInfo(format, targetDate);
+  const environment = await formatEnvironmentInfo(format, targetDate);
   if (!environment.resolved || !environment.startDate) {
     return c.json({ error: environment.reason, environment }, 422);
   }
