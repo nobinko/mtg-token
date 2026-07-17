@@ -34,6 +34,45 @@ test("physical token copies create a virtual copy marker", async () => {
   assert.equal(objects[0].category, "コピー");
 });
 
+test("exile-tracking mechanics create virtual card markers", async () => {
+  const baseSource = {
+    set: "TST",
+    setName: "Test Set",
+    releasedAt: "2026-01-01",
+    image: "",
+    imageSource: "",
+    imageSourceLabel: "",
+    imageSourceUrl: "",
+    scryfallUri: "https://scryfall.com/card/test/exile-source"
+  };
+
+  const airbend = await objectsForSource({
+    ...baseSource,
+    id: "airbend-source",
+    name: "Airbend Source",
+    raw: {
+      oracle_text: "When this creature enters, airbend up to one target nonland permanent."
+    }
+  }, { enrichJapaneseAssets: false });
+
+  assert.equal(airbend.length, 1);
+  assert.equal(airbend[0].name, "Airbent card marker");
+  assert.equal(airbend[0].japaneseName, "エアベンド・カード・マーカー");
+
+  const paradigm = await objectsForSource({
+    ...baseSource,
+    id: "paradigm-source",
+    name: "Paradigm Source",
+    raw: {
+      oracle_text: "Paradigm (After this spell resolves, exile it. At the beginning of your first main phase, you may cast a copy of the exiled card.)"
+    }
+  }, { enrichJapaneseAssets: false });
+
+  assert.equal(paradigm.length, 1);
+  assert.equal(paradigm[0].name, "Paradigm card marker");
+  assert.equal(paradigm[0].japaneseName, "パラダイム・カード・マーカー");
+});
+
 test("buildBulkObjects deckCount does not saturate at the display deck cap", async () => {
   const makeDecks = (prefix, count) => Array.from({ length: count }, (_, i) => ({
     url: `https://decks.example/${prefix}-${i}`,
