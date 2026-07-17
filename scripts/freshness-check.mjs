@@ -193,12 +193,21 @@ if (banResult.changes) {
   eventsUpdated = true;
 }
 
-await writeFile(snapshotPath, `${JSON.stringify({
-  generatedAt: new Date().toISOString(),
+// generatedAt だけの差分で毎日コミットが積まれないよう、内容が変わった時だけ書き換える
+const nextSnapshotBody = {
   bannedByFormat: banResult.current,
   setCodes: setResult.allCodes,
   keywords: keywordResult.current
-}, null, 2)}\n`, "utf8");
+};
+const prevSnapshotBody = snapshot
+  ? { bannedByFormat: snapshot.bannedByFormat, setCodes: snapshot.setCodes, keywords: snapshot.keywords }
+  : null;
+if (JSON.stringify(prevSnapshotBody) !== JSON.stringify(nextSnapshotBody)) {
+  await writeFile(snapshotPath, `${JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    ...nextSnapshotBody
+  }, null, 2)}\n`, "utf8");
+}
 
 const report = {
   generatedAt: new Date().toISOString(),
