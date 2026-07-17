@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-17T02:28:51.085Z",
+  "generatedAt": "2026-07-17T02:39:38.960Z",
   "bannedByFormat": {
     "standard": [
       "Abuelo's Awakening",
@@ -273,11 +273,6 @@
     ]
   },
   "setCodes": [
-    "trk",
-    "sds",
-    "fra",
-    "hob",
-    "msh",
     "sos",
     "tmt",
     "ecl",
@@ -416,7 +411,8 @@
     "arn",
     "2ed",
     "leb",
-    "lea"
+    "lea",
+    "msh"
   ],
   "keywords": [
     "Abandon",

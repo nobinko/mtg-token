@@ -56,7 +56,9 @@ jobs:
           stale_msg=$(jq -r '.staleAnnouncement.message // empty' freshness-report.json)
           if [ -n "$stale_msg" ]; then
             title="環境イベント表: 禁止改定の予定日を過ぎています"
-            if [ -z "$(gh issue list --state open --search "in:title $title" --json number --jq '.[0].number')" ]; then
+            # jq '.[0].number' は0件時に文字列 "null" を出すため、件数で判定する
+            count=$(gh issue list --state open --search "in:title $title" --json number --jq 'length')
+            if [ "${count:-0}" -eq 0 ]; then
               gh issue create --title "$title" --body "$stale_msg"
             fi
           fi
@@ -67,7 +69,8 @@ jobs:
             gh label create mechanics-audit --description "新メカニズムの現物監査が必要" --color 1d76db 2>/dev/null || true
             codes=$(jq -r '[.newSets[]?.code] | join(", ")' freshness-report.json)
             title="メカニズム監査: ${codes:-新キーワード検知}"
-            if [ -z "$(gh issue list --state open --label mechanics-audit --json number --jq '.[0].number')" ]; then
+            count=$(gh issue list --state open --label mechanics-audit --json number --jq 'length')
+            if [ "${count:-0}" -eq 0 ]; then
               body=$(printf '新しいセットまたはキーワードを検知しました。docs/architecture.md の「定期メンテナンス」に沿って、盤面の現物・除外追跡が必要なメカニズムがあるか公式情報で監査してください。\n\n## 新セット\n%s\n\n## 新キーワード\n%s\n\n監査の結果、現物が必要なメカニズムがあれば lib/scryfall.js の候補クエリと lib/tokens.js の補助生成に追加し、candidateQueryVersion を上げて、テスト付きでPRを作成してください。' "${new_sets:-なし}" "${new_keywords:-なし}")
               gh issue create --title "$title" --label mechanics-audit --body "$body"
             fi

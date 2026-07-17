@@ -29,6 +29,8 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function scryfall(url) {
   await sleep(REQUEST_DELAY_MS);
   const response = await fetch(url, { headers: { "user-agent": USER_AGENT, accept: "application/json" } });
+  // Scryfall は「検索結果0件」も404で返す。呼び出し側が空として扱えるよう null を返す
+  if (response.status === 404) return null;
   if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${url}`);
   return response.json();
 }
@@ -38,6 +40,7 @@ async function scryfallList(url) {
   let next = url;
   while (next) {
     const page = await scryfall(next);
+    if (!page) break;
     items.push(...(page.data || []));
     next = page.has_more ? page.next_page : null;
   }
@@ -53,7 +56,7 @@ async function fetchBannedNames(format) {
 async function isCardLegalNow(name, format) {
   try {
     const card = await scryfall(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name)}`);
-    return card.legalities?.[format] === "legal";
+    return card?.legalities?.[format] === "legal";
   } catch {
     return false;
   }
@@ -141,20 +144,23 @@ function banChangeEvent(changes, today) {
 }
 
 // --- 3. 新セット・新キーワード ---
+// スナップショットには「処理済み（＝過去に検知した or 運用開始前から存在した）」セットだけを載せる。
+// Scryfall には未発売セットが数ヶ月前から載るため、全コードを保存すると
+// 発売が近づいた時には既知扱いになり、監査 Issue が一度も発火しなくなる。
 async function detectNewSets(snapshot, today) {
-  const sets = (await scryfall("https://api.scryfall.com/sets")).data || [];
+  const sets = (await scryfall("https://api.scryfall.com/sets"))?.data || [];
   const paperSets = sets.filter((set) => !set.digital && ["expansion", "core"].includes(set.set_type));
-  const allCodes = paperSets.map((set) => set.code);
-  if (!snapshot) return { allCodes, fresh: [] };
+  // 発売済み〜発売21日前のセットだけを処理対象にする（プレビュー時期に合わせて事前に監査できる）
+  const horizon = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const due = paperSets.filter((set) => set.released_at && set.released_at <= horizon);
+  const dueCodes = due.map((set) => set.code);
+  if (!snapshot) return { processedCodes: dueCodes, fresh: [] };
 
   const known = new Set(snapshot);
-  const windowStart = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const windowEnd = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const fresh = paperSets
+  const fresh = due
     .filter((set) => !known.has(set.code))
-    .filter((set) => set.released_at && set.released_at >= windowStart && set.released_at <= windowEnd)
     .map((set) => ({ code: set.code.toUpperCase(), name: set.name, releasedAt: set.released_at }));
-  return { allCodes, fresh };
+  return { processedCodes: [...new Set([...snapshot, ...dueCodes])], fresh };
 }
 
 async function detectNewKeywords(snapshot) {
@@ -196,7 +202,7 @@ if (banResult.changes) {
 // generatedAt だけの差分で毎日コミットが積まれないよう、内容が変わった時だけ書き換える
 const nextSnapshotBody = {
   bannedByFormat: banResult.current,
-  setCodes: setResult.allCodes,
+  setCodes: setResult.processedCodes,
   keywords: keywordResult.current
 };
 const prevSnapshotBody = snapshot
