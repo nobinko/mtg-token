@@ -41,6 +41,56 @@ test("extractDeckEntries reads matching magic.gg deck-list cards", () => {
   assert.deepEqual(entries[0].cards, ["Slickshot Show-Off", "Flow State", "Stormchaser's Talent"]);
 });
 
+function mtgoDecklistHtml(data) {
+  return `<script>window.MTGO.decklists.data = ${JSON.stringify(data)};</script>`;
+}
+
+test("extractDeckEntries labels MTGO decks Unknown instead of the event name", () => {
+  const html = mtgoDecklistHtml({
+    description: "Modern Challenge 64",
+    starttime: "2026-07-13",
+    format: "CMODERN",
+    decklists: [{
+      player: "SomePlayer",
+      decktournamentid: 1,
+      main_deck: [
+        { card_attributes: { card_name: "Ragavan, Nimble Pilferer" } },
+        { card_attributes: { card_name: "Steam Vents" } }
+      ],
+      sideboard_deck: []
+    }]
+  });
+
+  const entries = extractDeckEntries(html, "https://www.mtgo.com/decklist/modern-challenge-64-2026-07-13", "Modern Challenge 64", [], "", "modern");
+
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].title, "Modern Challenge 64 - SomePlayer");
+  assert.equal(entries[0].archetype, "Unknown");
+});
+
+test("extractDeckEntries still classifies MTGO decks by card signatures", () => {
+  const html = mtgoDecklistHtml({
+    description: "Standard Challenge 32",
+    starttime: "2026-07-13",
+    format: "CSTANDARD",
+    decklists: [{
+      player: "SomePlayer",
+      decktournamentid: 2,
+      main_deck: [
+        { card_attributes: { card_name: "Slickshot Show-Off" } },
+        { card_attributes: { card_name: "Flow State" } },
+        { card_attributes: { card_name: "Stormchaser's Talent" } }
+      ],
+      sideboard_deck: []
+    }]
+  });
+
+  const entries = extractDeckEntries(html, "https://www.mtgo.com/decklist/standard-challenge-32-2026-07-13", "Standard Challenge 32", [], "", "standard");
+
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].archetype, "イゼット果敢");
+});
+
 test("extractLinks does not confuse premodern with modern MTGO decklists", () => {
   const html = `
     <a href="https://www.mtgo.com/decklist/premodern-league-2026-06-01">Premodern</a>
