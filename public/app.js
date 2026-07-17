@@ -74,6 +74,20 @@ function hideHoverPreview() {
   hoverPreview.removeAttribute("src");
 }
 
+// 大会日の初期値: 今日が土日ならその週末（今日）、平日なら次の土曜日。
+// 準備は平日、大会は週末という運用前提。toISOString() はUTC変換でJSTだと
+// 日付が前日にずれることがあるため、ローカル日付のまま整形する。
+function defaultTargetDate() {
+  const date = new Date();
+  const day = date.getDay();
+  if (day !== 0 && day !== 6) date.setDate(date.getDate() + (6 - day));
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const dayOfMonth = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${dayOfMonth}`;
+}
+
+targetDateInput.value = defaultTargetDate();
+
 const eventScaleProfiles = {
   spotlight: {
     threshold: 1,
