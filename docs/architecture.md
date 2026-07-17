@@ -126,6 +126,15 @@ Scryfall APIは `User-Agent` と `Accept` を付けて呼び出し、検索系�
 
 依存方向はおおむね `server.mjs` から `lib/` へ流し、`lib/` 間の循環を作らない方針です。
 
+## 定期メンテナンス（セット発売・禁止改定ごと）
+
+検索品質は次の鮮度依存データに支えられている。新セット発売や禁止改定のたびに確認する。
+
+1. `data/environment-events.json` — 発売・改定イベントを追記する（コード変更不要。これが古いと環境開始日の判定が古くなり、旧環境のデッキが混ざる）。
+2. `lib/scryfall.js` の候補クエリ — 新メカニズムがカード状の現物や除外追跡を必要とするなら語彙を追加し、`candidateQueryVersion` を上げる。カウンター管理のみのメカニズムは追加しない。
+3. `lib/archetype.js` の `archetypeRules` / `archetypeLexicon` — 現行Standardのメタゲームに合わせて更新する（他フォーマットは土地色フォールバックで縮退する設計）。
+4. `lib/data.js` の `tokenJapaneseNameMap` と `lib/archetype.js` の `LAND_COLOR_MAP` — 新しいトークン種の和名、新しい2色以上ランドを追加する。
+
 ## 変更時のチェック
 
 実装を変えたら、最低限次を確認します。
