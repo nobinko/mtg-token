@@ -37,6 +37,34 @@
         "legacy": "Undercity Informer was banned in Legacy."
       },
       "nextAnnouncementDate": "2026-06-30"
+    },
+    {
+      "date": "2026-06-26",
+      "type": "set-release",
+      "title": "Marvel Super Heroes tabletop release",
+      "sourceUrl": "https://magic.wizards.com/en/news/feature/collecting-marvel-super-heroes",
+      "formatsAffected": ["standard", "pioneer", "modern", "legacy"],
+      "changes": {
+        "standard": "Marvel Super Heroes became Standard legal, adding a new Standard-legal set.",
+        "pioneer": "Marvel Super Heroes became legal in Pioneer.",
+        "modern": "Marvel Super Heroes became legal in Modern.",
+        "legacy": "Marvel Super Heroes became legal in Legacy."
+      }
+    },
+    {
+      "date": "2026-06-29",
+      "type": "banned-restricted",
+      "title": "Banned and Restricted Announcement - June 29, 2026",
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/banned-and-restricted-june-29-2026",
+      "formatsAffected": ["legacy"],
+      "formatsUnchanged": ["standard", "pioneer", "modern"],
+      "changes": {
+        "standard": "No changes.",
+        "pioneer": "No changes.",
+        "modern": "No changes.",
+        "legacy": "Candelabra of Tawnos was banned in Legacy."
+      },
+      "nextAnnouncementDate": "2026-08-10"
     }
   ]
 }
