@@ -23,6 +23,25 @@ test("extractDeckEntries ignores deck-list tags for the wrong format", () => {
   assert.deepEqual(extractDeckEntries(html, "https://magic.gg/decklists/test", "Test", [], "", "standard"), []);
 });
 
+test("extractDeckEntries ignores brawl deck-lists in constructed searches", () => {
+  const html = `
+    <deck-list format="Standard Brawl" deck-title="Brawl Deck">
+      <main-deck>1 Slickshot Show-Off</main-deck>
+    </deck-list>
+  `;
+
+  assert.deepEqual(extractDeckEntries(html, "https://magic.gg/decklists/test", "Test", [], "", "standard"), []);
+});
+
+test("extractDeckEntries decodes lowercase unicode escapes in embedded markup", () => {
+  const html = "\\u003cdeck-list format=\"standard\" deck-title=\"Escaped Deck\"\\u003e\\u003cmain-deck\\u003e4 Flow State\\u003c/main-deck\\u003e\\u003c/deck-list\\u003e";
+
+  const entries = extractDeckEntries(html, "https://magic.gg/decklists/standard-test", "Event", [], "", "standard");
+
+  assert.equal(entries.length, 1);
+  assert.deepEqual(entries[0].cards, ["Flow State"]);
+});
+
 test("extractDeckEntries reads matching magic.gg deck-list cards", () => {
   const html = `
     <deck-list format="standard" deck-title="Izzet Prowess" subtitle="Player">
