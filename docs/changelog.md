@@ -2,6 +2,10 @@
 
 実装の詳細設計は [architecture.md](architecture.md)、巡回元の実測は [decklist-sources.md](decklist-sources.md) を参照してください。
 
+## 2026-07-27
+
+- HOB（The Hobbit、2026-08-14）の新メカニズムを監査し、トークンを出す Recruit を候補クエリとトークンヒントに追加（`candidateQueryVersion` を 3 へ）。恒久的な状態でしかない Storied / enduring story と、カウンター管理のみの Hone は従来方針どおり対象外。Amass（ゴブリン軍団）と Adventure は既存語彙で捕捉済み。
+
 ## 2026-07-17
 
 - 環境イベント表に Marvel Super Heroes 発売（2026-06-26、standard/pioneer/modern/legacy）と禁止改定（2026-06-29、Legacy: Candelabra of Tawnos 禁止、次回改定 2026-08-10）を追記。
