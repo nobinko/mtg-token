@@ -53,6 +53,28 @@
         "legacy": "Candelabra of Tawnos was banned in Legacy."
       },
       "nextAnnouncementDate": "2026-08-10"
+    },
+    {
+      "date": "2026-08-10",
+      "type": "banned-restricted",
+      "title": "Banned and Restricted update (auto-detected 2026-08-10)",
+      "sourceUrl": "https://magic.wizards.com/en/news/banned-restricted",
+      "formatsAffected": [
+        "standard",
+        "legacy"
+      ],
+      "formatsUnchanged": [
+        "pioneer",
+        "modern"
+      ],
+      "changes": {
+        "standard": "Badgermole Cub, Gran-Gran, Stormchaser's Talent was banned in Standard.",
+        "pioneer": "No changes.",
+        "modern": "No changes.",
+        "legacy": "The Fantasticar was banned in Legacy."
+      },
+      "autoDetected": true,
+      "note": "Scryfallリーガリティ差分による自動検知。日付は検知日で、公式発表日と最大1日ずれることがある。"
     }
   ]
 }
