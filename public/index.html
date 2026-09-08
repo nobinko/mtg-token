@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MTG Token Finder</title>
-    <link rel="stylesheet" href="/styles.css?v=20260602-emblem-token-ja">
+    <link rel="stylesheet" href="/styles.css?v=20260907-set-picker">
   </head>
   <body>
     <main class="app">
@@ -80,15 +80,28 @@
           <button id="search-button" type="submit">検索</button>
           <button id="print-button" type="button">印刷</button>
           <button id="clear-cache-button" type="button">キャッシュ削除</button>
+          <button id="update-environment-button" type="button">環境データを更新</button>
         </form>
       </section>
 
       <section class="sources">
+        <label class="check-control"><input id="preparation-mode" type="checkbox">新セット直後の準備モード（全フォーマット共通）</label>
+        <div class="controls" id="preparation-controls" hidden>
+          <label class="preparation-choice">対象セット<select id="preparation-set-choice" aria-describedby="preparation-set-description"><option value="">大会日に合う候補を取得します</option></select></label>
+          <p id="preparation-set-description" aria-live="polite"></p>
+          <p id="preparation-catalog-status" aria-live="polite"></p>
+          <label id="preparation-manual" hidden>セットコード（手動指定）<input id="preparation-set" placeholder="例: fra" maxlength="8"></label>
+          <label>構築適用日（自動入力・調整可）<input id="preparation-date" type="date"></label>
+          <button id="yokohama-preset" type="button">横浜2026・モダンの設定</button>
+        </div>
+        <p id="preparation-help" hidden>直前環境の実績と新セットの追加準備候補を別々に表示します。構築適用日は発売日と異なる場合があります。新セット情報が未公開・未収録なら候補は未完備です。</p>
         <label for="sources">巡回元URL</label>
         <textarea id="sources" spellcheck="false"></textarea>
       </section>
 
       <section class="status" id="status">フォーマットを選んで検索できます。</section>
+      <section class="status" id="update-status" aria-live="polite">環境データの状態を確認しています。</section>
+      <section class="status" id="result-freshness" hidden></section>
 
       <section class="sampling-summary" id="sampling-summary"></section>
       <section class="environment-summary" id="environment-summary" hidden></section>
@@ -98,6 +111,11 @@
       <section class="deck-summary" id="deck-summary" hidden></section>
 
       <section class="results" id="results" aria-live="polite"></section>
+      <section id="preparation-results" hidden aria-live="polite">
+        <h2>新セット分・追加準備候補</h2>
+        <p id="preparation-status"></p>
+        <div id="preparation-objects"></div>
+      </section>
       <footer class="legal-note">
         Unofficial Fan Content. Magic: The Gathering のカード画像・テキスト等は Wizards of the Coast に帰属します。このツールは Wizards of the Coast / Scryfall 非公認です。
       </footer>
@@ -165,6 +183,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20260717-enrich-chunking" type="module"></script>
+    <script src="/app.js?v=20260907-set-picker" type="module"></script>
   </body>
 </html>

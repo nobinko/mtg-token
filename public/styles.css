@@ -9,6 +9,16 @@
   box-sizing: border-box;
 }
 
+[hidden] { display: none !important; }
+#preparation-controls { margin: 12px 0; }
+#preparation-controls .preparation-choice,
+#preparation-set-description, #preparation-catalog-status { grid-column: 1 / -1; min-width: 0; }
+#preparation-set-description, #preparation-catalog-status { margin: 0; line-height: 1.65; }
+#preparation-catalog-status { color: #80591d; }
+#preparation-set-choice { width: 100%; min-width: 0; }
+#preparation-results { border-top: 3px solid #b7791f; margin-top: 28px; padding-top: 16px; }
+#preparation-status { margin-bottom: 16px; line-height: 1.7; }
+
 body {
   margin: 0;
 }
@@ -909,6 +919,10 @@ summary {
 .log-scryfall .log-text { color: #67e8f9; }
 .log-default .log-text { color: #d4cfca; }
 
+@media (max-width: 900px) {
+  .toolbar { align-items: stretch; flex-direction: column; }
+}
+
 @media (max-width: 720px) {
   .app {
     padding: 16px 16px 290px;
@@ -960,6 +974,7 @@ summary {
   }
 
   .toolbar,
+  .log-panel,
   .sources,
   .status,
   .environment-summary,
@@ -968,6 +983,8 @@ summary {
   .image-link {
     display: none !important;
   }
+
+  #result-freshness:not([hidden]) { display: block !important; margin-bottom: 6mm; }
 
   .summary {
     border: 0;

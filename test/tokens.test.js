@@ -3,6 +3,30 @@ import test from "node:test";
 
 import { buildBulkObjects, objectsForSource, tokenHints } from "../lib/tokens.js";
 
+test("mentioning tokens without creating them does not report missing objects", async () => {
+  const texts = {
+    "Rest in Peace": "When this enchantment enters, exile all graveyards.\nIf a card or token would be put into a graveyard from anywhere, exile it instead.",
+    "Sheoldred's Edict": "Choose one —\n• Each opponent sacrifices a nontoken creature of their choice.\n• Each opponent sacrifices a creature token of their choice.\n• Each opponent sacrifices a planeswalker of their choice.",
+    "Necrodominance": "Skip your draw step.\nIf a card or token would be put into your graveyard from anywhere, exile it instead.",
+    "Belladonna Took": "Whenever a token you control enters, you gain 1 life if this is the first time this ability has resolved this turn. If it's the second time, draw a card. If it's the third time, put a +1/+1 counter on each creature you control."
+  };
+  for (const [name, text] of Object.entries(texts)) {
+    const warnings = [];
+    const objects = await objectsForSource({ id: name, name, raw: { oracle_text: text } }, { warnings, enrichJapaneseAssets: false });
+    assert.deepEqual(objects, [], name);
+    assert.deepEqual(warnings, [], name);
+  }
+});
+
+test("unresolved token generators still warn, including keywords without reminders", async () => {
+  for (const text of ["Create two 1/1 red Goblin creature tokens.", "Investigate.", "Amass Orcs 1.", "Mobilize 2"]) {
+    const warnings = [];
+    await objectsForSource({ id: text, name: "Generator", raw: { oracle_text: text } }, { warnings, enrichJapaneseAssets: false });
+    assert.equal(warnings.length, 1, text);
+    assert.match(warnings[0], /生成するトークン/);
+  }
+});
+
 test("spell-copy reminder text does not request a copy marker", () => {
   const hints = tokenHints({
     oracle_text: "Create a 2/1 white and black Inkling creature token with flying. (You may cast a copy of its spell.)"

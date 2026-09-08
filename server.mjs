@@ -9,6 +9,11 @@ import { defaultSources, formatOptions, normalizeFormat } from "./lib/data.js";
 import { toIsoDate, imageRefFor } from "./lib/util.js";
 import { clearPageCache } from "./lib/cache.js";
 import { formatEnvironmentInfo } from "./lib/environment.js";
+import { environmentUpdates, confirmedEvents } from "./lib/updates.js";
+import { fetchSetReleaseEvents, fetchSetCatalog } from "./lib/set-events.js";
+import { preparationSetChoices } from "./lib/preparation-sets.js";
+import { preparationWindow, preparationSources, dateOnly } from "./lib/preparation.js";
+import { fetchPreparationSet, fetchJapaneseTokenPrintById } from "./lib/scryfall.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
 import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
 import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName } from "./lib/tokens.js";
@@ -62,6 +67,35 @@ console.error = (...args) => {
 };
 
 const app = new Hono();
+app.use("/api/*", async (c, next) => {
+  if (c.req.method === "POST") {
+    const origin = c.req.header("origin");
+    if ((origin && origin !== new URL(c.req.url).origin) || c.req.header("sec-fetch-site") === "cross-site") return c.json({ error: "同じ画面から操作してください。" }, 403);
+  }
+  await next();
+});
+let activeSearches = 0;
+app.use("/api/token-cards", async (c, next) => {
+  if (environmentUpdates.busy) return c.json({ error: "環境データ更新中です。完了後に検索してください。" }, 409);
+  activeSearches += 1;
+  try { await next(); } finally { activeSearches -= 1; }
+});
+app.get("/api/environment/status", async (c) => c.json(await environmentUpdates.status()));
+app.post("/api/environment/update", async (c) => {
+  const origin = c.req.header("origin");
+  if (origin && origin !== new URL(c.req.url).origin) return c.json({ error: "同じ画面から更新してください。" }, 403);
+  if (activeSearches || environmentUpdates.busy) return c.json({ error: "検索または更新中です。完了後に実行してください。" }, 409);
+  const body = await c.req.json().catch(() => ({}));
+  if (!["standard", "pioneer", "modern", "legacy"].includes(body.format)) return c.json({ error: "フォーマットが不正です。" }, 400);
+  if (activeSearches || environmentUpdates.busy) return c.json({ error: "検索または更新中です。完了後に実行してください。" }, 409);
+  try {
+    await environmentUpdates.update(body.format, {
+      fetchSets: () => fetchSetReleaseEvents({ refresh: true, persist: false }),
+      fetchCandidates: (format) => fetchFinderCandidates(format, { refresh: true, persist: false })
+    });
+    return c.json(await environmentUpdates.status());
+  } catch (error) { return c.json({ error: error.message, status: await environmentUpdates.status() }, 502); }
+});
 
 function normalizeRequestedDeckCount(value, fallback = 300) {
   const parsed = Number(value);
@@ -72,6 +106,14 @@ function normalizeRequestedDeckCount(value, fallback = 300) {
 app.get("/api/default-sources", (c) => c.json(defaultSources));
 
 app.get("/api/formats", (c) => c.json(formatOptions));
+
+app.get("/api/preparation-sets", async (c) => {
+  const format = c.req.query("format");
+  const targetDate = c.req.query("targetDate");
+  if (!["standard", "pioneer", "modern", "legacy"].includes(format) || !dateOnly(targetDate)) return c.json({ error: "フォーマットと大会日を確認してください。" }, 400);
+  const [catalog, active] = await Promise.all([fetchSetCatalog({ refresh: c.req.query("refresh") === "1" }), environmentUpdates.read()]);
+  return c.json({ ...preparationSetChoices(catalog.sets, confirmedEvents(active.pack), format, targetDate), source: catalog.source, warning: catalog.warning });
+});
 
 app.get("/api/logs", (c) => {
   return streamSSE(c, async (stream) => {
@@ -112,18 +154,27 @@ app.post("/api/token-cards", async (c) => {
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
   const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
+  if (body.targetDate && !dateOnly(body.targetDate)) return c.json({ error: "大会日が不正です。" }, 400);
   const environment = await formatEnvironmentInfo(format, targetDate);
   if (!environment.resolved || !environment.startDate) {
     return c.json({ error: environment.reason, environment }, 422);
   }
-  const environmentStartDate = environment.startDate;
+  let preparation;
+  try { preparation = preparationWindow(environment.events, format, targetDate, body.preparation); }
+  catch (error) { return c.json({ error: error.message }, 400); }
+  const environmentStartDate = preparation?.startDate || environment.startDate;
+  const crawlTargetDate = preparation?.endDate || targetDate;
+  const active = await environmentUpdates.read();
+  const freshCandidates = active.format === format && Date.now() - Date.parse(active.checkedAt) < 24 * 60 * 60 * 1000;
   console.log(`[search] start format=${format} target=${targetDate} decks=${maxChildPages}`);
 
   const [candidates, crawl] = await Promise.all([
-    fetchFinderCandidates(format),
-    crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate, environmentStartDate, format })
+    freshCandidates ? Promise.resolve(active.candidates) : fetchFinderCandidates(format, { refresh: Boolean(active.checkedAt) || Boolean(preparation) }),
+    crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate: crawlTargetDate, environmentStartDate, format })
   ]);
 
+  const allowedDeckUrls = new Set(deckResultsFromPages(crawl.pages).slice(0, maxChildPages).map((deck) => deck.url));
+  crawl.pages = crawl.pages.map((page) => ({ ...page, deckEntries: (page.deckEntries || []).filter((deck) => allowedDeckUrls.has(deck.url)) }));
   const allDeckEntries = crawl.pages.flatMap((page) => page.deckEntries ?? []);
   const { knownArchetypes } = crawl;
 
@@ -175,7 +226,23 @@ app.post("/api/token-cards", async (c) => {
   }
 
   const matched = findCardMentions(candidates, crawl.pages).slice(0, maxMatchedCards);
-  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false });
+  const objectWarnings = [];
+  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings });
+  let preparationResult = null;
+  if (preparation) {
+    const warnings = [];
+    preparationResult = { ...preparation, objects: [], warnings, status: "未取得" };
+    try {
+      const set = await fetchPreparationSet(preparation.setCode);
+      const sources = preparationSources(set.cards, format, preparation.startsAt);
+      if (!sources.length) warnings.push("対象フォーマットの候補を確定できません。未収録または使用不可の可能性があります。");
+      if (sources.some((source) => source.legalityUnconfirmed)) warnings.push("未発売カードを含みます。当日のフォーマット使用可否は未確認です。");
+      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings });
+      preparationResult = { ...preparationResult, setName: set.metadata.name, sourceCount: sources.length, fetchedAt: set.fetchedAt,
+        status: "取得済み（公開・収録済み情報の範囲。新メカニズムの網羅性は未確認）",
+        objects: extraObjects.map((object) => ({ ...object, preparationOnly: true, note: [object.note, "新セットの追加準備候補。採用実績による推薦ではありません。"].filter(Boolean).join(" ") })) };
+    } catch (error) { warnings.push(`新セット情報を取得できません: ${error.message}。候補なしではなく未取得です。`); }
+  }
   const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
   const archetypes = overallArchetypeStats(deckResults);
   console.log(`[search] done decks=${deckResults.length} sourceCards=${matched.length} objects=${objects.length}`);
@@ -185,7 +252,9 @@ app.post("/api/token-cards", async (c) => {
     format,
     targetDate,
     environmentStartDate,
-    environment,
+    environment: { ...environment, events: undefined },
+    preparation: preparationResult,
+    objectWarnings,
     sourceUrls,
     scannedPages: crawl.pages.map((page) => page.url),
     errors: crawl.errors,
@@ -256,7 +325,7 @@ app.post("/api/enrich-card-assets", async (c) => {
       || await fetchJapaneseName(name)
       || japaneseOperationalName({ name, typeLine, kind });
 
-    const jaCard = await fetchJapanesePrint(name, { objectKind: kind });
+    const jaCard = await fetchJapaneseTokenPrintById(object.printId);
     const imageJaRef = jaCard ? imageRefFor(jaCard) : null;
     objectResults.push({
       key: String(object.key || ""),
@@ -281,6 +350,6 @@ app.onError((err, c) => {
   return c.json({ error: err.message }, 500);
 });
 
-serve({ fetch: app.fetch, port }, () => {
+serve({ fetch: app.fetch, port, hostname: "127.0.0.1" }, () => {
   console.log(`MTG Token Finder running at http://localhost:${port}`);
 });

@@ -27,6 +27,7 @@ npm start
 | 設計思想、データフロー、モジュール責務 | [docs/architecture.md](docs/architecture.md) |
 | デッキリスト取得元の実測結果と制限 | [docs/decklist-sources.md](docs/decklist-sources.md) |
 | 変更履歴 | [docs/changelog.md](docs/changelog.md) |
+| 配布後の環境更新と配信手順 | [docs/environment-updates.md](docs/environment-updates.md) |
 
 ## 現在できること
 

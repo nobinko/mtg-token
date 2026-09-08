@@ -139,7 +139,8 @@ function banChangeEvent(changes, today) {
     formatsUnchanged: unchanged,
     changes: changeText,
     autoDetected: true,
-    note: "Scryfallリーガリティ差分による自動検知。日付は検知日で、公式発表日と最大1日ずれることがある。"
+    confirmed: false,
+    note: "Scryfallリーガリティ差分による自動検知。dateは検知日です。公式発表のannouncedAtと紙のeffectiveDateを確認し、confirmedをtrueにするまで環境開始日に使用しません。"
   };
 }
 
@@ -221,6 +222,7 @@ const report = {
   staleAnnouncement,
   banChanges: banResult.changes,
   eventsUpdated,
+  unconfirmedBans: eventsFile.events.filter((event) => event.autoDetected && event.confirmed !== true),
   newSets: setResult.fresh,
   newKeywords: keywordResult.fresh
 };

@@ -22,8 +22,146 @@ const resultsEl = document.querySelector("#results");
 const searchButton = document.querySelector("#search-button");
 const printButton = document.querySelector("#print-button");
 const clearCacheButton = document.querySelector("#clear-cache-button");
+const updateEnvironmentButton = document.querySelector("#update-environment-button");
+const updateStatusEl = document.querySelector("#update-status");
+const resultFreshnessEl = document.querySelector("#result-freshness");
+
+function renderUpdateStatus(data) {
+  const checked = data.checkedAt ? new Date(data.checkedAt).toLocaleString("ja-JP") : "未実施（同梱データ）";
+  updateStatusEl.textContent = `最終取得: ${checked} ／ 環境データ: ${data.revision} ／ 確認済みイベント最終日: ${data.lastEvent || "不明"}`
+    + (data.format ? ` ／ 候補カード再取得: ${data.format.toUpperCase()}` : "")
+    + ` ／ 公式情報の確認範囲: ${data.verifiedThrough || "未設定・最新性は未確認"}`
+    + (data.announcementOverdue ? " ／ 次回改定予定日を過ぎています。配信元での確認が必要です。" : "")
+    + (data.pending.length ? ` ／ 適用日未確認: ${data.pending.map((item) => item.title).join("、")}` : "")
+    + (data.error ? ` ／ 前回の更新失敗: ${data.error}` : "");
+}
+
+async function updateEnvironment() {
+  updateEnvironmentButton.disabled = true;
+  searchButton.disabled = true;
+  searchRunId += 1;
+  const format = formatSelect.value;
+  updateStatusEl.textContent = `環境履歴・セット情報・${format.toUpperCase()}の候補カードを取得しています。数分かかることがあります。`;
+  try {
+    const response = await fetch("/api/environment/update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ format }) });
+    const data = await response.json();
+    if (!response.ok) {
+      if (data.status) renderUpdateStatus(data.status);
+      throw new Error(data.error || "更新に失敗しました。");
+    }
+    renderUpdateStatus(data);
+    searchRunId += 1;
+    if (!summaryEl.hidden) {
+      resultFreshnessEl.hidden = false;
+      resultFreshnessEl.textContent = "更新前の検索結果です。新しい環境で再検索してください。「抜いた」チェックは保持しています。";
+    }
+    setStatus("環境データを取得・反映しました。確認範囲と未確認事項を確認して検索してください。");
+    refreshCacheInput.checked = true;
+    if (preparationMode.checked) await loadPreparationSets({ preserve: true, refresh: true });
+  } catch (error) {
+    setStatus(`更新失敗: ${error.message} 前回の環境データを保持しています。`);
+  } finally {
+    updateEnvironmentButton.disabled = false;
+    searchButton.disabled = false;
+  }
+}
 const setTemplate = document.querySelector("#set-template");
 const objectTemplate = document.querySelector("#object-template");
+const preparationMode = document.querySelector("#preparation-mode");
+const preparationSet = document.querySelector("#preparation-set");
+const preparationChoice = document.querySelector("#preparation-set-choice");
+const preparationDescription = document.querySelector("#preparation-set-description");
+const preparationCatalogStatus = document.querySelector("#preparation-catalog-status");
+const preparationDate = document.querySelector("#preparation-date");
+const preparationPanel = document.querySelector("#preparation-results");
+const preparationObjectsEl = document.querySelector("#preparation-objects");
+let lastPreparationObjects = [];
+let preparationChoices = [];
+let preparationRequest = 0;
+let preparationLoading = false;
+
+function applyPreparationChoice({ keepDate = false } = {}) {
+  const manual = preparationChoice.value === "__manual__";
+  document.querySelector("#preparation-manual").hidden = !manual;
+  const selected = preparationChoices.find((choice) => choice.code === preparationChoice.value);
+  preparationDescription.replaceChildren();
+  if (manual) {
+    preparationDescription.textContent = "一覧にないセットだけ手動指定してください。セットコードと公式の構築適用日が必要です。";
+    return;
+  }
+  preparationSet.value = selected?.code || "";
+  if (!keepDate) preparationDate.value = selected?.startsAt || "";
+  if (!selected) return;
+  preparationDescription.textContent = `${selected.description} 発売日: ${selected.releasedAt || "未取得"} ／ 構築適用日: ${selected.startsAt}${selected.confirmed ? "（環境履歴の登録日）" : "（未確認・仮置き）"}。`;
+  if (preparationDate.value && preparationDate.value !== selected.startsAt) preparationDescription.append(` 検索には手動調整した ${preparationDate.value} を使用します。`);
+  if (/^https:\/\//.test(selected.sourceUrl)) {
+    const link = document.createElement("a");
+    link.href = selected.sourceUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = " 日程の出典";
+    preparationDescription.append(link);
+  }
+}
+
+async function loadPreparationSets({ preserve = false, preferredCode = "", refresh = false } = {}) {
+  if (!preparationMode.checked) return;
+  const request = ++preparationRequest;
+  const previous = preserve ? preparationChoice.value : "";
+  preparationLoading = true;
+  preparationChoice.disabled = true;
+  preparationCatalogStatus.textContent = "大会日とフォーマットに合うセット候補を取得しています…";
+  try {
+    const params = new URLSearchParams({ format: formatSelect.value, targetDate: targetDateInput.value });
+    if (refresh) params.set("refresh", "1");
+    const response = await fetch(`/api/preparation-sets?${params}`);
+    const data = await response.json();
+    if (request !== preparationRequest) return;
+    if (!response.ok) throw new Error(data.error || "セット一覧を取得できませんでした。");
+    preparationChoices = data.choices;
+    preparationChoice.replaceChildren();
+    const recommended = data.choices.find((choice) => choice.code === data.recommendedCode);
+    const ordered = recommended ? [recommended, ...data.choices.filter((choice) => choice !== recommended)] : data.choices;
+    for (const choice of ordered) {
+      const option = new Option(`${choice.code === data.recommendedCode ? "おすすめ：" : ""}${choice.name} — ${choice.startsAt}${choice.confirmed ? " 構築適用" : " 仮置き"}${choice.eligible ? "" : "（大会後）"}`, choice.code);
+      option.disabled = !choice.eligible;
+      preparationChoice.append(option);
+    }
+    preparationChoice.append(new Option("一覧にないセットを手動指定", "__manual__"));
+    const wanted = preferredCode || previous;
+    preparationChoice.value = wanted === "__manual__" || data.choices.some((choice) => choice.code === wanted && choice.eligible)
+      ? wanted : data.recommendedCode || "__manual__";
+    applyPreparationChoice({ keepDate: Boolean(previous && previous === preparationChoice.value) });
+    preparationCatalogStatus.textContent = data.warning || (data.recommendedCode ? "大会日前6か月〜大会後3か月の公開済みセット予定から選べます。将来の使用可否は未確定です。" : "大会日前の候補がありません。大会日を確認するか、手動指定してください。");
+  } catch (error) {
+    if (request !== preparationRequest) return;
+    preparationChoices = [];
+    preparationChoice.replaceChildren(new Option("一覧にないセットを手動指定", "__manual__"));
+    preparationSet.value = "";
+    preparationDate.value = "";
+    applyPreparationChoice();
+    preparationCatalogStatus.textContent = `${error.message} 準備モードを入れ直すと再取得できます。通常検索は利用できます。`;
+  } finally {
+    if (request === preparationRequest) {
+      preparationLoading = false;
+      preparationChoice.disabled = false;
+    }
+  }
+}
+
+preparationChoice.addEventListener("change", () => applyPreparationChoice());
+preparationDate.addEventListener("change", () => applyPreparationChoice({ keepDate: true }));
+preparationMode.addEventListener("change", () => {
+  document.querySelector("#preparation-controls").hidden = !preparationMode.checked;
+  document.querySelector("#preparation-help").hidden = !preparationMode.checked;
+  if (preparationMode.checked) loadPreparationSets({ preserve: true });
+});
+document.querySelector("#yokohama-preset").addEventListener("click", () => {
+  formatSelect.value = "modern";
+  targetDateInput.value = "2026-10-03";
+  updateSourcesForFormat();
+  loadPreparationSets({ preferredCode: "fra" });
+});
 
 const langBtns = document.querySelectorAll(".lang-btn");
 
@@ -223,11 +361,17 @@ function renderSummary(data) {
   const mainLine = document.createElement("div");
   mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物 ${data.objects.length}種類を検出。チェック済み ${checkedCount}/${data.objects.length}。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}${unparsedText}。`;
   summaryEl.append(mainLine);
+  if (data.preparation) {
+    mainLine.prepend("直前環境の実績：");
+    const extraLine = document.createElement("div");
+    extraLine.textContent = `新セットの追加準備候補：${data.preparation.objects.length}種類（下の別枠）。採用率には含めません。`;
+    summaryEl.append(extraLine);
+  }
 
   if (data.sourceExhausted && data.requestedDeckCount && data.searchedDeckCount < data.requestedDeckCount) {
     const exhaustedLine = document.createElement("div");
     exhaustedLine.className = "sampling-warn";
-    exhaustedLine.textContent = `要求 ${data.requestedDeckCount}デッキに対して、現在の環境期間内で取得できたデッキは ${data.searchedDeckCount}件です。古いデッキで水増しせず、この件数で集計しています。`;
+    exhaustedLine.textContent = `要求 ${data.requestedDeckCount}デッキに対して、${data.preparation ? "直前環境の参照期間" : "現在の環境期間"}内で取得できたデッキは ${data.searchedDeckCount}件です。この件数で集計しています。`;
     summaryEl.append(exhaustedLine);
   }
 
@@ -742,11 +886,7 @@ function renderObject(object) {
     if (picked.checked) checkedObjects.add(key);
     else checkedObjects.delete(key);
     saveCheckedObjects();
-    article.classList.toggle("is-checked", picked.checked);
-    if (hideCheckedInput.checked && picked.checked) {
-      article.hidden = true;
-      updateVisibleGroupCounts();
-    }
+    renderCurrentResults();
   });
 
   imageLink.href = object.scryfallUri;
@@ -763,6 +903,7 @@ function renderObject(object) {
   type.textContent = object.typeLine;
   const priority = tokenPriority(object);
   deckCount.textContent = `${priority.label}: ${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks (${priority.percent.toFixed(1)}%)`;
+  if (object.preparationOnly) deckCount.textContent = "追加準備候補・採用率未評価";
   deckCount.classList.add(priority.className);
   setPill.textContent = `${object.set}${object.releasedAt ? ` / ${object.releasedAt}` : ""}`;
   note.textContent = object.note || "";
@@ -775,6 +916,7 @@ function renderObject(object) {
   fill.style.width = `${Math.min(priority.percent, 100)}%`;
   bar.append(fill);
   hints.append(bar);
+  if (object.preparationOnly) bar.hidden = true;
   renderSourcePreview(sourcePreview, object.sourceCards);
 
   for (const sourceCard of object.sourceCards || []) {
@@ -799,7 +941,7 @@ function renderObject(object) {
     link.href = sourceCard.scryfallUri;
     link.target = "_blank";
     link.rel = "noreferrer";
-    link.textContent = sourceCard.japaneseName
+    link.textContent = object.preparationOnly ? (sourceCard.japaneseName ? `${sourceCard.name} / ${sourceCard.japaneseName}` : sourceCard.name) : sourceCard.japaneseName
       ? `${sourceCard.name} / ${sourceCard.japaneseName} (${sourceCard.deckCount || 0})`
       : `${sourceCard.name} (${sourceCard.deckCount || 0})`;
     item.append(link);
@@ -821,7 +963,7 @@ function renderObject(object) {
 }
 
 function updateVisibleGroupCounts() {
-  for (const group of resultsEl.querySelectorAll(".set-group")) {
+  for (const group of document.querySelectorAll("#results .set-group, #preparation-objects .set-group")) {
     const cards = [...group.querySelectorAll(".card")].filter((card) => !card.hidden);
     const count = group.querySelector(".count");
     if (count) count.textContent = `${cards.length}種類`;
@@ -829,15 +971,15 @@ function updateVisibleGroupCounts() {
   }
 }
 
-function renderGroups(groups) {
-  resultsEl.replaceChildren();
+function renderGroups(groups, container = resultsEl) {
+  container.replaceChildren();
   const sortedGroups = viewModeSelect.value === "kind" ? groups : sortGroups(groups);
   const visibleGroupData = sortedGroups
     .map((group) => ({ ...group, objects: visibleObjects(group.objects), count: visibleObjects(group.objects).length }))
     .filter((group) => group.objects.length);
 
   if (!visibleGroupData.length) {
-    resultsEl.textContent = hideCheckedInput.checked
+    container.textContent = hideCheckedInput.checked
       ? "未チェックの現物はありません。"
       : "一致する現物は見つかりませんでした。巡回元URLや検索デッキ/リスト数を増やして再検索してください。";
     return;
@@ -859,13 +1001,18 @@ function renderGroups(groups) {
       grid.append(renderObject(object));
     }
 
-    resultsEl.append(section);
+    container.append(section);
   }
 }
 
 function renderCurrentResults() {
   const groups = viewModeSelect.value === "kind" ? groupsByKind(lastObjects) : groupsBySetClient(lastObjects);
   renderGroups(groups);
+  if (!preparationPanel.hidden) {
+    const extraGroups = viewModeSelect.value === "kind" ? groupsByKind(lastPreparationObjects) : groupsBySetClient(lastPreparationObjects);
+    renderGroups(extraGroups, preparationObjectsEl);
+    if (!lastPreparationObjects.length) preparationObjectsEl.textContent = "現時点で表示できる追加候補がありません。上の取得状況を確認してください。";
+  }
 }
 
 function uniqueSourceCards(objects) {
@@ -881,6 +1028,7 @@ function uniqueSourceCards(objects) {
 function objectAssetRequests(objects) {
   return objects.map((object) => ({
     key: objectKey(object),
+    printId: object.printId || "",
     name: object.name,
     kind: object.kind,
     typeLine: object.typeLine,
@@ -979,11 +1127,17 @@ async function enrichCurrentAssets(runId) {
 
 async function runSearch(event) {
   event.preventDefault();
+  if (preparationMode.checked && preparationLoading) { setStatus("セット候補の取得完了を待ってから検索してください。"); return; }
+  if (preparationMode.checked && (!/^[a-z0-9]{2,8}$/i.test(preparationSet.value.trim()) || !preparationDate.value || preparationDate.value > targetDateInput.value)) {
+    setStatus("対象セットを選び、大会日以前の構築適用日を確認してください。"); return;
+  }
   const runId = searchRunId + 1;
   searchRunId = runId;
   activeLogRunId = `${logSessionId}-${runId}`;
   const button = searchButton;
   button.disabled = true;
+  updateEnvironmentButton.disabled = true;
+  resultFreshnessEl.hidden = true;
   environmentSummaryEl.hidden = true;
   environmentSummaryEl.replaceChildren();
   summaryEl.hidden = true;
@@ -994,6 +1148,9 @@ async function runSearch(event) {
   deckSummaryEl.hidden = true;
   deckSummaryEl.replaceChildren();
   resultsEl.replaceChildren();
+  preparationPanel.hidden = true;
+  lastPreparationObjects = [];
+  preparationObjectsEl.replaceChildren();
   logContent.replaceChildren();
   appendLog({ line: "この検索のログだけを表示します。", runId: activeLogRunId }, { force: true });
   setStatus("検索中。数百件規模だとScryfall照合、関連トークン取得、各サイト巡回でしばらく時間がかかります。");
@@ -1009,7 +1166,8 @@ async function runSearch(event) {
         sources: sourceLines(),
         maxChildPages: Number(maxPagesInput.value),
         useCache: useCacheInput.checked,
-        refreshCache: refreshCacheInput.checked
+        refreshCache: refreshCacheInput.checked,
+        preparation: preparationMode.checked ? { setCode: preparationSet.value.trim(), startsAt: preparationDate.value } : null
       })
     });
     const data = await response.json();
@@ -1020,7 +1178,16 @@ async function runSearch(event) {
     lastSearchedDeckCount = data.searchedDeckCount || 0;
     showAllDecks = false;
     setStatus("検索完了。チェックしながら、バルクのエキスパンション順または種類別で探せます。");
-    renderEnvironmentSummary(data.environment || {});
+    renderEnvironmentSummary(data.preparation ? { ...data.preparation.previous, targetDate: data.preparation.endDate,
+      reason: `直前環境からの準備候補（${data.preparation.startDate}〜${data.preparation.endDate}）。${data.preparation.warning}` } : data.environment || {});
+    preparationPanel.hidden = !data.preparation;
+    lastPreparationObjects = data.preparation?.objects || [];
+    if (data.preparation) document.querySelector("#preparation-status").textContent = `${data.preparation.setName || data.preparation.setCode.toUpperCase()}：${data.preparation.status}。${data.preparation.warnings.join(" ")}`;
+    resultFreshnessEl.hidden = false;
+    const revisionLabel = !data.environment?.dataRevision || data.environment.dataRevision === "同梱版"
+      ? "同梱版（本体付属）" : data.environment.dataRevision;
+    resultFreshnessEl.textContent = `検索に使用した環境履歴: ${revisionLabel}。${data.environment?.temporalNote || ""}`;
+    if (data.objectWarnings?.length) resultFreshnessEl.textContent += ` 現物情報の未完備: ${data.objectWarnings.join(" ")}`;
     renderSummary(data);
     renderArchetypeSummary(data.archetypes || []);
     renderTokenSummary(lastObjects);
@@ -1033,6 +1200,7 @@ async function runSearch(event) {
     setStatus(`エラー: ${error.message}`);
   } finally {
     button.disabled = false;
+    updateEnvironmentButton.disabled = false;
   }
 }
 
@@ -1129,6 +1297,10 @@ function initLogStream() {
 }
 
 async function init() {
+  fetch("/api/environment/status").then((response) => {
+    if (!response.ok) throw new Error("状態取得失敗");
+    return response.json();
+  }).then(renderUpdateStatus).catch(() => { updateStatusEl.textContent = "環境データの状態を取得できません。"; });
   const [formatsResponse, sourcesResponse] = await Promise.all([
     fetch("/api/formats"),
     fetch("/api/default-sources")
@@ -1163,7 +1335,7 @@ function applyCardLang(lang) {
     btn.setAttribute("aria-pressed", btn.dataset.lang === lang ? "true" : "false");
   }
 
-  if (lastObjects.length) {
+  if (lastObjects.length || lastPreparationObjects.length) {
     renderCurrentResults();
     return;
   }
@@ -1210,6 +1382,8 @@ for (const btn of langBtns) {
 }
 
 formatSelect.addEventListener("change", updateSourcesForFormat);
+formatSelect.addEventListener("change", () => loadPreparationSets());
+targetDateInput.addEventListener("change", () => loadPreparationSets());
 eventScaleSelect.addEventListener("change", applyEventScaleProfile);
 usageThresholdInput.addEventListener("input", () => {
   eventScaleSelect.value = "custom";
@@ -1226,4 +1400,5 @@ hideCheckedInput.addEventListener("change", renderCurrentResults);
 form.addEventListener("submit", runSearch);
 printButton.addEventListener("click", () => window.print());
 clearCacheButton.addEventListener("click", clearCache);
+updateEnvironmentButton.addEventListener("click", updateEnvironment);
 init().catch((error) => setStatus(`初期化エラー: ${error.message}`));

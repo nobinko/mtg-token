@@ -24,7 +24,7 @@ test("setReleaseEventsFromSets keeps only paper expansions and cores", () => {
 
   assert.deepEqual(events.map((event) => event.title), ["Big Expansion tabletop release", "Core Set tabletop release"]);
   assert.equal(events[0].formatsAffected.length, 4);
-  assert.equal(events[0].changes.standard, "Big Expansion became legal in Standard.");
+  assert.match(events[0].changes.standard, /構築適用日は未確認/);
 });
 
 test("mergeEnvironmentEvents prefers manual entries over same-day auto entries", () => {

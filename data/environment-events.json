@@ -1,5 +1,27 @@
 {
+  "schemaVersion": 1,
+  "minimumReaderVersion": 1,
+  "verifiedThrough": null,
   "events": [
+    {
+      "date": "2026-08-07",
+      "effectiveDate": "2026-08-07",
+      "type": "set-release",
+      "setCode": "hob",
+      "title": "The Hobbit tabletop legality (Prerelease)",
+      "sourceUrl": "https://magic.wizards.com/en/news/feature/the-hobbit-prerelease-guide",
+      "formatsAffected": ["standard", "pioneer", "modern", "legacy"]
+    },
+    {
+      "date": "2026-09-25",
+      "effectiveDate": "2026-09-25",
+      "type": "set-release",
+      "setCode": "fra",
+      "setName": "リアリティ・フラクチャー / Reality Fracture",
+      "title": "Reality Fracture tabletop legality (Prerelease)",
+      "sourceUrl": "https://wpn.wizards.com/en/news/reality-fracture-dates-and-details",
+      "formatsAffected": ["standard", "pioneer", "modern", "legacy"]
+    },
     {
       "date": "2025-07-25",
       "type": "rotation",
@@ -57,8 +79,12 @@
     {
       "date": "2026-08-10",
       "type": "banned-restricted",
-      "title": "Banned and Restricted update (auto-detected 2026-08-10)",
-      "sourceUrl": "https://magic.wizards.com/en/news/banned-restricted",
+      "title": "Banned and Restricted Announcement - August 10, 2026",
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/banned-and-restricted-august-10-2026",
+      "announcedAt": "2026-08-10",
+      "effectiveDate": "2026-08-10",
+      "nextAnnouncementDate": "2026-10-12",
+      "confirmed": true,
       "formatsAffected": [
         "standard",
         "legacy"
@@ -74,7 +100,7 @@
         "legacy": "The Fantasticar was banned in Legacy."
       },
       "autoDetected": true,
-      "note": "Scryfallリーガリティ差分による自動検知。日付は検知日で、公式発表日と最大1日ずれることがある。"
+      "note": "2026-09-07に公式発表本文で対象カードと2026-08-10の適用日を確認。自動検知の履歴は保持。"
     }
   ]
 }

@@ -53,6 +53,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
+          pending=$(jq '.unconfirmedBans | length' freshness-report.json)
+          if [ "$pending" -gt 0 ]; then
+            title="環境イベント表: 自動検知した禁止改定の適用日確認"
+            count=$(gh issue list --state open --search "in:title $title" --json number --jq 'length')
+            if [ "${count:-0}" -eq 0 ]; then
+              body_file=$(mktemp)
+              jq -r '"配布済みツールが正しい環境開始日を使うため、公式本文で対象フォーマット・発表日・紙の適用日を確認してください。environment-events.json の該当イベントに announcedAt / effectiveDate / confirmed: true / 公式sourceUrlを設定します。詳細: docs/environment-updates.md\n\n" + ([.unconfirmedBans[] | "- " + .title] | join("\n"))' freshness-report.json > "$body_file"
+              gh issue create --title "$title" --body-file "$body_file"
+            fi
+          fi
           stale_msg=$(jq -r '.staleAnnouncement.message // empty' freshness-report.json)
           if [ -n "$stale_msg" ]; then
             title="環境イベント表: 禁止改定の予定日を過ぎています"
