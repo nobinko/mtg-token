@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MTG Token Finder</title>
-    <link rel="stylesheet" href="/styles.css?v=20260907-set-picker">
+    <link rel="stylesheet" href="/styles.css?v=20260909-meta-preparation-v1">
   </head>
   <body>
     <main class="app">
@@ -106,6 +106,7 @@
       <section class="sampling-summary" id="sampling-summary"></section>
       <section class="environment-summary" id="environment-summary" hidden></section>
       <section class="summary" id="summary" hidden></section>
+      <section class="top-meta" id="top-meta" hidden></section>
       <section class="archetype-summary" id="archetype-summary" hidden></section>
       <section class="token-summary" id="token-summary" hidden></section>
       <section class="deck-summary" id="deck-summary" hidden></section>
@@ -120,6 +121,321 @@
         Unofficial Fan Content. Magic: The Gathering のカード画像・テキスト等は Wizards of the Coast に帰属します。このツールは Wizards of the Coast / Scryfall 非公認です。
       </footer>
     </main>
+
+    <dialog id="deck-dialog" class="deck-dialog" aria-labelledby="deck-dialog-title">
+      <div class="dialog-shell">
+        <header class="dialog-header">
+          <div>
+            <p class="dialog-kicker">トップメタの典型例</p>
+            <h2 id="deck-dialog-title">デッキリスト</h2>
+          </div>
+          <button id="deck-dialog-close" class="secondary-button dialog-close" type="button" aria-label="デッキリストを閉じる">閉じる</button>
+        </header>
+        <p id="deck-dialog-status" class="dialog-status" aria-live="polite"></p>
+        <div id="deck-dialog-meta" class="deck-dialog-meta"></div>
+        <div class="deck-list-columns">
+          <section>
+            <h3>メイン <span id="deck-mainboard-count"></span></h3>
+            <ol id="deck-mainboard-list" class="deck-card-list"></ol>
+          </section>
+          <section>
+            <h3>サイドボード <span id="deck-sideboard-count"></span></h3>
+            <ol id="deck-sideboard-list" class="deck-card-list"></ol>
+          </section>
+        </div>
+        <footer class="dialog-actions">
+          <button id="deck-copy-button" class="secondary-button" type="button" disabled>Arena形式をコピー</button>
+          <button id="deck-goldfish-button" type="button" disabled>このデッキをひとり回し</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog id="goldfish-dialog" class="goldfish-dialog" aria-labelledby="goldfish-title">
+      <div class="dialog-shell goldfish-shell">
+        <header class="dialog-header">
+          <div>
+            <p class="dialog-kicker">紙の操作をそのまま置けるプレイテスト卓</p>
+            <h2 id="goldfish-title">ひとり回し</h2>
+          </div>
+          <button id="goldfish-close" class="secondary-button dialog-close" type="button" aria-label="ひとり回しを閉じる">閉じる</button>
+        </header>
+
+        <section class="goldfish-scoreboard" aria-label="ゲーム状況">
+          <div class="goldfish-player-panel opponent-panel">
+            <strong class="goldfish-player-name">相手</strong>
+            <div class="goldfish-tracker-row">
+              <span>ライフ</span>
+              <button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="life" data-goldfish-delta="-5">−5</button>
+              <button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="life" data-goldfish-delta="-1">−1</button>
+              <input id="goldfish-opponent-life" data-goldfish-tracker-input="opponent:life" type="number" value="20" aria-label="相手のライフ">
+              <button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="life" data-goldfish-delta="1">＋1</button>
+              <button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="life" data-goldfish-delta="5">＋5</button>
+            </div>
+            <div class="goldfish-tracker-row compact-tracker">
+              <span>毒</span>
+              <button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="poison" data-goldfish-delta="-1">−</button>
+              <input id="goldfish-opponent-poison" data-goldfish-tracker-input="opponent:poison" type="number" value="0" min="0" aria-label="相手の毒カウンター">
+              <button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="poison" data-goldfish-delta="1">＋</button>
+            </div>
+          </div>
+
+          <div class="goldfish-match-controls">
+            <div class="goldfish-turn-line">
+              <span class="goldfish-stat">ターン <strong id="goldfish-turn">—</strong></span>
+              <label>開始
+                <select id="goldfish-play-draw">
+                  <option value="play" selected>先手</option>
+                  <option value="draw">後手</option>
+                </select>
+              </label>
+              <button id="goldfish-open-library" class="goldfish-stat goldfish-library-button" type="button" aria-expanded="false" disabled>
+                山札 <strong id="goldfish-library-count">0</strong><span>操作</span>
+              </button>
+            </div>
+            <div class="goldfish-toolbar">
+              <button id="goldfish-new-game" class="secondary-button" type="button">新しい初手</button>
+              <button id="goldfish-mulligan" class="secondary-button" type="button">マリガン</button>
+              <button id="goldfish-keep" type="button">キープ</button>
+              <button id="goldfish-draw" class="secondary-button" type="button">1枚引く</button>
+              <button id="goldfish-next-turn" type="button">次のターン</button>
+              <button id="goldfish-untap-all" class="secondary-button" type="button">全アンタップ</button>
+              <button id="goldfish-undo" class="secondary-button" type="button" disabled>元に戻す</button>
+              <button id="goldfish-redo" class="secondary-button" type="button" disabled>やり直す</button>
+            </div>
+            <div class="goldfish-session-tools">
+              <button id="goldfish-save" class="quiet-button" type="button">保存</button>
+              <button id="goldfish-resume" class="quiet-button" type="button" disabled>再開</button>
+              <button id="goldfish-toggle-game-log" class="quiet-button" type="button" aria-expanded="false">ゲームログ</button>
+              <button id="goldfish-shortcuts" class="quiet-button" type="button" aria-expanded="false">操作キー</button>
+              <span id="goldfish-save-status">未保存</span>
+            </div>
+          </div>
+
+          <div class="goldfish-player-panel self-panel">
+            <strong class="goldfish-player-name">自分</strong>
+            <div class="goldfish-tracker-row">
+              <span>ライフ</span>
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="life" data-goldfish-delta="-5">−5</button>
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="life" data-goldfish-delta="-1">−1</button>
+              <input id="goldfish-self-life" data-goldfish-tracker-input="self:life" type="number" value="20" aria-label="自分のライフ">
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="life" data-goldfish-delta="1">＋1</button>
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="life" data-goldfish-delta="5">＋5</button>
+            </div>
+            <div class="goldfish-tracker-row compact-tracker">
+              <span>毒</span>
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="poison" data-goldfish-delta="-1">−</button>
+              <input id="goldfish-self-poison" data-goldfish-tracker-input="self:poison" type="number" value="0" min="0" aria-label="自分の毒カウンター">
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="poison" data-goldfish-delta="1">＋</button>
+              <span>エネルギー</span>
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="energy" data-goldfish-delta="-1">−</button>
+              <input id="goldfish-self-energy" data-goldfish-tracker-input="self:energy" type="number" value="0" min="0" aria-label="自分のエネルギー">
+              <button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="energy" data-goldfish-delta="1">＋</button>
+            </div>
+          </div>
+        </section>
+
+        <p id="goldfish-message" class="goldfish-message" aria-live="polite"></p>
+
+        <div class="goldfish-layout">
+          <div class="goldfish-table-column">
+            <div class="goldfish-zones">
+            <div class="goldfish-small-zones">
+              <section class="goldfish-zone">
+                <h3>墓地 <span id="goldfish-graveyard-count">0</span></h3>
+                <div id="goldfish-graveyard" class="goldfish-card-zone compact-zone visual-compact-zone" data-goldfish-drop="graveyard" data-drop-label="墓地へ"></div>
+              </section>
+              <section class="goldfish-zone">
+                <h3>追放 <span id="goldfish-exile-count">0</span></h3>
+                <div id="goldfish-exile" class="goldfish-card-zone compact-zone visual-compact-zone" data-goldfish-drop="exile" data-drop-label="追放へ"></div>
+              </section>
+              <section class="goldfish-zone secondary-zone">
+                <h3>統率／相棒 <span id="goldfish-command-count">0</span></h3>
+                <div id="goldfish-command" class="goldfish-card-zone compact-zone" data-goldfish-drop="command" data-drop-label="統率／相棒へ"></div>
+              </section>
+              <section class="goldfish-zone secondary-zone">
+                <h3>サイド <span id="goldfish-sideboard-count">0</span></h3>
+                <div id="goldfish-sideboard" class="goldfish-card-zone compact-zone" data-goldfish-drop="sideboard" data-drop-label="サイドへ"></div>
+              </section>
+            </div>
+
+            <section class="goldfish-zone battlefield-zone">
+              <header class="goldfish-zone-header">
+                <div>
+                  <h3>戦場 <span id="goldfish-battlefield-count">0</span></h3>
+                  <p>カードをダブルクリックするとタップ／アンタップ。Ctrl＋クリックで複数選択。</p>
+                </div>
+                <button id="goldfish-tap-all" class="quiet-button" type="button">全タップ</button>
+              </header>
+              <div class="goldfish-battlefield-lanes">
+                <section class="goldfish-battlefield-lane other-lane">
+                  <h4>その他のパーマネント <span id="goldfish-other-count">0</span></h4>
+                  <div id="goldfish-battlefield-other" class="goldfish-card-zone battlefield-drop-zone" data-goldfish-drop="battlefield" data-battlefield-lane="other" data-drop-label="その他へ"></div>
+                </section>
+                <section class="goldfish-battlefield-lane creature-lane">
+                  <h4>クリーチャー <span id="goldfish-creature-count">0</span></h4>
+                  <div id="goldfish-battlefield-creature" class="goldfish-card-zone battlefield-drop-zone" data-goldfish-drop="battlefield" data-battlefield-lane="creature" data-drop-label="クリーチャーへ"></div>
+                </section>
+                <section class="goldfish-battlefield-lane land-lane">
+                  <h4>土地 <span id="goldfish-land-count">0</span></h4>
+                  <div id="goldfish-battlefield-land" class="goldfish-card-zone battlefield-drop-zone" data-goldfish-drop="battlefield" data-battlefield-lane="land" data-drop-label="土地へ"></div>
+                </section>
+              </div>
+            </section>
+
+            <details class="goldfish-table-tools">
+              <summary>トークン・カスタムカード・ダイス</summary>
+              <div class="goldfish-table-tools-grid">
+                <form id="goldfish-token-form" class="goldfish-token-form">
+                  <label>名前<input id="goldfish-token-name" value="トークン" maxlength="80"></label>
+                  <label>種類
+                    <select id="goldfish-token-type">
+                      <option value="Token Creature">クリーチャー</option>
+                      <option value="Token Artifact">アーティファクト</option>
+                      <option value="Token Enchantment">エンチャント</option>
+                      <option value="Custom Permanent">その他</option>
+                    </select>
+                  </label>
+                  <label>パワー<input id="goldfish-token-power" value="1" maxlength="12"></label>
+                  <label>タフネス<input id="goldfish-token-toughness" value="1" maxlength="12"></label>
+                  <label>枚数<input id="goldfish-token-count" type="number" value="1" min="1" max="50"></label>
+                  <button type="submit">戦場に作る</button>
+                </form>
+                <div class="goldfish-random-tools">
+                  <strong>ランダム</strong>
+                  <button type="button" data-goldfish-random="coin">コイン</button>
+                  <button type="button" data-goldfish-random="6">d6</button>
+                  <button type="button" data-goldfish-random="20">d20</button>
+                  <output id="goldfish-random-result">—</output>
+                </div>
+              </div>
+            </details>
+
+            </div>
+
+            <section class="goldfish-zone hand-zone">
+              <h3>手札 <span id="goldfish-hand-count">0</span></h3>
+              <div id="goldfish-hand" class="goldfish-card-zone" data-goldfish-drop="hand" data-drop-label="手札へ"></div>
+            </section>
+          </div>
+
+          <aside class="goldfish-inspector">
+            <div class="goldfish-selection-heading">
+              <p id="goldfish-selected-name" class="goldfish-selected-name">カードを選択してください。</p>
+              <button id="goldfish-clear-selection" class="quiet-button" type="button">選択解除</button>
+            </div>
+            <img id="goldfish-preview" alt="選択したカードの画像" hidden>
+            <p id="goldfish-selected-detail" class="goldfish-selected-detail"></p>
+            <div id="goldfish-card-actions" class="goldfish-card-actions" hidden>
+              <button type="button" data-goldfish-action="battlefield" data-battlefield-lane="land">土地へ</button>
+              <button type="button" data-goldfish-action="battlefield" data-battlefield-lane="creature">クリーチャーへ</button>
+              <button type="button" data-goldfish-action="battlefield" data-battlefield-lane="other">その他へ</button>
+              <button type="button" data-goldfish-action="hand">手札へ</button>
+              <button type="button" data-goldfish-action="graveyard">墓地へ</button>
+              <button type="button" data-goldfish-action="exile">追放</button>
+              <button type="button" data-goldfish-action="command">統率／相棒へ</button>
+              <button type="button" data-goldfish-action="sideboard">サイドへ</button>
+              <button type="button" data-goldfish-action="libraryTop">山札の上へ</button>
+              <button type="button" data-goldfish-action="libraryBottom">山札の下へ</button>
+              <button type="button" data-goldfish-action="tap">タップ切替</button>
+              <button type="button" data-goldfish-action="copy">コピー作成</button>
+              <button type="button" data-goldfish-action="face">別の面</button>
+              <button type="button" data-goldfish-action="facedown">裏向き</button>
+              <button type="button" data-goldfish-action="group">グループ化／解除</button>
+              <button type="button" data-goldfish-action="fetch">フェッチ（墓地・−1）</button>
+            </div>
+
+            <section id="goldfish-counter-tools" class="goldfish-counter-tools" hidden>
+              <h3>カウンター／P・T</h3>
+              <div class="goldfish-counter-quick">
+                <button type="button" data-goldfish-counter="+1/+1" data-goldfish-delta="1">+1/+1 ＋</button>
+                <button type="button" data-goldfish-counter="+1/+1" data-goldfish-delta="-1">+1/+1 −</button>
+                <button type="button" data-goldfish-counter="-1/-1" data-goldfish-delta="1">−1/−1 ＋</button>
+                <button type="button" data-goldfish-counter="-1/-1" data-goldfish-delta="-1">−1/−1 −</button>
+              </div>
+              <div class="goldfish-custom-counter">
+                <input id="goldfish-counter-name" maxlength="40" placeholder="忠誠、蓄積など">
+                <button id="goldfish-counter-add" type="button">＋</button>
+                <button id="goldfish-counter-remove" type="button">−</button>
+              </div>
+              <div id="goldfish-counter-list" class="goldfish-counter-list"></div>
+              <div class="goldfish-pt-controls">
+                <input id="goldfish-power" maxlength="12" placeholder="P" aria-label="パワー">
+                <span>/</span>
+                <input id="goldfish-toughness" maxlength="12" placeholder="T" aria-label="タフネス">
+                <button id="goldfish-pt-apply" type="button">P/T反映</button>
+              </div>
+              <label class="goldfish-note-label">メモ
+                <textarea id="goldfish-card-note" maxlength="240" rows="2" placeholder="攻撃済み、対象など"></textarea>
+              </label>
+              <button id="goldfish-note-apply" class="quiet-button" type="button">メモを反映</button>
+            </section>
+          </aside>
+
+          <aside id="goldfish-library-browser" class="goldfish-library-browser" hidden>
+            <header class="goldfish-library-header">
+              <div>
+                <p>検索と上から見る操作を分離</p>
+                <h3>山札操作</h3>
+              </div>
+              <button id="goldfish-close-library" class="secondary-button" type="button">閉じる</button>
+            </header>
+            <div class="goldfish-library-tabs" role="tablist">
+              <button type="button" role="tab" data-goldfish-library-mode="search" aria-selected="true">探してシャッフル</button>
+              <button type="button" role="tab" data-goldfish-library-mode="top" aria-selected="false">上からX枚</button>
+            </div>
+            <section id="goldfish-library-search-panel">
+              <label class="goldfish-library-search">
+                カード名で絞り込み
+                <input id="goldfish-library-query" type="search" placeholder="例: Steam Vents" autocomplete="off">
+              </label>
+              <p id="goldfish-library-summary" class="goldfish-library-summary"></p>
+              <p class="goldfish-library-hint">ここから移動すると山札を自動でシャッフルします。フェッチやサーチはこちらです。</p>
+              <div id="goldfish-library-results" class="goldfish-library-results"></div>
+            </section>
+            <section id="goldfish-library-top-panel" hidden>
+              <div class="goldfish-top-controls">
+                <label>枚数<input id="goldfish-top-count" type="number" value="3" min="1" max="100"></label>
+                <button type="button" data-goldfish-top-action="peek">見る</button>
+                <button type="button" data-goldfish-top-action="hand">引く</button>
+                <button type="button" data-goldfish-top-action="graveyard">切削</button>
+                <button type="button" data-goldfish-top-action="exile">追放</button>
+              </div>
+              <p class="goldfish-library-hint">見るだけでは順番を変えません。表示したカードを山札の上／下や各ゾーンへドラッグできます。</p>
+              <div id="goldfish-top-results" class="goldfish-library-results top-results"></div>
+            </section>
+            <div class="goldfish-library-footer">
+              <div class="goldfish-library-drop-targets" aria-label="山札へ戻す場所">
+                <div class="goldfish-library-drop" data-goldfish-drop="libraryTop" data-drop-label="山札の上へ">ここへドロップ<br><strong>山札の上</strong></div>
+                <div class="goldfish-library-drop" data-goldfish-drop="libraryBottom" data-drop-label="山札の下へ">ここへドロップ<br><strong>山札の下</strong></div>
+              </div>
+              <button id="goldfish-shuffle-library" class="secondary-button" type="button">山札をシャッフル</button>
+            </div>
+          </aside>
+
+          <aside id="goldfish-game-log" class="goldfish-game-log" hidden>
+            <header>
+              <div><p>保存される操作履歴</p><h3>ゲームログ／リプレイ</h3></div>
+              <button id="goldfish-close-game-log" class="secondary-button" type="button">閉じる</button>
+            </header>
+            <ol id="goldfish-game-log-list"></ol>
+          </aside>
+
+          <aside id="goldfish-shortcut-help" class="goldfish-shortcut-help" hidden>
+            <header><h3>操作キー</h3><button id="goldfish-close-shortcuts" class="secondary-button" type="button">閉じる</button></header>
+            <dl>
+              <div><dt>T</dt><dd>選択カードをタップ／アンタップ</dd></div>
+              <div><dt>U</dt><dd>全アンタップ</dd></div>
+              <div><dt>D</dt><dd>1枚引く</dd></div>
+              <div><dt>N</dt><dd>次のターン</dd></div>
+              <div><dt>L</dt><dd>山札操作を開く／閉じる</dd></div>
+              <div><dt>Ctrl+Z</dt><dd>元に戻す</dd></div>
+              <div><dt>Ctrl+Y</dt><dd>やり直す</dd></div>
+              <div><dt>?</dt><dd>この一覧</dd></div>
+            </dl>
+          </aside>
+        </div>
+      </div>
+    </dialog>
 
     <template id="set-template">
       <section class="set-group">
@@ -183,6 +499,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20260907-set-picker" type="module"></script>
+    <script src="/app.js?v=20260909-meta-preparation-v1" type="module"></script>
   </body>
 </html>

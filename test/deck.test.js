@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { extractDeckCardNames, extractDeckEntries, extractLinks } from "../lib/deck.js";
+import { extractDeckCardNames, extractDeckEntries, extractDeckRows, extractLinks } from "../lib/deck.js";
 
 test("extractDeckCardNames decodes escaped deck-list markup", () => {
   const text = "4 Slickshot Show-Off\\n2 Stormchaser's Talent\\n1 Island (SOS) 42";
@@ -10,6 +10,13 @@ test("extractDeckCardNames decodes escaped deck-list markup", () => {
     "Slickshot Show-Off",
     "Stormchaser's Talent",
     "Island"
+  ]);
+});
+
+test("extractDeckRows preserves quantities", () => {
+  assert.deepEqual(extractDeckRows("4 Island\n2 Test Spell\n1 Island"), [
+    { name: "Island", count: 5 },
+    { name: "Test Spell", count: 2 }
   ]);
 });
 
@@ -50,6 +57,9 @@ test("extractDeckEntries reads matching magic.gg deck-list cards", () => {
         4 Flow State
         4 Stormchaser's Talent
       </main-deck>
+      <side-board>
+        2 Negate
+      </side-board>
     </deck-list>
   `;
 
@@ -57,7 +67,10 @@ test("extractDeckEntries reads matching magic.gg deck-list cards", () => {
 
   assert.equal(entries.length, 1);
   assert.equal(entries[0].eventDate, "2026-05-30");
-  assert.deepEqual(entries[0].cards, ["Slickshot Show-Off", "Flow State", "Stormchaser's Talent"]);
+  assert.deepEqual(entries[0].cards, ["Slickshot Show-Off", "Flow State", "Stormchaser's Talent", "Negate"]);
+  assert.equal(entries[0].mainboardCount, 12);
+  assert.equal(entries[0].sideboardCount, 2);
+  assert.deepEqual(entries[0].sideboard, [{ name: "Negate", count: 2 }]);
 });
 
 function mtgoDecklistHtml(data) {
@@ -73,8 +86,8 @@ test("extractDeckEntries labels MTGO decks Unknown instead of the event name", (
       player: "SomePlayer",
       decktournamentid: 1,
       main_deck: [
-        { card_attributes: { card_name: "Ragavan, Nimble Pilferer" } },
-        { card_attributes: { card_name: "Steam Vents" } }
+        { qty: "4", card_attributes: { card_name: "Ragavan, Nimble Pilferer" } },
+        { qty: "2", card_attributes: { card_name: "Steam Vents" } }
       ],
       sideboard_deck: []
     }]
@@ -85,6 +98,7 @@ test("extractDeckEntries labels MTGO decks Unknown instead of the event name", (
   assert.equal(entries.length, 1);
   assert.equal(entries[0].title, "Modern Challenge 64 - SomePlayer");
   assert.equal(entries[0].archetype, "Unknown");
+  assert.equal(entries[0].mainboardCount, 6);
 });
 
 test("extractDeckEntries still classifies MTGO decks by card signatures", () => {

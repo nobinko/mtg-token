@@ -189,6 +189,7 @@ textarea {
 .sampling-summary,
 .environment-summary,
 .summary,
+.top-meta,
 .archetype-summary,
 .token-summary,
 .deck-summary {
@@ -196,6 +197,780 @@ textarea {
   padding: 12px 14px;
   border-left: 4px solid #176a63;
   background: #fffdf8;
+}
+
+.top-meta {
+  display: grid;
+  gap: 10px;
+  border-left-color: #6d5bd0;
+}
+
+.top-meta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.top-meta-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.top-meta-source,
+.top-meta-note {
+  color: #5d6668;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.top-meta-source a,
+.deck-dialog-meta a {
+  color: #176a63;
+  font-weight: 800;
+}
+
+.top-meta-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.top-meta-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto auto;
+  gap: 9px;
+  align-items: center;
+  padding: 9px;
+  border: 1px solid #cdc4b6;
+  border-radius: 6px;
+  background: #f8f4ec;
+}
+
+.top-meta-rank {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #6d5bd0;
+  color: #fff;
+  font-size: 12px;
+}
+
+.top-meta-name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-meta-share {
+  color: #6d5bd0;
+  font-size: 14px;
+}
+
+.meta-deck-button {
+  min-height: 34px;
+  padding: 0 10px;
+  background: #5d6668;
+  font-size: 12px;
+}
+
+.archetype-caveat {
+  margin-top: 8px;
+  color: #80591d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.deck-dialog,
+.goldfish-dialog {
+  width: min(980px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+}
+
+.goldfish-dialog {
+  width: min(1420px, calc(100vw - 24px));
+}
+
+.deck-dialog::backdrop,
+.goldfish-dialog::backdrop {
+  background: rgba(24, 28, 29, 0.72);
+}
+
+.dialog-shell {
+  max-height: calc(100vh - 32px);
+  padding: 20px;
+  overflow: auto;
+  background: #f4f1ea;
+  color: #1e2528;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #d5cec0;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.dialog-kicker {
+  margin-bottom: 3px;
+  color: #6d5bd0;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.secondary-button {
+  background: #5d6668;
+}
+
+.dialog-close {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 13px;
+}
+
+.dialog-status {
+  margin-top: 12px;
+  color: #176a63;
+  font-weight: 900;
+}
+
+.dialog-error,
+.dialog-warning {
+  color: #9a3412;
+}
+
+.deck-dialog-meta {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+  color: #5d6668;
+  font-size: 12px;
+}
+
+.deck-list-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.deck-list-columns > section {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #d5cec0;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.deck-list-columns h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.deck-list-columns h3 span {
+  color: #5d6668;
+  font-size: 12px;
+}
+
+.deck-card-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deck-list-columns > section:last-child .deck-card-list {
+  grid-template-columns: 1fr;
+}
+
+.deck-card-list li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 5px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.deck-card-list li strong {
+  color: #6d5bd0;
+  text-align: right;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.goldfish-shell {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  min-height: min(900px, calc(100vh - 24px));
+  max-height: calc(100vh - 24px);
+}
+
+.goldfish-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.goldfish-toolbar button,
+.goldfish-toolbar select {
+  min-height: 36px;
+}
+
+.goldfish-toolbar button {
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.goldfish-stat,
+.goldfish-life {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #cdc4b6;
+  border-radius: 6px;
+  background: #fffdf8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.goldfish-library-button {
+  gap: 5px;
+  padding: 0 8px;
+  color: #174d48;
+  cursor: pointer;
+}
+
+.goldfish-library-button span {
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #176a63;
+  color: white;
+  font-size: 10px;
+}
+
+.tiny-button {
+  width: 28px;
+  min-height: 26px !important;
+  padding: 0 !important;
+  border: 1px solid #b8b0a3;
+  background: #5d6668;
+}
+
+.goldfish-message {
+  min-height: 34px;
+  padding: 8px 10px;
+  border-left: 4px solid #b7791f;
+  background: #fffdf8;
+  color: #5d4d38;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.goldfish-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 14px;
+  min-height: 0;
+  margin-top: 12px;
+}
+
+.goldfish-layout.is-library-open {
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 390px);
+}
+
+.goldfish-zones {
+  display: grid;
+  grid-template-areas:
+    "side battlefield"
+    "hand hand";
+  grid-template-columns: minmax(160px, 210px) minmax(0, 1fr);
+  grid-template-rows: minmax(180px, 1fr) auto;
+  gap: 10px;
+  min-width: 0;
+}
+
+.goldfish-zone {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #cdc4b6;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.goldfish-zone h3 {
+  margin-bottom: 8px;
+  color: #5d6668;
+  font-size: 12px;
+}
+
+.goldfish-zone h3 span {
+  color: #176a63;
+}
+
+.goldfish-card-zone {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 6px;
+  min-height: 52px;
+  border-radius: 6px;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.battlefield-zone .goldfish-card-zone {
+  min-height: 140px;
+}
+
+.battlefield-zone {
+  grid-area: battlefield;
+}
+
+.battlefield-zone .goldfish-card-visual {
+  flex: 0 0 118px;
+  max-width: 118px;
+}
+
+.hand-zone {
+  grid-area: hand;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fffdf8 0%, #f5efe4 100%);
+}
+
+.hand-zone .goldfish-card-zone {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 220px;
+  padding: 3px 3px 11px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-color: #8a7f70 #e6dfd4;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+
+.goldfish-small-zones {
+  grid-area: side;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.goldfish-card-chip {
+  min-height: 36px;
+  max-width: 220px;
+  padding: 6px 9px;
+  border: 2px solid transparent;
+  background: #e5f0eb;
+  color: #174d48;
+  font-size: 12px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goldfish-card-chip.is-draggable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.goldfish-card-chip.is-draggable:active {
+  cursor: grabbing;
+}
+
+.goldfish-card-chip.is-dragging {
+  opacity: 0.42;
+}
+
+.goldfish-card-zone.is-drop-ready,
+.goldfish-library-drop.is-drop-ready {
+  box-shadow: inset 0 0 0 2px rgba(23, 106, 99, 0.34);
+}
+
+.goldfish-card-zone.is-drop-over,
+.goldfish-library-drop.is-drop-over {
+  background: #dcf4ed;
+  box-shadow: inset 0 0 0 3px #176a63;
+}
+
+.goldfish-card-zone.is-drop-over::after {
+  position: absolute;
+  z-index: 5;
+  inset: 6px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed #176a63;
+  border-radius: 7px;
+  background: rgba(244, 255, 250, 0.9);
+  color: #174d48;
+  content: attr(data-drop-label);
+  font-size: 14px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.goldfish-card-visual {
+  position: relative;
+  display: grid;
+  flex: 1 1 0;
+  grid-template-rows: auto 34px;
+  min-width: 112px;
+  max-width: 158px;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border-width: 3px;
+  border-radius: 10px;
+  background: #252b2d;
+  box-shadow: 0 5px 12px rgba(27, 31, 32, 0.22);
+  white-space: normal;
+  scroll-snap-align: start;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.goldfish-card-visual:hover,
+.goldfish-card-visual:focus-visible {
+  z-index: 1;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(27, 31, 32, 0.3);
+}
+
+.goldfish-card-visual img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 488 / 680;
+  background: #252b2d;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.goldfish-card-caption {
+  display: block;
+  min-width: 0;
+  padding: 8px 7px 7px;
+  overflow: hidden;
+  background: #e5f0eb;
+  color: #174d48;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.15;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goldfish-card-visual.image-unavailable {
+  grid-template-rows: minmax(150px, 1fr) 34px;
+}
+
+.goldfish-card-visual.image-unavailable::before {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  color: #d8d4ca;
+  content: "画像なし";
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.goldfish-card-chip.is-selected {
+  border-color: #6d5bd0;
+  box-shadow: 0 0 0 2px rgba(109, 91, 208, 0.18);
+}
+
+.goldfish-card-chip.is-bottom-choice {
+  border-color: #b7791f;
+  background: #fef3c7;
+  color: #7c4510;
+}
+
+.goldfish-card-visual.is-bottom-choice::after {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #b7791f;
+  color: white;
+  content: "下に戻す";
+  font-size: 10px;
+  font-weight: 900;
+  box-shadow: 0 2px 7px rgba(52, 37, 11, 0.35);
+}
+
+.goldfish-card-visual.is-bottom-choice .goldfish-card-caption {
+  background: #fef3c7;
+  color: #7c4510;
+}
+
+.goldfish-card-chip.is-tapped {
+  background: #dcd6f7;
+  color: #463aa0;
+  font-style: italic;
+}
+
+.battlefield-zone .goldfish-card-visual.is-tapped::after {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #6d5bd0;
+  color: white;
+  content: "タップ";
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+  box-shadow: 0 2px 7px rgba(36, 29, 83, 0.38);
+}
+
+.goldfish-empty {
+  color: #9a9388;
+  font-size: 12px;
+}
+
+.goldfish-inspector {
+  align-self: start;
+  display: grid;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid #cdc4b6;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.goldfish-inspector img {
+  width: 100%;
+  aspect-ratio: 488 / 680;
+  border-radius: 7px;
+  background: #e4ded3;
+  object-fit: contain;
+}
+
+.goldfish-selected-name {
+  font-size: 12px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.goldfish-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.goldfish-card-actions button {
+  min-height: 34px;
+  padding: 5px 6px;
+  font-size: 11px;
+}
+
+.goldfish-library-browser {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(180px, 1fr) auto;
+  gap: 10px;
+  min-width: 0;
+  max-height: calc(100vh - 220px);
+  padding: 12px;
+  overflow: hidden;
+  border: 2px solid #176a63;
+  border-radius: 9px;
+  background: #f7fbf8;
+  box-shadow: 0 8px 24px rgba(23, 106, 99, 0.14);
+}
+
+.goldfish-library-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goldfish-library-header p {
+  margin: 0 0 2px;
+  color: #6d5bd0;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.goldfish-library-header h3 {
+  margin: 0;
+  color: #174d48;
+  font-size: 18px;
+}
+
+.goldfish-library-header button {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.goldfish-library-search {
+  gap: 4px;
+  font-size: 11px;
+}
+
+.goldfish-library-search input {
+  min-height: 38px;
+}
+
+.goldfish-library-summary,
+.goldfish-library-hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.goldfish-library-summary {
+  color: #174d48;
+  font-weight: 900;
+}
+
+.goldfish-library-hint {
+  padding: 7px 8px;
+  border-left: 3px solid #b7791f;
+  background: #fff8e7;
+  color: #6f5227;
+}
+
+.goldfish-library-results {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  padding-right: 4px;
+  overflow-y: auto;
+  scrollbar-color: #8a7f70 #e6dfd4;
+  scrollbar-width: thin;
+}
+
+.goldfish-library-result {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 9px;
+  padding: 8px;
+  border: 1px solid #d5cec0;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.goldfish-library-card {
+  width: 92px;
+  min-width: 0;
+  max-width: 92px;
+  grid-template-rows: auto 31px;
+  align-self: start;
+}
+
+.goldfish-library-card .goldfish-card-caption {
+  padding: 7px 5px 6px;
+  font-size: 9px;
+}
+
+.goldfish-library-result-detail {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.goldfish-library-result-detail h4,
+.goldfish-library-result-detail p {
+  margin: 0;
+}
+
+.goldfish-library-result-detail h4 {
+  color: #1e2528;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.goldfish-library-result-detail p {
+  color: #5d6668;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.goldfish-library-result-actions {
+  display: grid;
+  gap: 5px;
+}
+
+.goldfish-library-result-actions button {
+  min-height: 31px;
+  padding: 4px 6px;
+  font-size: 10px;
+}
+
+.goldfish-library-empty {
+  color: #5d6668;
+  font-size: 12px;
+}
+
+.goldfish-library-footer {
+  display: grid;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px solid #d5cec0;
+}
+
+.goldfish-library-drop-targets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.goldfish-library-drop {
+  display: grid;
+  place-items: center;
+  min-height: 54px;
+  padding: 6px;
+  border: 2px dashed #9a9388;
+  border-radius: 7px;
+  color: #5d6668;
+  font-size: 10px;
+  text-align: center;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.goldfish-library-footer > button {
+  min-height: 34px;
+  font-size: 11px;
 }
 
 .token-summary {
@@ -950,6 +1725,88 @@ summary {
     justify-self: center;
   }
 
+  .top-meta-list,
+  .deck-list-columns,
+  .goldfish-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .goldfish-layout.is-library-open {
+    grid-template-columns: 1fr;
+  }
+
+  .top-meta-row {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+  }
+
+  .top-meta-row .meta-deck-button {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+
+  .dialog-shell {
+    padding: 14px;
+  }
+
+  .deck-card-list {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .goldfish-dialog,
+  .deck-dialog {
+    width: calc(100vw - 12px);
+    max-height: calc(100vh - 12px);
+  }
+
+  .goldfish-shell {
+    min-height: calc(100vh - 12px);
+    max-height: calc(100vh - 12px);
+  }
+
+  .goldfish-inspector {
+    grid-template-columns: 130px minmax(0, 1fr);
+  }
+
+  .goldfish-library-browser {
+    position: static;
+    max-height: none;
+  }
+
+  .goldfish-library-results {
+    max-height: 55vh;
+  }
+
+  .goldfish-inspector img {
+    grid-row: 1 / span 2;
+  }
+
+  .goldfish-small-zones {
+    grid-template-rows: none;
+  }
+
+  .goldfish-zones {
+    grid-template-areas:
+      "battlefield"
+      "hand"
+      "side";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .hand-zone .goldfish-card-zone {
+    min-height: 196px;
+  }
+
+  .goldfish-card-visual {
+    flex: 0 0 118px;
+    max-width: 118px;
+  }
+
   .log-panel {
     right: 8px;
     left: 8px;
@@ -974,6 +1831,8 @@ summary {
   }
 
   .toolbar,
+  .deck-dialog,
+  .goldfish-dialog,
   .log-panel,
   .sources,
   .status,
@@ -1033,5 +1892,998 @@ summary {
 
   .card.is-checked {
     display: none;
+  }
+}
+
+/* Goldfish playtest table v2 */
+.goldfish-shell {
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  min-height: min(940px, calc(100vh - 24px));
+  padding: 16px;
+}
+
+.goldfish-scoreboard {
+  display: grid;
+  grid-template-columns: minmax(250px, .8fr) minmax(470px, 1.65fr) minmax(250px, .8fr);
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 10px;
+}
+
+.goldfish-player-panel,
+.goldfish-match-controls {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #c9c0b3;
+  border-radius: 9px;
+  background: #fffdf8;
+}
+
+.goldfish-player-panel {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+}
+
+.opponent-panel {
+  border-top: 4px solid #9a3412;
+  background: linear-gradient(160deg, #fffdf8, #fff3ed);
+}
+
+.self-panel {
+  border-top: 4px solid #176a63;
+  background: linear-gradient(160deg, #fffdf8, #eef9f5);
+}
+
+.goldfish-player-name {
+  color: #3d4547;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+.goldfish-tracker-row {
+  display: grid;
+  grid-template-columns: auto repeat(2, 34px) 56px repeat(2, 34px);
+  gap: 4px;
+  align-items: center;
+}
+
+.goldfish-tracker-row > span {
+  color: #5d6668;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.goldfish-tracker-row button {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0;
+  font-size: 11px;
+}
+
+.goldfish-tracker-row input {
+  width: 56px;
+  min-height: 36px;
+  padding: 3px;
+  border-color: #9a9388;
+  background: white;
+  font-size: 19px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.compact-tracker {
+  grid-template-columns: auto 30px 46px 30px;
+}
+
+.compact-tracker input {
+  width: 46px;
+  min-height: 32px;
+  font-size: 14px;
+}
+
+.goldfish-match-controls {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border-top: 4px solid #6d5bd0;
+}
+
+.goldfish-turn-line,
+.goldfish-session-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.goldfish-turn-line label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #5d6668;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.goldfish-turn-line select {
+  min-height: 34px;
+  padding: 0 28px 0 8px;
+}
+
+.goldfish-toolbar {
+  justify-content: center;
+  padding: 0;
+}
+
+.goldfish-toolbar button,
+.goldfish-session-tools button {
+  min-height: 34px;
+  padding: 0 9px;
+  font-size: 11px;
+}
+
+.quiet-button {
+  border: 1px solid #a69d90;
+  background: #f5f1e9;
+  color: #465052;
+}
+
+.quiet-button:hover,
+.quiet-button:focus-visible {
+  background: #e8e1d5;
+}
+
+.goldfish-session-tools {
+  padding-top: 7px;
+  border-top: 1px solid #e3ddd2;
+}
+
+#goldfish-save-status {
+  color: #6b6257;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.goldfish-message {
+  min-height: 38px;
+  margin-top: 9px;
+  border-radius: 0 7px 7px 0;
+  line-height: 1.5;
+}
+
+.goldfish-layout,
+.goldfish-layout.is-library-open,
+.goldfish-layout.is-side-panel-open {
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 310px);
+  gap: 10px;
+}
+
+.goldfish-table-column {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.goldfish-zones {
+  grid-template-areas:
+    "side battlefield"
+    "tools battlefield";
+  grid-template-columns: minmax(160px, 190px) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+  min-height: 0;
+  padding-right: 3px;
+  overflow-y: auto;
+}
+
+.goldfish-small-zones {
+  grid-area: side;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, auto);
+  gap: 7px;
+}
+
+.goldfish-zone {
+  padding: 8px;
+  border-color: #c9c0b3;
+}
+
+.goldfish-zone h3,
+.goldfish-zone h4 {
+  margin: 0;
+}
+
+.secondary-zone {
+  background: #f6f2ea;
+}
+
+.goldfish-zone-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.goldfish-zone-header p {
+  margin-top: 2px;
+  color: #766e63;
+  font-size: 10px;
+}
+
+.goldfish-zone-header button {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0 8px;
+  font-size: 10px;
+}
+
+.goldfish-battlefield-lanes {
+  display: grid;
+  gap: 7px;
+}
+
+.goldfish-battlefield-lane {
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid #d8d0c4;
+  border-radius: 7px;
+}
+
+.goldfish-battlefield-lane h4 {
+  padding: 0 2px 5px;
+  color: #5d6668;
+  font-size: 10px;
+  letter-spacing: .025em;
+}
+
+.goldfish-battlefield-lane h4 span {
+  color: #176a63;
+}
+
+.other-lane {
+  background: linear-gradient(90deg, #faf7ff, #fffdf8);
+}
+
+.creature-lane {
+  background: linear-gradient(90deg, #f1faf5, #fffdf8);
+}
+
+.land-lane {
+  background: linear-gradient(90deg, #faf5e9, #fffdf8);
+}
+
+.battlefield-zone .goldfish-card-zone,
+.battlefield-drop-zone {
+  min-height: 146px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.battlefield-zone .goldfish-card-visual {
+  flex: 0 0 94px;
+  width: 94px;
+  max-width: 94px;
+}
+
+.hand-zone .goldfish-card-zone {
+  min-height: 181px;
+  padding: 5px 5px 12px;
+}
+
+.hand-zone {
+  grid-area: auto;
+  box-shadow: 0 -5px 18px rgba(40, 35, 29, .1);
+}
+
+.hand-zone .goldfish-card-visual {
+  flex: 0 0 128px;
+  width: 128px;
+  max-width: 128px;
+}
+
+.visual-compact-zone {
+  flex-wrap: nowrap;
+  min-height: 93px;
+  padding: 2px 2px 8px;
+  overflow-x: auto;
+}
+
+.visual-compact-zone .goldfish-card-visual {
+  flex: 0 0 58px;
+  width: 58px;
+  min-width: 58px;
+  max-width: 58px;
+}
+
+.visual-compact-zone .goldfish-card-caption {
+  display: none;
+}
+
+.compact-zone:not(.visual-compact-zone) {
+  align-content: start;
+  min-height: 48px;
+}
+
+.compact-zone:not(.visual-compact-zone) .goldfish-card-chip {
+  min-height: 28px;
+  padding: 4px 6px;
+  font-size: 9px;
+}
+
+.goldfish-card-visual {
+  display: block;
+  min-width: 88px;
+  padding: 0;
+  overflow: visible;
+  border: 3px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.goldfish-card-visual:hover,
+.goldfish-card-visual:focus-visible {
+  transform: translateY(-3px);
+  filter: drop-shadow(0 7px 8px rgba(27, 31, 32, .24));
+}
+
+.goldfish-card-surface {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 27px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 7px;
+  background: #252b2d;
+  box-shadow: 0 4px 9px rgba(27, 31, 32, .24);
+  transform-origin: 50% 50%;
+  transition: transform 150ms ease, opacity 120ms ease;
+}
+
+.goldfish-card-visual img,
+.goldfish-card-back {
+  display: block;
+  width: 100%;
+  aspect-ratio: 488 / 680;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.goldfish-card-back {
+  place-items: center;
+  background:
+    radial-gradient(circle, transparent 29%, #101418 30% 35%, transparent 36%),
+    radial-gradient(circle at 50% 42%, #603519, #17130f 72%);
+  color: #f0dca9;
+  font-family: Georgia, serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.goldfish-card-caption {
+  min-height: 27px;
+  padding: 6px 5px 5px;
+  font-size: 9px;
+}
+
+.goldfish-card-visual.image-unavailable {
+  min-height: 0;
+}
+
+.goldfish-card-visual.image-unavailable .goldfish-card-surface::before {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 488 / 680;
+  padding: 8px;
+  color: #d8d4ca;
+  content: "画像なし";
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.goldfish-card-visual.image-unavailable::before {
+  content: none;
+}
+
+.battlefield-drop-zone .goldfish-card-visual.is-tapped {
+  margin-inline: 15px;
+}
+
+.battlefield-drop-zone .goldfish-card-visual.is-tapped .goldfish-card-surface {
+  transform: rotate(90deg) scale(.72);
+}
+
+.battlefield-zone .goldfish-card-visual.is-tapped::after {
+  top: 4px;
+  right: 3px;
+  z-index: 4;
+  padding: 3px 5px;
+  font-size: 8px;
+}
+
+.goldfish-card-chip.is-selected {
+  border-color: #6d5bd0;
+  box-shadow: 0 0 0 2px rgba(109, 91, 208, .22);
+}
+
+.goldfish-card-chip.is-bottom-choice {
+  background: transparent;
+}
+
+.goldfish-card-badges {
+  position: absolute;
+  z-index: 3;
+  inset: 4px 4px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.goldfish-card-badges > span {
+  padding: 2px 4px;
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 999px;
+  background: rgba(25, 31, 32, .88);
+  color: white;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0,0,0,.28);
+}
+
+.goldfish-card-badges .pt-badge {
+  margin-left: auto;
+  background: rgba(23, 106, 99, .94);
+}
+
+.goldfish-card-badges .group-badge {
+  background: rgba(109, 91, 208, .94);
+}
+
+.goldfish-card-badges .note-badge {
+  background: rgba(183, 121, 31, .96);
+}
+
+.goldfish-table-tools {
+  grid-area: tools;
+  align-self: start;
+  border: 1px solid #c9c0b3;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.goldfish-table-tools summary {
+  padding: 9px;
+  color: #5d6668;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.goldfish-table-tools-grid {
+  display: grid;
+  gap: 10px;
+  padding: 0 9px 9px;
+}
+
+.goldfish-token-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.goldfish-token-form label {
+  gap: 2px;
+  color: #5d6668;
+  font-size: 9px;
+}
+
+.goldfish-token-form input,
+.goldfish-token-form select {
+  width: 100%;
+  min-height: 30px;
+  padding: 3px 5px;
+  font-size: 10px;
+}
+
+.goldfish-token-form button {
+  grid-column: 1 / -1;
+  min-height: 32px;
+  font-size: 10px;
+}
+
+.goldfish-random-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.goldfish-random-tools strong,
+.goldfish-random-tools output {
+  font-size: 10px;
+}
+
+.goldfish-random-tools button {
+  min-height: 29px;
+  padding: 0 7px;
+  font-size: 9px;
+}
+
+.goldfish-random-tools output {
+  flex: 1 1 100%;
+  padding: 7px;
+  border-radius: 5px;
+  background: #f4f1ea;
+  font-weight: 900;
+  text-align: center;
+}
+
+.goldfish-inspector,
+.goldfish-library-browser,
+.goldfish-game-log,
+.goldfish-shortcut-help {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  min-width: 0;
+  max-height: calc(100vh - 270px);
+  overflow: auto;
+  border: 1px solid #c9c0b3;
+  border-radius: 9px;
+  background: #fffdf8;
+  box-shadow: 0 7px 20px rgba(40, 35, 29, .12);
+}
+
+.goldfish-inspector {
+  gap: 8px;
+  padding: 10px;
+}
+
+.goldfish-selection-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.goldfish-selection-heading button {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 7px;
+  font-size: 9px;
+}
+
+.goldfish-inspector img {
+  width: min(100%, 195px);
+  justify-self: center;
+}
+
+.goldfish-selected-detail {
+  color: #6b6257;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.goldfish-card-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.goldfish-card-actions button {
+  min-height: 30px;
+  padding: 4px;
+  font-size: 9px;
+}
+
+.goldfish-counter-tools {
+  display: grid;
+  gap: 7px;
+  padding-top: 9px;
+  border-top: 1px solid #ddd5c9;
+}
+
+.goldfish-counter-tools h3 {
+  margin: 0;
+  color: #5d6668;
+  font-size: 11px;
+}
+
+.goldfish-counter-quick,
+.goldfish-custom-counter,
+.goldfish-pt-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.goldfish-counter-quick button,
+.goldfish-custom-counter button,
+.goldfish-pt-controls button {
+  min-height: 29px;
+  padding: 3px;
+  font-size: 8px;
+}
+
+.goldfish-custom-counter {
+  grid-template-columns: minmax(0, 1fr) 36px 36px;
+}
+
+.goldfish-custom-counter input,
+.goldfish-pt-controls input {
+  min-width: 0;
+  min-height: 29px;
+  padding: 3px 5px;
+  font-size: 9px;
+}
+
+.goldfish-counter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 18px;
+  color: #5d6668;
+  font-size: 9px;
+}
+
+.goldfish-counter-list span {
+  padding: 3px 5px;
+  border-radius: 999px;
+  background: #e5f0eb;
+  color: #174d48;
+  font-weight: 900;
+}
+
+.goldfish-pt-controls {
+  grid-template-columns: 42px auto 42px minmax(62px, 1fr);
+  align-items: center;
+}
+
+.goldfish-note-label {
+  gap: 3px;
+  color: #5d6668;
+  font-size: 9px;
+}
+
+.goldfish-note-label textarea {
+  width: 100%;
+  resize: vertical;
+  font: inherit;
+}
+
+.goldfish-library-browser {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  max-height: calc(100vh - 270px);
+  border: 2px solid #176a63;
+  padding: 10px;
+}
+
+.goldfish-library-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.goldfish-library-tabs button {
+  min-height: 32px;
+  padding: 4px;
+  border: 1px solid #a9bcb6;
+  background: #e9f3ef;
+  color: #174d48;
+  font-size: 9px;
+}
+
+.goldfish-library-tabs button[aria-selected="true"] {
+  background: #176a63;
+  color: white;
+}
+
+#goldfish-library-search-panel,
+#goldfish-library-top-panel {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(150px, 1fr);
+  gap: 7px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.goldfish-library-results {
+  max-height: calc(100vh - 520px);
+}
+
+.goldfish-library-result {
+  grid-template-columns: 72px minmax(0, 1fr);
+  padding: 6px;
+}
+
+.goldfish-library-card {
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+}
+
+.goldfish-library-result-actions button {
+  min-height: 28px;
+  font-size: 9px;
+}
+
+.goldfish-top-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.goldfish-top-controls label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #5d6668;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.goldfish-top-controls input {
+  width: 54px;
+  min-height: 30px;
+  padding: 3px;
+}
+
+.goldfish-top-controls button {
+  min-height: 30px;
+  padding: 3px;
+  font-size: 9px;
+}
+
+.goldfish-game-log,
+.goldfish-shortcut-help {
+  padding: 10px;
+}
+
+.goldfish-game-log header,
+.goldfish-shortcut-help header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #d5cec0;
+}
+
+.goldfish-game-log header p {
+  color: #6d5bd0;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.goldfish-game-log h3,
+.goldfish-shortcut-help h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.goldfish-game-log header button,
+.goldfish-shortcut-help header button {
+  min-height: 29px;
+  padding: 0 7px;
+  font-size: 9px;
+}
+
+.goldfish-game-log ol {
+  display: grid;
+  gap: 5px;
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goldfish-log-entry {
+  width: 100%;
+  min-height: 0;
+  padding: 7px 8px;
+  border: 1px solid #d5cec0;
+  background: #f8f5ef;
+  color: #394244;
+  font-size: 9px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.goldfish-log-entry.is-current {
+  border-color: #6d5bd0;
+  background: #eeeafd;
+  color: #463aa0;
+}
+
+.goldfish-shortcut-help dl {
+  display: grid;
+  gap: 0;
+  margin: 8px 0 0;
+}
+
+.goldfish-shortcut-help dl > div {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 7px;
+  padding: 7px 2px;
+  border-bottom: 1px solid #e8e1d7;
+}
+
+.goldfish-shortcut-help dt {
+  font-weight: 900;
+}
+
+.goldfish-shortcut-help dd {
+  margin: 0;
+  color: #5d6668;
+  font-size: 10px;
+}
+
+.goldfish-dialog.is-loading-goldfish .goldfish-layout,
+.goldfish-dialog.is-loading-goldfish .goldfish-scoreboard {
+  opacity: .62;
+  pointer-events: none;
+}
+
+@media (min-width: 821px) {
+  .goldfish-shell,
+  .goldfish-layout {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 1120px) {
+  .goldfish-scoreboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .goldfish-match-controls {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .goldfish-player-panel {
+    grid-row: 2;
+  }
+
+  .goldfish-zones {
+    grid-template-columns: 154px minmax(0, 1fr);
+  }
+
+  .goldfish-small-zones {
+    grid-template-columns: 1fr;
+  }
+
+  .battlefield-zone .goldfish-card-visual {
+    flex-basis: 86px;
+    width: 86px;
+    max-width: 86px;
+  }
+}
+
+@media (max-width: 820px) {
+  .goldfish-dialog {
+    width: calc(100vw - 10px);
+    max-height: calc(100vh - 10px);
+  }
+
+  .goldfish-shell {
+    min-height: calc(100vh - 10px);
+    max-height: calc(100vh - 10px);
+    padding: 10px;
+  }
+
+  .goldfish-scoreboard,
+  .goldfish-layout,
+  .goldfish-layout.is-library-open,
+  .goldfish-layout.is-side-panel-open,
+  .goldfish-zones {
+    grid-template-columns: 1fr;
+  }
+
+  .goldfish-scoreboard {
+    grid-template-rows: auto;
+  }
+
+  .goldfish-match-controls,
+  .goldfish-player-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .goldfish-match-controls {
+    order: -1;
+  }
+
+  .goldfish-zones {
+    grid-template-areas:
+      "battlefield"
+      "side"
+      "tools";
+  }
+
+  .goldfish-table-column {
+    display: block;
+  }
+
+  .goldfish-zones {
+    grid-template-rows: auto;
+    padding-right: 0;
+    overflow: visible;
+  }
+
+  .hand-zone {
+    margin-top: 8px;
+  }
+
+  .goldfish-small-zones {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .goldfish-inspector,
+  .goldfish-library-browser,
+  .goldfish-game-log,
+  .goldfish-shortcut-help {
+    position: static;
+    max-height: none;
+  }
+
+  .goldfish-library-results {
+    max-height: 55vh;
+  }
+
+  .goldfish-tracker-row {
+    justify-content: center;
+  }
+
+  .hand-zone .goldfish-card-visual {
+    flex-basis: 116px;
+    width: 116px;
+    max-width: 116px;
+  }
+}
+
+@media (max-width: 520px) {
+  .goldfish-small-zones {
+    grid-template-columns: 1fr;
+  }
+
+  .goldfish-scoreboard {
+    gap: 6px;
+  }
+
+  .goldfish-tracker-row {
+    grid-template-columns: auto repeat(2, 31px) 50px repeat(2, 31px);
+  }
+
+  .compact-tracker {
+    grid-template-columns: auto 28px 42px 28px;
+  }
+
+  .compact-tracker > span:nth-of-type(2) {
+    grid-column: 1;
+  }
+
+  .goldfish-tracker-row input {
+    width: 50px;
+  }
+
+  .compact-tracker input {
+    width: 42px;
+  }
+
+  .battlefield-zone .goldfish-card-visual {
+    flex-basis: 76px;
+    width: 76px;
+    max-width: 76px;
   }
 }

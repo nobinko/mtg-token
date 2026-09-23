@@ -4,6 +4,15 @@
 
 実測日: 2026-06-02 JST
 
+追補実測日: 2026-09-08 JST
+
+## 2026-09-08 追補: トップメタと典型リスト
+
+- MTGTop8 Modernフォーマットページ `https://mtgtop8.com/format?f=MO` を通常HTTP取得し、`meta=54` の直近2週間集計897デッキと上位アーキタイプを抽出できた。
+- 上位は出典の表示どおり、UR Aggro 11%、Blink 10%、Broodscale Bloodchief 10%など。これは取得時点のスナップショットであり、固定値や過去日付の再現値として保持しない。
+- UR Aggroのアーキタイプページから現環境内の候補8件を取得し、すべて完全リストとして比較できた。選ばれた実在例はメイン60枚・サイド15枚で、プレイヤー、大会、順位、日付も一覧行から抽出できた。
+- メタ順位にはこの出典集計を使い、トークン探索用の混在ソース検索結果から行う自動アーキタイプ推定は使わない。
+
 ## 結論
 
 - MTGO公式とMTGTop8は、通常HTTP取得でカード名まで抽出できるため、デフォルト巡回元として維持する。
@@ -22,7 +31,7 @@
 | 晴れる屋検索結果 | `https://www.hareruyamtg.com/ja/deck/result?formats%5B3%5D=3&dateFrom=2026/05/19&pageSize=20` | 202 / 0 bytes | 自動巡回しない | レスポンスヘッダに `x-amzn-waf-action: challenge`。通常UAでも同じ。本文が空で `/show/` リンクを拾えない |
 | 晴れる屋個別show | `https://www.hareruyamtg.com/ja/deck/1156836/show/` | 200 / 約3.1MB | 未対応 | HTMLは取得でき、「Magic Online用テキスト」等のデッキ表示はある。ただし現行 `extractDeckEntries` では1エントリ/カード0件で、カード名抽出に失敗する |
 | MTGO公式 | `https://www.mtgo.com/decklist/legacy-league-2026-06-0210612` | 200 | デフォルト巡回元 | ページ内の `window.MTGO.decklists.data` JSONから7デッキを抽出。先頭例は `Legacy League - Nedus`、公開日 `2026-06-02`、カード名29種 |
-| MTGTop8 | `https://mtgtop8.com/format?f=LE` → `https://mtgtop8.com/event?e=85974&d=852939&f=LE` | 200 | デフォルト巡回元 | フォーマットページからイベント/個別デッキリンクを抽出可能。個別デッキ例 `Boros Aggro - Blungoreus` はイベント日 `2026-05-31`、カード名28種 |
+| MTGTop8 | `https://mtgtop8.com/format?f=LE` → `https://mtgtop8.com/event?e=85974&d=852939&f=LE` | 200 | デフォルト巡回元・トップメタ/典型例 | フォーマットページからイベント/個別デッキリンクを抽出可能。2026-09-08にはModernの現在メタ897件と、UR Aggro候補8件から60+15枚の実在例を取得 |
 | magic.gg | `https://magic.gg/decklists` | 200 | 条件付き巡回元 | ページ取得は可能。ただし2026-06-02の実測ではLegacyに一致するリンクが0件だった。フォーマット名がURLや `<deck-list format>` に出る時だけ採用 |
 | MTGGoldfishメタ | `https://www.mtggoldfish.com/metagame/legacy.legacy` | 200 | メタ補助のみ | メタページは取れるが、個別デッキ取得が安定しない |
 | MTGGoldfish個別 | `https://www.mtggoldfish.com/deck/7149824` | 403 | 自動巡回しない | Cloudflare `Just a moment...` が返る |

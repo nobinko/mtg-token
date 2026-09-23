@@ -4,21 +4,23 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
-import { port, publicDir, maxMatchedCards } from "./lib/config.js";
+import { port, publicDir, maxMatchedCards, seedPageMaxAgeMs } from "./lib/config.js";
 import { defaultSources, formatOptions, normalizeFormat } from "./lib/data.js";
 import { toIsoDate, imageRefFor } from "./lib/util.js";
-import { clearPageCache } from "./lib/cache.js";
-import { formatEnvironmentInfo } from "./lib/environment.js";
+import { clearPageCache, fetchPage } from "./lib/cache.js";
+import { formatEnvironmentInfo, isDateInEnvironment } from "./lib/environment.js";
 import { environmentUpdates, confirmedEvents } from "./lib/updates.js";
 import { fetchSetReleaseEvents, fetchSetCatalog } from "./lib/set-events.js";
 import { preparationSetChoices } from "./lib/preparation-sets.js";
 import { preparationWindow, preparationSources, dateOnly } from "./lib/preparation.js";
 import { fetchPreparationSet, fetchJapaneseTokenPrintById } from "./lib/scryfall.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
-import { fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
+import { fetchCardMetadata, fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
 import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
 import { crawlSources } from "./lib/crawl.js";
+import { extractDeckEntries } from "./lib/deck.js";
+import { chooseRepresentativeDeck, extractMtgTop8ArchetypeDeckLinks, normalizeMtgTop8ArchetypeUrl, representativeAsOfDate } from "./lib/meta.js";
 
 // ---- ログブロードキャスト ----
 const sseClients = new Set();
@@ -103,9 +105,146 @@ function normalizeRequestedDeckCount(value, fallback = 300) {
   return Math.max(20, Math.min(Math.trunc(count), 600));
 }
 
+function publicRepresentativeDeck(deck) {
+  return {
+    title: deck.title,
+    url: deck.url,
+    pageUrl: deck.pageUrl,
+    eventDate: deck.eventDate,
+    player: deck.player || "",
+    event: deck.event || "",
+    placement: deck.placement || "",
+    mainboard: deck.mainboard || [],
+    sideboard: deck.sideboard || [],
+    mainboardCount: deck.mainboardCount || 0,
+    sideboardCount: deck.sideboardCount || 0
+  };
+}
+
+async function fetchRepresentativeCandidate(link, format, options) {
+  const page = await fetchPage(link.url, options);
+  const deck = extractDeckEntries(page.html, link.url, page.title, [link.url], link.eventDate || page.publishedDate || "", format)[0];
+  if (!deck) throw new Error("デッキリストを抽出できませんでした。");
+  if (link.eventDate) deck.eventDate = link.eventDate;
+  deck.player = link.player || "";
+  deck.event = link.event || "";
+  deck.placement = link.placement || "";
+  return deck;
+}
+
 app.get("/api/default-sources", (c) => c.json(defaultSources));
 
 app.get("/api/formats", (c) => c.json(formatOptions));
+
+app.post("/api/meta-deck", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const logRunId = normalizeLogRunId(body.logRunId);
+  return logContext.run({ runId: logRunId }, async () => {
+    const format = String(body.format || "").toLowerCase();
+    if (!["standard", "pioneer", "modern", "legacy"].includes(format)) return c.json({ error: "フォーマットが不正です。" }, 400);
+    const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
+    if (body.targetDate && !dateOnly(body.targetDate)) return c.json({ error: "大会日が不正です。" }, 400);
+    const archetypeUrl = normalizeMtgTop8ArchetypeUrl(body.archetypeUrl, format);
+    if (!archetypeUrl) return c.json({ error: "トップメタの取得元URLが不正です。" }, 400);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const targetEnvironment = await formatEnvironmentInfo(format, targetDate);
+    if (!targetEnvironment.resolved || !targetEnvironment.startDate) return c.json({ error: targetEnvironment.reason, environment: targetEnvironment }, 422);
+
+    let representativeEnvironment = targetEnvironment;
+    let representativeEndDate = representativeAsOfDate(targetDate, today);
+    let representativeScope = {
+      type: "target-environment",
+      label: "指定日の環境",
+      note: ""
+    };
+
+    if (body.preparation) {
+      let preparation;
+      try {
+        preparation = preparationWindow(targetEnvironment.events, format, targetDate, body.preparation, today);
+      } catch (error) {
+        return c.json({ error: error.message }, 400);
+      }
+      representativeEnvironment = preparation.previous;
+      representativeEndDate = preparation.endDate;
+      representativeScope = {
+        type: "preparation-baseline",
+        label: "新セット導入前の準備用ベースライン",
+        note: `大会日 ${targetDate} の新環境実績ではありません。新セット導入前の ${preparation.startDate}〜${preparation.endDate} に公開された実在リストから選んでいます。`
+      };
+    } else if (targetDate > today) {
+      representativeEnvironment = await formatEnvironmentInfo(format, representativeEndDate);
+      if (!representativeEnvironment.resolved || !representativeEnvironment.startDate) {
+        return c.json({ error: representativeEnvironment.reason, environment: representativeEnvironment }, 422);
+      }
+      representativeScope = {
+        type: "current-baseline",
+        label: "現時点の準備用ベースライン",
+        note: `大会日 ${targetDate} は未来のため、${representativeEndDate} 時点の環境に公開された実在リストから選んでいます。大会当日のメタ予測ではありません。`
+      };
+    }
+
+    const fetchOptions = {
+      useCache: body.useCache !== false,
+      refreshCache: body.refreshCache === true
+    };
+
+    let archetypePage;
+    try {
+      console.log(`[meta] fetching archetype ${archetypeUrl}`);
+      archetypePage = await fetchPage(archetypeUrl, { ...fetchOptions, maxAgeMs: seedPageMaxAgeMs });
+    } catch (error) {
+      return c.json({ error: `アーキタイプ一覧を取得できません: ${error.message}` }, 502);
+    }
+
+    const allLinks = extractMtgTop8ArchetypeDeckLinks(archetypePage.html, archetypeUrl, format);
+    const candidateLinks = allLinks
+      .filter((link) => !link.eventDate || isDateInEnvironment(link.eventDate, representativeEnvironment.startDate, representativeEndDate))
+      .slice(0, 8);
+    if (!candidateLinks.length) {
+      return c.json({ error: `${representativeEnvironment.startDate}〜${representativeEndDate}に該当する完全デッキ候補がありません。` }, 404);
+    }
+
+    const decks = [];
+    const warnings = [];
+    for (let index = 0; index < candidateLinks.length; index += 3) {
+      const batch = candidateLinks.slice(index, index + 3);
+      const settled = await Promise.allSettled(batch.map((link) => fetchRepresentativeCandidate(link, format, fetchOptions)));
+      settled.forEach((result, resultIndex) => {
+        if (result.status === "fulfilled") decks.push(result.value);
+        else warnings.push(`${batch[resultIndex].name || "デッキ"}: ${result.reason?.message || result.reason}`);
+      });
+    }
+
+    const representative = chooseRepresentativeDeck(decks);
+    if (!representative) {
+      return c.json({ error: "60枚のメインデッキを持つ完全リストを取得できませんでした。", warnings }, 502);
+    }
+
+    console.log(`[meta] representative candidates=${representative.sampleSize} selected=${representative.deck.url}`);
+    return c.json({
+      archetypeName: String(body.archetypeName || "").slice(0, 120),
+      source: "MTGTop8",
+      sourceUrl: archetypeUrl,
+      sourceFetchedAt: archetypePage.fetchedAt,
+      environmentStartDate: representativeEnvironment.startDate,
+      representativeEndDate,
+      representativeScope: {
+        ...representativeScope,
+        startDate: representativeEnvironment.startDate,
+        endDate: representativeEndDate
+      },
+      targetDate,
+      candidateLinkCount: candidateLinks.length,
+      sampleSize: representative.sampleSize,
+      similarityPercent: representative.similarityPercent,
+      selectionMethod: representative.method,
+      deck: publicRepresentativeDeck(representative.deck),
+      warnings: warnings.slice(0, 8)
+    });
+  });
+});
 
 app.get("/api/preparation-sets", async (c) => {
   const format = c.req.query("format");
@@ -113,6 +252,13 @@ app.get("/api/preparation-sets", async (c) => {
   if (!["standard", "pioneer", "modern", "legacy"].includes(format) || !dateOnly(targetDate)) return c.json({ error: "フォーマットと大会日を確認してください。" }, 400);
   const [catalog, active] = await Promise.all([fetchSetCatalog({ refresh: c.req.query("refresh") === "1" }), environmentUpdates.read()]);
   return c.json({ ...preparationSetChoices(catalog.sets, confirmedEvents(active.pack), format, targetDate), source: catalog.source, warning: catalog.warning });
+});
+
+app.post("/api/card-metadata", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const names = Array.isArray(body.names) ? body.names.slice(0, 150) : [];
+  if (!names.length) return c.json({ cards: [] });
+  return c.json({ cards: await fetchCardMetadata(names) });
 });
 
 app.get("/api/logs", (c) => {
@@ -245,6 +391,12 @@ app.post("/api/token-cards", async (c) => {
   }
   const deckResults = deckResultsFromPages(crawl.pages).slice(0, maxChildPages);
   const archetypes = overallArchetypeStats(deckResults);
+  const metaSnapshot = (crawl.metaSnapshots || []).find((snapshot) => snapshot.entries?.length) || null;
+  const topMeta = metaSnapshot ? {
+    ...metaSnapshot,
+    entries: metaSnapshot.entries.slice(0, 10),
+    note: "トップメタは検索デッキの自動分類ではなく、取得時点のMTGTop8掲載値です。大会日の過去スナップショットではありません。"
+  } : null;
   console.log(`[search] done decks=${deckResults.length} sourceCards=${matched.length} objects=${objects.length}`);
 
   return c.json({
@@ -267,6 +419,7 @@ app.post("/api/token-cards", async (c) => {
     searchedDecks: deckResults,
     searchedDeckCount: deckResults.length,
     archetypes,
+    topMeta,
     candidateCount: candidates.length,
     cards: matched.map(({ raw: _raw, ...card }) => card),
     objects,
