@@ -1,12 +1,14 @@
 import {
   adjustGoldfishCounter,
   cloneGoldfishState,
+  canDragGoldfishCard,
   copyGoldfishCards,
   createGoldfishGame,
   createGoldfishToken,
   cycleGoldfishFace,
   drawGoldfishCard,
   drawGoldfishCards,
+  dropGoldfishCards,
   groupGoldfishCards,
   keepGoldfishHand,
   moveGoldfishCards,
@@ -23,7 +25,8 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js";
+} from "./goldfish.js?v=20260926-gallery-v2";
+import { mergeCardMetadata } from "./card-metadata.js?v=20260926-gallery-v2";
 
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command"];
 const ZONE_LABELS = {
@@ -52,6 +55,10 @@ function scryfallImageUrl(name) {
 
 function cardFace(card) {
   return card.faces?.[card.faceIndex || 0] || null;
+}
+
+function cardDisplayName(card) {
+  return cardFace(card)?.name || card.name;
 }
 
 function cardImageUrl(card) {
@@ -294,7 +301,7 @@ export function createGoldfishController(dialog) {
   }
 
   function beginDrag(event, card, zone, { shuffleLibrary = false } = {}) {
-    if (!state || state.phase !== "playing") {
+    if (!canDragGoldfishCard(state, zone)) {
       event.preventDefault();
       return;
     }
@@ -303,11 +310,17 @@ export function createGoldfishController(dialog) {
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", cardIds.join(","));
     event.currentTarget.classList.add("is-dragging");
-    for (const target of dialog.querySelectorAll("[data-goldfish-drop]")) target.classList.add("is-drop-ready");
+    for (const target of dialog.querySelectorAll("[data-goldfish-drop]")) {
+      if (canDropOn(target)) target.classList.add("is-drop-ready");
+    }
+  }
+
+  function canDropOn(target) {
+    return dragged && (state?.phase === "playing" || (state?.phase === "opening" && !state.bottomRequired && dragged.sourceZone === "hand" && target.dataset.goldfishDrop === "battlefield"));
   }
 
   function cardAriaLabel(card) {
-    const parts = [card.name];
+    const parts = [cardDisplayName(card)];
     if (card.tapped) parts.push("タップ");
     if (card.faceDown) parts.push("裏向き");
     const counters = Object.entries(card.counters || {}).map(([name, value]) => `${name} ${value}`);
@@ -329,8 +342,8 @@ export function createGoldfishController(dialog) {
       badge.textContent = `${name} ${value}`;
       badges.append(badge);
     }
-    const power = card.powerOverride || cardFace(card)?.power || card.power;
-    const toughness = card.toughnessOverride || cardFace(card)?.toughness || card.toughness;
+    const power = card.powerOverride || (cardFace(card)?.power ?? card.power);
+    const toughness = card.toughnessOverride || (cardFace(card)?.toughness ?? card.toughness);
     if (power || toughness) {
       const badge = document.createElement("span");
       badge.className = "pt-badge";
@@ -364,7 +377,7 @@ export function createGoldfishController(dialog) {
     button.dataset.cardId = card.id;
     button.dataset.cardZone = zone;
     button.dataset.cardPosition = String(position);
-    button.draggable = state?.phase === "playing";
+    button.draggable = canDragGoldfishCard(state, zone);
     if (button.draggable) button.classList.add("is-draggable");
     if (visual) button.classList.add("goldfish-card-visual");
     if (card.tapped) button.classList.add("is-tapped");
@@ -387,6 +400,7 @@ export function createGoldfishController(dialog) {
         surface.append(back);
       } else {
         const image = document.createElement("img");
+        image.draggable = false;
         image.src = cardImageUrl(card);
         image.alt = "";
         image.loading = lazy ? "lazy" : "eager";
@@ -404,12 +418,12 @@ export function createGoldfishController(dialog) {
       }
       const caption = document.createElement("span");
       caption.className = "goldfish-card-caption";
-      caption.textContent = card.name;
+      caption.textContent = cardDisplayName(card);
       surface.append(caption);
       appendCardBadges(surface, card);
       button.append(surface);
     } else {
-      button.textContent = card.name;
+      button.textContent = cardDisplayName(card);
     }
 
     button.title = button.draggable
@@ -616,12 +630,12 @@ export function createGoldfishController(dialog) {
       return;
     }
 
-    ui.selectedName.textContent = selected.length > 1 ? `${selected.length}枚を選択中` : primary.card.name;
+    ui.selectedName.textContent = selected.length > 1 ? `${selected.length}枚を選択中` : cardDisplayName(primary.card);
     const counters = Object.entries(primary.card.counters || {}).map(([name, value]) => `${name}:${value}`).join(" / ");
     ui.selectedDetail.textContent = [
       ZONE_LABELS[primary.zone] || primary.zone,
       primary.card.lane ? LANE_LABELS[primary.card.lane] : "",
-      primary.card.typeLine,
+      cardFace(primary.card)?.typeLine || primary.card.typeLine,
       counters,
       primary.card.note
     ].filter(Boolean).join(" ／ ");
@@ -687,7 +701,7 @@ export function createGoldfishController(dialog) {
     else if (opening && state.bottomRequired) {
       ui.message.textContent = `マリガン${state.mulligans}回。手札から戻す${state.bottomRequired}枚を選択してください（${mulliganBottomIds.size}/${state.bottomRequired}）。`;
     } else if (opening) {
-      ui.message.textContent = "初手7枚です。マリガンするか、そのままキープしてください。";
+      ui.message.textContent = "初手7枚です。戦場へドラッグするとキープして開始します。マリガン・キープのボタンも使えます。";
     } else {
       ui.message.textContent = `${state.onThePlay ? "先手" : "後手"}、ターン${state.turn}。ドラッグで移動、ダブルクリックまたはTでタップできます。`;
     }
@@ -706,13 +720,14 @@ export function createGoldfishController(dialog) {
     if (fromLibrary && shuffleLibrary && !destination.startsWith("library")) {
       next = takeGoldfishCardsFromLibrary(state, cardIds, destination, Math.random, { lane, index });
     } else {
-      next = moveGoldfishCards(state, cardIds, destination, { lane, index });
+      next = dropGoldfishCards(state, cardIds, destination, { lane, index });
     }
     const names = locations.map(({ card }) => card.name);
     const subject = names.length === 1 ? `「${names[0]}」` : `${names.length}枚`;
     const laneText = destination === "battlefield" && lane ? `の${LANE_LABELS[lane]}` : "";
     const suffix = fromLibrary && shuffleLibrary ? "。山札をシャッフルしました。" : "。";
-    commit(next, `${subject}を${ZONE_LABELS[destination] || destination}${laneText}へ移しました${suffix}`, {
+    const opening = state.phase === "opening" ? "初手をキープし、" : "";
+    commit(next, `${opening}${subject}を${ZONE_LABELS[destination] || destination}${laneText}へ移しました${suffix}`, {
       select: cardIds,
       primary: cardIds[0],
       closeLibrary
@@ -765,7 +780,7 @@ export function createGoldfishController(dialog) {
     timeline = [];
     timelineIndex = -1;
     pushTimeline("新しい初手を引きました。");
-    render(message || "シャッフルして初手7枚を引きました。");
+    render(message || "初手7枚を引きました。戦場へドラッグするとキープして開始します。マリガンも選べます。");
   }
 
   async function enrichDeck(deck) {
@@ -778,9 +793,7 @@ export function createGoldfishController(dialog) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || "カード種別を取得できませんでした。");
-    const metadata = new Map((data.cards || []).filter((card) => !card.unavailable).map((card) => [normalizeName(card.name), card]));
-    const merge = (rows) => (rows || []).map((row) => ({ ...row, ...(metadata.get(normalizeName(row.name)) || {}) }));
-    return { ...deck, mainboard: merge(deck.mainboard), sideboard: merge(deck.sideboard) };
+    return { ...deck, mainboard: mergeCardMetadata(deck.mainboard, data.cards), sideboard: mergeCardMetadata(deck.sideboard, data.cards) };
   }
 
   async function open(deck, title) {
@@ -824,14 +837,15 @@ export function createGoldfishController(dialog) {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
       if (saved?.version !== 2 || saved.signature !== deckSignature(activeDeck)) throw new Error("このデッキの保存データがありません。");
+      const metadata = [...(activeDeck.mainboard || []), ...(activeDeck.sideboard || [])];
       const restoredTimeline = (Array.isArray(saved.timeline) ? saved.timeline : []).slice(-MAX_TIMELINE).map((entry) => ({
         at: entry.at || saved.savedAt,
         message: String(entry.message || "保存盤面").slice(0, 240),
-        state: restoreGoldfishGame(entry.state),
+        state: restoreGoldfishGame(entry.state, { metadata }),
         selectedIds: Array.isArray(entry.selectedIds) ? entry.selectedIds.slice(0, 100) : [],
         primaryId: String(entry.primaryId || "")
       }));
-      state = restoreGoldfishGame(saved.state);
+      state = restoreGoldfishGame(saved.state, { metadata });
       timeline = restoredTimeline.length ? restoredTimeline : [timelineEntry("保存盤面")];
       timelineIndex = Math.max(0, Math.min(Number(saved.timelineIndex) || 0, timeline.length - 1));
       state = cloneGoldfishState(timeline[timelineIndex]?.state || state);
@@ -979,17 +993,20 @@ export function createGoldfishController(dialog) {
   }
 
   for (const target of dialog.querySelectorAll("[data-goldfish-drop]")) {
-    target.addEventListener("dragover", (event) => {
-      if (!dragged || state?.phase !== "playing") return;
+    const acceptDrop = (event) => {
+      if (!canDropOn(target)) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
       target.classList.add("is-drop-over");
-    });
+    };
+    target.addEventListener("dragenter", acceptDrop);
+    target.addEventListener("dragover", acceptDrop);
     target.addEventListener("dragleave", (event) => {
       if (!target.contains(event.relatedTarget)) target.classList.remove("is-drop-over");
     });
     target.addEventListener("drop", (event) => {
       event.preventDefault();
+      if (!canDropOn(target)) { clearDropHighlights(); return; }
       const currentDrag = dragged;
       const cardTarget = event.target.closest(".goldfish-card-chip");
       const destination = target.dataset.goldfishDrop;

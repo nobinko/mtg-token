@@ -3,12 +3,14 @@ import test from "node:test";
 
 import {
   adjustGoldfishCounter,
+  canDragGoldfishCard,
   copyGoldfishCards,
   createGoldfishGame,
   createGoldfishToken,
   cycleGoldfishFace,
   defaultGoldfishLane,
   drawGoldfishCard,
+  dropGoldfishCards,
   groupGoldfishCards,
   keepGoldfishHand,
   moveGoldfishCard,
@@ -32,6 +34,44 @@ import {
 
 const deck = [{ name: "Island", count: 30 }, { name: "Test Spell", count: 30 }];
 const fixedRandom = () => 0.25;
+
+test("dropping the opening hand onto the battlefield keeps it as one undoable transition", () => {
+  const original = createGoldfishGame(deck, { random: fixedRandom });
+  const ids = original.hand.slice(0, 2).map((card) => card.id);
+  assert.equal(canDragGoldfishCard(original, "hand"), true);
+  assert.equal(canDragGoldfishCard(original, "sideboard"), false);
+  const next = dropGoldfishCards(original, ids, "battlefield", { lane: "land" });
+  assert.equal(next.phase, "playing");
+  assert.equal(next.turn, 1);
+  assert.equal(next.hand.length, 5);
+  assert.equal(next.library.length, 53);
+  assert.deepEqual(next.battlefield.map((card) => card.id), ids);
+  assert.ok(next.battlefield.every((card) => card.lane === "land"));
+  assert.equal(original.phase, "opening");
+  assert.equal(original.hand.length, 7);
+  assert.equal(original.battlefield.length, 0);
+  const moved = dropGoldfishCards(next, ids, "graveyard");
+  assert.deepEqual(moved.graveyard.map((card) => card.id), ids);
+  assert.equal(moved.battlefield.length, 0);
+});
+
+test("opening drag draws exactly once on the draw and respects London mulligans", () => {
+  const original = createGoldfishGame(deck, { random: fixedRandom, onThePlay: false });
+  const id = original.hand[0].id;
+  const next = dropGoldfishCards(original, [id], "battlefield");
+  assert.equal(next.library.length, 52);
+  assert.equal(next.hand.length, 7);
+  const moved = dropGoldfishCards(next, [id], "hand");
+  assert.equal(moved.library.length, 52);
+  assert.equal(moved.hand.length, 8);
+  const mulligan = mulliganGoldfish(original, fixedRandom);
+  assert.equal(canDragGoldfishCard(mulligan, "hand"), false);
+  assert.throws(() => dropGoldfishCards(mulligan, [mulligan.hand[0].id], "battlefield"), /キープしてから/);
+  assert.equal(mulligan.phase, "opening");
+  assert.throws(() => dropGoldfishCards(original, [id], "graveyard"), /初手は戦場/);
+  assert.throws(() => dropGoldfishCards(original, [], "battlefield"), /初手は戦場/);
+  assert.equal(original.hand.length, 7);
+});
 
 test("createGoldfishGame shuffles a real 60-card deck and draws seven", () => {
   const state = createGoldfishGame(deck, { sideboardRows: [{ name: "Dispel", count: 2 }], random: fixedRandom });
