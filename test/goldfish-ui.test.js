@@ -37,7 +37,6 @@ test("the application uses the unified controller instead of the retired inline 
   assert.match(app, /createGoldfishController/);
   assert.doesNotMatch(app, /function renderGoldfish\(/);
   assert.doesNotMatch(app, /const goldfishState/);
-  assert.match(controller, /button\.draggable = state\?\.phase === "playing"/);
   assert.match(controller, /addEventListener\("dragstart"/);
   assert.match(controller, /addEventListener\("drop"/);
   assert.match(controller, /dataset\.battlefieldLane/);

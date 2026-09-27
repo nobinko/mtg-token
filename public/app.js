@@ -1,4 +1,6 @@
-import { createGoldfishController } from "./goldfish-ui.js";
+import { createGoldfishController } from "./goldfish-ui.js?v=20260926-gallery-v2";
+import { objectKey, objectCharacteristics, migrateCheckedObjects } from "./object-identity.js?v=20260926-gallery-v2";
+import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -32,8 +34,7 @@ const deckDialog = document.querySelector("#deck-dialog");
 const deckDialogTitle = document.querySelector("#deck-dialog-title");
 const deckDialogStatus = document.querySelector("#deck-dialog-status");
 const deckDialogMeta = document.querySelector("#deck-dialog-meta");
-const deckMainboardList = document.querySelector("#deck-mainboard-list");
-const deckSideboardList = document.querySelector("#deck-sideboard-list");
+const deckGallery = createDeckGallery(deckDialog, document.querySelector("#deck-card-preview"));
 const deckMainboardCount = document.querySelector("#deck-mainboard-count");
 const deckSideboardCount = document.querySelector("#deck-sideboard-count");
 const deckCopyButton = document.querySelector("#deck-copy-button");
@@ -276,10 +277,6 @@ function readCheckedObjects() {
 
 function saveCheckedObjects() {
   localStorage.setItem(checkedStorageKey, JSON.stringify([...checkedObjects]));
-}
-
-function objectKey(object) {
-  return `${object.set}|${object.name}|${object.typeLine}`;
 }
 
 function setStatus(message) {
@@ -554,19 +551,6 @@ function renderTopMeta(topMeta) {
   topMetaEl.append(list);
 }
 
-function renderDeckRows(container, rows) {
-  container.replaceChildren();
-  for (const row of rows || []) {
-    const item = document.createElement("li");
-    const count = document.createElement("strong");
-    count.textContent = String(row.count);
-    const name = document.createElement("span");
-    name.textContent = row.name;
-    item.append(count, name);
-    container.append(item);
-  }
-}
-
 function arenaDeckText(deck) {
   const main = (deck.mainboard || []).map((row) => `${row.count} ${row.name}`).join("\n");
   const side = (deck.sideboard || []).map((row) => `${row.count} ${row.name}`).join("\n");
@@ -580,8 +564,7 @@ async function openRepresentativeDeck(entry) {
   deckDialogStatus.className = "dialog-status";
   deckDialogStatus.textContent = "直近の完全リストを比較して、典型例を選んでいます…";
   deckDialogMeta.replaceChildren();
-  deckMainboardList.replaceChildren();
-  deckSideboardList.replaceChildren();
+  deckGallery.clear();
   deckMainboardCount.textContent = "";
   deckSideboardCount.textContent = "";
   deckCopyButton.disabled = true;
@@ -641,8 +624,7 @@ async function openRepresentativeDeck(entry) {
     }
     deckMainboardCount.textContent = `${data.deck.mainboardCount}枚`;
     deckSideboardCount.textContent = `${data.deck.sideboardCount}枚`;
-    renderDeckRows(deckMainboardList, data.deck.mainboard);
-    renderDeckRows(deckSideboardList, data.deck.sideboard);
+    deckGallery.setDeck(data.deck);
     deckCopyButton.disabled = false;
     deckGoldfishButton.disabled = false;
   } catch (error) {
@@ -833,7 +815,7 @@ function renderTokenSummary(objects) {
     const row = document.createElement("div");
     row.className = `token-rank-row ${priority.className}`;
     const name = document.createElement("span");
-    name.textContent = object.name;
+    name.textContent = [object.name, objectCharacteristics(object)].filter(Boolean).join(" — ");
     const percent = document.createElement("strong");
     percent.textContent = `${priority.percent.toFixed(1)}%`;
     const count = document.createElement("em");
@@ -1100,7 +1082,7 @@ function renderObject(object) {
   title.textContent = object.name;
   jp.textContent = object.japaneseName || `名称確認: ${object.category || "トークン"}`;
   kind.textContent = object.category || object.kind;
-  type.textContent = object.typeLine;
+  type.textContent = [object.typeLine, objectCharacteristics(object)].filter(Boolean).join(" / ");
   const priority = tokenPriority(object);
   deckCount.textContent = `${priority.label}: ${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks (${priority.percent.toFixed(1)}%)`;
   if (object.preparationOnly) deckCount.textContent = "追加準備候補・採用率未評価";
@@ -1399,11 +1381,17 @@ async function runSearch(event) {
       reason: `直前環境からの準備候補（${data.preparation.startDate}〜${data.preparation.endDate}）。${data.preparation.warning}` } : data.environment || {});
     preparationPanel.hidden = !data.preparation;
     lastPreparationObjects = data.preparation?.objects || [];
+    const migrated = migrateCheckedObjects(checkedObjects);
+    checkedObjects.clear();
+    for (const key of migrated.checked) checkedObjects.add(key);
+    if (migrated.changed) saveCheckedObjects();
     if (data.preparation) document.querySelector("#preparation-status").textContent = `${data.preparation.setName || data.preparation.setCode.toUpperCase()}：${data.preparation.status}。${data.preparation.warnings.join(" ")}`;
     resultFreshnessEl.hidden = false;
     const revisionLabel = !data.environment?.dataRevision || data.environment.dataRevision === "同梱版"
       ? "同梱版（本体付属）" : data.environment.dataRevision;
     resultFreshnessEl.textContent = `検索に使用した環境履歴: ${revisionLabel}。${data.environment?.temporalNote || ""}`;
+    if (migrated.resetCount) resultFreshnessEl.textContent += " 旧形式の準備チェックは同名トークンの区別を確認できないため解除しました。現物を確認してチェックし直してください。";
+    if (data.candidateWarnings?.length) resultFreshnessEl.textContent += ` ${data.candidateWarnings.join(" ")}`;
     if (data.objectWarnings?.length) resultFreshnessEl.textContent += ` 現物情報の未完備: ${data.objectWarnings.join(" ")}`;
     renderSummary(data);
     renderTopMeta(data.topMeta);
@@ -1600,7 +1588,7 @@ for (const btn of langBtns) {
 }
 
 document.querySelector("#deck-dialog-close").addEventListener("click", () => deckDialog.close());
-deckDialog.addEventListener("close", () => { representativeRequestId += 1; });
+deckDialog.addEventListener("close", () => { representativeRequestId += 1; deckGallery.clear(); });
 for (const dialog of [deckDialog, goldfishDialog]) {
   dialog.addEventListener("click", (event) => {
     if (event.target === dialog) dialog.close();

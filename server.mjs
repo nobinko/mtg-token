@@ -15,7 +15,8 @@ import { preparationSetChoices } from "./lib/preparation-sets.js";
 import { preparationWindow, preparationSources, dateOnly } from "./lib/preparation.js";
 import { fetchPreparationSet, fetchJapaneseTokenPrintById } from "./lib/scryfall.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
-import { fetchCardMetadata, fetchFinderCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
+import { fetchCardMetadata, fetchFinderCandidates, fetchSearchCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
+import { isVirtualObject } from "./public/object-identity.js";
 import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
 import { crawlSources } from "./lib/crawl.js";
@@ -258,7 +259,7 @@ app.post("/api/card-metadata", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const names = Array.isArray(body.names) ? body.names.slice(0, 150) : [];
   if (!names.length) return c.json({ cards: [] });
-  return c.json({ cards: await fetchCardMetadata(names) });
+  return c.json({ cards: await fetchCardMetadata(names, { language: body.language === "ja" ? "ja" : "en" }) });
 });
 
 app.get("/api/logs", (c) => {
@@ -311,13 +312,13 @@ app.post("/api/token-cards", async (c) => {
   const environmentStartDate = preparation?.startDate || environment.startDate;
   const crawlTargetDate = preparation?.endDate || targetDate;
   const active = await environmentUpdates.read();
-  const freshCandidates = active.format === format && Date.now() - Date.parse(active.checkedAt) < 24 * 60 * 60 * 1000;
   console.log(`[search] start format=${format} target=${targetDate} decks=${maxChildPages}`);
 
-  const [candidates, crawl] = await Promise.all([
-    freshCandidates ? Promise.resolve(active.candidates) : fetchFinderCandidates(format, { refresh: Boolean(active.checkedAt) || Boolean(preparation) }),
+  const [candidateResult, crawl] = await Promise.all([
+    fetchSearchCandidates(format, active),
     crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate: crawlTargetDate, environmentStartDate, format })
   ]);
+  const candidates = candidateResult.cards;
 
   const allowedDeckUrls = new Set(deckResultsFromPages(crawl.pages).slice(0, maxChildPages).map((deck) => deck.url));
   crawl.pages = crawl.pages.map((page) => ({ ...page, deckEntries: (page.deckEntries || []).filter((deck) => allowedDeckUrls.has(deck.url)) }));
@@ -407,6 +408,7 @@ app.post("/api/token-cards", async (c) => {
     environment: { ...environment, events: undefined },
     preparation: preparationResult,
     objectWarnings,
+    candidateWarnings: candidateResult.warnings,
     sourceUrls,
     scannedPages: crawl.pages.map((page) => page.url),
     errors: crawl.errors,
@@ -463,8 +465,9 @@ app.post("/api/enrich-card-assets", async (c) => {
     const typeLine = String(object.typeLine || "");
     if (!name) continue;
     const sourceNames = Array.isArray(object.sourceNames) ? object.sourceNames.filter(Boolean) : [];
-    let japaneseName = "";
-    for (const sourceName of sourceNames.slice(0, 4)) {
+    const helper = isVirtualObject({ ...object, typeLine });
+    let japaneseName = helper ? japaneseOperationalName({ name, typeLine, kind }) : "";
+    for (const sourceName of helper ? [] : sourceNames.slice(0, 4)) {
       const sourceSet = String(sourceInputByName.get(sourceName)?.set || "");
       japaneseName = await fetchJapaneseRelatedObjectName(sourceName, { name, type_line: typeLine }, { set: sourceSet });
       if (japaneseName) break;
@@ -503,6 +506,6 @@ app.onError((err, c) => {
   return c.json({ error: err.message }, 500);
 });
 
-serve({ fetch: app.fetch, port, hostname: "127.0.0.1" }, () => {
+export const server = serve({ fetch: app.fetch, port, hostname: "127.0.0.1" }, () => {
   console.log(`MTG Token Finder running at http://localhost:${port}`);
 });

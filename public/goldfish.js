@@ -1,3 +1,5 @@
+import { mergeCardMetadata } from "./card-metadata.js?v=20260926-gallery-v2";
+
 export const GOLDFISH_SCHEMA_VERSION = 2;
 export const GOLDFISH_LANES = ["other", "creature", "land"];
 
@@ -180,7 +182,7 @@ export function cloneGoldfishState(state) {
   return next;
 }
 
-export function restoreGoldfishGame(value) {
+export function restoreGoldfishGame(value, { metadata = [] } = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("保存データが不正です。");
   const next = cloneGoldfishState(value);
   if (!next.deckRows.length || next.library.length + next.hand.length + next.battlefield.length + next.graveyard.length + next.exile.length < 7) {
@@ -190,6 +192,19 @@ export function restoreGoldfishGame(value) {
   next.turn = clampInteger(next.turn, 0, 999);
   next.mulligans = clampInteger(next.mulligans, 0, 7);
   next.bottomRequired = clampInteger(next.bottomRequired, 0, 7);
+  if (metadata.length) {
+    next.deckRows = normalizedRows(mergeCardMetadata(next.deckRows, metadata));
+    next.sideboardRows = normalizedRows(mergeCardMetadata(next.sideboardRows, metadata));
+    for (const zone of CARD_ZONES) {
+      next[zone] = next[zone].map((card) => {
+        if (card.kind === "token") return card;
+        const enriched = mergeCardMetadata([card], metadata)[0];
+        // A manually placed battlefield card keeps its lane.
+        if (zone !== "battlefield" && !card.typeLine) enriched.lane = defaultGoldfishLane(enriched.typeLine, enriched.name);
+        return enriched;
+      });
+    }
+  }
   return next;
 }
 
@@ -282,6 +297,23 @@ function locateCards(state, cardIds) {
   }
   if (locations.size !== requested.length) throw new Error("選択したカードが見つかりません。");
   return requested.map((id) => locations.get(id));
+}
+
+export function canDragGoldfishCard(state, zone) {
+  return state?.phase === "playing" || (state?.phase === "opening" && !state.bottomRequired && zone === "hand");
+}
+
+export function dropGoldfishCards(state, cardIds, destination, options = {}) {
+  let next = state;
+  if (state.phase === "opening") {
+    if (state.bottomRequired) throw new Error(`手札から戻す${state.bottomRequired}枚を選び、キープしてから移動してください。`);
+    const locations = locateCards(state, cardIds);
+    if (!locations.length || destination !== "battlefield" || !locations.every(({ zone }) => zone === "hand")) {
+      throw new Error("初手は戦場へドラッグするとキープして開始します。");
+    }
+    next = keepGoldfishHand(state);
+  }
+  return moveGoldfishCards(next, cardIds, destination, options);
 }
 
 function resetBattlefieldState(card) {

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MTG Token Finder</title>
-    <link rel="stylesheet" href="/styles.css?v=20260909-meta-preparation-v1">
+    <link rel="stylesheet" href="/styles.css?v=20260926-gallery-v2">
   </head>
   <body>
     <main class="app">
@@ -133,6 +133,14 @@
         </header>
         <p id="deck-dialog-status" class="dialog-status" aria-live="polite"></p>
         <div id="deck-dialog-meta" class="deck-dialog-meta"></div>
+        <div class="deck-gallery-toolbar">
+          <div class="deck-language-controls" role="group" aria-label="カード画像の言語">
+            <button type="button" data-deck-language="en" aria-pressed="true" disabled>English</button>
+            <button type="button" data-deck-language="ja" aria-pressed="false" disabled>日本語</button>
+          </div>
+          <p id="deck-image-status" aria-live="polite"></p>
+          <button id="deck-image-retry" class="secondary-button" type="button" hidden>画像を再取得</button>
+        </div>
         <div class="deck-list-columns">
           <section>
             <h3>メイン <span id="deck-mainboard-count"></span></h3>
@@ -147,6 +155,18 @@
           <button id="deck-copy-button" class="secondary-button" type="button" disabled>Arena形式をコピー</button>
           <button id="deck-goldfish-button" type="button" disabled>このデッキをひとり回し</button>
         </footer>
+      </div>
+    </dialog>
+
+    <dialog id="deck-card-preview" class="deck-card-preview" aria-labelledby="deck-preview-title">
+      <div class="dialog-shell">
+        <header class="dialog-header">
+          <h2 id="deck-preview-title"></h2>
+          <button id="deck-preview-close" type="button" class="secondary-button dialog-close" aria-label="カードの拡大を閉じる">閉じる</button>
+        </header>
+        <div id="deck-preview-faces" class="deck-language-controls" role="group" aria-label="カードの面"></div>
+        <img id="deck-preview-image" alt="">
+        <p id="deck-preview-note" aria-live="polite"></p>
       </div>
     </dialog>
 
@@ -499,6 +519,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20260909-meta-preparation-v1" type="module"></script>
+    <script src="/app.js?v=20260926-gallery-v2" type="module"></script>
   </body>
 </html>
