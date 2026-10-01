@@ -28,6 +28,7 @@ npm start
 | デッキリスト取得元の実測結果と制限 | [docs/decklist-sources.md](docs/decklist-sources.md) |
 | 変更履歴 | [docs/changelog.md](docs/changelog.md) |
 | 配布後の環境更新と配信手順 | [docs/environment-updates.md](docs/environment-updates.md) |
+| 2026年10月2日確認のモダン環境資料・再生成方法 | [MODERN ATLAS](reports/modern-meta-2026-10-01/README.md) |
 
 ## 現在できること
 

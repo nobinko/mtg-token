@@ -1,0 +1,13 @@
+*.zip
+modern-meta-2026-10-01/.work/
+modern-meta-2026-10-01/preview/
+modern-meta-2026-10-01/sources/
+modern-meta-2026-10-01/research.mjs
+modern-meta-2026-10-01/fetch-cards.mjs
+modern-meta-2026-10-01/inspect-cards.mjs
+modern-meta-2026-10-01/fetch-matchups.mjs
+modern-meta-2026-10-01/audit-research.mjs
+modern-meta-2026-10-01/complete-audit.mjs
+modern-meta-2026-10-01/add-variants.mjs
+modern-meta-2026-10-01/extend-cards.mjs
+modern-meta-2026-10-01/audit-cards.mjs

@@ -1,0 +1,3385 @@
+{
+  "checkedAt": "2026-10-01T15:14:56.990Z",
+  "date": "2026-10-02",
+  "windows": {
+    "recent": {
+      "source": "MTGTop8",
+      "sourceUrl": "https://mtgtop8.com/format?f=MO&meta=54",
+      "formatCode": "MO",
+      "windowLabel": "直近2週間",
+      "totalDecks": 680,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "tieRule": "同率は出典の掲載順",
+      "entries": [
+        {
+          "name": "Broodscale Bloodchief",
+          "sharePercent": 19,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2387&meta=54&f=MO",
+          "rank": 1
+        },
+        {
+          "name": "UR Aggro",
+          "sharePercent": 10,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=351&meta=54&f=MO",
+          "rank": 2
+        },
+        {
+          "name": "Blink",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=285&meta=54&f=MO",
+          "rank": 3
+        },
+        {
+          "name": "Creatures Toolbox",
+          "sharePercent": 6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=191&meta=54&f=MO",
+          "rank": 4
+        },
+        {
+          "name": "Affinity",
+          "sharePercent": 5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=189&meta=54&f=MO",
+          "rank": 5
+        },
+        {
+          "name": "UrzaTron",
+          "sharePercent": 5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=188&meta=54&f=MO",
+          "rank": 6
+        },
+        {
+          "name": "Instant Reanimator",
+          "sharePercent": 5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=312&meta=54&f=MO",
+          "rank": 7
+        },
+        {
+          "name": "Boros Aggro",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=193&meta=54&f=MO",
+          "rank": 8
+        },
+        {
+          "name": "4/5c Aggro",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=300&meta=54&f=MO",
+          "rank": 9
+        },
+        {
+          "name": "Ruby Storm",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1809&meta=54&f=MO",
+          "rank": 10
+        },
+        {
+          "name": "UW Control",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=209&meta=54&f=MO",
+          "rank": 11
+        },
+        {
+          "name": "Dimir Control",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1702&meta=54&f=MO",
+          "rank": 12
+        },
+        {
+          "name": "Boros Ponza",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3000&meta=54&f=MO",
+          "rank": 13
+        },
+        {
+          "name": "Living End",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=233&meta=54&f=MO",
+          "rank": 14
+        },
+        {
+          "name": "Eldrazi Ramp",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=533&meta=54&f=MO",
+          "rank": 15
+        },
+        {
+          "name": "Landless",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1009&meta=54&f=MO",
+          "rank": 16
+        },
+        {
+          "name": "Allosaurus Combo",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=822&meta=54&f=MO",
+          "rank": 17
+        },
+        {
+          "name": "Other - Control",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=187&meta=54&f=MO",
+          "rank": 18
+        },
+        {
+          "name": "Amulet Titan",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=348&meta=54&f=MO",
+          "rank": 19
+        },
+        {
+          "name": "Esper Control",
+          "sharePercent": 0.9,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=821&meta=54&f=MO",
+          "rank": 20
+        },
+        {
+          "name": "Red Deck Wins",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=226&meta=54&f=MO",
+          "rank": 21
+        },
+        {
+          "name": "Jeskai Control",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=790&meta=54&f=MO",
+          "rank": 22
+        },
+        {
+          "name": "Reanimator",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1000&meta=54&f=MO",
+          "rank": 23
+        },
+        {
+          "name": "Hollow One",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=767&meta=54&f=MO",
+          "rank": 24
+        },
+        {
+          "name": "Mardu Aggro",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=567&meta=54&f=MO",
+          "rank": 25
+        },
+        {
+          "name": "Rakdos Aggro",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=918&meta=54&f=MO",
+          "rank": 26
+        },
+        {
+          "name": "Cosmogoyf",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3119&meta=54&f=MO",
+          "rank": 27
+        },
+        {
+          "name": "Jeskai Aggro",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=231&meta=54&f=MO",
+          "rank": 28
+        },
+        {
+          "name": "Other - Combo",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=185&meta=54&f=MO",
+          "rank": 29
+        },
+        {
+          "name": "Eldrazi Aggro",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=552&meta=54&f=MO",
+          "rank": 30
+        },
+        {
+          "name": "Simic Birthing Ritual",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2697&meta=54&f=MO",
+          "rank": 31
+        },
+        {
+          "name": "UB Mill",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=787&meta=54&f=MO",
+          "rank": 32
+        },
+        {
+          "name": "Death's Shadow",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=636&meta=54&f=MO",
+          "rank": 33
+        },
+        {
+          "name": "Other - Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=186&meta=54&f=MO",
+          "rank": 34
+        },
+        {
+          "name": "Song of Creation",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2972&meta=54&f=MO",
+          "rank": 35
+        },
+        {
+          "name": "Twin Exarch",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=190&meta=54&f=MO",
+          "rank": 36
+        },
+        {
+          "name": "Heliod Life",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=955&meta=54&f=MO",
+          "rank": 37
+        },
+        {
+          "name": "Dredge",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=275&meta=54&f=MO",
+          "rank": 38
+        },
+        {
+          "name": "Hammer Time",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=815&meta=54&f=MO",
+          "rank": 39
+        },
+        {
+          "name": "Creativity",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=998&meta=54&f=MO",
+          "rank": 40
+        }
+      ],
+      "originalWindowLabel": "Last 2 Weeks"
+    },
+    "months": {
+      "source": "MTGTop8",
+      "sourceUrl": "https://mtgtop8.com/format?f=MO&meta=51",
+      "formatCode": "MO",
+      "windowLabel": "直近2か月",
+      "totalDecks": 3253,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "tieRule": "同率は出典の掲載順",
+      "entries": [
+        {
+          "name": "Broodscale Bloodchief",
+          "sharePercent": 12,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2387&meta=51&f=MO",
+          "rank": 1
+        },
+        {
+          "name": "UR Aggro",
+          "sharePercent": 10,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=351&meta=51&f=MO",
+          "rank": 2
+        },
+        {
+          "name": "Blink",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=285&meta=51&f=MO",
+          "rank": 3
+        },
+        {
+          "name": "Instant Reanimator",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=312&meta=51&f=MO",
+          "rank": 4
+        },
+        {
+          "name": "Creatures Toolbox",
+          "sharePercent": 7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=191&meta=51&f=MO",
+          "rank": 5
+        },
+        {
+          "name": "Affinity",
+          "sharePercent": 5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=189&meta=51&f=MO",
+          "rank": 6
+        },
+        {
+          "name": "Boros Aggro",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=193&meta=51&f=MO",
+          "rank": 7
+        },
+        {
+          "name": "Dimir Control",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1702&meta=51&f=MO",
+          "rank": 8
+        },
+        {
+          "name": "Eldrazi Ramp",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=533&meta=51&f=MO",
+          "rank": 9
+        },
+        {
+          "name": "UrzaTron",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=188&meta=51&f=MO",
+          "rank": 10
+        },
+        {
+          "name": "4/5c Aggro",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=300&meta=51&f=MO",
+          "rank": 11
+        },
+        {
+          "name": "UW Control",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=209&meta=51&f=MO",
+          "rank": 12
+        },
+        {
+          "name": "Boros Ponza",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3000&meta=51&f=MO",
+          "rank": 13
+        },
+        {
+          "name": "Living End",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=233&meta=51&f=MO",
+          "rank": 14
+        },
+        {
+          "name": "Ruby Storm",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1809&meta=51&f=MO",
+          "rank": 15
+        },
+        {
+          "name": "Hollow One",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=767&meta=51&f=MO",
+          "rank": 16
+        },
+        {
+          "name": "Allosaurus Combo",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=822&meta=51&f=MO",
+          "rank": 17
+        },
+        {
+          "name": "Landless",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1009&meta=51&f=MO",
+          "rank": 18
+        },
+        {
+          "name": "Reanimator",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1000&meta=51&f=MO",
+          "rank": 19
+        },
+        {
+          "name": "Amulet Titan",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=348&meta=51&f=MO",
+          "rank": 20
+        },
+        {
+          "name": "Jeskai Aggro",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=231&meta=51&f=MO",
+          "rank": 21
+        },
+        {
+          "name": "Esper Control",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=821&meta=51&f=MO",
+          "rank": 22
+        },
+        {
+          "name": "Other - Control",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=187&meta=51&f=MO",
+          "rank": 23
+        },
+        {
+          "name": "Other - Combo",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=185&meta=51&f=MO",
+          "rank": 24
+        },
+        {
+          "name": "Red Deck Wins",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=226&meta=51&f=MO",
+          "rank": 25
+        },
+        {
+          "name": "Simic Birthing Ritual",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2697&meta=51&f=MO",
+          "rank": 26
+        },
+        {
+          "name": "Cosmogoyf",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3119&meta=51&f=MO",
+          "rank": 27
+        },
+        {
+          "name": "Mono Black Aggro",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=819&meta=51&f=MO",
+          "rank": 28
+        },
+        {
+          "name": "Mardu Aggro",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=567&meta=51&f=MO",
+          "rank": 29
+        },
+        {
+          "name": "Eldrazi Aggro",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=552&meta=51&f=MO",
+          "rank": 30
+        },
+        {
+          "name": "Jeskai Control",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=790&meta=51&f=MO",
+          "rank": 31
+        },
+        {
+          "name": "Song of Creation",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2972&meta=51&f=MO",
+          "rank": 32
+        },
+        {
+          "name": "UB Mill",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=787&meta=51&f=MO",
+          "rank": 33
+        },
+        {
+          "name": "Hammer Time",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=815&meta=51&f=MO",
+          "rank": 34
+        },
+        {
+          "name": "Rakdos Aggro",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=918&meta=51&f=MO",
+          "rank": 35
+        },
+        {
+          "name": "Death's Shadow",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=636&meta=51&f=MO",
+          "rank": 36
+        },
+        {
+          "name": "Other - Aggro",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=186&meta=51&f=MO",
+          "rank": 37
+        },
+        {
+          "name": "Grixis Control",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=477&meta=51&f=MO",
+          "rank": 38
+        },
+        {
+          "name": "Elementals",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=276&meta=51&f=MO",
+          "rank": 39
+        },
+        {
+          "name": "Dredge",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=275&meta=51&f=MO",
+          "rank": 40
+        },
+        {
+          "name": "Selesnya Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=475&meta=51&f=MO",
+          "rank": 41
+        },
+        {
+          "name": "Merfolk",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=192&meta=51&f=MO",
+          "rank": 42
+        },
+        {
+          "name": "Goblins",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=829&meta=51&f=MO",
+          "rank": 43
+        },
+        {
+          "name": "Gruul Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=309&meta=51&f=MO",
+          "rank": 44
+        },
+        {
+          "name": "Mono Green Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=474&meta=51&f=MO",
+          "rank": 45
+        },
+        {
+          "name": "Temur Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=216&meta=51&f=MO",
+          "rank": 46
+        },
+        {
+          "name": "Jund",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=183&meta=51&f=MO",
+          "rank": 47
+        },
+        {
+          "name": "Arclight Phoenix",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=809&meta=51&f=MO",
+          "rank": 48
+        },
+        {
+          "name": "Aura Hexproof",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=299&meta=51&f=MO",
+          "rank": 49
+        },
+        {
+          "name": "Golgari Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=194&meta=51&f=MO",
+          "rank": 50
+        },
+        {
+          "name": "The Underworld Cookbook",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=982&meta=51&f=MO",
+          "rank": 51
+        },
+        {
+          "name": "Urza",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=531&meta=51&f=MO",
+          "rank": 52
+        },
+        {
+          "name": "Lantern Control",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1610&meta=51&f=MO",
+          "rank": 53
+        },
+        {
+          "name": "4/5c Control",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=949&meta=51&f=MO",
+          "rank": 54
+        },
+        {
+          "name": "UR Control",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=375&meta=51&f=MO",
+          "rank": 55
+        },
+        {
+          "name": "Gruul Utopia",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=573&meta=51&f=MO",
+          "rank": 56
+        },
+        {
+          "name": "UWx Midrange",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=181&meta=51&f=MO",
+          "rank": 57
+        },
+        {
+          "name": "Bant Control",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=882&meta=51&f=MO",
+          "rank": 58
+        },
+        {
+          "name": "Creativity",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=998&meta=51&f=MO",
+          "rank": 59
+        },
+        {
+          "name": "Jeskai Ascendancy",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=384&meta=51&f=MO",
+          "rank": 60
+        },
+        {
+          "name": "Heliod Life",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=955&meta=51&f=MO",
+          "rank": 61
+        },
+        {
+          "name": "Infect",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=196&meta=51&f=MO",
+          "rank": 62
+        },
+        {
+          "name": "UR Storm",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=184&meta=51&f=MO",
+          "rank": 63
+        },
+        {
+          "name": "Twin Exarch",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=190&meta=51&f=MO",
+          "rank": 64
+        }
+      ],
+      "originalWindowLabel": "Last 2 Months"
+    },
+    "major": {
+      "source": "MTGTop8",
+      "sourceUrl": "https://mtgtop8.com/format?f=MO&meta=189",
+      "formatCode": "MO",
+      "windowLabel": "主要大会・直近2か月",
+      "totalDecks": 271,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "tieRule": "同率は出典の掲載順",
+      "entries": [
+        {
+          "name": "Broodscale Bloodchief",
+          "sharePercent": 15,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2387&meta=189&f=MO",
+          "rank": 1
+        },
+        {
+          "name": "Blink",
+          "sharePercent": 10,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=285&meta=189&f=MO",
+          "rank": 2
+        },
+        {
+          "name": "Affinity",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=189&meta=189&f=MO",
+          "rank": 3
+        },
+        {
+          "name": "UR Aggro",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=351&meta=189&f=MO",
+          "rank": 4
+        },
+        {
+          "name": "Instant Reanimator",
+          "sharePercent": 7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=312&meta=189&f=MO",
+          "rank": 5
+        },
+        {
+          "name": "Dimir Control",
+          "sharePercent": 6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1702&meta=189&f=MO",
+          "rank": 6
+        },
+        {
+          "name": "Creatures Toolbox",
+          "sharePercent": 6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=191&meta=189&f=MO",
+          "rank": 7
+        },
+        {
+          "name": "Boros Aggro",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=193&meta=189&f=MO",
+          "rank": 8
+        },
+        {
+          "name": "Eldrazi Ramp",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=533&meta=189&f=MO",
+          "rank": 9
+        },
+        {
+          "name": "Living End",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=233&meta=189&f=MO",
+          "rank": 10
+        },
+        {
+          "name": "4/5c Aggro",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=300&meta=189&f=MO",
+          "rank": 11
+        },
+        {
+          "name": "Boros Ponza",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3000&meta=189&f=MO",
+          "rank": 12
+        },
+        {
+          "name": "UrzaTron",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=188&meta=189&f=MO",
+          "rank": 13
+        },
+        {
+          "name": "UW Control",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=209&meta=189&f=MO",
+          "rank": 14
+        },
+        {
+          "name": "Reanimator",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1000&meta=189&f=MO",
+          "rank": 15
+        },
+        {
+          "name": "Ruby Storm",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1809&meta=189&f=MO",
+          "rank": 16
+        },
+        {
+          "name": "Hollow One",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=767&meta=189&f=MO",
+          "rank": 17
+        },
+        {
+          "name": "Amulet Titan",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=348&meta=189&f=MO",
+          "rank": 18
+        },
+        {
+          "name": "Allosaurus Combo",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=822&meta=189&f=MO",
+          "rank": 19
+        },
+        {
+          "name": "Landless",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1009&meta=189&f=MO",
+          "rank": 20
+        },
+        {
+          "name": "Other - Combo",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=185&meta=189&f=MO",
+          "rank": 21
+        },
+        {
+          "name": "Jeskai Aggro",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=231&meta=189&f=MO",
+          "rank": 22
+        },
+        {
+          "name": "Cosmogoyf",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3119&meta=189&f=MO",
+          "rank": 23
+        },
+        {
+          "name": "Jeskai Ascendancy",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=384&meta=189&f=MO",
+          "rank": 24
+        },
+        {
+          "name": "Mono Green Aggro",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=474&meta=189&f=MO",
+          "rank": 25
+        },
+        {
+          "name": "Simic Birthing Ritual",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2697&meta=189&f=MO",
+          "rank": 26
+        },
+        {
+          "name": "Grixis Control",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=477&meta=189&f=MO",
+          "rank": 27
+        },
+        {
+          "name": "Jeskai Control",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=790&meta=189&f=MO",
+          "rank": 28
+        },
+        {
+          "name": "Esper Control",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=821&meta=189&f=MO",
+          "rank": 29
+        },
+        {
+          "name": "Other - Control",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=187&meta=189&f=MO",
+          "rank": 30
+        },
+        {
+          "name": "UB Mill",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=787&meta=189&f=MO",
+          "rank": 31
+        },
+        {
+          "name": "UR Storm",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=184&meta=189&f=MO",
+          "rank": 32
+        },
+        {
+          "name": "Dredge",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=275&meta=189&f=MO",
+          "rank": 33
+        }
+      ],
+      "originalWindowLabel": "Last Major Events (2 Months)"
+    },
+    "paper": {
+      "source": "MTGTop8",
+      "sourceUrl": "https://mtgtop8.com/format?f=MO&meta=57",
+      "formatCode": "MO",
+      "windowLabel": "紙の大会・直近2か月",
+      "totalDecks": 1097,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "tieRule": "同率は出典の掲載順",
+      "entries": [
+        {
+          "name": "Broodscale Bloodchief",
+          "sharePercent": 12,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2387&meta=57&f=MO",
+          "rank": 1
+        },
+        {
+          "name": "UR Aggro",
+          "sharePercent": 9,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=351&meta=57&f=MO",
+          "rank": 2
+        },
+        {
+          "name": "Blink",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=285&meta=57&f=MO",
+          "rank": 3
+        },
+        {
+          "name": "Instant Reanimator",
+          "sharePercent": 8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=312&meta=57&f=MO",
+          "rank": 4
+        },
+        {
+          "name": "Creatures Toolbox",
+          "sharePercent": 7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=191&meta=57&f=MO",
+          "rank": 5
+        },
+        {
+          "name": "Affinity",
+          "sharePercent": 5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=189&meta=57&f=MO",
+          "rank": 6
+        },
+        {
+          "name": "Boros Aggro",
+          "sharePercent": 5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=193&meta=57&f=MO",
+          "rank": 7
+        },
+        {
+          "name": "Dimir Control",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1702&meta=57&f=MO",
+          "rank": 8
+        },
+        {
+          "name": "Eldrazi Ramp",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=533&meta=57&f=MO",
+          "rank": 9
+        },
+        {
+          "name": "UrzaTron",
+          "sharePercent": 4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=188&meta=57&f=MO",
+          "rank": 10
+        },
+        {
+          "name": "4/5c Aggro",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=300&meta=57&f=MO",
+          "rank": 11
+        },
+        {
+          "name": "UW Control",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=209&meta=57&f=MO",
+          "rank": 12
+        },
+        {
+          "name": "Living End",
+          "sharePercent": 3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=233&meta=57&f=MO",
+          "rank": 13
+        },
+        {
+          "name": "Hollow One",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=767&meta=57&f=MO",
+          "rank": 14
+        },
+        {
+          "name": "Boros Ponza",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3000&meta=57&f=MO",
+          "rank": 15
+        },
+        {
+          "name": "Amulet Titan",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=348&meta=57&f=MO",
+          "rank": 16
+        },
+        {
+          "name": "Reanimator",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1000&meta=57&f=MO",
+          "rank": 17
+        },
+        {
+          "name": "Allosaurus Combo",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=822&meta=57&f=MO",
+          "rank": 18
+        },
+        {
+          "name": "Ruby Storm",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1809&meta=57&f=MO",
+          "rank": 19
+        },
+        {
+          "name": "Landless",
+          "sharePercent": 2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=1009&meta=57&f=MO",
+          "rank": 20
+        },
+        {
+          "name": "Other - Combo",
+          "sharePercent": 1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=185&meta=57&f=MO",
+          "rank": 21
+        },
+        {
+          "name": "Other - Control",
+          "sharePercent": 0.8,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=187&meta=57&f=MO",
+          "rank": 22
+        },
+        {
+          "name": "Simic Birthing Ritual",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2697&meta=57&f=MO",
+          "rank": 23
+        },
+        {
+          "name": "Jeskai Aggro",
+          "sharePercent": 0.7,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=231&meta=57&f=MO",
+          "rank": 24
+        },
+        {
+          "name": "Red Deck Wins",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=226&meta=57&f=MO",
+          "rank": 25
+        },
+        {
+          "name": "UB Mill",
+          "sharePercent": 0.6,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=787&meta=57&f=MO",
+          "rank": 26
+        },
+        {
+          "name": "Eldrazi Aggro",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=552&meta=57&f=MO",
+          "rank": 27
+        },
+        {
+          "name": "Death's Shadow",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=636&meta=57&f=MO",
+          "rank": 28
+        },
+        {
+          "name": "Other - Aggro",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=186&meta=57&f=MO",
+          "rank": 29
+        },
+        {
+          "name": "Esper Control",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=821&meta=57&f=MO",
+          "rank": 30
+        },
+        {
+          "name": "Song of Creation",
+          "sharePercent": 0.5,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=2972&meta=57&f=MO",
+          "rank": 31
+        },
+        {
+          "name": "Merfolk",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=192&meta=57&f=MO",
+          "rank": 32
+        },
+        {
+          "name": "Mardu Aggro",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=567&meta=57&f=MO",
+          "rank": 33
+        },
+        {
+          "name": "Grixis Control",
+          "sharePercent": 0.4,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=477&meta=57&f=MO",
+          "rank": 34
+        },
+        {
+          "name": "Jeskai Control",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=790&meta=57&f=MO",
+          "rank": 35
+        },
+        {
+          "name": "Hammer Time",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=815&meta=57&f=MO",
+          "rank": 36
+        },
+        {
+          "name": "Dredge",
+          "sharePercent": 0.3,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=275&meta=57&f=MO",
+          "rank": 37
+        },
+        {
+          "name": "Goblins",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=829&meta=57&f=MO",
+          "rank": 38
+        },
+        {
+          "name": "Gruul Aggro",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=309&meta=57&f=MO",
+          "rank": 39
+        },
+        {
+          "name": "Temur Aggro",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=216&meta=57&f=MO",
+          "rank": 40
+        },
+        {
+          "name": "Cosmogoyf",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=3119&meta=57&f=MO",
+          "rank": 41
+        },
+        {
+          "name": "Jeskai Ascendancy",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=384&meta=57&f=MO",
+          "rank": 42
+        },
+        {
+          "name": "Heliod Life",
+          "sharePercent": 0.2,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=955&meta=57&f=MO",
+          "rank": 43
+        },
+        {
+          "name": "Selesnya Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=475&meta=57&f=MO",
+          "rank": 44
+        },
+        {
+          "name": "Jund",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=183&meta=57&f=MO",
+          "rank": 45
+        },
+        {
+          "name": "Mono Green Aggro",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=474&meta=57&f=MO",
+          "rank": 46
+        },
+        {
+          "name": "Aura Hexproof",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=299&meta=57&f=MO",
+          "rank": 47
+        },
+        {
+          "name": "The Underworld Cookbook",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=982&meta=57&f=MO",
+          "rank": 48
+        },
+        {
+          "name": "Elementals",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=276&meta=57&f=MO",
+          "rank": 49
+        },
+        {
+          "name": "4/5c Control",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=949&meta=57&f=MO",
+          "rank": 50
+        },
+        {
+          "name": "Infect",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=196&meta=57&f=MO",
+          "rank": 51
+        },
+        {
+          "name": "Creativity",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=998&meta=57&f=MO",
+          "rank": 52
+        },
+        {
+          "name": "Twin Exarch",
+          "sharePercent": 0.1,
+          "archetypeUrl": "https://mtgtop8.com/archetype?a=190&meta=57&f=MO",
+          "rank": 53
+        }
+      ],
+      "originalWindowLabel": "Live Tournaments Last 2 Months"
+    }
+  },
+  "supplemental": [
+    {
+      "name": "UW Control",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=209&meta=54&f=MO",
+      "rank": 11,
+      "representative": {
+        "title": "Scepter Chant",
+        "archetype": "Scepter Chant Scepter Chant",
+        "url": "https://mtgtop8.com/event?e=91444&d=894493&f=MO",
+        "pageTitle": "Scepter Chant",
+        "pageUrl": "https://mtgtop8.com/event?e=91444&d=894493&f=MO",
+        "eventDate": "2026-09-30",
+        "cards": [
+          "Arid Mesa",
+          "Flooded Strand",
+          "Geier Reach Sanitarium",
+          "Hall of Storm Giants",
+          "Hallowed Fountain",
+          "Island",
+          "Meticulous Archive",
+          "Monumental Henge",
+          "Mystic Gate",
+          "Plains",
+          "Sacred Foundry",
+          "Scalding Tarn",
+          "Steam Vents",
+          "Thundering Falls",
+          "Solitude",
+          "Consult the Star Charts",
+          "Counterspell",
+          "Day's Undoing",
+          "Galvanic Discharge",
+          "Lórien Revealed",
+          "Orim's Chant",
+          "Prismatic Ending",
+          "Spell Snare",
+          "Supreme Verdict",
+          "Wrath of the Skies",
+          "Isochron Scepter",
+          "Narset, Parter of Veils",
+          "Teferi, Time Raveler",
+          "The Wandering Emperor",
+          "Kaheera, the Orphanguard",
+          "Ashiok, Dream Render",
+          "Consign to Memory",
+          "Force of Negation",
+          "High Noon",
+          "Mystical Dispute",
+          "Obsidian Charmaw"
+        ],
+        "mainboard": [
+          {
+            "name": "Arid Mesa",
+            "count": 2
+          },
+          {
+            "name": "Flooded Strand",
+            "count": 4
+          },
+          {
+            "name": "Geier Reach Sanitarium",
+            "count": 1
+          },
+          {
+            "name": "Hall of Storm Giants",
+            "count": 1
+          },
+          {
+            "name": "Hallowed Fountain",
+            "count": 1
+          },
+          {
+            "name": "Island",
+            "count": 2
+          },
+          {
+            "name": "Meticulous Archive",
+            "count": 2
+          },
+          {
+            "name": "Monumental Henge",
+            "count": 1
+          },
+          {
+            "name": "Mystic Gate",
+            "count": 2
+          },
+          {
+            "name": "Plains",
+            "count": 2
+          },
+          {
+            "name": "Sacred Foundry",
+            "count": 1
+          },
+          {
+            "name": "Scalding Tarn",
+            "count": 2
+          },
+          {
+            "name": "Steam Vents",
+            "count": 1
+          },
+          {
+            "name": "Thundering Falls",
+            "count": 1
+          },
+          {
+            "name": "Solitude",
+            "count": 3
+          },
+          {
+            "name": "Consult the Star Charts",
+            "count": 4
+          },
+          {
+            "name": "Counterspell",
+            "count": 3
+          },
+          {
+            "name": "Day's Undoing",
+            "count": 1
+          },
+          {
+            "name": "Galvanic Discharge",
+            "count": 4
+          },
+          {
+            "name": "Lórien Revealed",
+            "count": 2
+          },
+          {
+            "name": "Orim's Chant",
+            "count": 4
+          },
+          {
+            "name": "Prismatic Ending",
+            "count": 1
+          },
+          {
+            "name": "Spell Snare",
+            "count": 2
+          },
+          {
+            "name": "Supreme Verdict",
+            "count": 1
+          },
+          {
+            "name": "Wrath of the Skies",
+            "count": 4
+          },
+          {
+            "name": "Isochron Scepter",
+            "count": 1
+          },
+          {
+            "name": "Narset, Parter of Veils",
+            "count": 3
+          },
+          {
+            "name": "Teferi, Time Raveler",
+            "count": 3
+          },
+          {
+            "name": "The Wandering Emperor",
+            "count": 1
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Kaheera, the Orphanguard",
+            "count": 1
+          },
+          {
+            "name": "Ashiok, Dream Render",
+            "count": 2
+          },
+          {
+            "name": "Consign to Memory",
+            "count": 4
+          },
+          {
+            "name": "Force of Negation",
+            "count": 1
+          },
+          {
+            "name": "High Noon",
+            "count": 2
+          },
+          {
+            "name": "Mystical Dispute",
+            "count": 2
+          },
+          {
+            "name": "Obsidian Charmaw",
+            "count": 2
+          },
+          {
+            "name": "Supreme Verdict",
+            "count": 1
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Scepter Chant",
+        "player": "nahuel10",
+        "event": "MTGO Challenge 32",
+        "placement": "2",
+        "companion": "Kaheera, the Orphanguard"
+      }
+    },
+    {
+      "name": "Dimir Control",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=1702&meta=54&f=MO",
+      "rank": 12,
+      "representative": {
+        "title": "Dimir Control",
+        "archetype": "Dimir Control Dimir Control",
+        "url": "https://mtgtop8.com/event?e=91444&d=894501&f=MO",
+        "pageTitle": "Dimir Control",
+        "pageUrl": "https://mtgtop8.com/event?e=91444&d=894501&f=MO",
+        "eventDate": "2026-09-30",
+        "cards": [
+          "Flooded Strand",
+          "Island",
+          "Marsh Flats",
+          "Otawara, Soaring City",
+          "Polluted Delta",
+          "Swamp",
+          "Undercity Sewers",
+          "Watery Grave",
+          "Harbinger of the Seas",
+          "Murktide Regent",
+          "Orcish Bowmasters",
+          "Psychic Frog",
+          "Quantum Riddler",
+          "Subtlety",
+          "Tamiyo, Inquisitive Student",
+          "Wan Shi Tong, Librarian",
+          "Consign to Memory",
+          "Counterspell",
+          "Drown in the Loch",
+          "Fatal Push",
+          "Force of Negation",
+          "Preordain",
+          "Sheoldred's Edict",
+          "Sink into Stupor",
+          "Spell Snare",
+          "Thoughtseize",
+          "Kaito, Bane of Nightmares",
+          "Break the Ice",
+          "Engineered Explosives",
+          "Mystical Dispute",
+          "Nihil Spellbomb",
+          "Requiting Hex",
+          "Stern Scolding",
+          "Toxic Deluge"
+        ],
+        "mainboard": [
+          {
+            "name": "Flooded Strand",
+            "count": 2
+          },
+          {
+            "name": "Island",
+            "count": 3
+          },
+          {
+            "name": "Marsh Flats",
+            "count": 3
+          },
+          {
+            "name": "Otawara, Soaring City",
+            "count": 1
+          },
+          {
+            "name": "Polluted Delta",
+            "count": 4
+          },
+          {
+            "name": "Swamp",
+            "count": 1
+          },
+          {
+            "name": "Undercity Sewers",
+            "count": 2
+          },
+          {
+            "name": "Watery Grave",
+            "count": 3
+          },
+          {
+            "name": "Harbinger of the Seas",
+            "count": 1
+          },
+          {
+            "name": "Murktide Regent",
+            "count": 1
+          },
+          {
+            "name": "Orcish Bowmasters",
+            "count": 2
+          },
+          {
+            "name": "Psychic Frog",
+            "count": 4
+          },
+          {
+            "name": "Quantum Riddler",
+            "count": 4
+          },
+          {
+            "name": "Subtlety",
+            "count": 2
+          },
+          {
+            "name": "Tamiyo, Inquisitive Student",
+            "count": 2
+          },
+          {
+            "name": "Wan Shi Tong, Librarian",
+            "count": 1
+          },
+          {
+            "name": "Consign to Memory",
+            "count": 2
+          },
+          {
+            "name": "Counterspell",
+            "count": 2
+          },
+          {
+            "name": "Drown in the Loch",
+            "count": 1
+          },
+          {
+            "name": "Fatal Push",
+            "count": 4
+          },
+          {
+            "name": "Force of Negation",
+            "count": 3
+          },
+          {
+            "name": "Preordain",
+            "count": 2
+          },
+          {
+            "name": "Sheoldred's Edict",
+            "count": 2
+          },
+          {
+            "name": "Sink into Stupor",
+            "count": 2
+          },
+          {
+            "name": "Spell Snare",
+            "count": 2
+          },
+          {
+            "name": "Thoughtseize",
+            "count": 3
+          },
+          {
+            "name": "Kaito, Bane of Nightmares",
+            "count": 1
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Break the Ice",
+            "count": 1
+          },
+          {
+            "name": "Consign to Memory",
+            "count": 2
+          },
+          {
+            "name": "Engineered Explosives",
+            "count": 2
+          },
+          {
+            "name": "Harbinger of the Seas",
+            "count": 2
+          },
+          {
+            "name": "Kaito, Bane of Nightmares",
+            "count": 1
+          },
+          {
+            "name": "Mystical Dispute",
+            "count": 2
+          },
+          {
+            "name": "Nihil Spellbomb",
+            "count": 2
+          },
+          {
+            "name": "Requiting Hex",
+            "count": 1
+          },
+          {
+            "name": "Stern Scolding",
+            "count": 1
+          },
+          {
+            "name": "Toxic Deluge",
+            "count": 1
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Dimir Control",
+        "player": "oinkmage22",
+        "event": "MTGO Challenge 32",
+        "placement": "5-8"
+      }
+    },
+    {
+      "name": "Boros Ponza",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=3000&meta=54&f=MO",
+      "rank": 13,
+      "representative": {
+        "title": "Boros Ponza",
+        "archetype": "Boros Ponza Boros Ponza",
+        "url": "https://mtgtop8.com/event?e=91408&d=894233&f=MO",
+        "pageTitle": "Boros Ponza",
+        "pageUrl": "https://mtgtop8.com/event?e=91408&d=894233&f=MO",
+        "eventDate": "2026-09-29",
+        "cards": [
+          "Arid Mesa",
+          "Cori Mountain Monastery",
+          "Demolition Field",
+          "Field of Ruin",
+          "Mountain",
+          "Plains",
+          "Sacred Foundry",
+          "Sunken Citadel",
+          "Solitude",
+          "Avengers Disassembled",
+          "Cleansing Wildfire",
+          "Erode",
+          "Galvanic Discharge",
+          "Path to Exile",
+          "Price of Freedom",
+          "Wrath of the Skies",
+          "Relic of Progenitus",
+          "The Legend of Roku",
+          "Kaheera, the Orphanguard",
+          "Chandra, Awakened Inferno",
+          "Disruptor Flute",
+          "High Noon",
+          "Surgical Extraction",
+          "Wear / Tear",
+          "Wrath of God"
+        ],
+        "mainboard": [
+          {
+            "name": "Arid Mesa",
+            "count": 1
+          },
+          {
+            "name": "Cori Mountain Monastery",
+            "count": 4
+          },
+          {
+            "name": "Demolition Field",
+            "count": 4
+          },
+          {
+            "name": "Field of Ruin",
+            "count": 4
+          },
+          {
+            "name": "Mountain",
+            "count": 2
+          },
+          {
+            "name": "Plains",
+            "count": 4
+          },
+          {
+            "name": "Sacred Foundry",
+            "count": 3
+          },
+          {
+            "name": "Sunken Citadel",
+            "count": 3
+          },
+          {
+            "name": "Solitude",
+            "count": 4
+          },
+          {
+            "name": "Avengers Disassembled",
+            "count": 3
+          },
+          {
+            "name": "Cleansing Wildfire",
+            "count": 4
+          },
+          {
+            "name": "Erode",
+            "count": 4
+          },
+          {
+            "name": "Galvanic Discharge",
+            "count": 3
+          },
+          {
+            "name": "Path to Exile",
+            "count": 4
+          },
+          {
+            "name": "Price of Freedom",
+            "count": 4
+          },
+          {
+            "name": "Wrath of the Skies",
+            "count": 4
+          },
+          {
+            "name": "Relic of Progenitus",
+            "count": 4
+          },
+          {
+            "name": "The Legend of Roku",
+            "count": 1
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Kaheera, the Orphanguard",
+            "count": 1
+          },
+          {
+            "name": "Chandra, Awakened Inferno",
+            "count": 1
+          },
+          {
+            "name": "Disruptor Flute",
+            "count": 2
+          },
+          {
+            "name": "High Noon",
+            "count": 4
+          },
+          {
+            "name": "Surgical Extraction",
+            "count": 2
+          },
+          {
+            "name": "The Legend of Roku",
+            "count": 1
+          },
+          {
+            "name": "Wear / Tear",
+            "count": 2
+          },
+          {
+            "name": "Wrath of God",
+            "count": 2
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Boros Ponza",
+        "player": "nahuel10",
+        "event": "MTGO Challenge 32",
+        "placement": "5-8",
+        "companion": "Kaheera, the Orphanguard"
+      }
+    },
+    {
+      "name": "Living End",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=233&meta=54&f=MO",
+      "rank": 14,
+      "representative": {
+        "title": "Living End",
+        "archetype": "Living End Living End",
+        "url": "https://mtgtop8.com/event?e=91443&d=894481&f=MO",
+        "pageTitle": "Living End",
+        "pageUrl": "https://mtgtop8.com/event?e=91443&d=894481&f=MO",
+        "eventDate": "2026-09-29",
+        "cards": [
+          "Breeding Pool",
+          "Commercial District",
+          "Forest",
+          "Hedge Maze",
+          "Island",
+          "Misty Rainforest",
+          "Sacred Foundry",
+          "Steam Vents",
+          "Stomping Ground",
+          "Temple Garden",
+          "Thundering Falls",
+          "Colossal Skyturtle",
+          "Curator of Mysteries",
+          "Endurance",
+          "Generous Ent",
+          "Oliphaunt",
+          "Shardless Agent",
+          "Street Wraith",
+          "Subtlety",
+          "Waker of Waves",
+          "Wistfulness",
+          "Force of Negation",
+          "Living End",
+          "Sink into Stupor",
+          "Valakut Awakening",
+          "Violent Outburst",
+          "Clarion Conqueror",
+          "Force of Vigor",
+          "Foundation Breaker",
+          "Inevitable Betrayal",
+          "Mystical Dispute",
+          "Teferi, Time Raveler"
+        ],
+        "mainboard": [
+          {
+            "name": "Breeding Pool",
+            "count": 1
+          },
+          {
+            "name": "Commercial District",
+            "count": 1
+          },
+          {
+            "name": "Forest",
+            "count": 1
+          },
+          {
+            "name": "Hedge Maze",
+            "count": 1
+          },
+          {
+            "name": "Island",
+            "count": 1
+          },
+          {
+            "name": "Misty Rainforest",
+            "count": 4
+          },
+          {
+            "name": "Sacred Foundry",
+            "count": 1
+          },
+          {
+            "name": "Steam Vents",
+            "count": 1
+          },
+          {
+            "name": "Stomping Ground",
+            "count": 1
+          },
+          {
+            "name": "Temple Garden",
+            "count": 1
+          },
+          {
+            "name": "Thundering Falls",
+            "count": 1
+          },
+          {
+            "name": "Colossal Skyturtle",
+            "count": 1
+          },
+          {
+            "name": "Curator of Mysteries",
+            "count": 4
+          },
+          {
+            "name": "Endurance",
+            "count": 4
+          },
+          {
+            "name": "Generous Ent",
+            "count": 4
+          },
+          {
+            "name": "Oliphaunt",
+            "count": 3
+          },
+          {
+            "name": "Shardless Agent",
+            "count": 4
+          },
+          {
+            "name": "Street Wraith",
+            "count": 4
+          },
+          {
+            "name": "Subtlety",
+            "count": 4
+          },
+          {
+            "name": "Waker of Waves",
+            "count": 1
+          },
+          {
+            "name": "Wistfulness",
+            "count": 4
+          },
+          {
+            "name": "Force of Negation",
+            "count": 4
+          },
+          {
+            "name": "Living End",
+            "count": 3
+          },
+          {
+            "name": "Sink into Stupor",
+            "count": 1
+          },
+          {
+            "name": "Valakut Awakening",
+            "count": 1
+          },
+          {
+            "name": "Violent Outburst",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Clarion Conqueror",
+            "count": 4
+          },
+          {
+            "name": "Force of Vigor",
+            "count": 2
+          },
+          {
+            "name": "Foundation Breaker",
+            "count": 1
+          },
+          {
+            "name": "Inevitable Betrayal",
+            "count": 2
+          },
+          {
+            "name": "Mystical Dispute",
+            "count": 4
+          },
+          {
+            "name": "Teferi, Time Raveler",
+            "count": 2
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Living End",
+        "player": "MeninoNey",
+        "event": "MTGO Challenge 64",
+        "placement": "5-8"
+      }
+    },
+    {
+      "name": "Eldrazi Ramp",
+      "sharePercent": 2,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=533&meta=54&f=MO",
+      "rank": 15,
+      "representative": {
+        "title": "Eldrazi Ramp",
+        "archetype": "Eldrazi Ramp Eldrazi Ramp",
+        "url": "https://mtgtop8.com/event?e=91408&d=894236&f=MO",
+        "pageTitle": "Eldrazi Ramp",
+        "pageUrl": "https://mtgtop8.com/event?e=91408&d=894236&f=MO",
+        "eventDate": "2026-09-29",
+        "cards": [
+          "Boseiju, Who Endures",
+          "Dryad Arbor",
+          "Eldrazi Temple",
+          "Forest",
+          "Gemstone Caverns",
+          "Ghost Quarter",
+          "Mosswort Bridge",
+          "Ugin's Labyrinth",
+          "Devourer of Destiny",
+          "Disciple of Freyalise",
+          "Drowner of Truth",
+          "Emrakul, the Promised End",
+          "Fanatic of Rhonas",
+          "Slumbering Trudge",
+          "Sowing Mycospawn",
+          "Ulamog, the Ceaseless Hunger",
+          "Green Sun's Zenith",
+          "Kozilek's Command",
+          "Malevolent Rumble",
+          "Fight Rigging",
+          "Ugin, Eye of the Storms",
+          "Chalice of the Void",
+          "Chomping Changeling",
+          "Collector Ouphe",
+          "Dismember",
+          "Elder Gargaroth",
+          "Endurance",
+          "Force of Vigor",
+          "Keen-Eyed Curator",
+          "Thought-Knot Seer",
+          "Trinisphere"
+        ],
+        "mainboard": [
+          {
+            "name": "Boseiju, Who Endures",
+            "count": 1
+          },
+          {
+            "name": "Dryad Arbor",
+            "count": 1
+          },
+          {
+            "name": "Eldrazi Temple",
+            "count": 4
+          },
+          {
+            "name": "Forest",
+            "count": 5
+          },
+          {
+            "name": "Gemstone Caverns",
+            "count": 1
+          },
+          {
+            "name": "Ghost Quarter",
+            "count": 1
+          },
+          {
+            "name": "Mosswort Bridge",
+            "count": 1
+          },
+          {
+            "name": "Ugin's Labyrinth",
+            "count": 4
+          },
+          {
+            "name": "Devourer of Destiny",
+            "count": 1
+          },
+          {
+            "name": "Disciple of Freyalise",
+            "count": 4
+          },
+          {
+            "name": "Drowner of Truth",
+            "count": 2
+          },
+          {
+            "name": "Emrakul, the Promised End",
+            "count": 4
+          },
+          {
+            "name": "Fanatic of Rhonas",
+            "count": 4
+          },
+          {
+            "name": "Slumbering Trudge",
+            "count": 4
+          },
+          {
+            "name": "Sowing Mycospawn",
+            "count": 4
+          },
+          {
+            "name": "Ulamog, the Ceaseless Hunger",
+            "count": 2
+          },
+          {
+            "name": "Green Sun's Zenith",
+            "count": 4
+          },
+          {
+            "name": "Kozilek's Command",
+            "count": 4
+          },
+          {
+            "name": "Malevolent Rumble",
+            "count": 4
+          },
+          {
+            "name": "Fight Rigging",
+            "count": 4
+          },
+          {
+            "name": "Ugin, Eye of the Storms",
+            "count": 1
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Chalice of the Void",
+            "count": 3
+          },
+          {
+            "name": "Chomping Changeling",
+            "count": 1
+          },
+          {
+            "name": "Collector Ouphe",
+            "count": 1
+          },
+          {
+            "name": "Dismember",
+            "count": 1
+          },
+          {
+            "name": "Elder Gargaroth",
+            "count": 1
+          },
+          {
+            "name": "Endurance",
+            "count": 2
+          },
+          {
+            "name": "Force of Vigor",
+            "count": 2
+          },
+          {
+            "name": "Keen-Eyed Curator",
+            "count": 1
+          },
+          {
+            "name": "Thought-Knot Seer",
+            "count": 1
+          },
+          {
+            "name": "Trinisphere",
+            "count": 2
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Eldrazi Ramp",
+        "player": "justFeather",
+        "event": "MTGO Challenge 32",
+        "placement": "5-8"
+      }
+    },
+    {
+      "name": "Landless",
+      "sharePercent": 2,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=1009&meta=54&f=MO",
+      "rank": 16,
+      "representative": {
+        "title": "Landless Belcher",
+        "archetype": "Landless Belcher Landless Belcher",
+        "url": "https://mtgtop8.com/event?e=91410&d=894270&f=MO",
+        "pageTitle": "Landless Belcher",
+        "pageUrl": "https://mtgtop8.com/event?e=91410&d=894270&f=MO",
+        "eventDate": "2026-09-29",
+        "cards": [
+          "Hydroelectric Specimen",
+          "Tameshi, Reality Architect",
+          "Beyeen Veil",
+          "Counterspell",
+          "Disrupting Shoal",
+          "Force of Negation",
+          "Into the Flood Maw",
+          "Jwari Disruption",
+          "Preordain",
+          "Sea Gate Restoration",
+          "Sink into Stupor",
+          "Spell Snare",
+          "Stern Scolding",
+          "Suppression Ray",
+          "Waterlogged Teachings",
+          "Whir of Invention",
+          "Goblin Charbelcher",
+          "Lotus Bloom",
+          "Consign to Memory",
+          "Engineered Explosives",
+          "Grafdigger's Cage",
+          "Mountain",
+          "Mystical Dispute",
+          "Stock Up",
+          "Unable to Scream"
+        ],
+        "mainboard": [
+          {
+            "name": "Hydroelectric Specimen",
+            "count": 4
+          },
+          {
+            "name": "Tameshi, Reality Architect",
+            "count": 4
+          },
+          {
+            "name": "Beyeen Veil",
+            "count": 2
+          },
+          {
+            "name": "Counterspell",
+            "count": 2
+          },
+          {
+            "name": "Disrupting Shoal",
+            "count": 4
+          },
+          {
+            "name": "Force of Negation",
+            "count": 3
+          },
+          {
+            "name": "Into the Flood Maw",
+            "count": 3
+          },
+          {
+            "name": "Jwari Disruption",
+            "count": 4
+          },
+          {
+            "name": "Preordain",
+            "count": 4
+          },
+          {
+            "name": "Sea Gate Restoration",
+            "count": 4
+          },
+          {
+            "name": "Sink into Stupor",
+            "count": 4
+          },
+          {
+            "name": "Spell Snare",
+            "count": 3
+          },
+          {
+            "name": "Stern Scolding",
+            "count": 1
+          },
+          {
+            "name": "Suppression Ray",
+            "count": 4
+          },
+          {
+            "name": "Waterlogged Teachings",
+            "count": 2
+          },
+          {
+            "name": "Whir of Invention",
+            "count": 4
+          },
+          {
+            "name": "Goblin Charbelcher",
+            "count": 4
+          },
+          {
+            "name": "Lotus Bloom",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Consign to Memory",
+            "count": 4
+          },
+          {
+            "name": "Engineered Explosives",
+            "count": 2
+          },
+          {
+            "name": "Grafdigger's Cage",
+            "count": 1
+          },
+          {
+            "name": "Mountain",
+            "count": 1
+          },
+          {
+            "name": "Mystical Dispute",
+            "count": 3
+          },
+          {
+            "name": "Stock Up",
+            "count": 2
+          },
+          {
+            "name": "Unable to Scream",
+            "count": 2
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Landless Belcher",
+        "player": "Xenowan",
+        "event": "MTGO Challenge 16",
+        "placement": "5-8"
+      }
+    },
+    {
+      "name": "Allosaurus Combo",
+      "sharePercent": 2,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=822&meta=54&f=MO",
+      "rank": 17,
+      "representative": {
+        "title": "Allosaurus Combo",
+        "archetype": "Allosaurus Combo Allosaurus Combo",
+        "url": "https://mtgtop8.com/event?e=91443&d=894480&f=MO",
+        "pageTitle": "Allosaurus Combo",
+        "pageUrl": "https://mtgtop8.com/event?e=91443&d=894480&f=MO",
+        "eventDate": "2026-09-29",
+        "cards": [
+          "Boseiju, Who Endures",
+          "Breeding Pool",
+          "Flooded Strand",
+          "Forest",
+          "Hedge Maze",
+          "Island",
+          "Misty Rainforest",
+          "Polluted Delta",
+          "Scalding Tarn",
+          "Allosaurus Rider",
+          "Atraxa, Grand Unifier",
+          "Disciple of Freyalise",
+          "Endurance",
+          "Generous Ent",
+          "Ghalta, Stampede Tyrant",
+          "Griselbrand",
+          "Hooting Mandrills",
+          "Xenagos, God of Revels",
+          "Bridgeworks Battle",
+          "Consign to Memory",
+          "Eldritch Evolution",
+          "Neoform",
+          "Pact of Negation",
+          "Planar Genesis",
+          "Summoner's Pact",
+          "Veil of Summer",
+          "Dismember",
+          "Hope of Ghirapur",
+          "Into the Flood Maw",
+          "Mystical Dispute",
+          "Natural State",
+          "Nature's Claim"
+        ],
+        "mainboard": [
+          {
+            "name": "Boseiju, Who Endures",
+            "count": 1
+          },
+          {
+            "name": "Breeding Pool",
+            "count": 1
+          },
+          {
+            "name": "Flooded Strand",
+            "count": 2
+          },
+          {
+            "name": "Forest",
+            "count": 1
+          },
+          {
+            "name": "Hedge Maze",
+            "count": 3
+          },
+          {
+            "name": "Island",
+            "count": 1
+          },
+          {
+            "name": "Misty Rainforest",
+            "count": 4
+          },
+          {
+            "name": "Polluted Delta",
+            "count": 1
+          },
+          {
+            "name": "Scalding Tarn",
+            "count": 1
+          },
+          {
+            "name": "Allosaurus Rider",
+            "count": 4
+          },
+          {
+            "name": "Atraxa, Grand Unifier",
+            "count": 1
+          },
+          {
+            "name": "Disciple of Freyalise",
+            "count": 2
+          },
+          {
+            "name": "Endurance",
+            "count": 1
+          },
+          {
+            "name": "Generous Ent",
+            "count": 2
+          },
+          {
+            "name": "Ghalta, Stampede Tyrant",
+            "count": 2
+          },
+          {
+            "name": "Griselbrand",
+            "count": 1
+          },
+          {
+            "name": "Hooting Mandrills",
+            "count": 1
+          },
+          {
+            "name": "Xenagos, God of Revels",
+            "count": 1
+          },
+          {
+            "name": "Bridgeworks Battle",
+            "count": 2
+          },
+          {
+            "name": "Consign to Memory",
+            "count": 4
+          },
+          {
+            "name": "Eldritch Evolution",
+            "count": 4
+          },
+          {
+            "name": "Neoform",
+            "count": 4
+          },
+          {
+            "name": "Pact of Negation",
+            "count": 4
+          },
+          {
+            "name": "Planar Genesis",
+            "count": 4
+          },
+          {
+            "name": "Summoner's Pact",
+            "count": 4
+          },
+          {
+            "name": "Veil of Summer",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Dismember",
+            "count": 1
+          },
+          {
+            "name": "Hooting Mandrills",
+            "count": 1
+          },
+          {
+            "name": "Hope of Ghirapur",
+            "count": 4
+          },
+          {
+            "name": "Into the Flood Maw",
+            "count": 1
+          },
+          {
+            "name": "Mystical Dispute",
+            "count": 4
+          },
+          {
+            "name": "Natural State",
+            "count": 2
+          },
+          {
+            "name": "Nature's Claim",
+            "count": 2
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Allosaurus Combo",
+        "player": "ice_nine_BIGFAN",
+        "event": "MTGO Challenge 64",
+        "placement": "5-8"
+      }
+    },
+    {
+      "name": "Other - Control",
+      "sharePercent": 1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=187&meta=54&f=MO",
+      "rank": 18,
+      "representative": {
+        "title": "Golgari Necrodominance",
+        "archetype": "Golgari Necrodominance Golgari Necrodominance",
+        "url": "https://mtgtop8.com/event?e=91409&d=894250&f=MO",
+        "pageTitle": "Golgari Necrodominance",
+        "pageUrl": "https://mtgtop8.com/event?e=91409&d=894250&f=MO",
+        "eventDate": "2026-09-28",
+        "cards": [
+          "Bloodstained Mire",
+          "Blooming Marsh",
+          "Castle Locthwain",
+          "Marsh Flats",
+          "Overgrown Tomb",
+          "Swamp",
+          "Underground Mortuary",
+          "Verdant Catacombs",
+          "Boggart Trawler",
+          "Dauthi Voidwalker",
+          "Orcish Bowmasters",
+          "Sheoldred, the Apocalypse",
+          "Sorin of House Markov",
+          "Fatal Push",
+          "Fell the Profane",
+          "Force of Despair",
+          "March of Wretched Sorrow",
+          "Sheoldred's Edict",
+          "Soul Spike",
+          "Thoughtseize",
+          "Witherbloom Charm",
+          "Necrodominance",
+          "Professor Dellian Fel",
+          "Assassin's Trophy",
+          "Break the Ice",
+          "Culling Ritual",
+          "Disruptor Flute",
+          "Inquisition of Kozilek",
+          "Surgical Extraction"
+        ],
+        "mainboard": [
+          {
+            "name": "Bloodstained Mire",
+            "count": 3
+          },
+          {
+            "name": "Blooming Marsh",
+            "count": 2
+          },
+          {
+            "name": "Castle Locthwain",
+            "count": 1
+          },
+          {
+            "name": "Marsh Flats",
+            "count": 2
+          },
+          {
+            "name": "Overgrown Tomb",
+            "count": 1
+          },
+          {
+            "name": "Swamp",
+            "count": 5
+          },
+          {
+            "name": "Underground Mortuary",
+            "count": 2
+          },
+          {
+            "name": "Verdant Catacombs",
+            "count": 2
+          },
+          {
+            "name": "Boggart Trawler",
+            "count": 4
+          },
+          {
+            "name": "Dauthi Voidwalker",
+            "count": 2
+          },
+          {
+            "name": "Orcish Bowmasters",
+            "count": 4
+          },
+          {
+            "name": "Sheoldred, the Apocalypse",
+            "count": 2
+          },
+          {
+            "name": "Sorin of House Markov",
+            "count": 1
+          },
+          {
+            "name": "Fatal Push",
+            "count": 4
+          },
+          {
+            "name": "Fell the Profane",
+            "count": 2
+          },
+          {
+            "name": "Force of Despair",
+            "count": 2
+          },
+          {
+            "name": "March of Wretched Sorrow",
+            "count": 3
+          },
+          {
+            "name": "Sheoldred's Edict",
+            "count": 1
+          },
+          {
+            "name": "Soul Spike",
+            "count": 4
+          },
+          {
+            "name": "Thoughtseize",
+            "count": 4
+          },
+          {
+            "name": "Witherbloom Charm",
+            "count": 3
+          },
+          {
+            "name": "Necrodominance",
+            "count": 4
+          },
+          {
+            "name": "Professor Dellian Fel",
+            "count": 2
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Assassin's Trophy",
+            "count": 1
+          },
+          {
+            "name": "Break the Ice",
+            "count": 4
+          },
+          {
+            "name": "Culling Ritual",
+            "count": 2
+          },
+          {
+            "name": "Dauthi Voidwalker",
+            "count": 2
+          },
+          {
+            "name": "Disruptor Flute",
+            "count": 2
+          },
+          {
+            "name": "Inquisition of Kozilek",
+            "count": 2
+          },
+          {
+            "name": "Surgical Extraction",
+            "count": 2
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Golgari Necrodominance",
+        "player": "musasabi",
+        "event": "MTGO Challenge 96",
+        "placement": "15"
+      }
+    },
+    {
+      "name": "Amulet Titan",
+      "sharePercent": 1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=348&meta=54&f=MO",
+      "rank": 19,
+      "representative": {
+        "title": "Amulet Titan",
+        "archetype": "Amulet Titan Amulet Titan",
+        "url": "https://mtgtop8.com/event?e=91444&d=894496&f=MO",
+        "pageTitle": "Amulet Titan",
+        "pageUrl": "https://mtgtop8.com/event?e=91444&d=894496&f=MO",
+        "eventDate": "2026-09-30",
+        "cards": [
+          "Boseiju, Who Endures",
+          "Crumbling Vestige",
+          "Echoing Deeps",
+          "Forest",
+          "Gruul Turf",
+          "Hanweir Battlements",
+          "Mirrorpool",
+          "Shifting Woodland",
+          "Simic Growth Chamber",
+          "The Mycosynth Gardens",
+          "Tolaria West",
+          "Urza's Saga",
+          "Valakut, the Molten Pinnacle",
+          "Vesuva",
+          "Aftermath Analyst",
+          "Arboreal Grazer",
+          "Cultivator Colossus",
+          "Dryad of the Ilysian Grove",
+          "Primeval Titan",
+          "Sakura-Tribe Scout",
+          "Green Sun's Zenith",
+          "Scapeshift",
+          "Summoner's Pact",
+          "Amulet of Vigor",
+          "Spelunking",
+          "Bojuka Bog",
+          "Cursed Totem",
+          "Dismember",
+          "Elvish Reclaimer",
+          "Endurance",
+          "Fire Magic",
+          "Force of Vigor",
+          "Tireless Tracker"
+        ],
+        "mainboard": [
+          {
+            "name": "Boseiju, Who Endures",
+            "count": 3
+          },
+          {
+            "name": "Crumbling Vestige",
+            "count": 4
+          },
+          {
+            "name": "Echoing Deeps",
+            "count": 1
+          },
+          {
+            "name": "Forest",
+            "count": 3
+          },
+          {
+            "name": "Gruul Turf",
+            "count": 4
+          },
+          {
+            "name": "Hanweir Battlements",
+            "count": 1
+          },
+          {
+            "name": "Mirrorpool",
+            "count": 1
+          },
+          {
+            "name": "Shifting Woodland",
+            "count": 1
+          },
+          {
+            "name": "Simic Growth Chamber",
+            "count": 3
+          },
+          {
+            "name": "The Mycosynth Gardens",
+            "count": 3
+          },
+          {
+            "name": "Tolaria West",
+            "count": 1
+          },
+          {
+            "name": "Urza's Saga",
+            "count": 4
+          },
+          {
+            "name": "Valakut, the Molten Pinnacle",
+            "count": 1
+          },
+          {
+            "name": "Vesuva",
+            "count": 1
+          },
+          {
+            "name": "Aftermath Analyst",
+            "count": 1
+          },
+          {
+            "name": "Arboreal Grazer",
+            "count": 4
+          },
+          {
+            "name": "Cultivator Colossus",
+            "count": 1
+          },
+          {
+            "name": "Dryad of the Ilysian Grove",
+            "count": 1
+          },
+          {
+            "name": "Primeval Titan",
+            "count": 3
+          },
+          {
+            "name": "Sakura-Tribe Scout",
+            "count": 2
+          },
+          {
+            "name": "Green Sun's Zenith",
+            "count": 3
+          },
+          {
+            "name": "Scapeshift",
+            "count": 4
+          },
+          {
+            "name": "Summoner's Pact",
+            "count": 2
+          },
+          {
+            "name": "Amulet of Vigor",
+            "count": 4
+          },
+          {
+            "name": "Spelunking",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Bojuka Bog",
+            "count": 1
+          },
+          {
+            "name": "Boseiju, Who Endures",
+            "count": 1
+          },
+          {
+            "name": "Cursed Totem",
+            "count": 2
+          },
+          {
+            "name": "Dismember",
+            "count": 3
+          },
+          {
+            "name": "Elvish Reclaimer",
+            "count": 1
+          },
+          {
+            "name": "Endurance",
+            "count": 2
+          },
+          {
+            "name": "Fire Magic",
+            "count": 2
+          },
+          {
+            "name": "Force of Vigor",
+            "count": 2
+          },
+          {
+            "name": "Tireless Tracker",
+            "count": 1
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Amulet Titan",
+        "player": "Mistakenn",
+        "event": "MTGO Challenge 32",
+        "placement": "3-4"
+      }
+    }
+  ],
+  "variants": [
+    {
+      "rank": 2,
+      "deck": {
+        "title": "UR Murktide — Chichichi",
+        "archetype": "UR Murktide",
+        "url": "https://mtgtop8.com/event?e=91337&d=893705&f=MO",
+        "pageTitle": "UR Murktide — Chichichi",
+        "pageUrl": "https://mtgtop8.com/event?e=91337&d=893705&f=MO",
+        "eventDate": "2026-09-27",
+        "cards": [
+          "Island",
+          "Misty Rainforest",
+          "Polluted Delta",
+          "Scalding Tarn",
+          "Spirebluff Canal",
+          "Steam Vents",
+          "Thundering Falls",
+          "Dragon's Rage Channeler",
+          "Murktide Regent",
+          "Ragavan, Nimble Pilferer",
+          "Subtlety",
+          "Consign to Memory",
+          "Counterspell",
+          "Expressive Iteration",
+          "Force of Negation",
+          "Lightning Bolt",
+          "Preordain",
+          "Spell Pierce",
+          "Spell Snare",
+          "Unholy Heat",
+          "Mishra's Bauble",
+          "Blood Moon",
+          "Fire Magic",
+          "Hurkyl's Recall",
+          "Meltdown",
+          "Mystical Dispute",
+          "Obsidian Charmaw",
+          "Stern Scolding",
+          "Surgical Extraction"
+        ],
+        "mainboard": [
+          {
+            "name": "Island",
+            "count": 3
+          },
+          {
+            "name": "Misty Rainforest",
+            "count": 2
+          },
+          {
+            "name": "Polluted Delta",
+            "count": 2
+          },
+          {
+            "name": "Scalding Tarn",
+            "count": 3
+          },
+          {
+            "name": "Spirebluff Canal",
+            "count": 4
+          },
+          {
+            "name": "Steam Vents",
+            "count": 3
+          },
+          {
+            "name": "Thundering Falls",
+            "count": 1
+          },
+          {
+            "name": "Dragon's Rage Channeler",
+            "count": 4
+          },
+          {
+            "name": "Murktide Regent",
+            "count": 3
+          },
+          {
+            "name": "Ragavan, Nimble Pilferer",
+            "count": 4
+          },
+          {
+            "name": "Subtlety",
+            "count": 2
+          },
+          {
+            "name": "Consign to Memory",
+            "count": 1
+          },
+          {
+            "name": "Counterspell",
+            "count": 4
+          },
+          {
+            "name": "Expressive Iteration",
+            "count": 4
+          },
+          {
+            "name": "Force of Negation",
+            "count": 1
+          },
+          {
+            "name": "Lightning Bolt",
+            "count": 3
+          },
+          {
+            "name": "Preordain",
+            "count": 4
+          },
+          {
+            "name": "Spell Pierce",
+            "count": 1
+          },
+          {
+            "name": "Spell Snare",
+            "count": 3
+          },
+          {
+            "name": "Unholy Heat",
+            "count": 4
+          },
+          {
+            "name": "Mishra's Bauble",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Blood Moon",
+            "count": 1
+          },
+          {
+            "name": "Consign to Memory",
+            "count": 3
+          },
+          {
+            "name": "Fire Magic",
+            "count": 1
+          },
+          {
+            "name": "Hurkyl's Recall",
+            "count": 1
+          },
+          {
+            "name": "Meltdown",
+            "count": 2
+          },
+          {
+            "name": "Mystical Dispute",
+            "count": 3
+          },
+          {
+            "name": "Obsidian Charmaw",
+            "count": 2
+          },
+          {
+            "name": "Stern Scolding",
+            "count": 1
+          },
+          {
+            "name": "Surgical Extraction",
+            "count": 1
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "UR Murktide",
+        "player": "Chichichi",
+        "event": "MTGO League",
+        "placement": "2"
+      }
+    },
+    {
+      "rank": 3,
+      "deck": {
+        "title": "Orzhov Blink",
+        "archetype": "Orzhov Blink Orzhov Blink",
+        "url": "https://mtgtop8.com/event?e=91337&d=893711&f=MO",
+        "pageTitle": "Orzhov Blink",
+        "pageUrl": "https://mtgtop8.com/event?e=91337&d=893711&f=MO",
+        "eventDate": "2026-09-27",
+        "cards": [
+          "Flooded Strand",
+          "Godless Shrine",
+          "Marsh Flats",
+          "Plains",
+          "Shadowy Backstreet",
+          "Swamp",
+          "Boggart Trawler",
+          "Emperor of Bones",
+          "Emptiness",
+          "Flickerwisp",
+          "Moon-Blessed Cleric",
+          "Overlord of the Balemurk",
+          "Phelia, Exuberant Shepherd",
+          "Recruiter of the Guard",
+          "Solitude",
+          "Witch Enchanter",
+          "Ephemerate",
+          "Fatal Push",
+          "Thoughtseize",
+          "Clarion Conqueror",
+          "Elesh Norn, Mother of Machines",
+          "End of the Hunt",
+          "High Noon",
+          "White Orchid Phantom",
+          "Wrath of the Skies"
+        ],
+        "mainboard": [
+          {
+            "name": "Flooded Strand",
+            "count": 4
+          },
+          {
+            "name": "Godless Shrine",
+            "count": 3
+          },
+          {
+            "name": "Marsh Flats",
+            "count": 4
+          },
+          {
+            "name": "Plains",
+            "count": 2
+          },
+          {
+            "name": "Shadowy Backstreet",
+            "count": 3
+          },
+          {
+            "name": "Swamp",
+            "count": 2
+          },
+          {
+            "name": "Boggart Trawler",
+            "count": 2
+          },
+          {
+            "name": "Emperor of Bones",
+            "count": 4
+          },
+          {
+            "name": "Emptiness",
+            "count": 3
+          },
+          {
+            "name": "Flickerwisp",
+            "count": 4
+          },
+          {
+            "name": "Moon-Blessed Cleric",
+            "count": 1
+          },
+          {
+            "name": "Overlord of the Balemurk",
+            "count": 4
+          },
+          {
+            "name": "Phelia, Exuberant Shepherd",
+            "count": 4
+          },
+          {
+            "name": "Recruiter of the Guard",
+            "count": 1
+          },
+          {
+            "name": "Solitude",
+            "count": 4
+          },
+          {
+            "name": "Witch Enchanter",
+            "count": 4
+          },
+          {
+            "name": "Ephemerate",
+            "count": 3
+          },
+          {
+            "name": "Fatal Push",
+            "count": 4
+          },
+          {
+            "name": "Thoughtseize",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Clarion Conqueror",
+            "count": 2
+          },
+          {
+            "name": "Elesh Norn, Mother of Machines",
+            "count": 1
+          },
+          {
+            "name": "End of the Hunt",
+            "count": 2
+          },
+          {
+            "name": "High Noon",
+            "count": 3
+          },
+          {
+            "name": "White Orchid Phantom",
+            "count": 4
+          },
+          {
+            "name": "Wrath of the Skies",
+            "count": 3
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Orzhov Blink",
+        "player": "_DG_",
+        "event": "MTGO League",
+        "placement": "8"
+      }
+    },
+    {
+      "rank": 5,
+      "deck": {
+        "title": "Pinnacle Affinity — Arcbound_Papi",
+        "archetype": "Pinnacle Affinity",
+        "url": "https://mtgtop8.com/event?e=91336&d=893693&f=MO",
+        "pageTitle": "Pinnacle Affinity — Arcbound_Papi",
+        "pageUrl": "https://mtgtop8.com/event?e=91336&d=893693&f=MO",
+        "eventDate": "2026-09-27",
+        "cards": [
+          "Darkslick Shores",
+          "Flooded Strand",
+          "Otawara, Soaring City",
+          "Polluted Delta",
+          "Scalding Tarn",
+          "Snow-Covered Island",
+          "Steam Vents",
+          "Urza's Saga",
+          "Watery Grave",
+          "Basim Ibn Ishaq",
+          "Kappa Cannoneer",
+          "Ornithopter",
+          "Pinnacle Emissary",
+          "Tamiyo, Inquisitive Student",
+          "Blood Fountain",
+          "Cranial Plating",
+          "Engineered Explosives",
+          "Mishra's Bauble",
+          "Mox Opal",
+          "Pithing Needle",
+          "Shadowspear",
+          "Skateboard",
+          "Stone of Erech",
+          "Tormod's Crypt",
+          "Consign to Memory",
+          "Damping Sphere",
+          "Fatal Push",
+          "Grafdigger's Cage",
+          "Metallic Rebuke",
+          "Mirko Vosk, Mind Drinker",
+          "Thoughtseize",
+          "Vexing Bauble"
+        ],
+        "mainboard": [
+          {
+            "name": "Darkslick Shores",
+            "count": 3
+          },
+          {
+            "name": "Flooded Strand",
+            "count": 1
+          },
+          {
+            "name": "Otawara, Soaring City",
+            "count": 1
+          },
+          {
+            "name": "Polluted Delta",
+            "count": 2
+          },
+          {
+            "name": "Scalding Tarn",
+            "count": 2
+          },
+          {
+            "name": "Snow-Covered Island",
+            "count": 2
+          },
+          {
+            "name": "Steam Vents",
+            "count": 1
+          },
+          {
+            "name": "Urza's Saga",
+            "count": 4
+          },
+          {
+            "name": "Watery Grave",
+            "count": 2
+          },
+          {
+            "name": "Basim Ibn Ishaq",
+            "count": 3
+          },
+          {
+            "name": "Kappa Cannoneer",
+            "count": 4
+          },
+          {
+            "name": "Ornithopter",
+            "count": 4
+          },
+          {
+            "name": "Pinnacle Emissary",
+            "count": 4
+          },
+          {
+            "name": "Tamiyo, Inquisitive Student",
+            "count": 3
+          },
+          {
+            "name": "Blood Fountain",
+            "count": 2
+          },
+          {
+            "name": "Cranial Plating",
+            "count": 3
+          },
+          {
+            "name": "Engineered Explosives",
+            "count": 3
+          },
+          {
+            "name": "Mishra's Bauble",
+            "count": 4
+          },
+          {
+            "name": "Mox Opal",
+            "count": 4
+          },
+          {
+            "name": "Pithing Needle",
+            "count": 1
+          },
+          {
+            "name": "Shadowspear",
+            "count": 1
+          },
+          {
+            "name": "Skateboard",
+            "count": 1
+          },
+          {
+            "name": "Stone of Erech",
+            "count": 1
+          },
+          {
+            "name": "Tormod's Crypt",
+            "count": 4
+          }
+        ],
+        "sideboard": [
+          {
+            "name": "Consign to Memory",
+            "count": 2
+          },
+          {
+            "name": "Damping Sphere",
+            "count": 2
+          },
+          {
+            "name": "Fatal Push",
+            "count": 3
+          },
+          {
+            "name": "Grafdigger's Cage",
+            "count": 1
+          },
+          {
+            "name": "Metallic Rebuke",
+            "count": 3
+          },
+          {
+            "name": "Mirko Vosk, Mind Drinker",
+            "count": 1
+          },
+          {
+            "name": "Thoughtseize",
+            "count": 2
+          },
+          {
+            "name": "Vexing Bauble",
+            "count": 1
+          }
+        ],
+        "mainboardCount": 60,
+        "sideboardCount": 15,
+        "name": "Pinnacle Affinity",
+        "player": "Arcbound_Papi",
+        "event": "MTGO Challenge 32",
+        "placement": "5-8"
+      }
+    }
+  ],
+  "transition": {
+    "set": "fra",
+    "name": "Reality Fracture",
+    "paperLegalDate": "2026-09-25",
+    "mtgoReleaseDate": "2026-09-29",
+    "mtgoReleaseUTC": "2026-09-29T17:00:00Z",
+    "releaseDate": "2026-10-02",
+    "checkedAt": "2026-10-01T23:14:34.965Z",
+    "sourceUrls": [
+      "https://wpn.wizards.com/en/news/reality-fracture-dates-and-details",
+      "https://magic.wizards.com/en/news/announcements/format-legality-shifts-to-prerelease-with-phyrexia-all-will-be-one",
+      "https://www.mtgo.com/news/fra-on-mtgo",
+      "https://magic.wizards.com/en/news/feature/reality-fracture-release-notes"
+    ],
+    "adoptionCheck": {
+      "url": "https://api.scryfall.com/cards/search?q=set%3Afra&unique=cards",
+      "method": "Intersect the 22 source lists with FRA cards whose Scryfall reprint flag is false, using Oracle IDs.",
+      "lists": 22,
+      "uniqueCardsInLists": 360,
+      "fraUniqueCards": 285,
+      "fraNewCards": 268,
+      "adoptedNewCards": [
+        {
+          "name": "Twinned Vision",
+          "oracleId": "fa1cc78f-26bc-4d5d-973b-7cb7d7490973",
+          "url": "https://scryfall.com/card/fra/157/twinned-vision?utm_source=api"
+        }
+      ]
+    },
+    "boundary": "Published aggregate windows include results from before FRA. No settled post-FRA share or win rate is inferred."
+  }
+}

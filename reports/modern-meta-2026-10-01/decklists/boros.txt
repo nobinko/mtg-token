@@ -1,0 +1,33 @@
+1 Arena of Glory
+4 Arid Mesa
+2 Dalkovan Encampment
+1 Elegant Parlor
+2 Flooded Strand
+3 Marsh Flats
+1 Mountain
+3 Plains
+3 Sacred Foundry
+2 Windswept Heath
+4 Ajani, Nacatl Pariah
+4 Guide of Souls
+2 Haliya, Guided by Light
+4 Ocelot Pride
+4 Ragavan, Nimble Pilferer
+3 Ranger-Captain of Eos
+4 Voice of Victory
+4 Galvanic Discharge
+2 Lightning Bolt
+2 Thraben Charm
+1 Blood Moon
+4 Goblin Bombardment
+
+Sideboard
+1 Blood Moon
+2 High Noon
+3 Obsidian Charmaw
+1 Rest in Peace
+2 Surgical Extraction
+1 The Legend of Roku
+2 Vexing Bauble
+2 Wear / Tear
+1 Wrath of the Skies

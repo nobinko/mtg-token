@@ -1,0 +1,699 @@
+{
+  "source": "MTG DECKS",
+  "url": "https://mtgdecks.net/Modern/winrates/range:last15days",
+  "from": "2026-09-16",
+  "to": "2026-10-01",
+  "sourceTotal": 4278,
+  "checkedAt": "2026-10-01T15:24:42.561Z",
+  "mapping": {
+    "broodscale": "Eldrazi Bloodchief Combo",
+    "prowess": "Izzet Prowess",
+    "blink": "Esper Blink",
+    "devoted": "Devoted Druid Combo",
+    "affinity": "Izzet Metalcraft",
+    "tron": "Prison Tron",
+    "goryo": "Esper Reanimator",
+    "boros": "Boros Energy",
+    "domain": "Domain Aggro",
+    "storm": "Ruby Storm"
+  },
+  "overall": {
+    "broodscale": {
+      "low": 48,
+      "high": 55,
+      "win": 52,
+      "n": 831
+    },
+    "prowess": {
+      "low": 40,
+      "high": 51,
+      "win": 46,
+      "n": 340
+    },
+    "blink": {
+      "low": 46,
+      "high": 57,
+      "win": 52,
+      "n": 293
+    },
+    "devoted": {
+      "low": 44,
+      "high": 57,
+      "win": 51,
+      "n": 265
+    },
+    "affinity": {
+      "low": 46,
+      "high": 58,
+      "win": 52,
+      "n": 244
+    },
+    "tron": {
+      "low": 43,
+      "high": 60,
+      "win": 52,
+      "n": 141
+    },
+    "goryo": {
+      "low": 49,
+      "high": 65,
+      "win": 57,
+      "n": 163
+    },
+    "boros": {
+      "low": 42,
+      "high": 55,
+      "win": 49,
+      "n": 230
+    },
+    "domain": {
+      "low": 43,
+      "high": 62,
+      "win": 52,
+      "n": 122
+    },
+    "storm": {
+      "low": 46,
+      "high": 59,
+      "win": 52,
+      "n": 230
+    }
+  },
+  "matrix": {
+    "broodscale": {
+      "broodscale": {
+        "low": 42,
+        "high": 58,
+        "win": 50,
+        "n": 144
+      },
+      "prowess": {
+        "low": 45,
+        "high": 69,
+        "win": 58,
+        "n": 71
+      },
+      "blink": {
+        "low": 38,
+        "high": 67,
+        "win": 53,
+        "n": 49
+      },
+      "devoted": {
+        "low": 24,
+        "high": 49,
+        "win": 36,
+        "n": 59
+      },
+      "affinity": {
+        "low": 34,
+        "high": 64,
+        "win": 49,
+        "n": 45
+      },
+      "tron": {
+        "low": 40,
+        "high": 72,
+        "win": 56,
+        "n": 41
+      },
+      "goryo": {
+        "low": 28,
+        "high": 66,
+        "win": 46,
+        "n": 28
+      },
+      "boros": {
+        "low": 32,
+        "high": 61,
+        "win": 46,
+        "n": 50
+      },
+      "domain": {
+        "low": 27,
+        "high": 73,
+        "win": 50,
+        "n": 20
+      },
+      "storm": {
+        "low": 29,
+        "high": 62,
+        "win": 45,
+        "n": 38
+      }
+    },
+    "prowess": {
+      "broodscale": {
+        "low": 31,
+        "high": 55,
+        "win": 42,
+        "n": 71
+      },
+      "prowess": {
+        "low": 31,
+        "high": 69,
+        "win": 50,
+        "n": 30
+      },
+      "blink": {
+        "low": 24,
+        "high": 65,
+        "win": 44,
+        "n": 25
+      },
+      "devoted": {
+        "low": 32,
+        "high": 77,
+        "win": 55,
+        "n": 20
+      },
+      "affinity": {
+        "low": 15,
+        "high": 59,
+        "win": 35,
+        "n": 20
+      },
+      "tron": {
+        "low": 2,
+        "high": 48,
+        "win": 17,
+        "n": 12
+      },
+      "goryo": {
+        "low": 15,
+        "high": 72,
+        "win": 42,
+        "n": 12
+      },
+      "boros": {
+        "low": 52,
+        "high": 90,
+        "win": 74,
+        "n": 23
+      },
+      "domain": {
+        "low": 0,
+        "high": 58,
+        "win": 14,
+        "n": 7
+      },
+      "storm": {
+        "low": 15,
+        "high": 65,
+        "win": 38,
+        "n": 16
+      }
+    },
+    "blink": {
+      "broodscale": {
+        "low": 33,
+        "high": 62,
+        "win": 47,
+        "n": 49
+      },
+      "prowess": {
+        "low": 35,
+        "high": 76,
+        "win": 56,
+        "n": 25
+      },
+      "blink": {
+        "low": 28,
+        "high": 72,
+        "win": 50,
+        "n": 22
+      },
+      "devoted": {
+        "low": 48,
+        "high": 93,
+        "win": 75,
+        "n": 16
+      },
+      "affinity": {
+        "low": 15,
+        "high": 59,
+        "win": 35,
+        "n": 20
+      },
+      "tron": {
+        "low": 0,
+        "high": 71,
+        "win": 0,
+        "n": 3
+      },
+      "goryo": {
+        "low": 49,
+        "high": 95,
+        "win": 79,
+        "n": 14
+      },
+      "boros": {
+        "low": 19,
+        "high": 75,
+        "win": 46,
+        "n": 13
+      },
+      "domain": {
+        "low": 35,
+        "high": 93,
+        "win": 70,
+        "n": 10
+      },
+      "storm": {
+        "low": 31,
+        "high": 78,
+        "win": 56,
+        "n": 18
+      }
+    },
+    "devoted": {
+      "broodscale": {
+        "low": 51,
+        "high": 76,
+        "win": 64,
+        "n": 59
+      },
+      "prowess": {
+        "low": 23,
+        "high": 68,
+        "win": 45,
+        "n": 20
+      },
+      "blink": {
+        "low": 7,
+        "high": 52,
+        "win": 25,
+        "n": 16
+      },
+      "devoted": {
+        "low": 26,
+        "high": 74,
+        "win": 50,
+        "n": 18
+      },
+      "affinity": {
+        "low": 32,
+        "high": 86,
+        "win": 62,
+        "n": 13
+      },
+      "tron": {
+        "low": 16,
+        "high": 84,
+        "win": 50,
+        "n": 8
+      },
+      "goryo": {
+        "low": 4,
+        "high": 71,
+        "win": 29,
+        "n": 7
+      },
+      "boros": {
+        "low": 5,
+        "high": 54,
+        "win": 23,
+        "n": 13
+      },
+      "domain": {
+        "low": 22,
+        "high": 96,
+        "win": 67,
+        "n": 6
+      },
+      "storm": {
+        "low": 26,
+        "high": 70,
+        "win": 48,
+        "n": 21
+      }
+    },
+    "affinity": {
+      "broodscale": {
+        "low": 36,
+        "high": 66,
+        "win": 51,
+        "n": 45
+      },
+      "prowess": {
+        "low": 41,
+        "high": 85,
+        "win": 65,
+        "n": 20
+      },
+      "blink": {
+        "low": 41,
+        "high": 85,
+        "win": 65,
+        "n": 20
+      },
+      "devoted": {
+        "low": 14,
+        "high": 68,
+        "win": 38,
+        "n": 13
+      },
+      "affinity": {
+        "low": 21,
+        "high": 79,
+        "win": 50,
+        "n": 12
+      },
+      "tron": {
+        "low": 24,
+        "high": 91,
+        "win": 63,
+        "n": 8
+      },
+      "goryo": {
+        "low": 15,
+        "high": 72,
+        "win": 42,
+        "n": 12
+      },
+      "boros": {
+        "low": 13,
+        "high": 65,
+        "win": 36,
+        "n": 14
+      },
+      "domain": {
+        "low": 4,
+        "high": 78,
+        "win": 33,
+        "n": 6
+      },
+      "storm": {
+        "low": 11,
+        "high": 69,
+        "win": 36,
+        "n": 11
+      }
+    },
+    "tron": {
+      "broodscale": {
+        "low": 28,
+        "high": 60,
+        "win": 44,
+        "n": 41
+      },
+      "prowess": {
+        "low": 52,
+        "high": 98,
+        "win": 83,
+        "n": 12
+      },
+      "blink": {
+        "low": 29,
+        "high": 100,
+        "win": 100,
+        "n": 3
+      },
+      "devoted": {
+        "low": 16,
+        "high": 84,
+        "win": 50,
+        "n": 8
+      },
+      "affinity": {
+        "low": 9,
+        "high": 76,
+        "win": 38,
+        "n": 8
+      },
+      "tron": {
+        "low": 7,
+        "high": 93,
+        "win": 50,
+        "n": 4
+      },
+      "goryo": {
+        "low": 10,
+        "high": 82,
+        "win": 43,
+        "n": 7
+      },
+      "boros": {
+        "low": 14,
+        "high": 79,
+        "win": 44,
+        "n": 9
+      },
+      "domain": {
+        "low": 0,
+        "high": 60,
+        "win": 0,
+        "n": 4
+      },
+      "storm": {
+        "low": 14,
+        "high": 79,
+        "win": 44,
+        "n": 9
+      }
+    },
+    "goryo": {
+      "broodscale": {
+        "low": 34,
+        "high": 72,
+        "win": 54,
+        "n": 28
+      },
+      "prowess": {
+        "low": 28,
+        "high": 85,
+        "win": 58,
+        "n": 12
+      },
+      "blink": {
+        "low": 5,
+        "high": 51,
+        "win": 21,
+        "n": 14
+      },
+      "devoted": {
+        "low": 29,
+        "high": 96,
+        "win": 71,
+        "n": 7
+      },
+      "affinity": {
+        "low": 28,
+        "high": 85,
+        "win": 58,
+        "n": 12
+      },
+      "tron": {
+        "low": 18,
+        "high": 90,
+        "win": 57,
+        "n": 7
+      },
+      "goryo": {
+        "low": 12,
+        "high": 88,
+        "win": 50,
+        "n": 6
+      },
+      "boros": {
+        "low": 23,
+        "high": 83,
+        "win": 55,
+        "n": 11
+      },
+      "domain": {
+        "low": 9,
+        "high": 99,
+        "win": 67,
+        "n": 3
+      },
+      "storm": {
+        "low": 16,
+        "high": 84,
+        "win": 50,
+        "n": 8
+      }
+    },
+    "boros": {
+      "broodscale": {
+        "low": 39,
+        "high": 68,
+        "win": 54,
+        "n": 50
+      },
+      "prowess": {
+        "low": 10,
+        "high": 48,
+        "win": 26,
+        "n": 23
+      },
+      "blink": {
+        "low": 25,
+        "high": 81,
+        "win": 54,
+        "n": 13
+      },
+      "devoted": {
+        "low": 46,
+        "high": 95,
+        "win": 77,
+        "n": 13
+      },
+      "affinity": {
+        "low": 35,
+        "high": 87,
+        "win": 64,
+        "n": 14
+      },
+      "tron": {
+        "low": 21,
+        "high": 86,
+        "win": 56,
+        "n": 9
+      },
+      "goryo": {
+        "low": 17,
+        "high": 77,
+        "win": 45,
+        "n": 11
+      },
+      "boros": {
+        "low": 21,
+        "high": 79,
+        "win": 50,
+        "n": 12
+      },
+      "domain": {
+        "low": 10,
+        "high": 65,
+        "win": 33,
+        "n": 12
+      },
+      "storm": {
+        "low": 5,
+        "high": 54,
+        "win": 23,
+        "n": 13
+      }
+    },
+    "domain": {
+      "broodscale": {
+        "low": 27,
+        "high": 73,
+        "win": 50,
+        "n": 20
+      },
+      "prowess": {
+        "low": 42,
+        "high": 100,
+        "win": 86,
+        "n": 7
+      },
+      "blink": {
+        "low": 7,
+        "high": 65,
+        "win": 30,
+        "n": 10
+      },
+      "devoted": {
+        "low": 4,
+        "high": 78,
+        "win": 33,
+        "n": 6
+      },
+      "affinity": {
+        "low": 22,
+        "high": 96,
+        "win": 67,
+        "n": 6
+      },
+      "tron": {
+        "low": 40,
+        "high": 100,
+        "win": 100,
+        "n": 4
+      },
+      "goryo": {
+        "low": 1,
+        "high": 91,
+        "win": 33,
+        "n": 3
+      },
+      "boros": {
+        "low": 35,
+        "high": 90,
+        "win": 67,
+        "n": 12
+      },
+      "domain": null,
+      "storm": {
+        "low": 7,
+        "high": 93,
+        "win": 50,
+        "n": 4
+      }
+    },
+    "storm": {
+      "broodscale": {
+        "low": 38,
+        "high": 71,
+        "win": 55,
+        "n": 38
+      },
+      "prowess": {
+        "low": 35,
+        "high": 85,
+        "win": 63,
+        "n": 16
+      },
+      "blink": {
+        "low": 22,
+        "high": 69,
+        "win": 44,
+        "n": 18
+      },
+      "devoted": {
+        "low": 30,
+        "high": 74,
+        "win": 52,
+        "n": 21
+      },
+      "affinity": {
+        "low": 31,
+        "high": 89,
+        "win": 64,
+        "n": 11
+      },
+      "tron": {
+        "low": 21,
+        "high": 86,
+        "win": 56,
+        "n": 9
+      },
+      "goryo": {
+        "low": 16,
+        "high": 84,
+        "win": 50,
+        "n": 8
+      },
+      "boros": {
+        "low": 46,
+        "high": 95,
+        "win": 77,
+        "n": 13
+      },
+      "domain": {
+        "low": 7,
+        "high": 93,
+        "win": 50,
+        "n": 4
+      },
+      "storm": {
+        "low": 26,
+        "high": 74,
+        "win": 50,
+        "n": 18
+      }
+    }
+  }
+}

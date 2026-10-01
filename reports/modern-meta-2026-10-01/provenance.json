@@ -1,0 +1,482 @@
+{
+  "edition": "2026-10-02",
+  "timezone": "Asia/Tokyo",
+  "assembledAt": "2026-10-01T23:49:32.219Z",
+  "aggregateSources": [
+    {
+      "key": "recent",
+      "source": "MTGTop8",
+      "url": "https://mtgtop8.com/format?f=MO&meta=54",
+      "window": "直近2週間",
+      "totalDecks": 680,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "categories": 40
+    },
+    {
+      "key": "months",
+      "source": "MTGTop8",
+      "url": "https://mtgtop8.com/format?f=MO&meta=51",
+      "window": "直近2か月",
+      "totalDecks": 3253,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "categories": 64
+    },
+    {
+      "key": "major",
+      "source": "MTGTop8",
+      "url": "https://mtgtop8.com/format?f=MO&meta=189",
+      "window": "主要大会・直近2か月",
+      "totalDecks": 271,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "categories": 33
+    },
+    {
+      "key": "paper",
+      "source": "MTGTop8",
+      "url": "https://mtgtop8.com/format?f=MO&meta=57",
+      "window": "紙の大会・直近2か月",
+      "totalDecks": 1097,
+      "fetchedAt": "2026-10-01T15:14:56.990Z",
+      "categories": 53
+    }
+  ],
+  "aggregateLimitations": [
+    "Published result lists, not all tournament entrants or all players.",
+    "Periods and event selections differ and overlap. Published shares are rounded.",
+    "All four windows include pre-FRA results; no settled post-FRA share is inferred."
+  ],
+  "listSelection": {
+    "top10Candidates": 59,
+    "method": "Medoid among 5–6 complete real lists per top-10 category, using normalized mainboard/sideboard count distance.",
+    "supplements": "One recent complete real list per additional category; broad source labels and represented archetypes are distinguished in the text.",
+    "variants": "Three real lists showing structurally different builds within source categories.",
+    "completeLists": [
+      {
+        "kind": "top10",
+        "rank": 1,
+        "name": "Broodscale Bloodchief",
+        "title": "Broodscale Bloodchief — HouseOfManaMTG",
+        "player": "HouseOfManaMTG",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-29",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91408&d=894239&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 2,
+        "name": "UR Cutter Prowess",
+        "title": "UR Cutter Prowess — queirozale7",
+        "player": "queirozale7",
+        "event": "MTGO League",
+        "eventDate": "2026-09-27",
+        "placement": "6",
+        "url": "https://mtgtop8.com/event?e=91337&d=893709&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 3,
+        "name": "Esper Blink",
+        "title": "Esper Blink — rastaf",
+        "player": "rastaf",
+        "event": "MTGO Challenge 64",
+        "eventDate": "2026-09-29",
+        "placement": "3-4",
+        "url": "https://mtgtop8.com/event?e=91443&d=894474&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 4,
+        "name": "Devoted Combo",
+        "title": "Devoted Combo — KapoUzumaki11",
+        "player": "KapoUzumaki11",
+        "event": "MTGO Challenge 16",
+        "eventDate": "2026-09-29",
+        "placement": "2",
+        "url": "https://mtgtop8.com/event?e=91410&d=894278&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 5,
+        "name": "Pinnacle Affinity",
+        "title": "Pinnacle Affinity — Sebastian0722",
+        "player": "Sebastian0722",
+        "event": "MTGO Challenge 16",
+        "eventDate": "2026-09-29",
+        "placement": "14",
+        "url": "https://mtgtop8.com/event?e=91410&d=894275&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 6,
+        "name": "UrzaTron",
+        "title": "UrzaTron — ejk",
+        "player": "ejk",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-29",
+        "placement": "3-4",
+        "url": "https://mtgtop8.com/event?e=91408&d=894234&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 7,
+        "name": "Instant Reanimator",
+        "title": "Instant Reanimator — YungDingo",
+        "player": "YungDingo",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-29",
+        "placement": "1",
+        "url": "https://mtgtop8.com/event?e=91408&d=894242&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 8,
+        "name": "Boros Aggro",
+        "title": "Boros Aggro — msmayer",
+        "player": "msmayer",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-30",
+        "placement": "15",
+        "url": "https://mtgtop8.com/event?e=91444&d=894492&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 9,
+        "name": "4/5c Aggro",
+        "title": "4/5c Aggro — bomberboss",
+        "player": "bomberboss",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-30",
+        "placement": "1",
+        "url": "https://mtgtop8.com/event?e=91444&d=894495&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "top10",
+        "rank": 10,
+        "name": "Ruby Storm",
+        "title": "Ruby Storm — hugofreitas1",
+        "player": "hugofreitas1",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-30",
+        "placement": "3-4",
+        "url": "https://mtgtop8.com/event?e=91444&d=894494&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "variant",
+        "rank": 2,
+        "name": "UR Murktide",
+        "title": "UR Murktide — Chichichi",
+        "player": "Chichichi",
+        "event": "MTGO League",
+        "eventDate": "2026-09-27",
+        "placement": "2",
+        "url": "https://mtgtop8.com/event?e=91337&d=893705&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "variant",
+        "rank": 3,
+        "name": "Orzhov Blink",
+        "title": "Orzhov Blink",
+        "player": "_DG_",
+        "event": "MTGO League",
+        "eventDate": "2026-09-27",
+        "placement": "8",
+        "url": "https://mtgtop8.com/event?e=91337&d=893711&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "variant",
+        "rank": 5,
+        "name": "Pinnacle Affinity",
+        "title": "Pinnacle Affinity — Arcbound_Papi",
+        "player": "Arcbound_Papi",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-27",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91336&d=893693&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 11,
+        "name": "Scepter Chant",
+        "title": "Scepter Chant",
+        "player": "nahuel10",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-30",
+        "placement": "2",
+        "url": "https://mtgtop8.com/event?e=91444&d=894493&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 12,
+        "name": "Dimir Control",
+        "title": "Dimir Control",
+        "player": "oinkmage22",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-30",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91444&d=894501&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 13,
+        "name": "Boros Ponza",
+        "title": "Boros Ponza",
+        "player": "nahuel10",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-29",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91408&d=894233&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 14,
+        "name": "Living End",
+        "title": "Living End",
+        "player": "MeninoNey",
+        "event": "MTGO Challenge 64",
+        "eventDate": "2026-09-29",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91443&d=894481&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 15,
+        "name": "Eldrazi Ramp",
+        "title": "Eldrazi Ramp",
+        "player": "justFeather",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-29",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91408&d=894236&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 16,
+        "name": "Landless Belcher",
+        "title": "Landless Belcher",
+        "player": "Xenowan",
+        "event": "MTGO Challenge 16",
+        "eventDate": "2026-09-29",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91410&d=894270&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 17,
+        "name": "Allosaurus Combo",
+        "title": "Allosaurus Combo",
+        "player": "ice_nine_BIGFAN",
+        "event": "MTGO Challenge 64",
+        "eventDate": "2026-09-29",
+        "placement": "5-8",
+        "url": "https://mtgtop8.com/event?e=91443&d=894480&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 18,
+        "name": "Golgari Necrodominance",
+        "title": "Golgari Necrodominance",
+        "player": "musasabi",
+        "event": "MTGO Challenge 96",
+        "eventDate": "2026-09-28",
+        "placement": "15",
+        "url": "https://mtgtop8.com/event?e=91409&d=894250&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      },
+      {
+        "kind": "supplemental",
+        "rank": 19,
+        "name": "Amulet Titan",
+        "title": "Amulet Titan",
+        "player": "Mistakenn",
+        "event": "MTGO Challenge 32",
+        "eventDate": "2026-09-30",
+        "placement": "3-4",
+        "url": "https://mtgtop8.com/event?e=91444&d=894496&f=MO",
+        "mainboard": 60,
+        "sideboard": 15
+      }
+    ]
+  },
+  "matchups": {
+    "source": "MTG DECKS",
+    "url": "https://mtgdecks.net/Modern/winrates/range:last15days",
+    "from": "2026-09-16",
+    "to": "2026-10-01",
+    "sourceTotalMoreThan": 4278,
+    "checkedAt": "2026-10-01T15:24:42.561Z",
+    "pairs": 45,
+    "mapping": {
+      "broodscale": "Eldrazi Bloodchief Combo",
+      "prowess": "Izzet Prowess",
+      "blink": "Esper Blink",
+      "devoted": "Devoted Druid Combo",
+      "affinity": "Izzet Metalcraft",
+      "tron": "Prison Tron",
+      "goryo": "Esper Reanimator",
+      "boros": "Boros Energy",
+      "domain": "Domain Aggro",
+      "storm": "Ruby Storm"
+    },
+    "limitations": [
+      "Published match statistics mix lists and players.",
+      "Main-game and post-sideboard descriptions are editorial structural analysis, not separately measured win rates.",
+      "Cell emphasis requires n>=30 and a source interval entirely above or below 50%; this is this guide’s display rule."
+    ]
+  },
+  "cards": {
+    "source": "Scryfall",
+    "api": "https://scryfall.com/docs/api",
+    "oracleCollectionEndpoint": "https://api.scryfall.com/cards/collection",
+    "checkedAt": [
+      "2026-10-01T15:43:33.869Z"
+    ],
+    "uniqueOracleIds": 363,
+    "nameAliases": 384,
+    "localJPEGs": 383,
+    "modernLegal": true,
+    "japaneseImageOracleIds": 362,
+    "englishImageFallbacks": [
+      {
+        "name": "Faithful Mending",
+        "japaneseName": "信仰の繕い",
+        "japaneseNameSource": "https://mtg-jp.com/products/card-gallery/0000216/535015/",
+        "url": "https://scryfall.com/card/mid/221/faithful-mending?utm_source=api"
+      }
+    ],
+    "imageManifest": {
+      "method": "SHA-256 of sorted UTF-8 lines: relative-path + space + image-SHA256 + LF",
+      "sha256": "9f38e872b0223ae05af7e10a0d4b02174bc0cd22ec2dce8fd62d188bd330f178"
+    }
+  },
+  "officialRules": {
+    "verifiedEdition": "2026-10-02",
+    "urls": [
+      "https://magic.wizards.com/en/formats/modern",
+      "https://magic.wizards.com/en/banned-restricted-list",
+      "https://magic.wizards.com/en/rules"
+    ]
+  },
+  "releaseBoundary": {
+    "set": "fra",
+    "name": "Reality Fracture",
+    "paperLegalDate": "2026-09-25",
+    "mtgoReleaseDate": "2026-09-29",
+    "mtgoReleaseUTC": "2026-09-29T17:00:00Z",
+    "releaseDate": "2026-10-02",
+    "checkedAt": "2026-10-01T23:14:34.965Z",
+    "sourceUrls": [
+      "https://wpn.wizards.com/en/news/reality-fracture-dates-and-details",
+      "https://magic.wizards.com/en/news/announcements/format-legality-shifts-to-prerelease-with-phyrexia-all-will-be-one",
+      "https://www.mtgo.com/news/fra-on-mtgo",
+      "https://magic.wizards.com/en/news/feature/reality-fracture-release-notes"
+    ],
+    "adoptionCheck": {
+      "url": "https://api.scryfall.com/cards/search?q=set%3Afra&unique=cards",
+      "method": "Intersect the 22 source lists with FRA cards whose Scryfall reprint flag is false, using Oracle IDs.",
+      "lists": 22,
+      "uniqueCardsInLists": 360,
+      "fraUniqueCards": 285,
+      "fraNewCards": 268,
+      "adoptedNewCards": [
+        {
+          "name": "Twinned Vision",
+          "oracleId": "fa1cc78f-26bc-4d5d-973b-7cb7d7490973",
+          "url": "https://scryfall.com/card/fra/157/twinned-vision?utm_source=api"
+        }
+      ]
+    },
+    "boundary": "Published aggregate windows include results from before FRA. No settled post-FRA share or win rate is inferred."
+  },
+  "inputSHA256": {
+    "snapshot.json": "668589fe420578e4a95d3bc3bd0b3b22e822c19098bb7f0de94183692bb9f70d",
+    "decks.json": "f30460264bc95da969f0ecb60f1c2c48509057ff11555c506cffc5b63791ee1b",
+    "audit-data.json": "163285e0fdab1920758b92c5425a6971ce359e2fc008155c86cbd2f533ad4a13",
+    "cards.json": "268e6b215ab540f898ae6d0215b4ca837329251a4d01094c04043cd69324baa6",
+    "matchup-stats.json": "ea3b2d59883b6d9b604acc8841992cba6188906d24dc30aafa526f6a6347c69c",
+    "content.mjs": "dca9c5a325dab36ae5bc04ac6a755c475dad909609239f67e39dde1eb82a0eab",
+    "supplemental-content.mjs": "fa978122537d09ff4a6f545dbe5143a67728e00d2019563549c9538fbdd0f30d",
+    "matchups.mjs": "5251a3162afb316a704f7d5b1a211e6186bd1f6355ce5b73fcb3a881d7c7eaed",
+    "build.mjs": "080b9962886c496cf1ea8972416ef23c806418003aa5e596d3617599c7794cc3",
+    "layout.mjs": "0bf1af73c0baf8765a12381abaa55552f0928d0347f282aeaca0aeb8a96b5e72",
+    "extras-layout.mjs": "7f143ce11a79c1b7314578b1e644f933f10045434f1f6783dde4c3d6133ed2b8",
+    "app.js": "e24c1840c8c0d9edf66a6d1bf07709fd595e508912199c98627670b71d0e9997",
+    "styles.css": "cf11e7d260e386caa41e3322d88cc389c50c8a6060b32394cd430256837914b4",
+    "source-reader.mjs": "877109d9bf3a39780d7ff8519715c2541f833a2d518c7d71a8e707ea0424f8bd",
+    "source-reader.test.mjs": "b298497801c6318046080fd5650c0c37289cfdb9d176d753307e59b7bbdad92a",
+    "validate.mjs": "d63718c2a0be2d8d16e32796d300e11421259df9ec7428750b8ea992ebc3f5f7"
+  },
+  "runtimeSHA256": {
+    "index.html": "f963fc7202ba63f377b6d8f48c1f4efa1b19545823447f20b030f91cae5ef956",
+    "data.js": "8277de7932cd583e7ea12a49785c6fe32c3e69ad4e3988ce9abc02e79e5365cf",
+    "styles.css": "cf11e7d260e386caa41e3322d88cc389c50c8a6060b32394cd430256837914b4",
+    "app.js": "e24c1840c8c0d9edf66a6d1bf07709fd595e508912199c98627670b71d0e9997",
+    "favicon.svg": "4517ed95859149eaf18797103a76d739b97e5ce2383ab809fcede98d1ba0e0d9"
+  },
+  "decklistSHA256": {
+    "decklists/affinity.txt": "204a28456d524d1cccaf36fc594e3ea0ca58afb2090ab6067ad25502f437e995",
+    "decklists/belcher.txt": "2d5f783b029f6723d9bd36cfba1d6f11da543cce9e0d6e3ebde7454c1cd9b674",
+    "decklists/blink.txt": "8f64fe1344f067041b61d40f7a20ae2e3563f435b543bdb89c07f09466e998b9",
+    "decklists/boros.txt": "903ee5fd4be844f22fc9b4c71e297a35359931397828a4d350d991ba83e69256",
+    "decklists/broodscale.txt": "e72948327259960fdb0088c98743875eb1fe99c08b55fd628f5a3976c3eaa324",
+    "decklists/devoted.txt": "2f47910b273bc269df0dd29524c306e3338ecbcc9a4df8943e137106228521f6",
+    "decklists/dimir.txt": "27bd65b3b72f30f5c74e8c1918bc4acfd04e57131075fd83de4f4e859d751cc0",
+    "decklists/domain.txt": "9f015d429b0ca65d2a167e190a335382b52ed41ff6a062a3ce8bdba512e8bada",
+    "decklists/eldrazi-ramp.txt": "52592c2984b159a77f7668eee3445d0ebbf993c10bb0075de63fc7ca1e562ef5",
+    "decklists/goryo.txt": "53d84feeb6c1f03562d009891c20ca927f5f154ed5a182f672cf5d17da55fa86",
+    "decklists/living-end.txt": "9169add6da48132511c53883eaa2e39b3a30492da981fb0e4f7e6862c74d1162",
+    "decklists/murktide.txt": "90ec260c18eb365d01d9b57706c92c9b26f525f0978675d6f974b82c13354389",
+    "decklists/necro.txt": "fca110e52585e5bd52452eb393847524f72322eae4122513f923f92020273457",
+    "decklists/neoform.txt": "d7caf5064f24f2c18a143ae5521a4600e5f4bee1122e20a241d31ecc9fa44fd8",
+    "decklists/orzhov-blink.txt": "91bafda9eca549e622b2de3d44da5bfce24a353aea9efe8b227ff48b26e967eb",
+    "decklists/plating-affinity.txt": "69ab6df7263e1163b481862260951c85848a47723ab0fcd3230660fe36307038",
+    "decklists/ponza.txt": "c87974b3e70097fa9bf9efac8a7388c67270a807edd0993d5aae956a4419d500",
+    "decklists/prowess.txt": "0d47108b039f2d6bef3a7d906079c16d9564df96ffe5afdae96d738cfd2f0dfe",
+    "decklists/scepter.txt": "62829906e88d0429a4f721fe1daa26a26e54be5b499aade8176e6cae5a8ad62a",
+    "decklists/storm.txt": "a4de1ca06a4b768906172d98c7437fd93105bf31fe44db4414cc74c20ab237c3",
+    "decklists/titan.txt": "cdfab2ead5aa5ab80c2b23264b62db13f758702dcf9e2ccd93c235546c25c91c",
+    "decklists/tron.txt": "3214b5185ffa9d644f3671e9b53682a6f5672cfe8dd45dfeb32db63bae271941"
+  },
+  "rights": "Magic: The Gathering and card names/images belong to their respective rights holders. Unofficial educational guide. Per-card image and Oracle sources are retained in cards.json."
+}

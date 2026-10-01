@@ -1,0 +1,32 @@
+3 Bloodstained Mire
+2 Blooming Marsh
+1 Castle Locthwain
+2 Marsh Flats
+1 Overgrown Tomb
+5 Swamp
+2 Underground Mortuary
+2 Verdant Catacombs
+4 Boggart Trawler
+2 Dauthi Voidwalker
+4 Orcish Bowmasters
+2 Sheoldred, the Apocalypse
+1 Sorin of House Markov
+4 Fatal Push
+2 Fell the Profane
+2 Force of Despair
+3 March of Wretched Sorrow
+1 Sheoldred's Edict
+4 Soul Spike
+4 Thoughtseize
+3 Witherbloom Charm
+4 Necrodominance
+2 Professor Dellian Fel
+
+Sideboard
+1 Assassin's Trophy
+4 Break the Ice
+2 Culling Ritual
+2 Dauthi Voidwalker
+2 Disruptor Flute
+2 Inquisition of Kozilek
+2 Surgical Extraction

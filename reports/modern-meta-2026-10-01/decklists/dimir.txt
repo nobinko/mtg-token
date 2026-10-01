@@ -1,0 +1,39 @@
+2 Flooded Strand
+3 Island
+3 Marsh Flats
+1 Otawara, Soaring City
+4 Polluted Delta
+1 Swamp
+2 Undercity Sewers
+3 Watery Grave
+1 Harbinger of the Seas
+1 Murktide Regent
+2 Orcish Bowmasters
+4 Psychic Frog
+4 Quantum Riddler
+2 Subtlety
+2 Tamiyo, Inquisitive Student
+1 Wan Shi Tong, Librarian
+2 Consign to Memory
+2 Counterspell
+1 Drown in the Loch
+4 Fatal Push
+3 Force of Negation
+2 Preordain
+2 Sheoldred's Edict
+2 Sink into Stupor
+2 Spell Snare
+3 Thoughtseize
+1 Kaito, Bane of Nightmares
+
+Sideboard
+1 Break the Ice
+2 Consign to Memory
+2 Engineered Explosives
+2 Harbinger of the Seas
+1 Kaito, Bane of Nightmares
+2 Mystical Dispute
+2 Nihil Spellbomb
+1 Requiting Hex
+1 Stern Scolding
+1 Toxic Deluge

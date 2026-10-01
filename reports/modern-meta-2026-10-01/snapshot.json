@@ -1,0 +1,252 @@
+{
+  "source": "MTGTop8",
+  "sourceUrl": "https://mtgtop8.com/format?f=MO&meta=54",
+  "formatCode": "MO",
+  "windowLabel": "直近2週間",
+  "totalDecks": 680,
+  "fetchedAt": "2026-10-01T15:14:56.990Z",
+  "tieRule": "同率は出典の掲載順",
+  "entries": [
+    {
+      "name": "Broodscale Bloodchief",
+      "sharePercent": 19,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=2387&meta=54&f=MO",
+      "rank": 1
+    },
+    {
+      "name": "UR Aggro",
+      "sharePercent": 10,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=351&meta=54&f=MO",
+      "rank": 2
+    },
+    {
+      "name": "Blink",
+      "sharePercent": 8,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=285&meta=54&f=MO",
+      "rank": 3
+    },
+    {
+      "name": "Creatures Toolbox",
+      "sharePercent": 6,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=191&meta=54&f=MO",
+      "rank": 4
+    },
+    {
+      "name": "Affinity",
+      "sharePercent": 5,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=189&meta=54&f=MO",
+      "rank": 5
+    },
+    {
+      "name": "UrzaTron",
+      "sharePercent": 5,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=188&meta=54&f=MO",
+      "rank": 6
+    },
+    {
+      "name": "Instant Reanimator",
+      "sharePercent": 5,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=312&meta=54&f=MO",
+      "rank": 7
+    },
+    {
+      "name": "Boros Aggro",
+      "sharePercent": 4,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=193&meta=54&f=MO",
+      "rank": 8
+    },
+    {
+      "name": "4/5c Aggro",
+      "sharePercent": 4,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=300&meta=54&f=MO",
+      "rank": 9
+    },
+    {
+      "name": "Ruby Storm",
+      "sharePercent": 4,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=1809&meta=54&f=MO",
+      "rank": 10
+    },
+    {
+      "name": "UW Control",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=209&meta=54&f=MO",
+      "rank": 11
+    },
+    {
+      "name": "Dimir Control",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=1702&meta=54&f=MO",
+      "rank": 12
+    },
+    {
+      "name": "Boros Ponza",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=3000&meta=54&f=MO",
+      "rank": 13
+    },
+    {
+      "name": "Living End",
+      "sharePercent": 3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=233&meta=54&f=MO",
+      "rank": 14
+    },
+    {
+      "name": "Eldrazi Ramp",
+      "sharePercent": 2,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=533&meta=54&f=MO",
+      "rank": 15
+    },
+    {
+      "name": "Landless",
+      "sharePercent": 2,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=1009&meta=54&f=MO",
+      "rank": 16
+    },
+    {
+      "name": "Allosaurus Combo",
+      "sharePercent": 2,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=822&meta=54&f=MO",
+      "rank": 17
+    },
+    {
+      "name": "Other - Control",
+      "sharePercent": 1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=187&meta=54&f=MO",
+      "rank": 18
+    },
+    {
+      "name": "Amulet Titan",
+      "sharePercent": 1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=348&meta=54&f=MO",
+      "rank": 19
+    },
+    {
+      "name": "Esper Control",
+      "sharePercent": 0.9,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=821&meta=54&f=MO",
+      "rank": 20
+    },
+    {
+      "name": "Red Deck Wins",
+      "sharePercent": 0.7,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=226&meta=54&f=MO",
+      "rank": 21
+    },
+    {
+      "name": "Jeskai Control",
+      "sharePercent": 0.7,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=790&meta=54&f=MO",
+      "rank": 22
+    },
+    {
+      "name": "Reanimator",
+      "sharePercent": 0.7,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=1000&meta=54&f=MO",
+      "rank": 23
+    },
+    {
+      "name": "Hollow One",
+      "sharePercent": 0.6,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=767&meta=54&f=MO",
+      "rank": 24
+    },
+    {
+      "name": "Mardu Aggro",
+      "sharePercent": 0.6,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=567&meta=54&f=MO",
+      "rank": 25
+    },
+    {
+      "name": "Rakdos Aggro",
+      "sharePercent": 0.6,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=918&meta=54&f=MO",
+      "rank": 26
+    },
+    {
+      "name": "Cosmogoyf",
+      "sharePercent": 0.6,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=3119&meta=54&f=MO",
+      "rank": 27
+    },
+    {
+      "name": "Jeskai Aggro",
+      "sharePercent": 0.4,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=231&meta=54&f=MO",
+      "rank": 28
+    },
+    {
+      "name": "Other - Combo",
+      "sharePercent": 0.4,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=185&meta=54&f=MO",
+      "rank": 29
+    },
+    {
+      "name": "Eldrazi Aggro",
+      "sharePercent": 0.3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=552&meta=54&f=MO",
+      "rank": 30
+    },
+    {
+      "name": "Simic Birthing Ritual",
+      "sharePercent": 0.3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=2697&meta=54&f=MO",
+      "rank": 31
+    },
+    {
+      "name": "UB Mill",
+      "sharePercent": 0.3,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=787&meta=54&f=MO",
+      "rank": 32
+    },
+    {
+      "name": "Death's Shadow",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=636&meta=54&f=MO",
+      "rank": 33
+    },
+    {
+      "name": "Other - Aggro",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=186&meta=54&f=MO",
+      "rank": 34
+    },
+    {
+      "name": "Song of Creation",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=2972&meta=54&f=MO",
+      "rank": 35
+    },
+    {
+      "name": "Twin Exarch",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=190&meta=54&f=MO",
+      "rank": 36
+    },
+    {
+      "name": "Heliod Life",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=955&meta=54&f=MO",
+      "rank": 37
+    },
+    {
+      "name": "Dredge",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=275&meta=54&f=MO",
+      "rank": 38
+    },
+    {
+      "name": "Hammer Time",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=815&meta=54&f=MO",
+      "rank": 39
+    },
+    {
+      "name": "Creativity",
+      "sharePercent": 0.1,
+      "archetypeUrl": "https://mtgtop8.com/archetype?a=998&meta=54&f=MO",
+      "rank": 40
+    }
+  ],
+  "originalWindowLabel": "Last 2 Weeks"
+}
