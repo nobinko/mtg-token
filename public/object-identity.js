@@ -14,6 +14,41 @@ export function objectKey(object) {
   return KEY_PREFIX + JSON.stringify([object.set, ...identity]);
 }
 
+export function tokenSignature(card) {
+  const face = (item) => [item.name, item.type_line ?? item.typeLine, item.oracle_text ?? item.oracleText ?? "",
+    item.power ?? "", item.toughness ?? "", item.loyalty ?? "", item.defense ?? "", [...(item.colors || [])].sort()];
+  return JSON.stringify([face(card), (card.card_faces || card.cardFaces || []).map(face)]);
+}
+
+// Preparation is shared across printings; aggregation still keeps each set row.
+export function preparationKey(object) {
+  if (isVirtualObject(object)) return `prep:helper:${JSON.stringify([object.name, object.typeLine])}`;
+  return `prep:physical:${JSON.stringify([object.oracleId || object.printId || object.id, tokenSignature(object)])}`;
+}
+
+export function preparedRecord(object, records) {
+  const record = records.get(preparationKey(object));
+  return record?.picked === true ? record : null;
+}
+
+export function setPrepared(object, records, picked, location = {}) {
+  records.set(preparationKey(object), { picked, set: location.set || object.set,
+    setName: location.setName || object.setName, printId: location.printId || object.printId || "",
+    name: object.name, sourceObjectKey: objectKey(object) });
+}
+
+export function migratePreparedRecords(objects, legacyChecks, records) {
+  let changed = false;
+  for (const object of objects) {
+    const key = preparationKey(object);
+    if (!records.has(key) && legacyChecks.has(objectKey(object))) {
+      setPrepared(object, records, true);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 export function migrateCheckedObjects(keys) {
   const checked = new Set();
   let resetCount = 0;

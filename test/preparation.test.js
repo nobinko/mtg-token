@@ -25,7 +25,7 @@ test("invalid preparation boundaries are rejected", () => {
   }
 });
 test("new set candidates exist without decks, known bans excluded, future legality labeled", async () => {
-  const base = { id: "a", name: "Example", set: "fra", set_name: "Fixture", oracle_text: "Create a token that's a copy of target creature.", type_line: "Sorcery" };
+  const base = { id: "a", name: "Example", set: "fra", set_name: "Fixture", games: ["paper"], oracle_text: "Create a token that's a copy of target creature.", type_line: "Sorcery" };
   const cards = [{ ...base, legalities: { modern: "not_legal" } }, { ...base, id: "b", name: "Banned", legalities: { modern: "banned" } }];
   const sources = preparationSources(cards, "modern", "2026-09-25", "2026-09-07");
   assert.equal(sources.length, 1);

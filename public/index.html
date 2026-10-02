@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MTG Token Finder</title>
-    <link rel="stylesheet" href="/styles.css?v=20260926-gallery-v2">
+    <link rel="stylesheet" href="/styles.css?v=20261002-shared-preparation">
   </head>
   <body>
     <main class="app">
       <section class="toolbar" aria-label="検索条件">
         <div>
           <h1>MTG Token Finder</h1>
-          <p>デッキリストから、バルクのトークン束で探す現物を抜き出すための準備表です。</p>
+          <p>紙の大会で使うトークン・紋章などを、デッキリストから探す準備表です。</p>
         </div>
         <form id="search-form" class="controls">
           <label>
@@ -47,7 +47,7 @@
           <label>
             表示
             <select id="view-mode">
-              <option value="set" selected>エキスパンション順</option>
+              <option value="set" selected>抜き出すセット順（元セット優先）</option>
               <option value="kind">種類別</option>
             </select>
           </label>
@@ -97,6 +97,7 @@
         <p id="preparation-help" hidden>直前環境の実績と新セットの追加準備候補を別々に表示します。構築適用日は発売日と異なる場合があります。新セット情報が未公開・未収録なら候補は未完備です。</p>
         <label for="sources">巡回元URL</label>
         <textarea id="sources" spellcheck="false"></textarea>
+        <p>発生源カードは選択フォーマットで使用可能な紙のカードを対象にします。MTGOの公開リストも参考にします。モダンは発生源の元セットにあるトークンを優先し、見つからないときは同じ仕様の別セット版を補充候補にします。</p>
       </section>
 
       <section class="status" id="status">フォーマットを選んで検索できます。</section>
@@ -106,6 +107,16 @@
       <section class="sampling-summary" id="sampling-summary"></section>
       <section class="environment-summary" id="environment-summary" hidden></section>
       <section class="summary" id="summary" hidden></section>
+      <section class="set-timeline" id="set-timeline" hidden aria-label="モダンのセット年表">
+        <header class="timeline-header">
+          <div><p class="timeline-eyebrow">PAPER MODERN / SET HISTORY</p><h2>どのセットから抜く？</h2></div>
+          <p id="timeline-counts" class="timeline-counts" aria-live="polite"></p>
+        </header>
+        <p id="timeline-note" class="timeline-note"></p>
+        <div class="timeline-legend"><span class="legend-needed">● 抜く必要あり</span><span class="legend-done">✓ 準備済み</span><span>— 今回は該当なし</span></div>
+        <div id="timeline-years" class="timeline-years"></div>
+        <div id="timeline-extra" class="timeline-extra" hidden></div>
+      </section>
       <section class="top-meta" id="top-meta" hidden></section>
       <section class="archetype-summary" id="archetype-summary" hidden></section>
       <section class="token-summary" id="token-summary" hidden></section>
@@ -460,7 +471,8 @@
     <template id="set-template">
       <section class="set-group">
         <header class="set-header">
-          <div>
+          <div class="set-heading">
+            <img class="group-set-symbol" alt="" hidden>
             <p class="set-code"></p>
             <h2></h2>
           </div>
@@ -493,6 +505,7 @@
             <span class="set-pill"></span>
           </div>
           <p class="note"></p>
+          <p class="prepared-notice" hidden></p>
           <div class="hints"></div>
           <div class="source-preview"></div>
           <details>
@@ -501,6 +514,10 @@
             <ul class="source-list"></ul>
           </details>
         </div>
+        <details class="alternative-prints" hidden>
+          <summary>このセットにない？ 別セット版を探す</summary>
+          <div class="alternative-content" aria-live="polite"></div>
+        </details>
       </article>
     </template>
 
@@ -519,6 +536,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20260926-gallery-v2" type="module"></script>
+    <script src="/app.js?v=20261002-shared-preparation" type="module"></script>
   </body>
 </html>

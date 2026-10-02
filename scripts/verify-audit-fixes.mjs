@@ -21,7 +21,7 @@ const candidates = tokens.map((token, index) => ({
   id: `source-${index}`, name: index === 3 ? "Ocelot Pride" : `Spirit Source ${index + 1}`, type_line: "Creature", set: "cmm", set_name: "Commander Masters",
   oracle_text: index === 3 ? "Create a Cat token. Create a token that's a copy of target creature." : `Create a ${token.power}/${token.toughness} Spirit creature token.`,
   image_uris: { normal: image(index === 3 ? "Ocelot Pride" : `Spirit Source ${index + 1}`, "#e8e0ca") },
-  all_parts: [{ ...token, component: "token", uri: `https://api.scryfall.com/cards/${token.id}` }], legalities: { modern: "legal" }
+  all_parts: [{ ...token, component: "token", uri: `https://api.scryfall.com/cards/${token.id}` }], games: ["paper"], legalities: { modern: "legal" }
 }));
 candidates.push({ id: "sidebar", name: "Sidebar Only", type_line: "Sorcery", oracle_text: "Create a token that's a copy of target creature." });
 const dfcs = [["Boggart Trawler", "Boggart Bog", "Creature", "Land"], ["Sink into Stupor", "Soporific Springs", "Instant", "Land"], ["Tamiyo, Inquisitive Student", "Tamiyo, Seasoned Scholar", "Creature", "Planeswalker"]]

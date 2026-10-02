@@ -11,9 +11,11 @@ import { clearPageCache, fetchPage } from "./lib/cache.js";
 import { formatEnvironmentInfo, isDateInEnvironment } from "./lib/environment.js";
 import { environmentUpdates, confirmedEvents } from "./lib/updates.js";
 import { fetchSetReleaseEvents, fetchSetCatalog } from "./lib/set-events.js";
+import { modernSetTimeline } from "./lib/modern-sets.js";
+import { fetchModernSourceOrigin } from "./lib/scryfall.js";
 import { preparationSetChoices } from "./lib/preparation-sets.js";
 import { preparationWindow, preparationSources, dateOnly } from "./lib/preparation.js";
-import { fetchPreparationSet, fetchJapaneseTokenPrintById } from "./lib/scryfall.js";
+import { fetchPreparationSet, fetchJapaneseTokenPrintById, fetchAlternateTokenPrintsById } from "./lib/scryfall.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
 import { fetchCardMetadata, fetchFinderCandidates, fetchSearchCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
 import { isVirtualObject } from "./public/object-identity.js";
@@ -374,7 +376,30 @@ app.post("/api/token-cards", async (c) => {
 
   const matched = findCardMentions(candidates, crawl.pages).slice(0, maxMatchedCards);
   const objectWarnings = [];
-  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings });
+  const catalog = format === "modern" ? await fetchSetCatalog() : { sets: [], warning: "" };
+  if (format === "modern" && catalog.sets.length) {
+    console.log(`[sets] resolving original Modern products for ${matched.length} source cards`);
+    const sets = new Map(catalog.sets.map((set) => [set.code, set]));
+    for (const source of matched) {
+      const origin = await fetchModernSourceOrigin(source.raw, sets, targetDate);
+      if (origin.note) objectWarnings.push(origin.note);
+      if (!origin.card) continue;
+      // Keep the source's image/link and its set label on the same printing.
+      const image = imageRefFor(origin.card);
+      source.raw = origin.card;
+      source.id = origin.card.id;
+      source.set = origin.card.set.toUpperCase();
+      source.setName = origin.card.set_name;
+      source.releasedAt = origin.card.released_at;
+      source.scryfallUri = origin.card.scryfall_uri;
+      source.image = image.url;
+      source.imageSource = image.source;
+      source.imageSourceLabel = image.sourceLabel;
+      source.imageSourceUrl = image.sourceUrl;
+    }
+    console.log("[sets] original products resolved; selecting matching token prints");
+  }
+  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings, preferSourceSet: format === "modern", targetDate });
   let preparationResult = null;
   if (preparation) {
     const warnings = [];
@@ -384,7 +409,7 @@ app.post("/api/token-cards", async (c) => {
       const sources = preparationSources(set.cards, format, preparation.startsAt);
       if (!sources.length) warnings.push("対象フォーマットの候補を確定できません。未収録または使用不可の可能性があります。");
       if (sources.some((source) => source.legalityUnconfirmed)) warnings.push("未発売カードを含みます。当日のフォーマット使用可否は未確認です。");
-      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings });
+      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings, preferSourceSet: format === "modern", targetDate });
       preparationResult = { ...preparationResult, setName: set.metadata.name, sourceCount: sources.length, fetchedAt: set.fetchedAt,
         status: "取得済み（公開・収録済み情報の範囲。新メカニズムの網羅性は未確認）",
         objects: extraObjects.map((object) => ({ ...object, preparationOnly: true, note: [object.note, "新セットの追加準備候補。採用実績による推薦ではありません。"].filter(Boolean).join(" ") })) };
@@ -406,12 +431,16 @@ app.post("/api/token-cards", async (c) => {
     targetDate,
     environmentStartDate,
     environment: { ...environment, events: undefined },
+    setTimeline: format === "modern" ? { sets: modernSetTimeline(catalog.sets, targetDate), warning: catalog.warning,
+      sourceUrl: "https://magic.wizards.com/en/formats/modern" } : null,
     preparation: preparationResult,
     objectWarnings,
     candidateWarnings: candidateResult.warnings,
     sourceUrls,
     scannedPages: crawl.pages.map((page) => page.url),
     errors: crawl.errors,
+    sourceWarnings: crawl.warnings,
+    duplicateDeckCount: crawl.duplicateDeckCount,
     cacheStats: crawl.cacheStats,
     siteStats: crawl.siteStats,
     requestedDeckCount: maxChildPages,
@@ -429,6 +458,21 @@ app.post("/api/token-cards", async (c) => {
     assetsDeferred: true
   });
   });
+});
+
+app.post("/api/token-alternatives", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const printId = String(body.printId || "");
+  if (!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(printId)) return c.json({ error: "印刷IDが不正です。" }, 400);
+  if (body.targetDate && !dateOnly(body.targetDate)) return c.json({ error: "大会日が不正です。" }, 400);
+  const now = new Date().toISOString().slice(0, 10);
+  const today = body.targetDate && body.targetDate < now ? body.targetDate : now;
+  try {
+    const alternatives = await fetchAlternateTokenPrintsById(printId, { today, includeCurrentProduct: body.includeCurrentProduct === true });
+    return c.json({ printId, alternatives, checkedThrough: today });
+  } catch (error) {
+    return c.json({ error: `別セット版を確認できませんでした: ${error.message}` }, 502);
+  }
 });
 
 app.post("/api/enrich-card-assets", async (c) => {
