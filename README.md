@@ -29,6 +29,7 @@ npm start
 | 変更履歴 | [docs/changelog.md](docs/changelog.md) |
 | 配布後の環境更新と配信手順 | [docs/environment-updates.md](docs/environment-updates.md) |
 | 2026年10月2日確認のモダン環境資料・再生成方法 | [MODERN ATLAS](reports/modern-meta-2026-10-01/README.md) |
+| スマートフォンでも開けるモダン環境資料 | [MODERN ATLAS 公開版](https://nobinko.github.io/mtg-token/) |
 
 ## 現在できること
 
