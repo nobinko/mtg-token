@@ -482,17 +482,18 @@ function renderEnvironmentSummary(environment) {
   environmentSummaryEl.append(list);
 }
 
-function renderDeckSummary(decks) {
+function renderDeckSummary(decks, { expanded = false } = {}) {
   deckSummaryEl.hidden = false;
   deckSummaryEl.replaceChildren();
   const visibleDecks = showAllDecks ? decks : decks.slice(0, initialDeckSummaryCount);
 
   const details = document.createElement("details");
   details.className = "summary-disclosure";
+  details.open = expanded;
 
   const heading = document.createElement("summary");
   heading.className = "deck-summary-heading";
-  heading.textContent = `検索したデッキ/リスト: ${decks.length}件（表示 ${visibleDecks.length}件）`;
+  heading.textContent = `検索済みの総数: ${decks.length}デッキ（一覧は${showAllDecks ? `全${visibleDecks.length}件` : `先頭${visibleDecks.length}件`}）`;
   details.append(heading);
 
   const list = document.createElement("div");
@@ -514,7 +515,7 @@ function renderDeckSummary(decks) {
     toggle.textContent = showAllDecks ? `先頭${initialDeckSummaryCount}件だけ表示` : `全${decks.length}件を表示`;
     toggle.addEventListener("click", () => {
       showAllDecks = !showAllDecks;
-      renderDeckSummary(decks);
+      renderDeckSummary(decks, { expanded: true });
     });
     details.append(toggle);
   }
