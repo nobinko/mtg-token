@@ -24,3 +24,21 @@ jobs:
       - run: npm test
 
       - run: node --check server.mjs
+
+      - name: Build the password-protected app from this commit
+        run: npm run build
+
+      - name: Verify the hosted runtime and source commit
+        run: node scripts/verify-hosted.mjs --release
+
+      - name: Save the tested hosted build
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: mtg-token-hosted-${{ github.sha }}
+          path: |
+            dist/
+            drizzle/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

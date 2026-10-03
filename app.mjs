@@ -4,6 +4,7 @@ import { streamSSE } from "hono/streaming";
 import { maxMatchedCards, seedPageMaxAgeMs } from "./lib/config.js";
 import { passwordGate } from "./lib/auth.js";
 import { hostedRuntime } from "./lib/runtime.js";
+import { buildInfo } from "./lib/build-info.js";
 import { defaultSources, formatOptions, normalizeFormat } from "./lib/data.js";
 import { toIsoDate, imageRefFor } from "./lib/util.js";
 import { clearPageCache, fetchPage } from "./lib/cache.js";
@@ -73,6 +74,7 @@ console.error = (...args) => {
 export const app = new Hono();
 app.use("*", passwordGate());
 app.get("/api/session", c => c.json({ protected: Boolean(hostedRuntime()) || process.env.AUTH_REQUIRED === "true" }));
+app.get("/api/version", c => c.json(buildInfo));
 app.use("/api/*", async (c, next) => {
   if (c.req.method === "POST") {
     const origin = c.req.header("origin");

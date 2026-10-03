@@ -21,6 +21,7 @@ try {
   const origin = "http://localhost";
   assert.equal((await mf.dispatchFetch(`${origin}/`, { redirect: "manual" })).status, 303);
   assert.equal((await mf.dispatchFetch(`${origin}/api/formats`)).status, 401);
+  assert.equal((await mf.dispatchFetch(`${origin}/api/version`)).status, 401);
   const login = await mf.dispatchFetch(`${origin}/login`, { method: "POST", headers: { origin, "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ password }).toString(), redirect: "manual" });
   assert.equal(login.status, 303);
   const headers = { cookie: login.headers.get("set-cookie").split(";")[0], origin };
@@ -28,6 +29,11 @@ try {
   assert.equal(page.status, 200);
   assert.match(await page.text(), /画像付き|deck-dialog/);
   assert.equal((await mf.dispatchFetch(`${origin}/app.js`, { headers })).status, 200);
+  const version = await (await mf.dispatchFetch(`${origin}/api/version`, { headers })).json();
+  const buildInfo = JSON.parse(await readFile("dist/build-info.json", "utf8"));
+  assert.equal(version.commitSha, buildInfo.commitSha);
+  assert.match(version.commitSha, /^[a-f0-9]{40}$/);
+  if (process.argv.includes("--release")) assert.equal(version.dirty, false, "未コミットの変更を含むビルドです。");
   const status = await (await mf.dispatchFetch(`${origin}/api/environment/status`, { headers })).json();
   assert.equal(status.revision, "同梱版");
   assert.equal((await mf.dispatchFetch(`${origin}/api/cache/clear`, { method: "POST", headers })).status, 200);

@@ -12,6 +12,8 @@
 
 `npm run build` で公開用Workerを生成します。D1スキーマを変更した場合は `npx drizzle-kit generate` で追加マイグレーションを生成してください。ローカル版の起動方法はこれまでどおりです。ローカルでも認証したい場合は `.env.example` を元に設定し、`node --env-file=.env server.mjs` で起動します。公開版は認証設定が欠けるとアクセスを拒否します。
 
+公開元はGitHubの`main`に統一します。自動公開の手順は [GitHub mainからの自動公開](docs/github-deployment.md) にまとめています。公開前に未コミット変更とGitHubの最新SHAを検証し、テスト・公開環境の確認に通った版だけを反映します。ログイン後の `/api/version` で公開中の元コミットを照合できます。
+
 ## すぐ使う
 
 リポジトリのフォルダにある **`start.bat`** をダブルクリックします。
