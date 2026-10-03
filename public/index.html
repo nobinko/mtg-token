@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MTG Token Finder</title>
-    <link rel="stylesheet" href="/styles.css?v=20261002-shared-preparation">
+    <link rel="stylesheet" href="/styles.css?v=20261003-token-decks">
   </head>
   <body>
     <main class="app">
@@ -137,7 +137,7 @@
       <div class="dialog-shell">
         <header class="dialog-header">
           <div>
-            <p class="dialog-kicker">トップメタの典型例</p>
+            <p id="deck-dialog-kicker" class="dialog-kicker">画像付きデッキリスト</p>
             <h2 id="deck-dialog-title">デッキリスト</h2>
           </div>
           <button id="deck-dialog-close" class="secondary-button dialog-close" type="button" aria-label="デッキリストを閉じる">閉じる</button>
@@ -508,6 +508,10 @@
           <p class="prepared-notice" hidden></p>
           <div class="hints"></div>
           <div class="source-preview"></div>
+          <details class="token-decks" hidden>
+            <summary></summary>
+            <div class="token-deck-list"></div>
+          </details>
           <details>
             <summary>これを出すカード / 採用元</summary>
             <ul class="source-card-list"></ul>
@@ -536,6 +540,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261002-shared-preparation" type="module"></script>
+    <script src="/app.js?v=20261003-token-decks" type="module"></script>
   </body>
 </html>

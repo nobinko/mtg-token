@@ -1,6 +1,7 @@
 import { createGoldfishController } from "./goldfish-ui.js?v=20260926-gallery-v2";
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261002-shared-preparation";
 import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
+import { decksForToken, sourcesForDeck, boardCount } from "./token-decks.js?v=20261003-token-decks";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -193,8 +194,10 @@ let lastSummaryData = null;
 const alternativePrintStates = new Map();
 let showAllDecks = false;
 let lastSearchedDeckCount = 0;
+let searchedDeckIndex = new Map();
+const openTokenDeckLists = new Set();
 let lastMetaContext = null;
-let loadedRepresentativeDeck = null;
+let loadedDeck = null;
 let representativeRequestId = 0;
 let checkedObjects = readCheckedObjects();
 const preparedStorageKey = "mtg-token-finder.prepared.v1";
@@ -495,12 +498,11 @@ function renderDeckSummary(decks) {
   const list = document.createElement("div");
   list.className = "deck-chip-list";
   for (const deck of visibleDecks) {
-    const link = document.createElement("a");
+    const link = document.createElement("button");
+    link.type = "button";
     link.className = "deck-chip";
-    link.href = deck.pageUrl || deck.url;
-    link.target = "_blank";
-    link.rel = "noreferrer";
     link.textContent = deck.title || deck.url;
+    link.addEventListener("click", () => openSearchedDeck(deck));
     list.append(link);
   }
   details.append(list);
@@ -599,12 +601,14 @@ function arenaDeckText(deck) {
   return `Deck\n${main}${side ? `\n\nSideboard\n${side}` : ""}`;
 }
 
-async function openRepresentativeDeck(entry) {
+function beginDeckDialog(title, kicker, status) {
   const requestId = ++representativeRequestId;
-  loadedRepresentativeDeck = null;
-  deckDialogTitle.textContent = entry.name;
+  loadedDeck = null;
+  hideHoverPreview();
+  deckDialogTitle.textContent = title;
+  document.querySelector("#deck-dialog-kicker").textContent = kicker;
   deckDialogStatus.className = "dialog-status";
-  deckDialogStatus.textContent = "直近の完全リストを比較して、典型例を選んでいます…";
+  deckDialogStatus.textContent = status;
   deckDialogMeta.replaceChildren();
   deckGallery.clear();
   deckMainboardCount.textContent = "";
@@ -612,6 +616,52 @@ async function openRepresentativeDeck(entry) {
   deckCopyButton.disabled = true;
   deckGoldfishButton.disabled = true;
   openDialog(deckDialog);
+  return requestId;
+}
+
+function renderDeckFacts(deck) {
+  const facts = document.createElement("p");
+  facts.textContent = [
+    deck.player ? `使用者: ${deck.player}` : "",
+    (deck.event || deck.eventName) ? `大会: ${deck.event || deck.eventName}` : "",
+    deck.placement ? `順位: ${deck.placement}` : "",
+    deck.eventDate ? `日付: ${deck.eventDate}` : ""
+  ].filter(Boolean).join(" / ");
+  if (facts.textContent) deckDialogMeta.append(facts);
+  const source = document.createElement("a");
+  source.href = deck.url || deck.pageUrl;
+  source.target = "_blank";
+  source.rel = "noopener noreferrer";
+  source.textContent = `原リストを開く — ${deck.title || deck.url}`;
+  deckDialogMeta.append(source);
+}
+
+function showDeckCards(deck) {
+  loadedDeck = { ...deck, mainboardCount: boardCount(deck.mainboard), sideboardCount: boardCount(deck.sideboard) };
+  deckMainboardCount.textContent = `${loadedDeck.mainboardCount}枚`;
+  deckSideboardCount.textContent = `${loadedDeck.sideboardCount}枚`;
+  deckGallery.setDeck(loadedDeck);
+  deckCopyButton.disabled = !loadedDeck.mainboardCount;
+  deckGoldfishButton.disabled = loadedDeck.mainboardCount < 60;
+}
+
+function openSearchedDeck(deck, object = null) {
+  beginDeckDialog(deck.archetype && deck.archetype !== "Unknown" ? deck.archetype : deck.title,
+    object ? `${object.japaneseName || object.name}を使うデッキ` : "検索したデッキの画像付きリスト", "");
+  if (object) {
+    const context = document.createElement("p");
+    context.textContent = `このトークンを出すカード: ${sourcesForDeck(object, deck).map((source) => source.name).join(" / ")}`;
+    deckDialogMeta.append(context);
+  }
+  renderDeckFacts(deck);
+  showDeckCards(deck);
+  deckDialogStatus.textContent = loadedDeck.mainboardCount >= 60
+    ? `検索で取得した実際のリスト / メイン${loadedDeck.mainboardCount}枚・サイド${loadedDeck.sideboardCount}枚`
+    : "枚数付きリストを一部しか取得できていません。取得できたカードを表示します。原リストも確認してください。";
+}
+
+async function openRepresentativeDeck(entry) {
+  const requestId = beginDeckDialog(entry.name, "トップメタの典型例", "直近の完全リストを比較して、典型例を選んでいます…");
 
   if (!lastMetaContext) {
     deckDialogStatus.textContent = "検索条件がありません。検索し直してください。";
@@ -632,7 +682,6 @@ async function openRepresentativeDeck(entry) {
     if (requestId !== representativeRequestId) return;
     if (!response.ok) throw new Error(data.error || "典型リストを取得できませんでした。");
 
-    loadedRepresentativeDeck = data.deck;
     deckDialogStatus.textContent = `${data.sampleSize}件の完全リストから選定 / 構成類似度 ${data.similarityPercent}%`;
     if (data.representativeScope?.note) {
       const scope = document.createElement("p");
@@ -642,33 +691,15 @@ async function openRepresentativeDeck(entry) {
     }
     const method = document.createElement("p");
     method.textContent = data.selectionMethod;
-    const facts = document.createElement("p");
-    const factParts = [
-      data.deck.player ? `使用者: ${data.deck.player}` : "",
-      data.deck.event ? `大会: ${data.deck.event}` : "",
-      data.deck.placement ? `順位: ${data.deck.placement}` : "",
-      data.deck.eventDate ? `日付: ${data.deck.eventDate}` : ""
-    ].filter(Boolean);
-    facts.textContent = factParts.join(" / ");
-    const source = document.createElement("a");
-    source.href = data.deck.pageUrl || data.deck.url;
-    source.target = "_blank";
-    source.rel = "noopener noreferrer";
-    source.textContent = `MTGTop8で原リストを開く — ${data.deck.title || entry.name}`;
     deckDialogMeta.append(method);
-    if (factParts.length) deckDialogMeta.append(facts);
-    deckDialogMeta.append(source);
+    renderDeckFacts(data.deck);
     if (data.warnings?.length) {
       const warning = document.createElement("p");
       warning.className = "dialog-warning";
       warning.textContent = `一部取得できなかった候補: ${data.warnings.length}件`;
       deckDialogMeta.append(warning);
     }
-    deckMainboardCount.textContent = `${data.deck.mainboardCount}枚`;
-    deckSideboardCount.textContent = `${data.deck.sideboardCount}枚`;
-    deckGallery.setDeck(data.deck);
-    deckCopyButton.disabled = false;
-    deckGoldfishButton.disabled = false;
+    showDeckCards(data.deck);
   } catch (error) {
     if (requestId !== representativeRequestId) return;
     deckDialogStatus.className = "dialog-status dialog-error";
@@ -1268,6 +1299,45 @@ async function loadAlternativePrints(key, state) {
   update();
 }
 
+function renderTokenDecks(details, object) {
+  const decks = decksForToken(object, searchedDeckIndex);
+  details.hidden = !decks.length;
+  if (!decks.length) return;
+  details.querySelector("summary").textContent = `このトークンを使うデッキ（画像付き）: ${decks.length}件`;
+  const key = objectKey(object);
+  const list = details.querySelector(".token-deck-list");
+  const render = () => {
+    if (list.childElementCount) return;
+    for (const deck of decks) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "token-deck-button";
+      button.setAttribute("aria-label", `${deck.title || deck.url}の画像付きデッキリストを開く`);
+      const title = document.createElement("strong");
+      title.textContent = deck.archetype && deck.archetype !== "Unknown" ? deck.archetype : deck.title;
+      const facts = document.createElement("span");
+      facts.textContent = [deck.player || deck.title, deck.eventDate,
+        `メイン${boardCount(deck.mainboard)}枚・サイド${boardCount(deck.sideboard)}枚`].filter(Boolean).join(" / ");
+      const source = document.createElement("span");
+      source.className = "token-deck-source";
+      source.textContent = `出すカード: ${sourcesForDeck(object, deck).map((card) => card.name).join(" / ")}`;
+      const action = document.createElement("span");
+      action.className = "token-deck-action";
+      action.textContent = "画像付きで開く →";
+      button.append(title, facts, source, action);
+      button.addEventListener("click", () => openSearchedDeck(deck, object));
+      list.append(button);
+    }
+  };
+  details.open = openTokenDeckLists.has(key);
+  if (details.open) render();
+  details.addEventListener("toggle", () => {
+    if (!details.isConnected) return;
+    if (details.open) { openTokenDeckLists.add(key); render(); }
+    else openTokenDeckLists.delete(key);
+  });
+}
+
 function renderObject(object) {
   const node = objectTemplate.content.cloneNode(true);
   const article = node.querySelector(".card");
@@ -1354,6 +1424,7 @@ function renderObject(object) {
   hints.append(bar);
   if (object.preparationOnly) bar.hidden = true;
   renderSourcePreview(sourcePreview, object.sourceCards);
+  renderTokenDecks(node.querySelector(".token-decks"), object);
 
   for (const sourceCard of object.sourceCards || []) {
     const item = document.createElement("li");
@@ -1606,6 +1677,8 @@ async function runSearch(event) {
   resultsEl.replaceChildren();
   preparationPanel.hidden = true;
   lastMetaContext = null;
+  searchedDeckIndex.clear();
+  openTokenDeckLists.clear();
   representativeRequestId += 1;
   if (deckDialog.open) deckDialog.close();
   if (goldfishDialog.open) goldfishDialog.close();
@@ -1637,6 +1710,7 @@ async function runSearch(event) {
     lastObjects = data.objects || [];
     lastSetTimeline = data.setTimeline || null;
     lastSearchedDeckCount = data.searchedDeckCount || 0;
+    searchedDeckIndex = new Map((data.searchedDecks || []).map((deck) => [deck.url, deck]));
     lastMetaContext = {
       logRunId: activeLogRunId,
       format: data.format,
@@ -1871,9 +1945,9 @@ for (const dialog of [deckDialog, goldfishDialog]) {
 }
 
 deckCopyButton.addEventListener("click", async () => {
-  if (!loadedRepresentativeDeck) return;
+  if (!loadedDeck) return;
   try {
-    await navigator.clipboard.writeText(arenaDeckText(loadedRepresentativeDeck));
+    await navigator.clipboard.writeText(arenaDeckText(loadedDeck));
     deckDialogStatus.textContent = "Arena形式をクリップボードへコピーしました。";
   } catch (error) {
     deckDialogStatus.textContent = `コピーできませんでした: ${error.message}`;
@@ -1881,7 +1955,7 @@ deckCopyButton.addEventListener("click", async () => {
 });
 
 deckGoldfishButton.addEventListener("click", () => {
-  if (loadedRepresentativeDeck) openGoldfish(loadedRepresentativeDeck);
+  if (loadedDeck) openGoldfish(loadedDeck);
 });
 
 formatSelect.addEventListener("change", updateSourcesForFormat);

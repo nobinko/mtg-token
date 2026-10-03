@@ -1512,6 +1512,17 @@ h3 {
   font-weight: 900;
 }
 
+.token-decks { margin-top: 12px; padding: 10px; border: 1px solid #a4c4b7; border-radius: 6px; background: #f1f7f3; }
+.token-decks > summary { color: #176a63; font-size: 13px; font-weight: 800; cursor: pointer; }
+.token-deck-list { display: grid; gap: 7px; max-height: 300px; overflow-y: auto; margin-top: 9px; }
+.token-deck-button { display: grid; gap: 5px; width: 100%; padding: 10px; border: 1px solid #c3d6cc; background: #fffdf8; color: #1e2528; text-align: left; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.token-deck-button:hover { background: #e5f0eb; border-color: #176a63; }
+.token-deck-button:focus-visible { outline: 2px solid #176a63; outline-offset: -2px; }
+.token-deck-button strong { color: #176a63; font-size: 14px; }
+.token-deck-source { color: #5d6668; }
+.token-deck-action { color: #176a63; font-weight: 800; }
+@media print { .token-decks { display: none; } }
+
 .source-mini {
   position: relative;
   display: grid;
@@ -1811,7 +1822,8 @@ summary {
   }
 
   .deck-card-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px 8px;
   }
 
   .dialog-actions {
