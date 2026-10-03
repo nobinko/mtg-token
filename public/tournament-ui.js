@@ -20,7 +20,9 @@ export function createTournamentController({ form, formatSelect, targetDateInput
     document.querySelector(".sources").hidden = active;
     for (const id of ["event-scale", "usage-threshold", "confidence", "max-pages", "use-cache", "refresh-cache"]) document.querySelector(`#${id}`).closest("label").hidden = active;
     for (const id of ["sampling-summary", "clear-cache-button", "update-environment-button", "update-status"]) document.querySelector(`#${id}`).hidden = active;
-    document.querySelector("#search-button").textContent = active ? "この大会のトークンを探す" : "検索";
+    document.querySelector("#search-advanced").hidden = active;
+    document.querySelector("#search-button").hidden = active;
+    document.querySelector("#search-button").textContent = "必要なトークンを探す";
     document.querySelector("#search-button").disabled = searching || active && !ready();
     onChange();
   }

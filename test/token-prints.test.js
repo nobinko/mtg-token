@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { chooseTokenPrint, chooseAlternateTokenPrints, sameTokenIdentity, tokenPrintRank, sourceTokenProducts } from "../lib/token-prints.js";
+import { chooseTokenPrint, chooseAlternateTokenPrints, sameTokenIdentity, tokenPrintRank, sourceTokenProducts, stockTokenProduct } from "../lib/token-prints.js";
 import { fetchPreferredTokenPrint, fetchAlternateTokenPrintsById } from "../lib/scryfall.js";
 
 const setList = [
@@ -12,7 +12,13 @@ const setList = [
   { code: "teld", set_type: "token", parent_set_code: "eld" },
   { code: "eld", set_type: "expansion" },
   { code: "tinr", set_type: "token", parent_set_code: "inr" },
-  { code: "inr", set_type: "masters" }
+  { code: "inr", set_type: "masters" },
+  { code: "tm21", set_type: "token", parent_set_code: "m21" },
+  { code: "m21", set_type: "core" },
+  { code: "tmh3", set_type: "token", parent_set_code: "mh3" },
+  { code: "mh3", set_type: "draft_innovation" },
+  { code: "ttdc", set_type: "token", parent_set_code: "tdc" },
+  { code: "tdc", set_type: "commander", parent_set_code: "tdm" }
 ];
 const sets = new Map(setList.map((set) => [set.code, set]));
 const original = { id: "special", oracle_id: "goblin-1-1", name: "Goblin", type_line: "Token Creature — Goblin", oracle_text: "", power: "1", toughness: "1", colors: ["R"], set: "sld", lang: "en", games: ["paper"], released_at: "2026-05-18", booster: false };
@@ -100,8 +106,43 @@ test("alternate 1/1 Cats must match color, abilities, type, faces and oracle ide
     { digital: true, games: ["arena"] }, { released_at: "2099-01-01" }]
     .map((delta, index) => ({ ...eld, id: `wrong-cat-${index}`, ...delta }));
   const candidates = [cat, commander, ...wrong, { ...eld, id: "eld-promo", promo: true, released_at: "2025-01-01" }, eld];
-  assert.deepEqual(chooseAlternateTokenPrints(cat, candidates, sets, { today: "2026-10-02" }).map((card) => card.id), ["eld-cat", "cmd-cat"]);
+  assert.deepEqual(chooseAlternateTokenPrints(cat, candidates, sets, { today: "2026-10-02" }).map((card) => card.id), ["eld-cat"]);
   assert.deepEqual(chooseAlternateTokenPrints(cat, [cat], sets), []);
+});
+
+test("stock suggestions allow expansion and core only, never special fallback or a commander child of an expansion", () => {
+  const core = { ...regular, id: "core", set: "tm21" };
+  const excluded = ["tcmd", "tinr", "tmh3", "ttdc", "unknown"].map(set => ({ ...regular, id: set, set }));
+  excluded.push({ ...regular, id: "promo", promo: true }, { ...regular, id: "showcase", frame_effects: ["showcase"] });
+  for (const card of excluded) assert.equal(stockTokenProduct(card, sets), null, card.id);
+  assert.equal(stockTokenProduct(core, sets).code, "m21");
+  assert.equal(chooseTokenPrint(original, excluded, sets, { stockOnly: true }), null);
+  assert.deepEqual(chooseAlternateTokenPrints(original, [core, ...excluded], sets).map(card => card.id), ["core"]);
+});
+
+test("stock lookup does not shortcut Masters references and keeps the needed identity when no ordinary print exists", async (t) => {
+  const masters = { ...regular, id: "stock-masters", oracle_id: "stock-oracle", set: "tinr" };
+  const core = { ...masters, id: "stock-core", set: "tm21" };
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/sets") return Response.json({ data: setList });
+    const query = parsed.searchParams.get("q") || "";
+    if (query.includes("oracleid:stock-failure")) return new Response("unavailable", { status: 400 });
+    return Response.json({ data: query.includes("oracleid:stock-oracle ") ? [masters, core] : [] });
+  });
+  const result = await fetchPreferredTokenPrint(masters, { stockOnly: true });
+  assert.equal(result.card.id, core.id);
+  assert.equal(result.productCode, "m21");
+  assert.equal(result.stockStatus, "available");
+  const missing = { ...masters, id: "stock-missing", oracle_id: "stock-missing" };
+  const fallback = await fetchPreferredTokenPrint(missing, { stockOnly: true });
+  assert.equal(fallback.card.id, missing.id, "Retain required token specification, not a procurement suggestion");
+  assert.equal(fallback.productCode, undefined);
+  assert.equal(fallback.printUnconfirmed, true);
+  assert.equal(fallback.stockStatus, "not-found");
+  const failed = await fetchPreferredTokenPrint({ ...masters, id: "stock-failure", oracle_id: "stock-failure" }, { stockOnly: true });
+  assert.equal(failed.stockStatus, "unconfirmed");
+  assert.equal(failed.printUnconfirmed, true);
 });
 
 test("alternative lookup reuses paginated print data, maps token sets to physical products and rejects non-token cards", async (t) => {

@@ -2,7 +2,7 @@ import { createGoldfishController } from "./goldfish-ui.js?v=20260926-gallery-v2
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261002-shared-preparation";
 import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
 import { decksForToken, sourcesForDeck, boardCount } from "./token-decks.js?v=20261003-token-decks";
-import { createTournamentController } from "./tournament-ui.js?v=20261003-melee";
+import { createTournamentController } from "./tournament-ui.js?v=20261003-stock-ui";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -980,6 +980,8 @@ function renderTags(container, labels) {
 function sortGroups(groups) {
   const direction = setSortSelect.value === "asc" ? 1 : -1;
   return [...groups].sort((a, b) => {
+    const order = group => group.set === "NEEDS-PREPARATION" ? 2 : group.set === "HELPERS" ? 1 : 0;
+    if (order(a) !== order(b)) return order(a) - order(b);
     const dateA = a.releasedAt || "0000-00-00";
     const dateB = b.releasedAt || "0000-00-00";
     const dateOrder = dateA.localeCompare(dateB) * direction;
@@ -1078,23 +1080,18 @@ function setSymbol(set, className = "") {
 }
 
 function renderSetTimeline() {
-  setTimelineEl.hidden = !lastSetTimeline;
-  if (!lastSetTimeline) return;
+  setTimelineEl.hidden = !lastSummaryData;
+  if (!lastSummaryData) return;
   const groups = groupsBySetClient([...new Map([...lastObjects, ...lastPreparationObjects].map((object) => [objectKey(object), object])).values()]);
   const byCode = new Map(groups.map((group) => [group.set, group]));
-  const sets = lastSetTimeline.sets || [];
-  const needed = groups.filter((group) => group.objects.some((object) => !objectIsPrepared(object))).length;
-  const done = groups.length - needed;
-  document.querySelector("#timeline-counts").textContent = `${sets.length}セット ／ 未準備 ${needed} ／ 準備済み ${done}`;
+  const sets = lastSetTimeline?.sets || [];
+  const stockGroups = groups.filter(group => !["HELPERS", "NEEDS-PREPARATION"].includes(group.set));
+  const needed = stockGroups.filter(group => group.objects.some(object => !objectIsPrepared(object))).length;
+  document.querySelector("#timeline-counts").textContent = "抜き出し先 " + stockGroups.length + "セット ／ 未準備 " + needed + "セット";
   const note = document.querySelector("#timeline-note");
-  note.replaceChildren(document.createTextNode("大会日までに発売されたモダン収録セットを全表示。色付きのセットからトークン等を抜き出せます。該当なしは今回の検索範囲での結果です。 "));
-  const reference = document.createElement("a");
-  reference.href = lastSetTimeline.sourceUrl;
-  reference.textContent = "モダンの収録範囲";
-  reference.target = "_blank";
-  reference.rel = "noreferrer";
-  note.append(reference);
-  if (lastSetTimeline.warning) note.append(document.createTextNode(` ${lastSetTimeline.warning}`));
+  note.textContent = "通常拡張セット・基本セットから、同じ仕様のトークンを抜き出します。セットを押すと準備表へ移動します。";
+  if (lastSetTimeline?.warning) note.append(document.createTextNode(lastSetTimeline.warning));
+  document.querySelector(".timeline-history").hidden = !sets.length;
 
   function tile(set) {
     const group = byCode.get(set.code);
@@ -1105,12 +1102,12 @@ function renderSetTimeline() {
     button.type = "button";
     button.className = `timeline-set ${remaining ? "needs-pulling" : objects.length ? "all-picked" : "no-matches"}`;
     button.dataset.set = set.code;
-    const state = remaining ? `● 抜く ${remaining}種` : objects.length ? `✓ ${shared ? "共有済" : "準備済"} ${objects.length}種` : "— 該当なし";
-    button.title = `${set.name}\n${set.releasedAt}\n${objects.map((object) => { const record = preparedRecord(object, preparedRecords); return `${object.japaneseName || object.name}${record ? `: ${record.set}で抜き出し済み` : ""}`; }).join("、") || "今回の検索では準備候補なし"}`;
+    const state = remaining ? `● ${["HELPERS", "NEEDS-PREPARATION"].includes(set.code) ? "用意" : "抜く"} ${remaining}種` : objects.length ? `✓ ${shared ? "共有済" : "準備済"} ${objects.length}種` : "— 該当なし";
+    button.title = `${set.name}\n${set.releasedAt}\n${objects.map((object) => { const record = preparedRecord(object, preparedRecords); return `${object.japaneseName || object.name}${record ? `: ${preparedLocation(record)}で準備済み` : ""}`; }).join("、") || "今回の検索では準備候補なし"}`;
     button.setAttribute("aria-label", `${set.code} ${set.name} ${state}`);
     if (set.iconSvgUri) button.append(setSymbol(set, "timeline-symbol"));
     const code = document.createElement("strong");
-    code.textContent = set.code;
+    code.textContent = set.code === "HELPERS" ? "汎用補助" : set.code === "NEEDS-PREPARATION" ? "別途用意" : set.code;
     const status = document.createElement("span");
     status.className = "timeline-set-status";
     status.textContent = state;
@@ -1129,6 +1126,10 @@ function renderSetTimeline() {
     return button;
   }
 
+  document.querySelector("#timeline-needed").replaceChildren(...sortGroups(stockGroups).map(group => tile({
+    code: group.set, name: group.setName, releasedAt: group.releasedAt,
+    iconSvgUri: sets.find(set => set.code === group.set)?.iconSvgUri
+  })));
   const years = document.querySelector("#timeline-years");
   const scrollTop = years.scrollTop;
   years.replaceChildren();
@@ -1150,14 +1151,13 @@ function renderSetTimeline() {
     years.append(row);
   }
   years.scrollTop = scrollTop;
-  const knownCodes = new Set(sets.map((set) => set.code));
   const extra = document.querySelector("#timeline-extra");
-  const extraGroups = groups.filter((group) => !knownCodes.has(group.set));
+  const extraGroups = groups.filter(group => ["HELPERS", "NEEDS-PREPARATION"].includes(group.set));
   extra.hidden = !extraGroups.length;
   extra.replaceChildren();
   if (extraGroups.length) {
     const label = document.createElement("p");
-    label.textContent = "別製品から補充する候補（上のモダン収録セットには含めません）";
+    label.textContent = "セットからの抜き出しと別に準備するもの";
     const products = document.createElement("div");
     products.className = "timeline-products";
     products.append(...extraGroups.map((group) => tile({ code: group.set, name: group.setName, releasedAt: group.releasedAt })));
@@ -1231,10 +1231,10 @@ function renderAlternativeContents(details, state) {
     return;
   }
   if (!state.alternatives.length) {
-    message.textContent = "同じ仕様の別セット版は、取得できた紙の印刷情報では見つかりませんでした。";
+    message.textContent = "同じ仕様の通常拡張セット・基本セット版は見つかりませんでした。統率者・マスターズなどの特殊製品は候補に含めません。";
     return;
   }
-  message.textContent = `同じ仕様の別セット版が ${state.alternatives.length}セットにあります。「ここで抜いた」で準備元を記録すると、ほかのセットの同じ仕様にも共有されます。画像は英語版です。`;
+  message.textContent = `通常拡張セット・基本セットの ${state.alternatives.length}セットから抜き出せます。色・サイズ・タイプ・能力が同じ紙の版です。「ここで抜いた」で同じ仕様にも準備チェックを共有します。`;
   const list = document.createElement("div");
   list.className = "alternative-grid";
   for (const print of state.alternatives) {
@@ -1341,6 +1341,10 @@ function renderTokenDecks(details, object) {
   });
 }
 
+function preparedLocation(record) {
+  return record.set === "NEEDS-PREPARATION" ? "別途用意" : record.set === "HELPERS" ? "汎用の補助カード" : record.set;
+}
+
 function renderObject(object) {
   const node = objectTemplate.content.cloneNode(true);
   const article = node.querySelector(".card");
@@ -1372,11 +1376,11 @@ function renderObject(object) {
   article.classList.toggle("is-checked", Boolean(record));
   article.classList.toggle("is-covered", shared);
   picked.checked = Boolean(record);
-  picked.nextElementSibling.textContent = shared ? "共有済み" : "抜いた";
+  picked.nextElementSibling.textContent = shared ? "共有済み" : object.virtual || object.printUnconfirmed ? "用意した" : "抜いた";
   picked.addEventListener("change", () => pickObject(object, picked.checked));
   const preparedNotice = node.querySelector(".prepared-notice");
   preparedNotice.hidden = !record;
-  if (record) preparedNotice.textContent = `${record.set}で抜き出し済み${shared ? "。同じ仕様なので、ここでは追加で抜く必要はありません。" : "。ほかのセットの同じ仕様にも共有されます。"}`;
+  if (record) preparedNotice.textContent = `${preparedLocation(record)}で準備済み${shared ? "。同じ仕様なので、ここでは追加で抜く必要はありません。" : "。ほかのセットの同じ仕様にも共有されます。"}`;
 
   imageLink.href = object.scryfallUri;
   imageLink.hidden = object.printUnconfirmed === true;
@@ -1395,7 +1399,7 @@ function renderObject(object) {
   deckCount.textContent = `${priority.label}: ${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks (${priority.percent.toFixed(1)}%)`;
   if (object.preparationOnly) deckCount.textContent = "追加準備候補・採用率未評価";
   deckCount.classList.add(priority.className);
-  setPill.textContent = object.printUnconfirmed ? `元セット ${object.set} の現物未確認` : `現物の印刷元: ${object.set}${object.releasedAt ? ` / ${object.releasedAt}` : ""}`;
+  setPill.textContent = object.virtual ? "汎用の補助カードで準備" : object.printUnconfirmed ? object.stockStatus === "not-found" ? "通常セット版未確認・別途用意" : "通常セット版の取得が未完了" : `抜き出し先: ${object.set}${object.releasedAt ? ` / ${object.releasedAt}` : ""}`;
   note.textContent = object.note || "";
   note.hidden = !object.note;
   const alternativeDetails = node.querySelector(".alternative-prints");
@@ -1418,7 +1422,8 @@ function renderObject(object) {
     });
   }
 
-  renderTags(hints, [object.kind, object.category, `画像:${imageSource.label}`].filter(Boolean));
+  hints.hidden = !object.virtual;
+  if (object.virtual) renderTags(hints, ["画像は発生源カード"]);
   const bar = document.createElement("div");
   bar.className = "token-frequency";
   const fill = document.createElement("span");
@@ -1505,7 +1510,9 @@ function renderGroups(groups, container = resultsEl) {
     const count = groupNode.querySelector(".count");
     const grid = groupNode.querySelector(".object-grid");
 
-    const printLabel = viewModeSelect.value === "set" ? "ここから抜く: " : "";
+    const specialGroup = ["HELPERS", "NEEDS-PREPARATION"].includes(group.set);
+    section.classList.toggle("special-group", specialGroup);
+    const printLabel = viewModeSelect.value === "set" && !specialGroup ? "ここから抜く: " : "";
     const set = lastSetTimeline?.sets.find((item) => item.code === group.set);
     const symbol = groupNode.querySelector(".group-set-symbol");
     if (viewModeSelect.value === "set" && set?.iconSvgUri) {
@@ -1513,7 +1520,7 @@ function renderGroups(groups, container = resultsEl) {
       symbol.hidden = false;
       symbol.addEventListener("error", () => { symbol.hidden = true; }, { once: true });
     }
-    code.textContent = `${printLabel}${group.releasedAt ? `${group.set} / ${group.releasedAt}` : group.set}`;
+    code.textContent = specialGroup ? group.set === "HELPERS" ? "補助カードで対応" : "通常セット版未確認・取得未完了" : `${printLabel}${group.releasedAt ? `${group.set} / ${group.releasedAt}` : group.set}`;
     title.textContent = group.setName;
     const remaining = group.objects.filter((object) => !objectIsPrepared(object)).length;
     count.textContent = `${group.count}種類 / 未準備 ${remaining}`;
@@ -1526,10 +1533,41 @@ function renderGroups(groups, container = resultsEl) {
   }
 }
 
+function renderPreparationOverview() {
+  const overview = document.querySelector("#preparation-overview");
+  const ready = Boolean(lastSummaryData);
+  for (const id of ["preparation-overview", "results-toolbar", "search-details", "meta-details"]) document.querySelector(`#${id}`).hidden = !ready;
+  if (!ready) return;
+  overview.replaceChildren();
+  const objects = [...new Map([...lastObjects, ...lastPreparationObjects].map(object => [preparationKey(object), object])).values()];
+  const prepared = objects.filter(objectIsPrepared).length;
+  const unavailable = objects.filter(object => object.printUnconfirmed && !objectIsPrepared(object)).length;
+  const stats = document.createElement("div");
+  stats.className = "preparation-stats";
+  for (const [label, value] of [["必要な種類", objects.length], ["未準備", objects.length - prepared], ["準備済み", prepared], ["別途用意・要確認", unavailable]]) {
+    const stat = document.createElement("div"), count = document.createElement("strong"), caption = document.createElement("span");
+    count.textContent = value; caption.textContent = label; stat.append(count, caption); stats.append(stat);
+  }
+  const progress = document.createElement("progress");
+  progress.max = Math.max(objects.length, 1); progress.value = prepared;
+  progress.setAttribute("aria-label", `準備済み ${prepared} / ${objects.length}種類`);
+  overview.append(stats, progress);
+  const data = lastSummaryData;
+  const basis = document.createElement("p");
+  basis.textContent = `${data.tournament ? "この大会の提出リスト" : "環境の公開リスト"} ${data.searchedDeckCount || 0}件から作成。必要数は同じ仕様をまとめた種類数です。`;
+  overview.append(basis);
+  const warnings = [...(data.sourceWarnings || [])];
+  if (data.sourceExhausted && data.requestedDeckCount && data.searchedDeckCount < data.requestedDeckCount) warnings.push(`指定 ${data.requestedDeckCount}件に対し、取得できたリストは ${data.searchedDeckCount}件です。`);
+  if ((data.errors || []).length || data.unparsedDeckCount) warnings.push(`取得・抽出できなかったリストがあります。検索範囲・照合の詳細を確認してください。`);
+  if (unavailable) warnings.push(`通常セット版が見つからない、または取得未完了の ${unavailable}種類は「別途用意するもの」に残しています。`);
+  for (const warning of new Set(warnings)) { const p = document.createElement("p"); p.className = "sampling-warn"; p.textContent = warning; overview.append(p); }
+}
+
 function renderCurrentResults() {
   hideHoverPreview();
   if (migratePreparedRecords([...lastObjects, ...lastPreparationObjects], checkedObjects, preparedRecords)) savePreparedRecords();
   if (lastSummaryData) renderSummary(lastSummaryData);
+  renderPreparationOverview();
   renderSetTimeline();
   const groups = viewModeSelect.value === "kind" ? groupsByKind(lastObjects) : groupsBySetClient(lastObjects);
   renderGroups(groups);
@@ -1553,7 +1591,7 @@ function uniqueSourceCards(objects) {
 function objectAssetRequests(objects) {
   return objects.map((object) => ({
     key: objectKey(object),
-    printId: object.printId || "",
+    printId: object.printUnconfirmed ? "" : object.printId || "",
     name: object.name,
     kind: object.kind,
     typeLine: object.typeLine,
@@ -1671,6 +1709,7 @@ async function runSearch(event) {
   environmentSummaryEl.hidden = true;
   environmentSummaryEl.replaceChildren();
   summaryEl.hidden = true;
+  for (const id of ["preparation-overview", "results-toolbar", "search-details", "meta-details"]) document.querySelector(`#${id}`).hidden = true;
   setTimelineEl.hidden = true;
   lastSetTimeline = null;
   lastSummaryData = null;
@@ -1762,6 +1801,7 @@ async function runSearch(event) {
     renderTokenSummary(lastObjects);
     renderDeckSummary(data.searchedDecks || []);
     renderCurrentResults();
+    document.querySelector("#preparation-overview").scrollIntoView({ behavior: "smooth", block: "start" });
     if (data.assetsDeferred) {
       enrichCurrentAssets(runId);
     }
@@ -1782,7 +1822,7 @@ const logClearBtn = document.querySelector("#log-clear-btn");
 const logToggleBtn = document.querySelector("#log-toggle-btn");
 const logPanelHeader = document.querySelector("#log-panel-header");
 
-let logCollapsed = false;
+let logCollapsed = true;
 
 const appEl = document.querySelector(".app");
 

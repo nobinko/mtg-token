@@ -106,7 +106,7 @@ body {
 .app {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 24px 24px 290px; /* 下は展開ログパネル分の余白 */
+  padding: 24px 24px 72px;
 }
 
 .legal-note {
@@ -3002,3 +3002,67 @@ summary {
     max-width: 76px;
   }
 }
+
+/* Preparation worksheet: keep the task visible, with context on demand. */
+.app-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0 22px; }
+.app-header h1 { font-size: 27px; margin: 4px 0 0; }
+.app-eyebrow { font-size: 12px; color: #176a63; font-weight: 750; }
+.app-header #logout-form { margin: 0; }
+.toolbar { display: block; padding: 22px; border: 1px solid #d5cec0; border-radius: 12px; background: #fffdf8; }
+.source-mode { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 0 24px; gap: 12px; }
+.source-mode legend { font-size: 15px; color: #1e2528; font-weight: 750; margin-bottom: 12px; }
+.source-mode label { padding: 14px 16px; align-items: center; }
+.source-mode label > span { display: grid; gap: 5px; }
+.source-mode small { color: #665f56; font-size: 12px; font-weight: 400; }
+.step-number { display: inline-grid; place-items: center; width: 23px; height: 23px; margin-right: 5px; border-radius: 50%; background: #176a63; color: #fff; font-size: 12px; font-weight: 750; vertical-align: middle; }
+.step-heading { margin: 0 0 12px; font-size: 15px; }
+.search-main { display: grid; grid-template-columns: .85fr 1.1fr 1.3fr 1fr; gap: 14px; }
+.search-main label, .search-main input, .search-main select { width: 100%; min-width: 0; }
+.search-main #search-button { grid-column: 1 / -1; justify-self: end; margin-top: 4px; min-width: 245px; }
+.settings-details { padding-top: 16px; }
+.settings-details > summary, .result-details > summary, .timeline-history > summary { cursor: pointer; color: #665f56; font-size: 13px; padding: 10px 0; }
+.settings-details > .controls { margin: 12px 0; }
+.sources { margin: 12px 0; padding: 5px 20px; border: 1px solid #d5cec0; border-radius: 8px; background: #faf7f1; }
+.sources > label, .sources > .controls, .sources > textarea, .sources > p { margin-top: 12px; }
+.sources > p:last-child { margin-bottom: 15px; }
+.preparation-overview { margin: 24px 0 12px; padding: 20px; background: #fffdf8; border: 1px solid #d5cec0; border-radius: 12px; }
+.preparation-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.preparation-stats > div { display: grid; gap: 5px; border-left: 2px solid #d5cec0; padding-left: 14px; }
+.preparation-stats strong { font-size: 28px; line-height: 1.1; color: #176a63; }
+.preparation-stats > div:nth-child(2) strong { color: #965b20; }
+.preparation-stats span { font-size: 12px; color: #665f56; }
+.preparation-overview progress { display: block; width: 100%; height: 7px; margin: 20px 0 12px; accent-color: #176a63; }
+.preparation-overview p { font-size: 12px; line-height: 1.7; margin-top: 6px; }
+.results-toolbar { gap: 12px 18px; margin: 16px 0; padding: 12px 0; }
+.results-toolbar label { width: auto; }
+.results-toolbar .check-control { display: flex; align-self: end; }
+.results-toolbar button { width: auto; }
+.needed-products { margin: 14px 0; }
+.needed-products:empty::after { content: "通常セットからの抜き出し候補はありません。下の別途準備欄と取得状況を確認してください。"; font-size: 12px; color: #665f56; }
+.timeline-history { margin-top: 14px; border-top: 1px solid #e9e2d6; }
+.timeline-extra .timeline-set { width: 155px; }
+.result-details { margin: 16px 0; border-top: 1px solid #d5cec0; padding: 4px 0; }
+.special-group .set-header { border-color: #b49c78; }
+.card:has(.image-link[hidden]) { grid-template-columns: 1fr; padding-top: 44px; }
+button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #176a63; outline-offset: 3px; }
+@media (max-width: 720px) {
+  .app { padding: 12px 16px 72px; }
+  .toolbar { padding: 16px; }
+  .app-header h1 { font-size: 22px; }
+  .source-mode { gap: 8px; margin-bottom: 20px; }
+  .source-mode label { padding: 12px 9px; gap: 7px; font-size: 13px; }
+  .source-mode small { font-size: 11px; line-height: 1.5; }
+  .search-main { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .search-main #search-button { width: 100%; min-width: 0; }
+  .results-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 12px; }
+  .results-toolbar label, .results-toolbar select, .results-toolbar button { width: 100%; min-width: 0; }
+  .results-toolbar .check-control { grid-column: 2; grid-row: 2; }
+  .results-toolbar #print-button { grid-column: 1 / -1; }
+  .preparation-overview { padding: 16px; }
+  .preparation-stats { gap: 8px; }
+  .preparation-stats > div { padding-left: 8px; }
+  .preparation-stats strong { font-size: 24px; }
+  .preparation-stats span { font-size: 10px; line-height: 1.5; }
+  .timeline-header h2 { font-size: 20px; }
+}
+@media print { .app-header, .results-toolbar, .timeline-history, .result-details { display: none !important; } }

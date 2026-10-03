@@ -432,7 +432,7 @@ app.post("/api/token-cards", async (c) => {
     }
     console.log("[sets] original products resolved; selecting matching token prints");
   }
-  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings, preferSourceSet: format === "modern", targetDate });
+  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings, preferSourceSet: true, stockOnly: true, targetDate });
   let preparationResult = null;
   if (preparation) {
     const warnings = [];
@@ -442,7 +442,7 @@ app.post("/api/token-cards", async (c) => {
       const sources = preparationSources(set.cards, format, preparation.startsAt);
       if (!sources.length) warnings.push("対象フォーマットの候補を確定できません。未収録または使用不可の可能性があります。");
       if (sources.some((source) => source.legalityUnconfirmed)) warnings.push("未発売カードを含みます。当日のフォーマット使用可否は未確認です。");
-      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings, preferSourceSet: format === "modern", targetDate });
+      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings, preferSourceSet: true, stockOnly: true, targetDate });
       preparationResult = { ...preparationResult, setName: set.metadata.name, sourceCount: sources.length, fetchedAt: set.fetchedAt,
         status: "取得済み（公開・収録済み情報の範囲。新メカニズムの網羅性は未確認）",
         objects: extraObjects.map((object) => ({ ...object, preparationOnly: true, note: [object.note, "新セットの追加準備候補。採用実績による推薦ではありません。"].filter(Boolean).join(" ") })) };

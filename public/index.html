@@ -7,96 +7,76 @@
     <meta name="robots" content="noindex,nofollow">
     <link rel="icon" href="/favicon.svg">
     <script type="module" src="/session.js"></script>
-    <link rel="stylesheet" href="/styles.css?v=20261003-melee">
+    <link rel="stylesheet" href="/styles.css?v=20261003-stock-ui">
   </head>
   <body>
     <main class="app">
+      <header class="app-header">
+        <div><p class="app-eyebrow">大会のトークン準備表</p><h1>MTG Token Finder</h1></div>
+        <form id="logout-form" action="/logout" method="post" hidden><button type="submit">ログアウト</button></form>
+      </header>
       <section class="toolbar" aria-label="検索条件">
-        <div>
-          <h1>MTG Token Finder</h1>
-          <p>紙の大会で使うトークン・紋章などを、デッキリストから探す準備表です。</p>
-          <fieldset class="source-mode">
-            <legend>準備に使うリスト</legend>
-            <label><input type="radio" name="source-mode" value="environment" checked>環境全体から探す</label>
-            <label><input type="radio" name="source-mode" value="tournament">この大会のリストで準備</label>
-          </fieldset>
-          <form id="logout-form" action="/logout" method="post" hidden><button type="submit">ログアウト</button></form>
-        </div>
-        <form id="search-form" class="controls">
-          <label>
+        <fieldset class="source-mode">
+          <legend><span class="step-number">1</span> 使うデッキリスト</legend>
+          <label><input type="radio" name="source-mode" value="environment" checked><span><strong>環境から探す</strong><small>最近の入賞リストから準備</small></span></label>
+          <label><input type="radio" name="source-mode" value="tournament"><span><strong>この大会で準備</strong><small>Melee・受け取った提出リスト</small></span></label>
+        </fieldset>
+        <form id="search-form" class="search-settings">
+          <h2 class="step-heading"><span class="step-number">2</span> 大会の条件</h2>
+          <div class="controls search-main"><label>
             フォーマット
             <select id="format"></select>
           </label>
-          <label>
+<label>
             大会日
             <input id="target-date" type="date">
           </label>
-          <label>
+<label>
             大会規模
             <select id="event-scale">
-              <option value="spotlight" selected>Spotlight / 大型オープン</option>
-              <option value="premier">PT / RC級</option>
+              <option value="spotlight" selected>大型オープン</option>
+              <option value="premier">PT・RC級</option>
               <option value="medium">中規模競技</option>
-              <option value="local">店舗/小規模</option>
+              <option value="local">店舗・小規模</option>
               <option value="custom">手動</option>
             </select>
           </label>
-          <label>
-            一般採用ライン
-            <input id="usage-threshold" type="number" min="0.1" max="10" step="0.1" value="1">
-          </label>
-          <label>
-            検出信頼度
-            <input id="confidence" type="number" min="80" max="99.9" step="0.1" value="95">
-          </label>
-          <label>
+<label>
             検索デッキ/リスト数
             <input id="max-pages" type="number" min="20" max="600" value="300">
           </label>
-          <label>
-            表示
-            <select id="view-mode">
-              <option value="set" selected>抜き出すセット順（元セット優先）</option>
-              <option value="kind">種類別</option>
-            </select>
-          </label>
-          <label>
-            エキスパンション順
-            <select id="set-sort">
-              <option value="desc" selected>発売日 新しい順</option>
-              <option value="asc">発売日 古い順</option>
-            </select>
-          </label>
-          <div class="lang-toggle" role="group" aria-label="カード画像言語">
-            <span class="lang-toggle-label">画像言語</span>
-            <div class="lang-toggle-buttons">
-              <button type="button" class="lang-btn lang-btn-active" data-lang="en" title="英語画像を表示">EN</button>
-              <button type="button" class="lang-btn" data-lang="ja" title="日本語画像があるカードだけ日本語画像に切替">JA</button>
-            </div>
+            <button id="search-button" type="submit">必要なトークンを探す</button>
           </div>
-          <label class="check-control">
-            <input id="hide-checked" type="checkbox">
-            未チェックだけ
+          <details id="search-advanced" class="settings-details"><summary>検索の細かい設定・データの更新</summary>
+            <div class="controls"><label>
+            一般採用ライン
+            <input id="usage-threshold" type="number" min="0.1" max="10" step="0.1" value="1">
           </label>
-          <label class="check-control">
+<label>
+            検出信頼度
+            <input id="confidence" type="number" min="80" max="99.9" step="0.1" value="95">
+          </label>
+<label class="check-control">
             <input id="use-cache" type="checkbox" checked>
             巡回キャッシュを使う
           </label>
-          <label class="check-control">
+<label class="check-control">
             <input id="refresh-cache" type="checkbox">
             今回は再取得
           </label>
-          <button id="search-button" type="submit">検索</button>
-          <button id="print-button" type="button">印刷</button>
-          <button id="clear-cache-button" type="button">キャッシュ削除</button>
-          <button id="update-environment-button" type="button">環境データを更新</button>
+              <button id="clear-cache-button" type="button" class="secondary-button">キャッシュ削除</button>
+              <button id="update-environment-button" type="button" class="secondary-button">環境データを更新</button>
+            </div>
+            <section class="sampling-summary" id="sampling-summary"></section>
+            <section class="status" id="update-status" aria-live="polite">環境データの状態を確認しています。</section>
+          </details>
         </form>
       </section>
 
       <section id="tournament-panel" class="tournament-panel" hidden aria-labelledby="tournament-title">
         <div class="tournament-heading"><div><p class="timeline-eyebrow">TOURNAMENT DECKLISTS</p><h2 id="tournament-title">当日の提出リストで準備する</h2></div><button type="button" id="tournament-yokohama" class="secondary-button">今回の横浜大会を入力</button></div>
         <p class="tournament-note">この大会で読み込んだリストだけから必要トークンを探します。上のフォーマットと大会日を確認してください。</p>
-        <div class="tournament-url-row"><label>Meleeの大会URL<input id="tournament-url" type="url" placeholder="https://melee.gg/Tournament/View/411350" autocomplete="off"></label><button id="tournament-load" type="button">大会を読み込む</button><a id="tournament-open" hidden target="_blank" rel="noopener noreferrer">Meleeを開く ↗</a></div>
+        <div class="tournament-url-row"><label>Meleeの大会URL<input id="tournament-url" type="url" placeholder="https://melee.gg/Tournament/View/411350" autocomplete="off"></label><button id="tournament-load" type="button" class="secondary-button">保存済みを読み込む</button><a id="tournament-open" hidden target="_blank" rel="noopener noreferrer">Meleeを開く ↗</a></div>
         <p id="tournament-status" class="tournament-note" role="status">登録済みのリストを大会URLから呼び出せます。初回は下から取り込んでください。</p>
         <details id="tournament-import" open>
           <summary>大会から受け取ったリストを取り込む</summary>
@@ -112,7 +92,7 @@
         <button id="tournament-search" type="button" hidden>この大会のトークンを探す</button>
       </section>
 
-      <section class="sources">
+      <details class="sources settings-details"><summary>取得元・新セット直後の追加準備</summary>
         <label class="check-control"><input id="preparation-mode" type="checkbox">新セット直後の準備モード（全フォーマット共通）</label>
         <div class="controls" id="preparation-controls" hidden>
           <label class="preparation-choice">対象セット<select id="preparation-set-choice" aria-describedby="preparation-set-description"><option value="">大会日に合う候補を取得します</option></select></label>
@@ -125,37 +105,67 @@
         <p id="preparation-help" hidden>直前環境の実績と新セットの追加準備候補を別々に表示します。構築適用日は発売日と異なる場合があります。新セット情報が未公開・未収録なら候補は未完備です。</p>
         <label for="sources">巡回元URL</label>
         <textarea id="sources" spellcheck="false"></textarea>
-        <p>発生源カードは選択フォーマットで使用可能な紙のカードを対象にします。MTGOの公開リストも参考にします。モダンは発生源の元セットにあるトークンを優先し、見つからないときは同じ仕様の別セット版を補充候補にします。</p>
-      </section>
+        <p>発生源カードは選択フォーマットで使用可能な紙のカードを対象にします。MTGOの公開リストも参考にします。抜き出す候補は通常の拡張セット・基本セットだけ。同じ仕様のものが見つからない場合は「別途用意するもの」に残します。</p>
+      </details>
 
       <section class="status" id="status">フォーマットを選んで検索できます。</section>
-      <section class="status" id="update-status" aria-live="polite">環境データの状態を確認しています。</section>
       <section class="status" id="result-freshness" hidden></section>
+      <section id="preparation-overview" class="preparation-overview" hidden aria-label="準備の進み具合"></section>
+      <section id="results-toolbar" class="results-toolbar controls" hidden aria-label="準備表の表示設定">
+        <label>
+            表示
+            <select id="view-mode">
+              <option value="set" selected>抜き出すセット別</option>
+              <option value="kind">種類別</option>
+            </select>
+          </label>
+        <label>
+            並び順
+            <select id="set-sort">
+              <option value="desc" selected>発売日 新しい順</option>
+              <option value="asc">発売日 古い順</option>
+            </select>
+          </label>
+        <div class="lang-toggle" role="group" aria-label="カード画像言語">
+            <span class="lang-toggle-label">画像言語</span>
+            <div class="lang-toggle-buttons">
+              <button type="button" class="lang-btn lang-btn-active" data-lang="en" title="英語画像を表示">EN</button>
+              <button type="button" class="lang-btn" data-lang="ja" title="日本語画像があるカードだけ日本語画像に切替">JA</button>
+            </div>
+          </div>
 
-      <section class="sampling-summary" id="sampling-summary"></section>
-      <section class="environment-summary" id="environment-summary" hidden></section>
-      <section class="summary" id="summary" hidden></section>
-      <section class="set-timeline" id="set-timeline" hidden aria-label="モダンのセット年表">
+        <label class="check-control">
+            <input id="hide-checked" type="checkbox">
+            未準備だけ
+          </label>
+        <button id="print-button" type="button" class="secondary-button">準備表を印刷</button>
+      </section>
+      <section class="set-timeline" id="set-timeline" hidden aria-label="抜き出すセット">
         <header class="timeline-header">
-          <div><p class="timeline-eyebrow">PAPER MODERN / SET HISTORY</p><h2>どのセットから抜く？</h2></div>
+          <div><p class="timeline-eyebrow">PREPARATION</p><h2><span class="step-number">3</span> 抜き出すセット</h2></div>
           <p id="timeline-counts" class="timeline-counts" aria-live="polite"></p>
         </header>
         <p id="timeline-note" class="timeline-note"></p>
+        <div id="timeline-needed" class="timeline-products needed-products"></div>
+        <details class="timeline-history"><summary>モダンの収録セット年表を見る</summary>
         <div class="timeline-legend"><span class="legend-needed">● 抜く必要あり</span><span class="legend-done">✓ 準備済み</span><span>— 今回は該当なし</span></div>
         <div id="timeline-years" class="timeline-years"></div>
+        </details>
         <div id="timeline-extra" class="timeline-extra" hidden></div>
       </section>
-      <section class="top-meta" id="top-meta" hidden></section>
-      <section class="archetype-summary" id="archetype-summary" hidden></section>
-      <section class="token-summary" id="token-summary" hidden></section>
-      <section class="deck-summary" id="deck-summary" hidden></section>
-
       <section class="results" id="results" aria-live="polite"></section>
       <section id="preparation-results" hidden aria-live="polite">
         <h2>新セット分・追加準備候補</h2>
         <p id="preparation-status"></p>
         <div id="preparation-objects"></div>
       </section>
+      <details id="search-details" class="result-details" hidden><summary>検索範囲・照合の詳細</summary><section class="environment-summary" id="environment-summary" hidden></section><section class="summary" id="summary" hidden></section></details>
+      <details id="meta-details" class="result-details" hidden><summary>採用デッキ・環境の内訳</summary>      <section class="top-meta" id="top-meta" hidden></section>
+      <section class="archetype-summary" id="archetype-summary" hidden></section>
+      <section class="token-summary" id="token-summary" hidden></section>
+      <section class="deck-summary" id="deck-summary" hidden></section>
+
+</details>
       <footer class="legal-note">
         Unofficial Fan Content. Magic: The Gathering のカード画像・テキスト等は Wizards of the Coast に帰属します。このツールは Wizards of the Coast / Scryfall 非公認です。
       </footer>
@@ -547,14 +557,14 @@
           </details>
         </div>
         <details class="alternative-prints" hidden>
-          <summary>このセットにない？ 別セット版を探す</summary>
+          <summary>手元の通常セットから別版を探す</summary>
           <div class="alternative-content" aria-live="polite"></div>
         </details>
       </article>
     </template>
 
     <!-- ログパネル -->
-    <div id="log-panel" class="log-panel">
+    <div id="log-panel" class="log-panel log-panel-collapsed">
       <div class="log-panel-header" id="log-panel-header">
         <span class="log-panel-title">
           <span class="log-dot" id="log-dot"></span>
@@ -562,12 +572,12 @@
         </span>
         <span class="log-panel-actions">
           <button type="button" id="log-clear-btn" class="log-action-btn">クリア</button>
-          <button type="button" id="log-toggle-btn" class="log-action-btn log-toggle-icon">▼</button>
+          <button type="button" id="log-toggle-btn" class="log-action-btn log-toggle-icon">▲</button>
         </span>
       </div>
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261003-melee" type="module"></script>
+    <script src="/app.js?v=20261003-stock-ui" type="module"></script>
   </body>
 </html>

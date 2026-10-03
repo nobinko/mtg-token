@@ -9,14 +9,23 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const temporary = await mkdtemp(join(tmpdir(), "mtg-audit-fixes-"));
 const cacheMode = process.argv.find((arg) => arg.startsWith("--cache="))?.split("=")[1] || "fresh";
 const image = (label, color = "#dae7df") => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="240" height="335"><rect width="240" height="335" rx="14" fill="${color}"/><text x="16" y="45" font-family="sans-serif" font-size="17">${label}</text><text x="16" y="295" font-family="sans-serif" font-size="14">LOCAL TEST FIXTURE</text></svg>`)}`;
-const sets = [{ code: "tcmm", set_type: "token", parent_set_code: "cmm" }, { code: "cmm", name: "Commander Masters", set_type: "masters" }, { code: "fra", name: "Fixture Set", set_type: "expansion", released_at: "2026-10-02" }];
+const sets = [{ code: "tcmm", set_type: "token", parent_set_code: "cmm" }, { code: "cmm", name: "Commander Masters", set_type: "masters" }, { code: "fra", name: "Fixture Set", set_type: "expansion", released_at: "2026-10-02" },
+  { code: "teld", set_type: "token", parent_set_code: "eld" }, { code: "eld", name: "Throne of Eldraine", set_type: "expansion", released_at: "2019-10-04" },
+  { code: "tm21", set_type: "token", parent_set_code: "m21" }, { code: "m21", name: "Core Set 2021", set_type: "core", released_at: "2020-07-03" },
+  { code: "ttdm", set_type: "token", parent_set_code: "tdm" }, { code: "tdm", name: "Tarkir: Dragonstorm", set_type: "expansion", released_at: "2025-04-11" }];
 const pack = { schemaVersion: 1, minimumReaderVersion: 1, verifiedThrough: "2026-09-26", events: [{ date: "2026-09-01", type: "banned-restricted", title: "ローカル検証用の環境境界", sourceUrl: "https://example.test/fixture", formatsAffected: ["standard", "pioneer", "modern", "legacy"] }] };
 const tokens = [
   { id: "colorless-spirit", oracle_id: "colorless-spirit", name: "Spirit", colors: [], power: "2", toughness: "2", oracle_text: "" },
   { id: "white-spirit", oracle_id: "white-spirit", name: "Spirit", colors: ["W"], power: "1", toughness: "1", oracle_text: "Flying" },
   { id: "white-black-spirit", oracle_id: "white-black-spirit", name: "Spirit", colors: ["W", "B"], power: "1", toughness: "1", oracle_text: "Flying" },
-  { id: "cat", oracle_id: "cat", name: "Cat", colors: ["W"], power: "1", toughness: "1", oracle_text: "" }
+  { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", oracle_id: "cat", name: "Cat", colors: ["W"], power: "1", toughness: "1", oracle_text: "" }
 ].map((card) => ({ ...card, type_line: `Token Creature — ${card.name}`, set: "tcmm", set_name: "Commander Masters Tokens", lang: "en", games: ["paper"], released_at: "2023-08-04", image_uris: { normal: image(`${card.name} ${card.power}/${card.toughness} ${card.colors.join("") || "C"}`) }, scryfall_uri: "https://example.test/token" }));
+const ordinaryPrints = [
+  { ...tokens[0], id: "colorless-m21", set: "tm21", set_name: "Core Set 2021 Tokens", released_at: "2020-07-03" },
+  { ...tokens[1], id: "white-eld", set: "teld", set_name: "Throne of Eldraine Tokens", released_at: "2019-10-04" },
+  { ...tokens[3], id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", set: "ttdm", set_name: "Tarkir: Dragonstorm Tokens", released_at: "2025-04-11" },
+  { ...tokens[3], id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", set: "teld", set_name: "Throne of Eldraine Tokens", released_at: "2019-10-04" }
+];
 const candidates = tokens.map((token, index) => ({
   id: `source-${index}`, name: index === 3 ? "Ocelot Pride" : `Spirit Source ${index + 1}`, type_line: "Creature", set: "cmm", set_name: "Commander Masters",
   oracle_text: index === 3 ? "Create a Cat token. Create a token that's a copy of target creature." : `Create a ${token.power}/${token.toughness} Spirit creature token.`,
@@ -64,9 +73,9 @@ globalThis.fetch = async (url, options = {}) => {
       if (basic) return Response.json({ data: [{ name: basic[0], lang: "ja", printed_name: basic[1], image_uris: { normal: image(basic[1]) } }] });
       return Response.json({ data: [] });
     }
-    return Response.json({ data: tokens.filter((card) => q.includes(`oracleid:${card.oracle_id} `)) });
+    return Response.json({ data: [...tokens, ...ordinaryPrints].filter((card) => q.includes(`oracleid:${card.oracle_id} `)) });
   }
-  const token = tokens.find((card) => parsed.pathname === `/cards/${card.id}`);
+  const token = [...tokens, ...ordinaryPrints].find((card) => parsed.pathname === `/cards/${card.id}`);
   if (token) return Response.json(token);
   throw new Error(`Unmocked fixture request: ${url}`);
 };

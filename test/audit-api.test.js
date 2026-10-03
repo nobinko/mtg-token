@@ -45,6 +45,15 @@ for (const cacheMode of ["fresh", "stale", "missing"]) {
     assert.equal(result.status, 200, logs);
     assert.equal(result.body.searchedDeckCount, 1, logs);
     assert.equal(result.body.objects.filter((object) => object.name === "Spirit").length, 3);
+    assert.equal(result.body.objects.some(object => object.set === "CMM"), false, "Special products never become pulling groups");
+    const unavailable = result.body.objects.find(object => object.colors?.includes("B"));
+    assert.equal(unavailable.set, "NEEDS-PREPARATION");
+    assert.equal(unavailable.stockStatus, "not-found");
+    assert.equal(unavailable.image, "", "Do not show a special-product image as a stock suggestion");
+    const stockCat = result.body.objects.find(object => object.name === "Cat");
+    assert.equal(stockCat.set, "TDM");
+    assert.equal(stockCat.stockStatus, "available");
+    assert.equal(result.body.objects.find(object => object.virtual).set, "HELPERS");
     assert.equal(result.body.cards.some((card) => card.name === "Sidebar Only"), false);
     const stats = messageOf(child, "stats");
     child.send("stats");
@@ -52,6 +61,9 @@ for (const cacheMode of ["fresh", "stale", "missing"]) {
     if (cacheMode === "missing") assert.match(result.body.candidateWarnings.join(""), /保存した候補/);
 
     if (cacheMode === "fresh") {
+      const alternatives = await post("/api/token-alternatives", { printId: stockCat.printId, targetDate: "2026-09-26" });
+      assert.equal(alternatives.status, 200, logs);
+      assert.deepEqual(alternatives.body.alternatives.map(print => print.set), ["ELD"]);
       const url = "https://melee.gg/Tournament/View/411350";
       const tournamentInput = { action: "import", url, format: "modern", targetDate: "2026-10-03", name: "Actual field", participants: 537,
         files: [{ content: JSON.stringify([{ player: "Actual player", mainboard: [{ name: "Ocelot Pride", count: 4 }, { name: "Unresolved Card", count: 1 }, { name: "Island", count: 55 }], sideboard: [] }]) }] };
