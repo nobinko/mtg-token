@@ -51,6 +51,38 @@ for (const cacheMode of ["fresh", "stale", "missing"]) {
     assert.equal((await stats).candidateRequests, cacheMode === "fresh" ? 0 : 1);
     if (cacheMode === "missing") assert.match(result.body.candidateWarnings.join(""), /保存した候補/);
 
+    if (cacheMode === "fresh") {
+      const url = "https://melee.gg/Tournament/View/411350";
+      const tournamentInput = { action: "import", url, format: "modern", targetDate: "2026-10-03", name: "Actual field", participants: 537,
+        files: [{ content: JSON.stringify([{ player: "Actual player", mainboard: [{ name: "Ocelot Pride", count: 4 }, { name: "Unresolved Card", count: 1 }, { name: "Island", count: 55 }], sideboard: [] }]) }] };
+      const imported = await post("/api/tournament", tournamentInput);
+      assert.equal(imported.status, 200, logs);
+      assert.equal(imported.body.missingCount, 536);
+      assert.equal(imported.body.coverageComplete, false);
+      const loaded = await post("/api/tournament", { action: "load", url });
+      assert.equal(loaded.body.fetchedAt, imported.body.fetchedAt);
+      const eventInput = { ...input, sourceMode: "tournament", targetDate: tournamentInput.targetDate, tournamentUrl: url, tournamentRevision: imported.body.fetchedAt, preparation: { setCode: "fra", startsAt: "2026-10-02" } };
+      const event = await post("/api/token-cards", eventInput);
+      assert.equal(event.status, 200, logs);
+      assert.equal(event.body.sourceMode, "tournament");
+      assert.equal(event.body.searchedDeckCount, 1);
+      assert.equal(event.body.searchedDecks[0].player, "Actual player");
+      assert.deepEqual(event.body.sourceUrls, [url]);
+      assert.equal(event.body.cards.some(card => card.name.startsWith("Spirit")), false, "Historical fixture decks must not enter the actual field");
+      assert.equal(event.body.cards.some(card => card.name === "Ocelot Pride"), true);
+      assert.equal(event.body.objects.some(object => object.name === "Cat"), true);
+      assert.equal(event.body.requestedDeckCount, null);
+      assert.equal(event.body.preparation, null);
+      assert.equal(event.body.unresolvedCardCount, 1);
+      assert.match(event.body.candidateWarnings.join(""), /Unresolved Card/);
+      assert.equal((await post("/api/token-cards", { ...eventInput, format: "pioneer" })).status, 409);
+      assert.equal((await post("/api/token-cards", { ...eventInput, targetDate: "2026-10-04" })).status, 409);
+      assert.equal((await post("/api/token-cards", { ...eventInput, tournamentRevision: "old" })).status, 409);
+      assert.equal((await post("/api/token-cards", { ...eventInput, tournamentUrl: "https://melee.gg/Tournament/View/999" })).status, 400);
+      assert.equal((await post("/api/tournament", { ...tournamentInput, files: [{ content: "bad" }] })).status, 400);
+      assert.equal((await post("/api/tournament", { action: "load", url })).body.fetchedAt, imported.body.fetchedAt, "Failed reimport preserves the saved lists");
+    }
+
     if (cacheMode !== "fresh") return;
     const marker = result.body.objects.find((object) => object.kind === "Marker");
     const enriched = await post("/api/enrich-card-assets", { objects: [{ ...marker, key: objectKey(marker), sourceNames: ["Ocelot Pride"] }] });

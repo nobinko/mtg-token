@@ -50,7 +50,7 @@ globalThis.fetch = async (url, options = {}) => {
   if (parsed.pathname === "/sets/fra") return Response.json(sets[2]);
   if (parsed.pathname === "/cards/collection") {
     const names = JSON.parse(options.body).identifiers.map((item) => item.name);
-    return Response.json({ data: names.map((name) => dfcs.find((card) => card.name === name || card.card_faces.some((face) => face.name === name)) || { name, type_line: name === "Island" ? "Basic Land — Island" : "Creature", image_uris: { normal: image(name) } }), not_found: [] });
+    return Response.json({ data: names.filter(name => name !== "Unresolved Card").map((name) => candidates.find(card => card.name === name) || dfcs.find((card) => card.name === name || card.card_faces.some((face) => face.name === name)) || { name, type_line: name === "Island" ? "Basic Land — Island" : "Creature", image_uris: { normal: image(name) } }), not_found: names.filter(name => name === "Unresolved Card").map(name => ({ name })) });
   }
   if (parsed.pathname === "/cards/search") {
     const q = parsed.searchParams.get("q") || "";

@@ -2,6 +2,7 @@ import { createGoldfishController } from "./goldfish-ui.js?v=20260926-gallery-v2
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261002-shared-preparation";
 import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
 import { decksForToken, sourcesForDeck, boardCount } from "./token-decks.js?v=20261003-token-decks";
+import { createTournamentController } from "./tournament-ui.js?v=20261003-melee";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -408,6 +409,7 @@ function renderSummary(data) {
 
   const mainLine = document.createElement("div");
   mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物候補 ${data.objects.length}件（同じ仕様をまとめると ${uniqueCount}種類）。準備済み ${checkedCount}/${data.objects.length}件（別セットで抜いた同じ仕様も含む）。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}${unparsedText}。`;
+  if (data.tournament) mainLine.textContent = mainLine.textContent.replace(/^\d+ページを巡回、/, "大会の提出リストを照合、");
   summaryEl.append(mainLine);
   if (data.duplicateDeckCount) {
     const duplicateLine = document.createElement("div");
@@ -630,10 +632,10 @@ function renderDeckFacts(deck) {
   ].filter(Boolean).join(" / ");
   if (facts.textContent) deckDialogMeta.append(facts);
   const source = document.createElement("a");
-  source.href = deck.url || deck.pageUrl;
+  source.href = deck.imported ? deck.originalUrl || deck.pageUrl : deck.url || deck.pageUrl;
   source.target = "_blank";
   source.rel = "noopener noreferrer";
-  source.textContent = `原リストを開く — ${deck.title || deck.url}`;
+  source.textContent = deck.imported && !deck.originalUrl ? "Meleeの大会ページを開く" : `原リストを開く — ${deck.title || deck.url}`;
   deckDialogMeta.append(source);
 }
 
@@ -657,7 +659,7 @@ function openSearchedDeck(deck, object = null) {
   renderDeckFacts(deck);
   showDeckCards(deck);
   deckDialogStatus.textContent = loadedDeck.mainboardCount >= 60
-    ? `検索で取得した実際のリスト / メイン${loadedDeck.mainboardCount}枚・サイド${loadedDeck.sideboardCount}枚`
+    ? `${deck.imported ? "大会用に取り込んだリスト" : "検索で取得した実際のリスト"} / メイン${loadedDeck.mainboardCount}枚・サイド${loadedDeck.sideboardCount}枚`
     : "枚数付きリストを一部しか取得できていません。取得できたカードを表示します。原リストも確認してください。";
 }
 
@@ -725,7 +727,7 @@ function renderArchetypeSummary(archetypes) {
 
   const heading = document.createElement("summary");
   heading.className = "deck-summary-heading";
-  heading.textContent = `検索サンプルの自動推定（参考）: ${sortedArchetypes.length}タイプ`;
+  heading.textContent = `${lastSummaryData?.tournament ? "大会リスト" : "検索サンプル"}の自動推定（参考）: ${sortedArchetypes.length}タイプ`;
   details.append(heading);
 
   const caveat = document.createElement("p");
@@ -1650,14 +1652,19 @@ async function enrichCurrentAssets(runId) {
 
 async function runSearch(event) {
   event.preventDefault();
-  if (preparationMode.checked && preparationLoading) { setStatus("セット候補の取得完了を待ってから検索してください。"); return; }
-  if (preparationMode.checked && (!/^[a-z0-9]{2,8}$/i.test(preparationSet.value.trim()) || !preparationDate.value || preparationDate.value > targetDateInput.value)) {
+  if (tournamentUI.isSearching()) return;
+  let tournamentPayload = {};
+  try { if (tournamentUI.isActive()) tournamentPayload = tournamentUI.payload(); }
+  catch (error) { setStatus(error.message); return; }
+  if (!tournamentUI.isActive() && preparationMode.checked && preparationLoading) { setStatus("セット候補の取得完了を待ってから検索してください。"); return; }
+  if (!tournamentUI.isActive() && preparationMode.checked && (!/^[a-z0-9]{2,8}$/i.test(preparationSet.value.trim()) || !preparationDate.value || preparationDate.value > targetDateInput.value)) {
     setStatus("対象セットを選び、大会日以前の構築適用日を確認してください。"); return;
   }
   const runId = searchRunId + 1;
   searchRunId = runId;
   activeLogRunId = `${logSessionId}-${runId}`;
   const button = searchButton;
+  tournamentUI.setSearching(true);
   button.disabled = true;
   updateEnvironmentButton.disabled = true;
   resultFreshnessEl.hidden = true;
@@ -1687,13 +1694,14 @@ async function runSearch(event) {
   preparationObjectsEl.replaceChildren();
   logContent.replaceChildren();
   appendLog({ line: "この検索のログだけを表示します。", runId: activeLogRunId }, { force: true });
-  setStatus("検索中。数百件規模だとScryfall照合、関連トークン取得、各サイト巡回でしばらく時間がかかります。");
+  setStatus(tournamentUI.isActive() ? "この大会のリストからカード情報と必要トークンを照合しています。" : "検索中。数百件規模だとScryfall照合、関連トークン取得、各サイト巡回でしばらく時間がかかります。");
 
   try {
     const response = await fetch("/api/token-cards", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
+        ...tournamentPayload,
         logRunId: activeLogRunId,
         format: formatSelect.value,
         targetDate: targetDateInput.value,
@@ -1701,11 +1709,12 @@ async function runSearch(event) {
         maxChildPages: Number(maxPagesInput.value),
         useCache: useCacheInput.checked,
         refreshCache: refreshCacheInput.checked,
-        preparation: preparationMode.checked ? { setCode: preparationSet.value.trim(), startsAt: preparationDate.value } : null
+        preparation: !tournamentUI.isActive() && preparationMode.checked ? { setCode: preparationSet.value.trim(), startsAt: preparationDate.value } : null
       })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "検索に失敗しました。");
+    if (runId !== searchRunId) return;
 
     lastGroups = data.groups || [];
     lastObjects = data.objects || [];
@@ -1725,7 +1734,10 @@ async function runSearch(event) {
     };
     showAllDecks = false;
     setStatus("検索完了。チェックしながら、バルクのエキスパンション順または種類別で探せます。");
-    renderEnvironmentSummary(data.preparation ? { ...data.preparation.previous, targetDate: data.preparation.endDate,
+    if (data.tournament) {
+      environmentSummaryEl.hidden = false;
+      environmentSummaryEl.textContent = `大会の提出リスト: ${data.tournament.name} / ${data.searchedDeckCount}件。採用率は読み込めたリストを母数にします。`;
+    } else renderEnvironmentSummary(data.preparation ? { ...data.preparation.previous, targetDate: data.preparation.endDate,
       reason: `直前環境からの準備候補（${data.preparation.startDate}〜${data.preparation.endDate}）。${data.preparation.warning}` } : data.environment || {});
     preparationPanel.hidden = !data.preparation;
     lastPreparationObjects = data.preparation?.objects || [];
@@ -1737,14 +1749,15 @@ async function runSearch(event) {
     resultFreshnessEl.hidden = false;
     const revisionLabel = !data.environment?.dataRevision || data.environment.dataRevision === "同梱版"
       ? "同梱版（本体付属）" : data.environment.dataRevision;
-    resultFreshnessEl.textContent = `検索に使用した環境履歴: ${revisionLabel}。${data.environment?.temporalNote || ""}`;
+    resultFreshnessEl.textContent = data.tournament ? `大会リスト取り込み日時: ${new Date(data.tournament.fetchedAt).toLocaleString("ja-JP")}。他大会のリストは含めていません。` : `検索に使用した環境履歴: ${revisionLabel}。${data.environment?.temporalNote || ""}`;
     if (migrated.resetCount) resultFreshnessEl.textContent += " 旧形式の準備チェックは同名トークンの区別を確認できないため解除しました。現物を確認してチェックし直してください。";
     if (data.candidateWarnings?.length) resultFreshnessEl.textContent += ` ${data.candidateWarnings.join(" ")}`;
     if (data.objectWarnings?.length) resultFreshnessEl.textContent += ` 現物情報の未完備: ${data.objectWarnings.join(" ")}`;
     lastSummaryData = data;
     if (migratePreparedRecords([...lastObjects, ...lastPreparationObjects], checkedObjects, preparedRecords)) savePreparedRecords();
     renderSummary(data);
-    renderTopMeta(data.topMeta);
+    if (data.tournament) topMetaEl.hidden = true;
+    else renderTopMeta(data.topMeta);
     renderArchetypeSummary(data.archetypes || []);
     renderTokenSummary(lastObjects);
     renderDeckSummary(data.searchedDecks || []);
@@ -1755,7 +1768,8 @@ async function runSearch(event) {
   } catch (error) {
     setStatus(`エラー: ${error.message}`);
   } finally {
-    button.disabled = false;
+    tournamentUI.setSearching(false);
+    button.disabled = tournamentUI.isActive() && !tournamentUI.ready();
     updateEnvironmentButton.disabled = false;
   }
 }
@@ -1976,6 +1990,10 @@ setSortSelect.addEventListener("change", renderCurrentResults);
 viewModeSelect.addEventListener("change", renderCurrentResults);
 hideCheckedInput.addEventListener("change", renderCurrentResults);
 form.addEventListener("submit", runSearch);
+const tournamentUI = createTournamentController({ form, formatSelect, targetDateInput, onConditionsLoaded: updateSourcesForFormat, onChange: () => {
+  searchRunId += 1;
+  if (lastSummaryData) { resultFreshnessEl.hidden = false; resultFreshnessEl.textContent = "条件変更前の結果です。選択したリストで再検索してください。"; }
+} });
 printButton.addEventListener("click", () => window.print());
 clearCacheButton.addEventListener("click", clearCache);
 updateEnvironmentButton.addEventListener("click", updateEnvironment);

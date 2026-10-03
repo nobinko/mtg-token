@@ -22,6 +22,7 @@ try {
   assert.equal((await mf.dispatchFetch(`${origin}/`, { redirect: "manual" })).status, 303);
   assert.equal((await mf.dispatchFetch(`${origin}/api/formats`)).status, 401);
   assert.equal((await mf.dispatchFetch(`${origin}/api/version`)).status, 401);
+  assert.equal((await mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST" })).status, 401);
   const login = await mf.dispatchFetch(`${origin}/login`, { method: "POST", headers: { origin, "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ password }).toString(), redirect: "manual" });
   assert.equal(login.status, 303);
   const headers = { cookie: login.headers.get("set-cookie").split(";")[0], origin };
@@ -29,6 +30,18 @@ try {
   assert.equal(page.status, 200);
   assert.match(await page.text(), /画像付き|deck-dialog/);
   assert.equal((await mf.dispatchFetch(`${origin}/app.js`, { headers })).status, 200);
+  assert.equal((await mf.dispatchFetch(`${origin}/tournament-ui.js`, { headers })).status, 200);
+  const tournamentUrl = "https://melee.gg/Tournament/View/411350";
+  const importResponse = await mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({
+    action: "import", url: tournamentUrl, format: "modern", targetDate: "2026-10-03", participants: 537,
+    files: [{ content: "Player: Local Verification\nDeck\n60 Island\nSideboard\n15 Dispel" }]
+  }) });
+  const tournament = await importResponse.json();
+  assert.equal(importResponse.status, 200, JSON.stringify(tournament));
+  assert.equal(tournament.deckCount, 1);
+  assert.equal(tournament.missingCount, 536);
+  const loadTournament = () => mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ action: "load", url: tournamentUrl }) });
+  assert.equal((await (await loadTournament()).json()).fetchedAt, tournament.fetchedAt);
   const version = await (await mf.dispatchFetch(`${origin}/api/version`, { headers })).json();
   const buildInfo = JSON.parse(await readFile("dist/build-info.json", "utf8"));
   assert.equal(version.commitSha, buildInfo.commitSha);
@@ -37,7 +50,8 @@ try {
   const status = await (await mf.dispatchFetch(`${origin}/api/environment/status`, { headers })).json();
   assert.equal(status.revision, "同梱版");
   assert.equal((await mf.dispatchFetch(`${origin}/api/cache/clear`, { method: "POST", headers })).status, 200);
-  console.log("Hosted Worker: login, protected assets/APIs, D1 and R2 verified.");
+  assert.equal((await (await loadTournament()).json()).deckCount, 1, "巡回キャッシュ削除で大会リストを消してはいけません。");
+  console.log("Hosted Worker: login, protected assets/APIs, D1, R2 and tournament imports verified.");
   if (process.argv.includes("--live-search")) {
     const response = await mf.dispatchFetch(`${origin}/api/token-cards`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ format: "modern", targetDate: "2026-10-03", maxChildPages: 20, useCache: true }) });
     const result = await response.json();

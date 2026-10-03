@@ -15,6 +15,10 @@
 
 ## データフロー
 
+大会の提出リストを受け取れる場合は通常の環境判定・巡回とは別の入口を使用します。`lib/tournament.js`が英語テキスト／CSV／JSONを正規化し、参加人数・失敗・重複を持つスナップショットを`.cache/tournaments/`（公開版ではR2）へ原子的に保存します。`POST /api/tournament`で取り込み／大会URLからの呼び出しを行い、`POST /api/token-cards`の`sourceMode: tournament`は保存済みの大会のみを集計します。フォーマット・大会日・取り込み日時がUI確認時と一致しなければ409で読み込み直しを要求します。
+
+大会モードはScryfall collection APIへ提出カード名を75件ずつ送って直接照合し、環境候補キャッシュと他大会の巡回に依存しません。その後は既存の発生源照合・現物生成・全採用URLの保持・画像付きデッキ表示を共有します。採用率の母数は読み込めたリスト数、参加人数不明時は網羅性未確認です。UIの入口は`public/tournament-ui.js`、入力書式とMelee側の取得制限は[melee-tournaments.md](melee-tournaments.md)を参照してください。
+
 ```text
 UI入力
   ↓

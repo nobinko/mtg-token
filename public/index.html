@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex,nofollow">
     <link rel="icon" href="/favicon.svg">
     <script type="module" src="/session.js"></script>
-    <link rel="stylesheet" href="/styles.css?v=20261003-token-decks">
+    <link rel="stylesheet" href="/styles.css?v=20261003-melee">
   </head>
   <body>
     <main class="app">
@@ -15,6 +15,11 @@
         <div>
           <h1>MTG Token Finder</h1>
           <p>紙の大会で使うトークン・紋章などを、デッキリストから探す準備表です。</p>
+          <fieldset class="source-mode">
+            <legend>準備に使うリスト</legend>
+            <label><input type="radio" name="source-mode" value="environment" checked>環境全体から探す</label>
+            <label><input type="radio" name="source-mode" value="tournament">この大会のリストで準備</label>
+          </fieldset>
           <form id="logout-form" action="/logout" method="post" hidden><button type="submit">ログアウト</button></form>
         </div>
         <form id="search-form" class="controls">
@@ -86,6 +91,25 @@
           <button id="clear-cache-button" type="button">キャッシュ削除</button>
           <button id="update-environment-button" type="button">環境データを更新</button>
         </form>
+      </section>
+
+      <section id="tournament-panel" class="tournament-panel" hidden aria-labelledby="tournament-title">
+        <div class="tournament-heading"><div><p class="timeline-eyebrow">TOURNAMENT DECKLISTS</p><h2 id="tournament-title">当日の提出リストで準備する</h2></div><button type="button" id="tournament-yokohama" class="secondary-button">今回の横浜大会を入力</button></div>
+        <p class="tournament-note">この大会で読み込んだリストだけから必要トークンを探します。上のフォーマットと大会日を確認してください。</p>
+        <div class="tournament-url-row"><label>Meleeの大会URL<input id="tournament-url" type="url" placeholder="https://melee.gg/Tournament/View/411350" autocomplete="off"></label><button id="tournament-load" type="button">大会を読み込む</button><a id="tournament-open" hidden target="_blank" rel="noopener noreferrer">Meleeを開く ↗</a></div>
+        <p id="tournament-status" class="tournament-note" role="status">登録済みのリストを大会URLから呼び出せます。初回は下から取り込んでください。</p>
+        <details id="tournament-import" open>
+          <summary>大会から受け取ったリストを取り込む</summary>
+          <p class="tournament-note">Meleeの一覧を自動取得できない場合はこちら。英語カード名のArena／MTGOテキスト、CSV、JSONに対応します。</p>
+          <div class="tournament-fields"><label>大会名（任意）<input id="tournament-name" maxlength="180" placeholder="例: Champions Cup Final"></label><label>参加人数（網羅性の確認用・任意）<input id="tournament-participants" type="number" min="1" max="2000" placeholder="例: 537"></label></div>
+          <label class="tournament-file">リストのファイル（複数選択可・合計3MBまで）<input id="tournament-files" type="file" multiple accept=".txt,.csv,.tsv,.json"></label>
+          <label class="tournament-paste">または、デッキのテキストを貼り付け<textarea id="tournament-text" rows="6" spellcheck="false" placeholder="Player: プレイヤー名&#10;Deck&#10;4 Ocelot Pride&#10;...&#10;Sideboard&#10;..."></textarea></label>
+          <details class="tournament-format-help"><summary>複数リスト／CSV／JSONの書式</summary><p>テキストはリストごとに「Player: 名前」を付けるか、「===」の行で区切ります。CSVは1カード1行で Player, CardName, Quantity, Board（main / sideboard）を指定します。JSONはデッキ配列で player, title, url（任意）, mainboard, sideboard を指定し、カードは {"name":"Ocelot Pride","count":4} で記述します。メイン60〜250枚・サイド15枚以下の構築リストを読み込みます。</p></details>
+          <button id="tournament-import-button" type="button">この大会のリストとして取り込む</button>
+          <p class="tournament-note">取り込んだ内容はこのサイトの利用者間で共有します。同じ大会URLへの再取り込みは全リストの置き換えです。</p>
+        </details>
+        <div id="tournament-preview" class="tournament-preview" hidden aria-live="polite"></div>
+        <button id="tournament-search" type="button" hidden>この大会のトークンを探す</button>
       </section>
 
       <section class="sources">
@@ -544,6 +568,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261003-mtgo-month-index-v2" type="module"></script>
+    <script src="/app.js?v=20261003-melee" type="module"></script>
   </body>
 </html>

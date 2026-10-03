@@ -1,6 +1,9 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
+import { bodyLimit } from "hono/body-limit";
+import { importTournament, readTournament, saveTournament, tournamentSummary, meleeTournamentUrl, fetchMeleeTournament } from "./lib/tournament.js";
+import { fetchTournamentCards } from "./lib/scryfall.js";
 import { maxMatchedCards, seedPageMaxAgeMs } from "./lib/config.js";
 import { passwordGate } from "./lib/auth.js";
 import { hostedRuntime } from "./lib/runtime.js";
@@ -19,7 +22,7 @@ import { fetchPreparationSet, fetchJapaneseTokenPrintById, fetchAlternateTokenPr
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
 import { fetchCardMetadata, fetchFinderCandidates, fetchSearchCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
 import { isVirtualObject } from "./public/object-identity.js";
-import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName } from "./lib/tokens.js";
+import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName, tokenHints } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
 import { crawlSources } from "./lib/crawl.js";
 import { extractDeckEntries } from "./lib/deck.js";
@@ -141,6 +144,25 @@ async function fetchRepresentativeCandidate(link, format, options) {
 app.get("/api/default-sources", (c) => c.json(defaultSources));
 
 app.get("/api/formats", (c) => c.json(formatOptions));
+
+app.post("/api/tournament", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => c.json({ error: "リストは合計3MBまでです。" }, 413) }), async c => {
+  const body = await c.req.json().catch(() => ({}));
+  const url = meleeTournamentUrl(body.url);
+  if (!url) return c.json({ error: "Meleeの大会URL（https://melee.gg/Tournament/View/数字）を入力してください。" }, 400);
+  if (body.action === "load") {
+    const saved = await readTournament(url);
+    if (saved) return c.json(tournamentSummary(saved));
+    try { await fetchMeleeTournament(url); }
+    catch (error) { return c.json({ error: error.message }, 502); }
+  }
+  if (body.action !== "import") return c.json({ error: "取り込み操作が不正です。" }, 400);
+  if (!["standard", "pioneer", "modern", "legacy"].includes(body.format) || !dateOnly(body.targetDate)) return c.json({ error: "フォーマットと大会日を選んでください。" }, 400);
+  let tournament;
+  try { tournament = importTournament(body); }
+  catch (error) { return c.json({ error: error.message }, 400); }
+  await saveTournament(tournament);
+  return c.json(tournamentSummary(tournament));
+});
 
 app.post("/api/meta-deck", async (c) => {
   const body = await c.req.json().catch(() => ({}));
@@ -299,20 +321,24 @@ app.post("/api/token-cards", async (c) => {
   const logRunId = normalizeLogRunId(body.logRunId);
   return logContext.run({ runId: logRunId }, async () => {
   const format = normalizeFormat(body.format);
-  const sourceUrls = Array.isArray(body.sources) && body.sources.length
+  const tournamentMode = body.sourceMode === "tournament";
+  const tournament = tournamentMode ? await readTournament(body.tournamentUrl) : null;
+  if (tournamentMode && !tournament) return c.json({ error: "この大会のリストを先に読み込んでください。" }, 400);
+  if (tournament && (tournament.format !== format || tournament.targetDate !== body.targetDate || tournament.fetchedAt !== body.tournamentRevision)) return c.json({ error: "読み込んだ大会の条件またはリストが変更されています。大会をもう一度読み込んで確認してください。" }, 409);
+  const sourceUrls = tournament ? [tournament.url] : Array.isArray(body.sources) && body.sources.length
     ? body.sources
     : defaultSources[format] ?? defaultSources.standard;
-  const maxChildPages = normalizeRequestedDeckCount(body.maxChildPages);
+  const maxChildPages = tournament ? tournament.decks.length : normalizeRequestedDeckCount(body.maxChildPages);
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
   const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
   if (body.targetDate && !dateOnly(body.targetDate)) return c.json({ error: "大会日が不正です。" }, 400);
-  const environment = await formatEnvironmentInfo(format, targetDate);
+  const environment = tournament ? { resolved: true, startDate: targetDate, targetDate, events: [], reason: "大会の提出リストを使用" } : await formatEnvironmentInfo(format, targetDate);
   if (!environment.resolved || !environment.startDate) {
     return c.json({ error: environment.reason, environment }, 422);
   }
   let preparation;
-  try { preparation = preparationWindow(environment.events, format, targetDate, body.preparation); }
+  try { preparation = tournament ? null : preparationWindow(environment.events, format, targetDate, body.preparation); }
   catch (error) { return c.json({ error: error.message }, 400); }
   const environmentStartDate = preparation?.startDate || environment.startDate;
   const crawlTargetDate = preparation?.endDate || targetDate;
@@ -320,10 +346,13 @@ app.post("/api/token-cards", async (c) => {
   console.log(`[search] start format=${format} target=${targetDate} decks=${maxChildPages}`);
 
   const [candidateResult, crawl] = await Promise.all([
-    fetchSearchCandidates(format, active),
-    crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate: crawlTargetDate, environmentStartDate, format })
+    tournament ? fetchTournamentCards(tournament.decks) : fetchSearchCandidates(format, active),
+    tournament ? Promise.resolve({ pages: [{ url: tournament.url, deckEntries: tournament.decks }], knownArchetypes: new Set(), errors: [],
+      warnings: tournament.coverageComplete ? [] : [tournament.missingCount == null ? "大会の総人数が未入力のため、全参加者の網羅は未確認です。読み込んだリストだけを集計しています。" : `参加${tournament.registeredCount}人に対して${tournament.deckCount}リストを集計。未取得${tournament.missingCount}人分のトークンは含まれません。`],
+      duplicateDeckCount: tournament.duplicateDeckCount, unparsedDeckCount: tournament.failures.length, cacheStats: { hits: 0, network: 0 }, siteStats: {}, deckEntryCount: tournament.deckCount, sourceExhausted: false })
+      : crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate: crawlTargetDate, environmentStartDate, format })
   ]);
-  const candidates = candidateResult.cards;
+  const candidates = tournament ? candidateResult.cards.filter(card => tokenHints(card).length || (card.all_parts || []).some(part => /token|emblem/i.test(part.type_line || part.component || ""))) : candidateResult.cards;
 
   const allowedDeckUrls = new Set(deckResultsFromPages(crawl.pages).slice(0, maxChildPages).map((deck) => deck.url));
   crawl.pages = crawl.pages.map((page) => ({ ...page, deckEntries: (page.deckEntries || []).filter((deck) => allowedDeckUrls.has(deck.url)) }));
@@ -377,7 +406,8 @@ app.post("/api/token-cards", async (c) => {
     }
   }
 
-  const matched = findCardMentions(candidates, crawl.pages).slice(0, maxMatchedCards);
+  const allMatched = findCardMentions(candidates, crawl.pages);
+  const matched = tournament ? allMatched : allMatched.slice(0, maxMatchedCards);
   const objectWarnings = [];
   const catalog = format === "modern" ? await fetchSetCatalog() : { sets: [], warning: "" };
   if (format === "modern" && catalog.sets.length) {
@@ -430,6 +460,9 @@ app.post("/api/token-cards", async (c) => {
 
   return c.json({
     logRunId,
+    sourceMode: tournament ? "tournament" : "environment",
+    tournament: tournament ? tournamentSummary(tournament) : null,
+    unresolvedCardCount: candidateResult.unresolvedCardCount || 0,
     format,
     targetDate,
     environmentStartDate,
@@ -446,8 +479,8 @@ app.post("/api/token-cards", async (c) => {
     duplicateDeckCount: crawl.duplicateDeckCount,
     cacheStats: crawl.cacheStats,
     siteStats: crawl.siteStats,
-    requestedDeckCount: maxChildPages,
-    searchedDeckLimitReached: crawl.deckEntryCount >= maxChildPages,
+    requestedDeckCount: tournament ? null : maxChildPages,
+    searchedDeckLimitReached: tournament ? false : crawl.deckEntryCount >= maxChildPages,
     sourceExhausted: crawl.sourceExhausted,
     unparsedDeckCount: crawl.unparsedDeckCount || 0,
     searchedDecks: deckResults,
