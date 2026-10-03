@@ -1,18 +1,18 @@
 # MTG Token Finder
 
-フィーチャー卓の配信準備で、バルクのトークン束から必要な現物を抜き出すためのローカルWebツールです。
+フィーチャー卓の配信準備で、バルクのトークン束から必要な現物を抜き出すためのWebツールです。スマホ・PCから使える公開版と、PCで起動するローカル版があります。
 
 このツールは「カード検索」ではなく「現場の準備表」です。デッキリストを集め、トークン・紋章・物理的なコピー・裏向き補助など、プレイ中にカード状の現物として必要になりそうなものを、探しやすい順に並べます。
 
 ## パスワード付きのWeb版
 
-スマホ・PCのブラウザから利用できるWeb版をSitesに公開します。画面・静的ファイル・全API・検索ログはサーバー側で認証を確認します。ログインは7日間有効で、画面上からログアウトできます。検索キャッシュと環境データはサーバー側のR2に保存し、ログインの試行回数はD1で制限します。
+[MTG Token Finder 公開版](https://mtg-token-finder-nobinko.nobinko.chatgpt.site) をスマホ・PCのブラウザから利用できます。管理者から共有されたパスワードでログインしてください。利用者によるNode.jsのインストールやPCの常時起動は不要です。画面・静的ファイル・全API・検索ログはサーバー側で認証を確認します。ログインは7日間有効で、画面上からログアウトできます。検索キャッシュと環境データはサーバー側のR2に保存し、ログインの試行回数はD1で制限します。
 
 共有パスワードのSHA-256を `SITE_PASSWORD_SHA256`、独立したランダム署名キーを `SESSION_SECRET` としてSitesのシークレットに設定します。実際のパスワード・キーをソースやGitに保存しないでください。パスワードの変更で既存のログインも無効になります。公開先のIDと保存領域の論理名は `.openai/hosting.json` に記録しています。
 
 `npm run build` で公開用Workerを生成します。D1スキーマを変更した場合は `npx drizzle-kit generate` で追加マイグレーションを生成してください。ローカル版の起動方法はこれまでどおりです。ローカルでも認証したい場合は `.env.example` を元に設定し、`node --env-file=.env server.mjs` で起動します。公開版は認証設定が欠けるとアクセスを拒否します。
 
-公開元はGitHubの`main`に統一します。自動公開の手順は [GitHub mainからの自動公開](docs/github-deployment.md) にまとめています。公開前に未コミット変更とGitHubの最新SHAを検証し、テスト・公開環境の確認に通った版だけを反映します。ログイン後の `/api/version` で公開中の元コミットを照合できます。
+公開元はGitHubの`main`です。Sitesのクラウドタスクが1時間ごとに更新を確認し、テスト・公開用ビルド・認証と保存領域の確認に通った最新版を反映します。push直後の反映ではありません。自動公開とパスワード変更の手順は [GitHub mainからの自動公開](docs/github-deployment.md) にまとめています。ログイン後の `/api/version` で公開中の元コミットを照合できます。
 
 ## すぐ使う
 
@@ -34,6 +34,7 @@ npm start
 | 読みたいこと | ファイル |
 |---|---|
 | 初回セットアップ、使い方、トラブル対応 | [docs/usage.md](docs/usage.md) |
+| 公開URL、1時間ごとの自動公開、パスワード変更 | [docs/github-deployment.md](docs/github-deployment.md) |
 | 設計思想、データフロー、モジュール責務 | [docs/architecture.md](docs/architecture.md) |
 | デッキリスト取得元の実測結果と制限 | [docs/decklist-sources.md](docs/decklist-sources.md) |
 | 変更履歴 | [docs/changelog.md](docs/changelog.md) |
@@ -67,7 +68,7 @@ npm start
 
 ## 開発
 
-サーバー側は `server.mjs` と `lib/`、画面側は `public/` に分かれています。詳しい責務分担は [docs/architecture.md](docs/architecture.md) を見てください。
+共通のサーバー側処理は `app.mjs` と `lib/`、起動入口はローカル用の `server.mjs` と公開用の `worker.mjs`、画面側は `public/` に分かれています。詳しい責務分担は [docs/architecture.md](docs/architecture.md) を見てください。
 
 ```powershell
 npm install
@@ -76,7 +77,7 @@ npm start
 
 ## 注意
 
-- このツールは身内のローカル準備用途の非公式Fan Contentです。Magic: The Gathering のカード画像・テキスト等は Wizards of the Coast に帰属します。このツールは Wizards of the Coast / Scryfall 非公認です。
+- このツールは身内の大会準備用途の非公式Fan Contentです。Magic: The Gathering のカード画像・テキスト等は Wizards of the Coast に帰属します。このツールは Wizards of the Coast / Scryfall 非公認です。
 - サイト側のHTML構造変更やアクセス制限で巡回できないページがあります。
 - WAF、Cloudflare、robots.txt、明示的なアクセス制限を回避して巡回する用途ではありません。
 - Scryfall照合母集団の枚数は、デッキ数に応じて変わる数字ではありません。検索デッキ数で変わるのは、ヒットした生成カード数、現物の種類数、採用デッキ数です。

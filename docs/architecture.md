@@ -18,7 +18,7 @@
 ```text
 UI入力
   ↓
-server.mjs
+server.mjs（ローカル）/ worker.mjs（公開）→ app.mjs
   ↓
 環境開始日を解決
   ↓
@@ -146,7 +146,16 @@ Scryfall APIは `User-Agent` と `Accept` を付けて呼び出し、検索系�
 
 | ファイル | 役割 |
 |---|---|
-| `server.mjs` | Honoルーティング、静的ファイル配信、検索API、日本語名/画像の後追い補完API、ひとり回し用カード情報API |
+| `app.mjs` | 共通Honoルーティング、認証、検索API、日本語名/画像の後追い補完API、ひとり回し用カード情報API、公開元SHAの確認API |
+| `server.mjs` | ローカルのNode.jsサーバー起動と静的ファイル配信 |
+| `worker.mjs` | 公開Workerの起動、要求ごとの実行環境、ビルドに含めた静的ファイルの配信 |
+| `lib/auth.js` / `lib/login-page.js` | 共有パスワード認証、署名付きセッション、ログイン画面、試行回数・POSTのOrigin・入力サイズの制限 |
+| `lib/runtime.js` / `lib/storage.js` | 要求ごとの公開環境参照、ローカルファイルとR2の保存先切替 |
+| `lib/build-info.js` | ビルド時の元SHA・未コミット変更・生成日時 |
+| `db/schema.ts` / `drizzle/` | D1のログイン試行制限テーブルと追加マイグレーション |
+| `scripts/build-hosted.mjs` | 公開Worker・静的ファイル・ビルド情報の生成 |
+| `scripts/assert-github-head.mjs` | 未コミット変更がなく、GitHub mainの最新SHAと一致することの確認 |
+| `scripts/verify-hosted.mjs` | Miniflareで公開ビルドの認証、D1/R2、元SHAを確認 |
 | `lib/config.js` | ポート、パス、検索上限、キャッシュTTL、fetchタイムアウト |
 | `lib/data.js` | トークン和名表、巡回元、公式確認済み日本語名/画像上書き表、フォーマット定義 |
 | `data/environment-events.json` | 禁止改定・ローテーションの手書きイベント（セット発売は自動解決） |
@@ -167,18 +176,22 @@ Scryfall APIは `User-Agent` と `Accept` を付けて呼び出し、検索系�
 | `lib/html.js` | HTMLタイトル、日付、テキスト正規化 |
 | `lib/util.js` | 汎用ユーティリティ |
 | `public/app.js` | ブラウザ側UI、検索結果描画、後追い補完反映、ひとり回し画面への入口 |
+| `public/session.js` | 認証切れ時のログイン画面への移動とログアウト表示 |
+| `public/token-decks.js` | 全採用URLと検索済みデッキの対応、発生源カードの照合 |
 | `public/object-identity.js` | サーバーとUI共通の現物識別、旧チェックの移行、色・P/T・能力の表示 |
 | `public/card-metadata.js` | 元のデッキ名・枚数・ゲーム状態を保つカード情報補完 |
-| `public/deck-gallery.js` | 典型リストの画像一覧、日英切替、両面画像の拡大、取得失敗時の縮退 |
+| `public/deck-gallery.js` | 典型リストと検索済みリストの画像一覧、日英切替、両面画像の拡大、取得失敗時の縮退 |
 | `public/goldfish-ui.js` | ひとり回しの描画、ドラッグ、複数選択、履歴、保存・再開、ショートカット |
 | `public/goldfish.js` | ひとり回しschema v2のシャッフル、マリガン、全ゾーン、レーン、各種管理値、トークン、カウンター、表裏の状態遷移 |
 | `public/styles.css` | 画面と印刷用スタイル |
 
-依存方向はおおむね `server.mjs` から `lib/` へ流し、`lib/` 間の循環を作らない方針です。
+依存方向は起動入口から `app.mjs`、`lib/` へ流し、`lib/` 間の循環を作らない方針です。
 
 現物の集計・チェック保存・後追い補完は `objectKey` を共有する。物理カードはセット＋Oracle ID（未提供なら印刷ID）、仮想補助はセット＋用途名＋タイプで区別する。同じOracle IDの発生源はデッキURLの和集合で集計する。旧形式の物理チェックには仕様の区別がないため、別の版へ推定移行しない。
 
 採用判定では `deck.cards` があれば空配列も含めてそれを正本とする。本文照合はカード配列を持たない旧形式のエントリーだけに限定する。両面カードの情報取得は正式名と各面名を別名として解決し、レスポンスの `requestedName` で依頼名を保持する。ひとり回しのデッキ名と保存識別は変更しない。
+
+トークンの採用集計と画像付きデッキ一覧は全件の `deckUrls` を使い、短い表示用 `decks` と分ける。MTGOの同じページにある複数リストはURLのフラグメントも含めて区別する。選んだデッキのメイン・サイドをそのまま画像表示し、発生源のカードだけを抜粋したリストにはしない。
 
 典型リストの画像は `POST /api/card-metadata` の `language`（`ja` / 既定 `en`）で取得する。英語のcollection結果から正式名を解決し、日本語は同じカードの日本語印刷を照合する。日本語取得で英語キャッシュを上書きしない。UIは6種ずつ日本語画像を取得して進捗を反映し、英語画像への縮退と再取得を提供する。カード画像は表示用であり、選定結果・Arenaコピー・ひとり回しのデッキ識別を変更しない。閉じた後や別デッキに切り替えた後の古い応答は世代番号で破棄する。
 
@@ -196,6 +209,8 @@ Scryfall APIは `User-Agent` と `Accept` を付けて呼び出し、検索系�
 4. `lib/data.js` の `tokenJapaneseNameMap` と `lib/archetype.js` の `LAND_COLOR_MAP` — 新しいトークン種の和名、新しい2色以上ランドを追加する。
 
 ## 自動化
+
+公開本体はSitesのクラウドタスクがGitHub `main`を1時間ごとに確認して更新します。最新の成功公開SHAと一致する場合は何もしません。更新時はテスト・ビルド・認証と保存領域・最新SHAを確認し、同じ公開先へ保存・デプロイします。手順とパスワード変更は[github-deployment.md](github-deployment.md)を参照してください。
 
 `.github/workflows/freshness.yml` が毎朝 06:00 JST に `scripts/freshness-check.mjs` を実行します。
 
@@ -223,6 +238,6 @@ git diff --check
 
 触ったファイルに応じて `node --check` の対象は増減します。巡回元やパーサを変えた場合は、[decklist-sources.md](decklist-sources.md) の再測定も行います。API入力境界を変えた場合は、範囲外・不正値・空値が安全な既定値に落ちることも確認します。
 
-`public/app.js` または `public/styles.css` を変更した場合は、`index.html` の読み込みURLにある `?v=` バージョン文字列も必ず更新します。サーバーは静的ファイルにキャッシュ制御ヘッダを付けないため、これを怠るとブラウザが古いファイルを使い続けます。
+`public/app.js` または `public/styles.css` を変更した場合は、`index.html` の読み込みURLにある `?v=` バージョン文字列も必ず更新します。ローカル版を含む既存のブラウザキャッシュに古いファイルが残らないようにします。公開版の認証済み応答には `private, no-store` を付けます。
 
 ブラウザの子モジュールを変更した場合は、そのimport URLの `?v=` も更新します。監査5件のHTTP回帰は `test/audit-api.test.js`、同じデータによる手動UI検証は `node scripts/verify-audit-fixes.mjs` を使います。検証用サーバーは一時ディレクトリと空きポートを使用し、終了時に自身の一時データを削除します。`--cache=stale` / `--cache=missing` で候補サービス停止時の縮退も再現できます。
