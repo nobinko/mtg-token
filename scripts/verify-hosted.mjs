@@ -1,0 +1,44 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFile, readdir } from "node:fs/promises";
+import { Miniflare, convertV4MiniflareOptions } from "miniflare";
+
+// Local verification credentials only. Production credentials live in Sites.
+const password = "local-verification-password-only";
+const mf = new Miniflare(convertV4MiniflareOptions({ workers: [{
+  name: "mtg-token",
+  scriptPath: "dist/server/index.js", modules: true,
+  compatibilityDate: "2026-10-01", compatibilityFlags: ["nodejs_compat"],
+  r2Buckets: { BUCKET: "token-cache" }, d1Databases: { DB: "token-auth" },
+  bindings: { SITE_PASSWORD_SHA256: createHash("sha256").update(password).digest("hex"), SESSION_SECRET: "local-verification-signing-secret-at-least-32-characters" },
+}] }));
+try {
+  const db = await mf.getD1Database("DB");
+  for (const file of await readdir("drizzle")) {
+    if (!file.endsWith(".sql")) continue;
+    for (const sql of (await readFile(`drizzle/${file}`, "utf8")).split("--> statement-breakpoint").filter(sql => sql.trim())) await db.prepare(sql).run();
+  }
+  const origin = "http://localhost";
+  assert.equal((await mf.dispatchFetch(`${origin}/`, { redirect: "manual" })).status, 303);
+  assert.equal((await mf.dispatchFetch(`${origin}/api/formats`)).status, 401);
+  const login = await mf.dispatchFetch(`${origin}/login`, { method: "POST", headers: { origin, "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ password }).toString(), redirect: "manual" });
+  assert.equal(login.status, 303);
+  const headers = { cookie: login.headers.get("set-cookie").split(";")[0], origin };
+  const page = await mf.dispatchFetch(`${origin}/`, { headers });
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /画像付き|deck-dialog/);
+  assert.equal((await mf.dispatchFetch(`${origin}/app.js`, { headers })).status, 200);
+  const status = await (await mf.dispatchFetch(`${origin}/api/environment/status`, { headers })).json();
+  assert.equal(status.revision, "同梱版");
+  assert.equal((await mf.dispatchFetch(`${origin}/api/cache/clear`, { method: "POST", headers })).status, 200);
+  console.log("Hosted Worker: login, protected assets/APIs, D1 and R2 verified.");
+  if (process.argv.includes("--live-search")) {
+    const response = await mf.dispatchFetch(`${origin}/api/token-cards`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ format: "modern", targetDate: "2026-10-03", maxChildPages: 20, useCache: true }) });
+    const result = await response.json();
+    assert.equal(response.status, 200, JSON.stringify(result));
+    assert.ok(result.searchedDeckCount >= 20, `Only ${result.searchedDeckCount} decks`);
+    assert.ok(result.objects.length);
+    assert.ok(result.searchedDecks.every(deck => deck.mainboard.length));
+    console.log(`Hosted live search: ${result.searchedDeckCount} decks, ${result.objects.length} token objects with complete decklists.`);
+  }
+} finally { await mf.dispose(); }

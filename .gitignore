@@ -2,3 +2,9 @@
 node_modules/
 *.log
 freshness-report.json
+dist/
+.env
+.env.*
+!.env.example
+.sites-runtime/
+*.tar.gz

@@ -5,10 +5,17 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "build": "node scripts/build-hosted.mjs"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.4",
     "hono": "^4.12.23"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.11",
+    "drizzle-orm": "^0.45.3",
+    "esbuild": "^0.28.2",
+    "miniflare": "^5.20261001.0-alpha"
   }
 }
