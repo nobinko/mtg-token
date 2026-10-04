@@ -1,171 +1,222 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" data-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MTG Token Finder</title>
     <meta name="robots" content="noindex,nofollow">
-    <link rel="icon" href="/favicon.svg">
+    <meta name="theme-color" content="#0b100f">
+    <link rel="icon" href="/favicon.svg?v=20261003-redesign">
+    <script src="/theme.js?v=20261003-redesign"></script>
     <script type="module" src="/session.js"></script>
-    <link rel="stylesheet" href="/styles.css?v=20261003-stock-ui">
+    <link rel="stylesheet" href="/styles.css?v=20261003-redesign">
   </head>
   <body>
     <main class="app">
       <header class="app-header">
-        <div><p class="app-eyebrow">大会のトークン準備表</p><h1>MTG Token Finder</h1></div>
-        <form id="logout-form" action="/logout" method="post" hidden><button type="submit">ログアウト</button></form>
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+            <defs>
+              <linearGradient id="brand-gold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f7dea0"/>
+                <stop offset="1" stop-color="#b7843a"/>
+              </linearGradient>
+            </defs>
+            <rect x="6" y="7" width="19" height="26" rx="3.5" transform="rotate(-13 15.5 20)" fill="none" stroke="url(#brand-gold)" stroke-opacity=".5" stroke-width="1.6"/>
+            <rect class="brand-card" x="14" y="6" width="19" height="27" rx="3.5" stroke="url(#brand-gold)" stroke-width="2"/>
+            <path d="M23.5 12.6l1.8 4.5 4.5 1.8-4.5 1.8-1.8 4.5-1.8-4.5-4.5-1.8 4.5-1.8z" fill="url(#brand-gold)"/>
+          </svg>
+          <div class="brand-text">
+            <p class="app-eyebrow">大会のトークン準備表</p>
+            <h1>MTG Token Finder</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="theme-toggle" type="button" class="icon-button theme-toggle" aria-label="明るい表示に切り替え">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+          </button>
+          <form id="logout-form" action="/logout" method="post" hidden><button type="submit" class="ghost-button">ログアウト</button></form>
+        </div>
       </header>
-      <section class="toolbar" aria-label="検索条件">
+
+      <section class="toolbar panel" aria-label="検索条件">
         <fieldset class="source-mode">
-          <legend><span class="step-number">1</span> 使うデッキリスト</legend>
-          <label><input type="radio" name="source-mode" value="environment" checked><span><strong>環境から探す</strong><small>最近の入賞リストから準備</small></span></label>
-          <label><input type="radio" name="source-mode" value="tournament"><span><strong>この大会で準備</strong><small>Melee・受け取った提出リスト</small></span></label>
+          <legend class="step-heading"><span class="step-number">1</span>使うデッキリスト</legend>
+          <div class="source-mode-options">
+            <label class="mode-option">
+              <input type="radio" name="source-mode" value="environment" checked>
+              <span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.9 5.2 3.9 8.5s-1.3 6.1-3.9 8.5c-2.6-2.4-3.9-5.2-3.9-8.5s1.3-6.1 3.9-8.5z"/></svg></span>
+              <span class="mode-text"><strong>環境から探す</strong><small>最近の入賞リストから準備</small></span>
+            </label>
+            <label class="mode-option">
+              <input type="radio" name="source-mode" value="tournament">
+              <span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></svg></span>
+              <span class="mode-text"><strong>この大会で準備</strong><small>Melee・受け取った提出リスト</small></span>
+            </label>
+          </div>
         </fieldset>
         <form id="search-form" class="search-settings">
-          <h2 class="step-heading"><span class="step-number">2</span> 大会の条件</h2>
-          <div class="controls search-main"><label>
-            フォーマット
-            <select id="format"></select>
-          </label>
-<label>
-            大会日
-            <input id="target-date" type="date">
-          </label>
-<label>
-            大会規模
-            <select id="event-scale">
-              <option value="spotlight" selected>大型オープン</option>
-              <option value="premier">PT・RC級</option>
-              <option value="medium">中規模競技</option>
-              <option value="local">店舗・小規模</option>
-              <option value="custom">手動</option>
-            </select>
-          </label>
-<label>
-            検索デッキ/リスト数
-            <input id="max-pages" type="number" min="20" max="600" value="300">
-          </label>
-            <button id="search-button" type="submit">必要なトークンを探す</button>
+          <h2 class="step-heading"><span class="step-number">2</span>大会の条件</h2>
+          <div class="controls search-main">
+            <label><span class="field-label">フォーマット</span><select id="format"></select></label>
+            <label><span class="field-label">大会日</span><input id="target-date" type="date"></label>
+            <label><span class="field-label">大会規模</span>
+              <select id="event-scale">
+                <option value="spotlight" selected>大型オープン</option>
+                <option value="premier">PT・RC級</option>
+                <option value="medium">中規模競技</option>
+                <option value="local">店舗・小規模</option>
+                <option value="custom">手動</option>
+              </select>
+            </label>
+            <label><span class="field-label">検索デッキ/リスト数</span><input id="max-pages" type="number" min="20" max="600" value="300"></label>
+            <button id="search-button" class="primary-button cta-button" type="submit">必要なトークンを探す</button>
           </div>
-          <details id="search-advanced" class="settings-details"><summary>検索の細かい設定・データの更新</summary>
-            <div class="controls"><label>
-            一般採用ライン
-            <input id="usage-threshold" type="number" min="0.1" max="10" step="0.1" value="1">
-          </label>
-<label>
-            検出信頼度
-            <input id="confidence" type="number" min="80" max="99.9" step="0.1" value="95">
-          </label>
-<label class="check-control">
-            <input id="use-cache" type="checkbox" checked>
-            巡回キャッシュを使う
-          </label>
-<label class="check-control">
-            <input id="refresh-cache" type="checkbox">
-            今回は再取得
-          </label>
-              <button id="clear-cache-button" type="button" class="secondary-button">キャッシュ削除</button>
-              <button id="update-environment-button" type="button" class="secondary-button">環境データを更新</button>
+          <details id="search-advanced" class="settings-details">
+            <summary>検索の細かい設定・データの更新</summary>
+            <div class="settings-body">
+              <div class="controls">
+                <label><span class="field-label">一般採用ライン（%）</span><input id="usage-threshold" type="number" min="0.1" max="10" step="0.1" value="1"></label>
+                <label><span class="field-label">検出信頼度（%）</span><input id="confidence" type="number" min="80" max="99.9" step="0.1" value="95"></label>
+                <label class="check-control"><input id="use-cache" type="checkbox" checked><span>巡回キャッシュを使う</span></label>
+                <label class="check-control"><input id="refresh-cache" type="checkbox"><span>今回は再取得</span></label>
+                <button id="clear-cache-button" type="button" class="secondary-button">キャッシュ削除</button>
+                <button id="update-environment-button" type="button" class="secondary-button">環境データを更新</button>
+              </div>
+              <section class="sampling-summary" id="sampling-summary"></section>
+              <section class="status" id="update-status" aria-live="polite">環境データの状態を確認しています。</section>
             </div>
-            <section class="sampling-summary" id="sampling-summary"></section>
-            <section class="status" id="update-status" aria-live="polite">環境データの状態を確認しています。</section>
           </details>
         </form>
       </section>
 
-      <section id="tournament-panel" class="tournament-panel" hidden aria-labelledby="tournament-title">
-        <div class="tournament-heading"><div><p class="timeline-eyebrow">TOURNAMENT DECKLISTS</p><h2 id="tournament-title">当日の提出リストで準備する</h2></div><button type="button" id="tournament-yokohama" class="secondary-button">今回の横浜大会を入力</button></div>
+      <section id="tournament-panel" class="tournament-panel panel" hidden aria-labelledby="tournament-title">
+        <div class="tournament-heading">
+          <div><p class="eyebrow">TOURNAMENT DECKLISTS</p><h2 id="tournament-title">当日の提出リストで準備する</h2></div>
+          <button type="button" id="tournament-yokohama" class="secondary-button">今回の横浜大会を入力</button>
+        </div>
         <p class="tournament-note">この大会で読み込んだリストだけから必要トークンを探します。上のフォーマットと大会日を確認してください。</p>
-        <div class="tournament-url-row"><label>Meleeの大会URL<input id="tournament-url" type="url" placeholder="https://melee.gg/Tournament/View/411350" autocomplete="off"></label><button id="tournament-load" type="button" class="secondary-button">保存済みを読み込む</button><a id="tournament-open" hidden target="_blank" rel="noopener noreferrer">Meleeを開く ↗</a></div>
-        <p id="tournament-status" class="tournament-note" role="status">登録済みのリストを大会URLから呼び出せます。初回は下から取り込んでください。</p>
-        <details id="tournament-import" open>
+        <div class="tournament-url-row">
+          <label><span class="field-label">Meleeの大会URL</span><input id="tournament-url" type="url" placeholder="https://melee.gg/Tournament/View/411350" autocomplete="off"></label>
+          <button id="tournament-load" type="button" class="secondary-button">保存済みを読み込む</button>
+          <a id="tournament-open" hidden target="_blank" rel="noopener noreferrer">Meleeを開く ↗</a>
+        </div>
+        <p id="tournament-status" class="tournament-note tournament-status" role="status">登録済みのリストを大会URLから呼び出せます。初回は下から取り込んでください。</p>
+        <details id="tournament-import" class="tournament-import" open>
           <summary>大会から受け取ったリストを取り込む</summary>
-          <p class="tournament-note">Meleeの一覧を自動取得できない場合はこちら。英語カード名のArena／MTGOテキスト、CSV、JSONに対応します。</p>
-          <div class="tournament-fields"><label>大会名（任意）<input id="tournament-name" maxlength="180" placeholder="例: Champions Cup Final"></label><label>参加人数（網羅性の確認用・任意）<input id="tournament-participants" type="number" min="1" max="2000" placeholder="例: 537"></label></div>
-          <label class="tournament-file">リストのファイル（複数選択可・合計3MBまで）<input id="tournament-files" type="file" multiple accept=".txt,.csv,.tsv,.json"></label>
-          <label class="tournament-paste">または、デッキのテキストを貼り付け<textarea id="tournament-text" rows="6" spellcheck="false" placeholder="Player: プレイヤー名&#10;Deck&#10;4 Ocelot Pride&#10;...&#10;Sideboard&#10;..."></textarea></label>
-          <details class="tournament-format-help"><summary>複数リスト／CSV／JSONの書式</summary><p>テキストはリストごとに「Player: 名前」を付けるか、「===」の行で区切ります。CSVは1カード1行で Player, CardName, Quantity, Board（main / sideboard）を指定します。JSONはデッキ配列で player, title, url（任意）, mainboard, sideboard を指定し、カードは {"name":"Ocelot Pride","count":4} で記述します。メイン60〜250枚・サイド15枚以下の構築リストを読み込みます。</p></details>
-          <button id="tournament-import-button" type="button">この大会のリストとして取り込む</button>
-          <p class="tournament-note">取り込んだ内容はこのサイトの利用者間で共有します。同じ大会URLへの再取り込みは全リストの置き換えです。</p>
+          <div class="tournament-import-body">
+            <p class="tournament-note">Meleeの一覧を自動取得できない場合はこちら。英語カード名のArena／MTGOテキスト、CSV、JSONに対応します。</p>
+            <div class="tournament-fields">
+              <label><span class="field-label">大会名（任意）</span><input id="tournament-name" maxlength="180" placeholder="例: Champions Cup Final"></label>
+              <label><span class="field-label">参加人数（網羅性の確認用・任意）</span><input id="tournament-participants" type="number" min="1" max="2000" placeholder="例: 537"></label>
+            </div>
+            <label class="tournament-file"><span class="field-label">リストのファイル（複数選択可・合計3MBまで）</span><input id="tournament-files" type="file" multiple accept=".txt,.csv,.tsv,.json"></label>
+            <label class="tournament-paste"><span class="field-label">または、デッキのテキストを貼り付け</span><textarea id="tournament-text" rows="6" spellcheck="false" placeholder="Player: プレイヤー名&#10;Deck&#10;4 Ocelot Pride&#10;...&#10;Sideboard&#10;..."></textarea></label>
+            <details class="tournament-format-help"><summary>複数リスト／CSV／JSONの書式</summary><p>テキストはリストごとに「Player: 名前」を付けるか、「===」の行で区切ります。CSVは1カード1行で Player, CardName, Quantity, Board（main / sideboard）を指定します。JSONはデッキ配列で player, title, url（任意）, mainboard, sideboard を指定し、カードは {"name":"Ocelot Pride","count":4} で記述します。メイン60〜250枚・サイド15枚以下の構築リストを読み込みます。</p></details>
+            <button id="tournament-import-button" type="button" class="primary-button">この大会のリストとして取り込む</button>
+            <p class="tournament-note">取り込んだ内容はこのサイトの利用者間で共有します。同じ大会URLへの再取り込みは全リストの置き換えです。</p>
+          </div>
         </details>
         <div id="tournament-preview" class="tournament-preview" hidden aria-live="polite"></div>
-        <button id="tournament-search" type="button" hidden>この大会のトークンを探す</button>
+        <button id="tournament-search" type="button" class="primary-button cta-button" hidden>この大会のトークンを探す</button>
       </section>
 
-      <details class="sources settings-details"><summary>取得元・新セット直後の追加準備</summary>
-        <label class="check-control"><input id="preparation-mode" type="checkbox">新セット直後の準備モード（全フォーマット共通）</label>
-        <div class="controls" id="preparation-controls" hidden>
-          <label class="preparation-choice">対象セット<select id="preparation-set-choice" aria-describedby="preparation-set-description"><option value="">大会日に合う候補を取得します</option></select></label>
-          <p id="preparation-set-description" aria-live="polite"></p>
-          <p id="preparation-catalog-status" aria-live="polite"></p>
-          <label id="preparation-manual" hidden>セットコード（手動指定）<input id="preparation-set" placeholder="例: fra" maxlength="8"></label>
-          <label>構築適用日（自動入力・調整可）<input id="preparation-date" type="date"></label>
-          <button id="yokohama-preset" type="button">横浜2026・モダンの設定</button>
+      <details class="sources settings-details panel panel-quiet">
+        <summary>取得元・新セット直後の追加準備</summary>
+        <div class="sources-body">
+          <label class="check-control"><input id="preparation-mode" type="checkbox"><span>新セット直後の準備モード（全フォーマット共通）</span></label>
+          <div class="controls" id="preparation-controls" hidden>
+            <label class="preparation-choice"><span class="field-label">対象セット</span><select id="preparation-set-choice" aria-describedby="preparation-set-description"><option value="">大会日に合う候補を取得します</option></select></label>
+            <p id="preparation-set-description" aria-live="polite"></p>
+            <p id="preparation-catalog-status" aria-live="polite"></p>
+            <label id="preparation-manual" hidden><span class="field-label">セットコード（手動指定）</span><input id="preparation-set" placeholder="例: fra" maxlength="8"></label>
+            <label><span class="field-label">構築適用日（自動入力・調整可）</span><input id="preparation-date" type="date"></label>
+            <button id="yokohama-preset" type="button" class="secondary-button">横浜2026・モダンの設定</button>
+          </div>
+          <p id="preparation-help" class="field-help" hidden>直前環境の実績と新セットの追加準備候補を別々に表示します。構築適用日は発売日と異なる場合があります。新セット情報が未公開・未収録なら候補は未完備です。</p>
+          <label for="sources" class="field-label">巡回元URL</label>
+          <textarea id="sources" spellcheck="false"></textarea>
+          <p class="field-help">発生源カードは選択フォーマットで使用可能な紙のカードを対象にします。MTGOの公開リストも参考にします。抜き出す候補は通常の拡張セット・基本セットだけ。同じ仕様のものが見つからない場合は「別途用意するもの」に残します。</p>
         </div>
-        <p id="preparation-help" hidden>直前環境の実績と新セットの追加準備候補を別々に表示します。構築適用日は発売日と異なる場合があります。新セット情報が未公開・未収録なら候補は未完備です。</p>
-        <label for="sources">巡回元URL</label>
-        <textarea id="sources" spellcheck="false"></textarea>
-        <p>発生源カードは選択フォーマットで使用可能な紙のカードを対象にします。MTGOの公開リストも参考にします。抜き出す候補は通常の拡張セット・基本セットだけ。同じ仕様のものが見つからない場合は「別途用意するもの」に残します。</p>
       </details>
 
-      <section class="status" id="status">フォーマットを選んで検索できます。</section>
-      <section class="status" id="result-freshness" hidden></section>
-      <section id="preparation-overview" class="preparation-overview" hidden aria-label="準備の進み具合"></section>
-      <section id="results-toolbar" class="results-toolbar controls" hidden aria-label="準備表の表示設定">
-        <label>
-            表示
-            <select id="view-mode">
-              <option value="set" selected>抜き出すセット別</option>
-              <option value="kind">種類別</option>
-            </select>
-          </label>
-        <label>
-            並び順
-            <select id="set-sort">
-              <option value="desc" selected>発売日 新しい順</option>
-              <option value="asc">発売日 古い順</option>
-            </select>
-          </label>
+      <section class="status" id="status" role="status">フォーマットを選んで検索できます。</section>
+      <section class="status status-note" id="result-freshness" hidden></section>
+
+      <section id="intro-steps" class="intro-steps" aria-label="使い方の流れ">
+        <article><span class="intro-number">01</span><h2>リストを選ぶ</h2><p>最近の入賞リスト、または大会で受け取った提出リストを使います。</p></article>
+        <article><span class="intro-number">02</span><h2>必要な現物を洗い出す</h2><p>トークン・紋章・コピー用マーカーなどを、採用デッキ数つきで集計します。</p></article>
+        <article><span class="intro-number">03</span><h2>セットごとに抜く</h2><p>バルクのエキスパンション順に並べた準備表で、抜いたものをチェックします。</p></article>
+      </section>
+
+      <section id="preparation-overview" class="preparation-overview panel" hidden aria-label="準備の進み具合"></section>
+
+      <section id="results-toolbar" class="results-toolbar" hidden aria-label="準備表の表示設定">
+        <div class="toolbar-progress" aria-live="polite">
+          <span class="toolbar-progress-text"><strong id="toolbar-progress-count">0</strong> / <span id="toolbar-progress-total">0</span> 準備済み</span>
+          <span class="toolbar-progress-bar" aria-hidden="true"><span id="toolbar-progress-fill"></span></span>
+        </div>
+        <label class="check-control toggle-chip"><input id="hide-checked" type="checkbox"><span>未準備だけ</span></label>
+        <button id="jump-to-sets" type="button" class="ghost-button jump-button">セット一覧</button>
+        <label class="toolbar-field"><span class="field-label">表示</span>
+          <select id="view-mode">
+            <option value="set" selected>抜き出すセット別</option>
+            <option value="kind">種類別</option>
+          </select>
+        </label>
+        <label class="toolbar-field"><span class="field-label">並び順</span>
+          <select id="set-sort">
+            <option value="desc" selected>発売日 新しい順</option>
+            <option value="asc">発売日 古い順</option>
+          </select>
+        </label>
         <div class="lang-toggle" role="group" aria-label="カード画像言語">
-            <span class="lang-toggle-label">画像言語</span>
-            <div class="lang-toggle-buttons">
-              <button type="button" class="lang-btn lang-btn-active" data-lang="en" title="英語画像を表示">EN</button>
-              <button type="button" class="lang-btn" data-lang="ja" title="日本語画像があるカードだけ日本語画像に切替">JA</button>
-            </div>
+          <span class="lang-toggle-label">画像</span>
+          <div class="lang-toggle-buttons segmented">
+            <button type="button" class="lang-btn lang-btn-active" data-lang="en" title="英語画像を表示">EN</button>
+            <button type="button" class="lang-btn" data-lang="ja" title="日本語画像があるカードだけ日本語画像に切替">JA</button>
           </div>
+        </div>
+        <button id="print-button" type="button" class="ghost-button print-button">準備表を印刷</button>
+      </section>
 
-        <label class="check-control">
-            <input id="hide-checked" type="checkbox">
-            未準備だけ
-          </label>
-        <button id="print-button" type="button" class="secondary-button">準備表を印刷</button>
-      </section>
-      <section class="set-timeline" id="set-timeline" hidden aria-label="抜き出すセット">
-        <header class="timeline-header">
-          <div><p class="timeline-eyebrow">PREPARATION</p><h2><span class="step-number">3</span> 抜き出すセット</h2></div>
-          <p id="timeline-counts" class="timeline-counts" aria-live="polite"></p>
-        </header>
-        <p id="timeline-note" class="timeline-note"></p>
-        <div id="timeline-needed" class="timeline-products needed-products"></div>
-        <details class="timeline-history"><summary>モダンの収録セット年表を見る</summary>
-        <div class="timeline-legend"><span class="legend-needed">● 抜く必要あり</span><span class="legend-done">✓ 準備済み</span><span>— 今回は該当なし</span></div>
-        <div id="timeline-years" class="timeline-years"></div>
-        </details>
-        <div id="timeline-extra" class="timeline-extra" hidden></div>
-      </section>
-      <section class="results" id="results" aria-live="polite"></section>
-      <section id="preparation-results" hidden aria-live="polite">
-        <h2>新セット分・追加準備候補</h2>
-        <p id="preparation-status"></p>
-        <div id="preparation-objects"></div>
-      </section>
-      <details id="search-details" class="result-details" hidden><summary>検索範囲・照合の詳細</summary><section class="environment-summary" id="environment-summary" hidden></section><section class="summary" id="summary" hidden></section></details>
-      <details id="meta-details" class="result-details" hidden><summary>採用デッキ・環境の内訳</summary>      <section class="top-meta" id="top-meta" hidden></section>
-      <section class="archetype-summary" id="archetype-summary" hidden></section>
-      <section class="token-summary" id="token-summary" hidden></section>
-      <section class="deck-summary" id="deck-summary" hidden></section>
+      <div class="results-layout">
+        <section class="set-timeline panel" id="set-timeline" hidden aria-label="抜き出すセット">
+          <header class="timeline-header">
+            <div><p class="eyebrow">PREPARATION</p><h2><span class="step-number">3</span>抜き出すセット</h2></div>
+            <p id="timeline-counts" class="timeline-counts" aria-live="polite"></p>
+          </header>
+          <p id="timeline-note" class="timeline-note"></p>
+          <div id="timeline-needed" class="timeline-products needed-products"></div>
+          <div id="timeline-extra" class="timeline-extra" hidden></div>
+          <details class="timeline-history"><summary>モダンの収録セット年表を見る</summary>
+            <div class="timeline-legend"><span class="legend-needed">● 抜く必要あり</span><span class="legend-done">✓ 準備済み</span><span>— 今回は該当なし</span></div>
+            <div id="timeline-years" class="timeline-years"></div>
+          </details>
+        </section>
 
-</details>
+        <div class="results-main">
+          <section class="results" id="results" aria-live="polite"></section>
+          <section id="preparation-results" class="preparation-results panel" hidden aria-live="polite">
+            <p class="eyebrow">NEW SET</p>
+            <h2>新セット分・追加準備候補</h2>
+            <p id="preparation-status"></p>
+            <div id="preparation-objects"></div>
+          </section>
+          <details id="search-details" class="result-details" hidden><summary>検索範囲・照合の詳細</summary>
+            <section class="environment-summary" id="environment-summary" hidden></section>
+            <section class="summary" id="summary" hidden></section>
+          </details>
+          <details id="meta-details" class="result-details" hidden><summary>採用デッキ・環境の内訳</summary>
+            <section class="top-meta" id="top-meta" hidden></section>
+            <section class="archetype-summary" id="archetype-summary" hidden></section>
+            <section class="token-summary" id="token-summary" hidden></section>
+            <section class="deck-summary" id="deck-summary" hidden></section>
+          </details>
+        </div>
+      </div>
+
       <footer class="legal-note">
         Unofficial Fan Content. Magic: The Gathering のカード画像・テキスト等は Wizards of the Coast に帰属します。このツールは Wizards of the Coast / Scryfall 非公認です。
       </footer>
@@ -178,12 +229,12 @@
             <p id="deck-dialog-kicker" class="dialog-kicker">画像付きデッキリスト</p>
             <h2 id="deck-dialog-title">デッキリスト</h2>
           </div>
-          <button id="deck-dialog-close" class="secondary-button dialog-close" type="button" aria-label="デッキリストを閉じる">閉じる</button>
+          <button id="deck-dialog-close" class="ghost-button dialog-close" type="button" aria-label="デッキリストを閉じる">閉じる</button>
         </header>
         <p id="deck-dialog-status" class="dialog-status" aria-live="polite"></p>
         <div id="deck-dialog-meta" class="deck-dialog-meta"></div>
         <div class="deck-gallery-toolbar">
-          <div class="deck-language-controls" role="group" aria-label="カード画像の言語">
+          <div class="deck-language-controls segmented" role="group" aria-label="カード画像の言語">
             <button type="button" data-deck-language="en" aria-pressed="true" disabled>English</button>
             <button type="button" data-deck-language="ja" aria-pressed="false" disabled>日本語</button>
           </div>
@@ -202,7 +253,7 @@
         </div>
         <footer class="dialog-actions">
           <button id="deck-copy-button" class="secondary-button" type="button" disabled>Arena形式をコピー</button>
-          <button id="deck-goldfish-button" type="button" disabled>このデッキをひとり回し</button>
+          <button id="deck-goldfish-button" class="primary-button" type="button" disabled>このデッキをひとり回し</button>
         </footer>
       </div>
     </dialog>
@@ -211,9 +262,9 @@
       <div class="dialog-shell">
         <header class="dialog-header">
           <h2 id="deck-preview-title"></h2>
-          <button id="deck-preview-close" type="button" class="secondary-button dialog-close" aria-label="カードの拡大を閉じる">閉じる</button>
+          <button id="deck-preview-close" type="button" class="ghost-button dialog-close" aria-label="カードの拡大を閉じる">閉じる</button>
         </header>
-        <div id="deck-preview-faces" class="deck-language-controls" role="group" aria-label="カードの面"></div>
+        <div id="deck-preview-faces" class="deck-language-controls segmented" role="group" aria-label="カードの面"></div>
         <img id="deck-preview-image" alt="">
         <p id="deck-preview-note" aria-live="polite"></p>
       </div>
@@ -226,7 +277,7 @@
             <p class="dialog-kicker">紙の操作をそのまま置けるプレイテスト卓</p>
             <h2 id="goldfish-title">ひとり回し</h2>
           </div>
-          <button id="goldfish-close" class="secondary-button dialog-close" type="button" aria-label="ひとり回しを閉じる">閉じる</button>
+          <button id="goldfish-close" class="ghost-button dialog-close" type="button" aria-label="ひとり回しを閉じる">閉じる</button>
         </header>
 
         <section class="goldfish-scoreboard" aria-label="ゲーム状況">
@@ -264,9 +315,9 @@
             <div class="goldfish-toolbar">
               <button id="goldfish-new-game" class="secondary-button" type="button">新しい初手</button>
               <button id="goldfish-mulligan" class="secondary-button" type="button">マリガン</button>
-              <button id="goldfish-keep" type="button">キープ</button>
+              <button id="goldfish-keep" class="primary-button" type="button">キープ</button>
               <button id="goldfish-draw" class="secondary-button" type="button">1枚引く</button>
-              <button id="goldfish-next-turn" type="button">次のターン</button>
+              <button id="goldfish-next-turn" class="primary-button" type="button">次のターン</button>
               <button id="goldfish-untap-all" class="secondary-button" type="button">全アンタップ</button>
               <button id="goldfish-undo" class="secondary-button" type="button" disabled>元に戻す</button>
               <button id="goldfish-redo" class="secondary-button" type="button" disabled>やり直す</button>
@@ -367,7 +418,7 @@
                   <label>パワー<input id="goldfish-token-power" value="1" maxlength="12"></label>
                   <label>タフネス<input id="goldfish-token-toughness" value="1" maxlength="12"></label>
                   <label>枚数<input id="goldfish-token-count" type="number" value="1" min="1" max="50"></label>
-                  <button type="submit">戦場に作る</button>
+                  <button type="submit" class="primary-button">戦場に作る</button>
                 </form>
                 <div class="goldfish-random-tools">
                   <strong>ランダム</strong>
@@ -446,9 +497,9 @@
                 <p>検索と上から見る操作を分離</p>
                 <h3>山札操作</h3>
               </div>
-              <button id="goldfish-close-library" class="secondary-button" type="button">閉じる</button>
+              <button id="goldfish-close-library" class="ghost-button" type="button">閉じる</button>
             </header>
-            <div class="goldfish-library-tabs" role="tablist">
+            <div class="goldfish-library-tabs segmented" role="tablist">
               <button type="button" role="tab" data-goldfish-library-mode="search" aria-selected="true">探してシャッフル</button>
               <button type="button" role="tab" data-goldfish-library-mode="top" aria-selected="false">上からX枚</button>
             </div>
@@ -484,13 +535,13 @@
           <aside id="goldfish-game-log" class="goldfish-game-log" hidden>
             <header>
               <div><p>保存される操作履歴</p><h3>ゲームログ／リプレイ</h3></div>
-              <button id="goldfish-close-game-log" class="secondary-button" type="button">閉じる</button>
+              <button id="goldfish-close-game-log" class="ghost-button" type="button">閉じる</button>
             </header>
             <ol id="goldfish-game-log-list"></ol>
           </aside>
 
           <aside id="goldfish-shortcut-help" class="goldfish-shortcut-help" hidden>
-            <header><h3>操作キー</h3><button id="goldfish-close-shortcuts" class="secondary-button" type="button">閉じる</button></header>
+            <header><h3>操作キー</h3><button id="goldfish-close-shortcuts" class="ghost-button" type="button">閉じる</button></header>
             <dl>
               <div><dt>T</dt><dd>選択カードをタップ／アンタップ</dd></div>
               <div><dt>U</dt><dd>全アンタップ</dd></div>
@@ -522,16 +573,16 @@
 
     <template id="object-template">
       <article class="card">
+        <a class="image-link" target="_blank" rel="noreferrer">
+          <img alt="" loading="lazy">
+        </a>
         <label class="picked-control">
           <input class="picked-checkbox" type="checkbox">
           <span>抜いた</span>
         </label>
-        <a class="image-link" target="_blank" rel="noreferrer">
-          <img alt="" loading="lazy">
-        </a>
         <div class="card-body">
           <div class="card-heading">
-            <div>
+            <div class="card-title">
               <h3></h3>
               <p class="jp"></p>
             </div>
@@ -542,24 +593,26 @@
             <span class="deck-count"></span>
             <span class="set-pill"></span>
           </div>
+          <div class="hints"></div>
           <p class="note"></p>
           <p class="prepared-notice" hidden></p>
-          <div class="hints"></div>
           <div class="source-preview"></div>
+        </div>
+        <div class="card-footer">
           <details class="token-decks" hidden>
             <summary></summary>
             <div class="token-deck-list"></div>
           </details>
-          <details>
+          <details class="source-details">
             <summary>これを出すカード / 採用元</summary>
             <ul class="source-card-list"></ul>
             <ul class="source-list"></ul>
           </details>
+          <details class="alternative-prints" hidden>
+            <summary>手元の通常セットから別版を探す</summary>
+            <div class="alternative-content" aria-live="polite"></div>
+          </details>
         </div>
-        <details class="alternative-prints" hidden>
-          <summary>手元の通常セットから別版を探す</summary>
-          <div class="alternative-content" aria-live="polite"></div>
-        </details>
       </article>
     </template>
 
@@ -578,6 +631,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261003-stock-ui" type="module"></script>
+    <script src="/app.js?v=20261003-redesign" type="module"></script>
   </body>
 </html>

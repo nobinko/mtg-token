@@ -741,10 +741,10 @@ function renderArchetypeSummary(archetypes) {
 
   const list = document.createElement("div");
   list.className = "archetype-list";
-  for (const item of sortedArchetypes.slice(0, 10)) {
+  for (const [index, item] of sortedArchetypes.slice(0, 10).entries()) {
     const row = document.createElement("div");
     row.className = "archetype-row";
-    const color = archetypeColor(item.name);
+    const color = archetypeColor(index);
 
     const dot = document.createElement("i");
     dot.style.background = color;
@@ -904,11 +904,11 @@ function renderTokenSummary(objects) {
   tokenSummaryEl.append(list);
 }
 
-function archetypeColor(name) {
-  const palette = ["#176a63", "#b7791f", "#6d5bd0", "#c2410c", "#2563eb", "#7f1d1d", "#4d7c0f", "#be185d", "#0f766e", "#64748b", "#9a3412"];
-  let hash = 0;
-  for (const char of String(name)) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return palette[hash % palette.length];
+// Validated categorical slots (styles.css --series-N) in fixed rank order; the rest fold into "その他".
+const archetypeSeriesSlots = 7;
+
+function archetypeColor(index) {
+  return index < archetypeSeriesSlots ? `var(--series-${index + 1})` : "var(--series-other)";
 }
 
 function polarToCartesian(cx, cy, r, angle) {
@@ -930,21 +930,29 @@ function renderMetaChart(archetypes) {
   svg.setAttribute("viewBox", "0 0 220 220");
   svg.setAttribute("role", "img");
 
-  const top = archetypes.slice(0, 10);
-  const total = top.reduce((sum, item) => sum + item.count, 0) || 1;
+  const slices = archetypes.slice(0, archetypeSeriesSlots).map((item, index) => ({ label: item.name, count: item.count || 0, percent: item.percent, color: archetypeColor(index) }));
+  const otherCount = archetypes.slice(archetypeSeriesSlots).reduce((sum, item) => sum + (item.count || 0), 0);
+  if (otherCount) slices.push({ label: "その他", count: otherCount, color: archetypeColor(archetypeSeriesSlots) });
+  const total = slices.reduce((sum, slice) => sum + slice.count, 0) || 1;
+  const gap = slices.length > 1 ? 1.4 : 0; // about a 2px surface gap at this radius
   let angle = 0;
-  for (const item of top) {
-    const span = item.count / total * 360;
-    const path = document.createElementNS(svgNs, "path");
-    path.setAttribute("d", donutSegment(110, 110, 82, angle, angle + span));
-    path.setAttribute("stroke", archetypeColor(item.name));
-    path.setAttribute("stroke-width", "36");
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke-linecap", "butt");
+  for (const slice of slices) {
+    const span = slice.count / total * 360;
+    const inset = span > gap * 2 ? gap / 2 : 0;
+    const segment = document.createElementNS(svgNs, span >= 359.9 ? "circle" : "path");
+    if (span >= 359.9) {
+      segment.setAttribute("cx", "110");
+      segment.setAttribute("cy", "110");
+      segment.setAttribute("r", "82");
+    } else segment.setAttribute("d", donutSegment(110, 110, 82, angle + inset, angle + span - inset));
+    segment.style.stroke = slice.color;
+    segment.setAttribute("stroke-width", "36");
+    segment.setAttribute("fill", "none");
+    segment.setAttribute("stroke-linecap", "butt");
     const title = document.createElementNS(svgNs, "title");
-    title.textContent = `${item.name}: ${item.percent}%`;
-    path.append(title);
-    svg.append(path);
+    title.textContent = `${slice.label}: ${slice.percent ?? (slice.count / total * 100).toFixed(1)}%`;
+    segment.append(title);
+    svg.append(segment);
     angle += span;
   }
 
@@ -1537,6 +1545,7 @@ function renderPreparationOverview() {
   const overview = document.querySelector("#preparation-overview");
   const ready = Boolean(lastSummaryData);
   for (const id of ["preparation-overview", "results-toolbar", "search-details", "meta-details"]) document.querySelector(`#${id}`).hidden = !ready;
+  document.querySelector("#intro-steps").hidden = ready;
   if (!ready) return;
   overview.replaceChildren();
   const objects = [...new Map([...lastObjects, ...lastPreparationObjects].map(object => [preparationKey(object), object])).values()];
@@ -1551,7 +1560,16 @@ function renderPreparationOverview() {
   const progress = document.createElement("progress");
   progress.max = Math.max(objects.length, 1); progress.value = prepared;
   progress.setAttribute("aria-label", `準備済み ${prepared} / ${objects.length}種類`);
-  overview.append(stats, progress);
+  const percent = objects.length ? Math.round(prepared / objects.length * 100) : 0;
+  const progressRow = document.createElement("div"), percentLabel = document.createElement("span");
+  progressRow.className = "overview-progress";
+  percentLabel.className = "overview-percent";
+  percentLabel.textContent = `${percent}%`;
+  progressRow.append(progress, percentLabel);
+  overview.append(stats, progressRow);
+  document.querySelector("#toolbar-progress-count").textContent = prepared;
+  document.querySelector("#toolbar-progress-total").textContent = objects.length;
+  document.querySelector("#toolbar-progress-fill").style.width = `${percent}%`;
   const data = lastSummaryData;
   const basis = document.createElement("p");
   basis.textContent = `${data.tournament ? "この大会の提出リスト" : "環境の公開リスト"} ${data.searchedDeckCount || 0}件から作成。必要数は同じ仕様をまとめた種類数です。`;
@@ -1703,6 +1721,7 @@ async function runSearch(event) {
   activeLogRunId = `${logSessionId}-${runId}`;
   const button = searchButton;
   tournamentUI.setSearching(true);
+  document.body.classList.add("is-searching");
   button.disabled = true;
   updateEnvironmentButton.disabled = true;
   resultFreshnessEl.hidden = true;
@@ -1809,6 +1828,7 @@ async function runSearch(event) {
     setStatus(`エラー: ${error.message}`);
   } finally {
     tournamentUI.setSearching(false);
+    document.body.classList.remove("is-searching");
     button.disabled = tournamentUI.isActive() && !tournamentUI.ready();
     updateEnvironmentButton.disabled = false;
   }
@@ -2035,6 +2055,7 @@ const tournamentUI = createTournamentController({ form, formatSelect, targetDate
   if (lastSummaryData) { resultFreshnessEl.hidden = false; resultFreshnessEl.textContent = "条件変更前の結果です。選択したリストで再検索してください。"; }
 } });
 printButton.addEventListener("click", () => window.print());
+document.querySelector("#jump-to-sets").addEventListener("click", () => setTimelineEl.scrollIntoView({ behavior: "smooth", block: "start" }));
 clearCacheButton.addEventListener("click", clearCache);
 updateEnvironmentButton.addEventListener("click", updateEnvironment);
 init().catch((error) => setStatus(`初期化エラー: ${error.message}`));
