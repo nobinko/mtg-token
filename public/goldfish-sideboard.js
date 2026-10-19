@@ -1,4 +1,4 @@
-import { createGoldfishGame } from "./goldfish.js?v=20261019-formats5";
+import { createGoldfishGame } from "./goldfish.js?v=20261020-solo3";
 
 // Registered rows, not cards currently in zones: a Wish, token or stolen card
 // must never become part of the next game's deck.
@@ -29,6 +29,7 @@ export function sideboardGoldfishGame(state, mainCounts, { random = Math.random 
 }
 
 export function goldfishFinish(state) {
+  if (state.rules.win) return state.rules.win;
   if (state.phase !== "playing" || state.rules.pendingChoice || state.stack.length || state.rules.sacrificeSequence) return null;
   const selfLost = state.players.self.life <= 0 || state.players.self.poison >= 10 || state.rules.emptyDraw;
   const opponentLost = state.players.opponent.life <= 0 || state.players.opponent.poison >= 10;

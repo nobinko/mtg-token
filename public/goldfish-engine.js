@@ -1,26 +1,32 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261019-formats5";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261019-formats5";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261019-formats5";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261019-formats5";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261019-formats5";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261019-formats5";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261019-formats5";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261019-formats5";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo3";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo3";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo3";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo3";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo3";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo3";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo3";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
 export const gameManaValue = card => goldfishManaValue(card);
-export function gameColors(card) { return face(card).colors?.length ? face(card).colors : [...new Set((face(card).manaCost || "").match(/[WUBRG]/g) || [])]; }
+export function gameColors(card) { return card.faceDown || /\bDevoid\b/.test(face(card).oracleText || "") ? [] : face(card).colors?.length ? face(card).colors : [...new Set((face(card).manaCost || "").match(/[WUBRG]/g) || [])]; }
 export function gameLandTypes(state, card) {
   if (!isType(card, "Land")) return [];
   let types = cardType(card).match(/\b(?:Plains|Island|Swamp|Mountain|Forest)\b/g) || [];
+  if (!state.battlefield.some(c => sameRef(ref(c), ref(card)))) return types;
+  const moon = hasRuleCard(state, "Blood Moon");
   // Both layer-four effects apply in timestamp order. Battlefield insertion order
   // is the entry order, and is preserved by layout/selection operations.
   for (const effect of live(state)) {
     if (name(effect) === "Blood Moon" && !/\bBasic\b/.test(cardType(card))) types = ["Mountain"];
     if (name(effect) === "Leyline of the Guildpact") types = ["Plains", "Island", "Swamp", "Mountain", "Forest"];
+    // Moon removes these nonbasic lands' static abilities before they can
+    // apply (dependency), irrespective of their entry timestamps.
+    if (!moon && verifiedGoldfishCard(effect) && name(effect) === "Yavimaya, Cradle of Growth") types.push("Forest");
+    if (!moon && verifiedGoldfishCard(effect) && name(effect) === "Urborg, Tomb of Yawgmoth") types.push("Swamp");
   }
-  return types;
+  return [...new Set(types)];
 }
 export const gameDomain = state => new Set(state.battlefield.flatMap(card => gameLandTypes(state, card))).size;
 export function engineStatAdjustments(state, card) {
@@ -32,6 +38,8 @@ export function engineStatAdjustments(state, card) {
   if (n === "Fiend Artisan") data.boost = state.graveyard.filter(c => isType(c, "Creature")).length;
   if (n === "Dark Matter Manipulator") data.boostPower = 2 * Math.floor(state.graveyard.length / 7);
   for (const aura of state.battlefield) if (aura.summonedAsBestow && find(state, aura.attachedTo)?.id === card.id) data.boost = (data.boost || 0) + 2;
+  for (const aura of state.battlefield) if (aura.kind === "token" && aura.name === "Monster Role" && sameRef(aura.attachedTo, ref(card))) data.boost = (data.boost || 0) + 1;
+  for (const aura of state.battlefield) if (name(aura) === "Sheltered by Ghosts" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) data.boostPower = (data.boostPower || 0) + 1;
   if (card.earthbent) data.power = data.toughness = 0;
   if (card.animated && (card.animated.until > state.rules.turnSerial || card.animated.serial === state.rules.turnSerial)) data.power = data.toughness = card.animated.size;
   return data;
@@ -41,6 +49,8 @@ export function engineKeywords(state, card) {
   if (card.earthbent) result.push("haste");
   if (card.dashed) result.push("haste");
   for (const aura of state.battlefield) if (aura.summonedAsBestow && find(state, aura.attachedTo)?.id === card.id) result.push("flying", "haste");
+  for (const aura of state.battlefield) if (aura.kind === "token" && aura.name === "Monster Role" && sameRef(aura.attachedTo, ref(card))) result.push("trample");
+  for (const aura of state.battlefield) if (name(aura) === "Sheltered by Ghosts" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) result.push("lifelink", "ward {2}");
   for (const key of ["flying", "trample", "haste", "vigilance", "lifelink", "hexproof", "first strike"]) if (card.counters?.[key] > 0) result.push(key);
   if (has(state, "Scion of Draco")) {
     const colors = has(state, "Leyline of the Guildpact") ? ["W", "U", "B", "R", "G"] : gameColors(card);
@@ -57,6 +67,7 @@ export function engineCandidates(state, operation, context = {}) {
     let cards = state[zone] || [];
     if (operation.top != null) cards = operation.top > 0 ? cards.slice(-operation.top).toReversed() : [];
     return cards.filter(card => {
+      if (f.spell && card.kind === "ability" || f.ability && card.kind !== "ability") return false;
       if (f.types?.length && !f.types.some(type => isType(card, type) || zone !== "battlefield" && type === "Creature" && name(card) === "Grist, the Hunger Tide")) return false;
       if (f.notTypes?.some(type => isType(card, type))) return false;
       if (f.nonBasic && isType(card, "Basic")) return false;
@@ -103,7 +114,7 @@ function destroy(state, card) {
 function counterTarget(state, ctx, destination = "graveyard") {
   if (ctx.target?.virtual) { (state.rules.notices ||= []).push({ text: `${ctx.sourceName}：相手の対象を打ち消す${destination === "exile" ? "・追放" : ""}（相手側の領域は省略）`, serial: state.rules.turnSerial }); ctx.vars.countered = true; return; }
   const card = find(state, ctx.target);
-  if (!card || card.cast?.uncounterable || /(?:This spell|\b[A-Z][^.]+) can't be countered\./.test(face(card).oracleText || "")) return;
+  if (!card || card.kind !== "ability" && (card.cast?.uncounterable || state.rules.uncounterableSerial === state.rules.turnSerial) || /(?:This spell|\b[A-Z][^.]+) can't be countered\./.test(face(card).oracleText || "")) return;
   if (card.kind === "ability") state.stack = state.stack.filter(c => c.id !== card.id);
   else move(state, card.id, "stack", destination);
   ctx.vars.countered = true;
@@ -119,11 +130,12 @@ export function engineEnter(state, card) {
   if (!verifiedGoldfishCard(card)) return entryTriggersBlocked(state, card);
   const add = (label, steps, extra) => queueGameAbility(state, card, label, steps, extra);
   if (n === "Urza's Saga" || n === "The Legend of Roku") { card.sagaChapter = 1; card.counters.lore = 1; add("第I章", n === "Urza's Saga" ? [{ op: "saga", chapter: 1 }] : [{ op: "impulse", count: 3 }]); return true; }
-  if (n === "Pompous Battlemage") { card.prepared = true; return true; }
+  if (["Pompous Battlemage", "Carnivorous Cultivator"].includes(n)) { card.prepared = true; return true; }
   if (n === "Moonshadow") { card.counters["-1/-1"] = 6; return true; }
   if (n === "Engineered Explosives") { card.counters.charge = card.castColors?.length || 0; return true; }
   if (n === "Chalice of the Void") { card.counters.charge = card.castX || 0; return true; }
   if (n === "Murktide Regent") { card.counters["+1/+1"] = (card.delvedCards || []).filter(c => isType(c, "Instant|Sorcery")).length; return true; }
+  if (n === "Eddymurk Crab" && state.rules.activePlayer !== "self") card.tapped = true;
   // These are entry choices, not triggered abilities: no priority window and
   // no interaction with Torpor Orb or Karn's trigger suppression.
   if (["Pithing Needle", "Disruptor Flute", "Cavern of Souls"].includes(n)) {
@@ -133,6 +145,16 @@ export function engineEnter(state, card) {
     return true;
   }
   if (entryTriggersBlocked(state, card)) return true;
+  if (n === "Faerie Miscreant") { if (live(state).some(c => c.id !== card.id && name(c) === n && isType(c, "Creature"))) add("別のフェアリーの悪党がいれば1枚引く", [{ op: "miscreant-draw" }]); return true; }
+  if (n === "Eddymurk Crab") { add("クリーチャーを2体までタップ", [{ op: "tap-targets" }], { targetSpec: { zone: "battlefield", types: ["Creature"], count: 2, optional: true, virtualOpponent: true } }); return true; }
+  if (["Vibrance", "Deceit"].includes(n)) {
+    const spent = card.castManaByColor || {};
+    if (n === "Vibrance" && spent.R >= 2) add("赤2マナで唱えた：3点", [{ op: "damage", amount: 3 }], { targetSpec: damageTarget });
+    if (n === "Vibrance" && spent.G >= 2) add("緑2マナで唱えた：土地探索・2点回復", [tutor({ types: ["Land"] }), { op: "life", amount: 2 }]);
+    if (n === "Deceit" && spent.U >= 2) add("青2マナで唱えた：土地でないパーマネントを戻す", [{ op: "bounce" }], { targetSpec: { zone: "battlefield", permanent: true, notTypes: ["Land"], excludeSelf: true, optional: true, virtualOpponent: true } });
+    if (n === "Deceit" && spent.B >= 2) add("黒2マナで唱えた：相手の手札破壊", [{ op: "opponent-effect", text: "相手の手札を公開して土地でないカード1枚を選んで捨てさせる" }]);
+    return true;
+  }
   if (FORMAT_ENTERS[n]) { add("戦場に出たとき", FORMAT_ENTERS[n], { x: card.castX || 0 }); return true; }
   if (n === "Rest in Peace") { add("全墓地を追放", [{ op: "exile-graveyard" }, { op: "opponent-effect", text: "相手の墓地を追放" }]); return true; }
   if (n === "Ingot Chewer") { add("アーティファクトを破壊", [{ op: "destroy-target" }], { targetSpec: { zone: "battlefield", types: ["Artifact"], virtualOpponent: true } }); return true; }
@@ -174,13 +196,14 @@ export function engineCast(state, spell) {
   };
   if (sourceSteps[n]) queueGameAbility(state, spell, "唱えたとき", sourceSteps[n], ["Devourer of Destiny", "Ugin, Eye of the Storms"].includes(n) ? { targetSpec: { zone: "battlefield", permanent: true, colored: true, optional: n.startsWith("Ugin"), virtualOpponent: true } } : {});
   if (n === "Sowing Mycospawn" && spell.cast?.kicked) queueGameAbility(state, spell, "キッカー：土地を追放", [{ op: "move-target", destination: "exile" }], { targetSpec: { zone: "battlefield", types: ["Land"], virtualOpponent: true } });
-  if (["Grapeshot", "Empty the Warrens", "Tendrils of Agony"].includes(n)) queueGameAbility(state, spell, `ストーム：${state.rules.spellsCast - 1}コピー`, [{ op: "storm", spell: structuredClone(spell), count: state.rules.spellsCast - 1 }]);
+  if (["Grapeshot", "Empty the Warrens", "Tendrils of Agony", "Flusterstorm"].includes(n)) queueGameAbility(state, spell, `ストーム：${state.rules.spellsCast - 1}コピー`, [{ op: "storm", spell: structuredClone(spell), count: state.rules.spellsCast - 1 }, ...(n === "Flusterstorm" && state.rules.spellsCast > 1 ? [{ op: "copy-target-options" }] : [])]);
   if (n === "Consign to Memory" && spell.cast?.replicate) queueGameAbility(state, spell, `複製：${spell.cast.replicate}コピー`, [{ op: "storm", spell: structuredClone(spell), count: spell.cast.replicate }, { op: "copy-target-options" }]);
   if (n === "Ulamog, the Ceaseless Hunger") queueGameAbility(state, spell, "パーマネント2つを追放", [{ op: "move-targets", destination: "exile" }], { targetSpec: { zone: "battlefield", permanent: true, count: 2, virtualOpponent: true } });
   if (n === "Cityscape Leveler") queueGameAbility(state, spell, "パーマネントを破壊・パワーストーン", [{ op: "leveler" }], { targetSpec: { zone: "battlefield", permanent: true, notTypes: ["Land"], optional: true, virtualOpponent: true } });
   for (const card of live(state)) {
     if (!verifiedGoldfishCard(card)) continue;
     const add = (label, steps, extra) => queueGameAbility(state, card, label, steps, extra);
+    if (name(card) === "Glaring Fleshraker" && !gameColors(spell).length) add("無色の呪文：落とし子を生成", [token("spawn")]);
     if (name(card) === "Pinnacle Emissary" && isType(spell, "Artifact")) add("ドローン生成", [token("drone")]);
     if (name(card) === "Stormchaser's Talent" && card.level >= 3 && isType(spell, "Instant|Sorcery")) add("カワウソ生成", [token("otter")]);
     if (name(card) === "Artist's Talent" && !isType(spell, "Creature")) add("任意で手札交換", [discard(1, { min: 0, remember: "selected" }), { op: "draw-selected" }]);
@@ -193,7 +216,7 @@ export function engineCast(state, spell) {
 }
 
 export function flushEngineEvents(state) {
-  if (state.rules.automation || state.rules.resolution) return state;
+  if (state.rules.automation || state.rules.resolution || state.rules.drawing) return state;
   for (let pass = 0; state.rules.events?.length && pass < 50; pass++) {
     const events = state.rules.events; state.rules.events = [];
     const deaths = events.filter(e => e.kind === "move" && e.from === "battlefield" && e.to === "graveyard" && isType(e.original, "Creature"));
@@ -202,6 +225,7 @@ export function flushEngineEvents(state) {
       for (const card of live(state).filter(c => name(c) === "Moonshadow" && verifiedGoldfishCard(c))) queueGameAbility(state, card, "−1/−1カウンターを取り除く", [{ op: "source-counter", name: "-1/-1", count: -1 }]);
     }
     for (const event of events) {
+      if (["sacrifice", "effect-sacrifice"].includes(event.reason) && event.original?.kind === "token") for (const c of watchers.filter(c => name(c) === "The Sackville-Bagginses" && verifiedGoldfishCard(c))) queueGameAbility(state, c, "トークンを生け贄：相手は1点失う", [{ op: "opponent-life", amount: -1 }]);
       if (event.reason === "sacrifice" && isType(event.original, "Artifact")) for (const c of (event.sacrificeWatchers || []).filter(c => verifiedGoldfishCard(c))) queueGameAbility(state, c, "アーティファクトを生け贄：相手に2点", [{ op: "damage", amount: 2 }], { target: { player: "opponent" } });
       if (event.kind === "draw") for (const c of (event.watchers || []).filter(c => name(c) === "Sheoldred, the Apocalypse" && verifiedGoldfishCard(c))) queueGameAbility(state, c, "ドロー：2点回復", [{ op: "life", amount: 2 }]);
       if (event.kind === "move" && event.from === "graveyard" && isType(event.original, "Instant|Sorcery")) for (const c of (event.graveyardWatchers || []).filter(c => verifiedGoldfishCard(c))) queueGameAbility(state, c, "墓地の呪文が離れた：＋1/＋1", [{ op: "source-counter", name: "+1/+1", count: 1 }]);
@@ -223,6 +247,7 @@ export function flushEngineEvents(state) {
         for (const watcher of live(state)) {
           if (!verifiedGoldfishCard(watcher)) continue;
           const n = name(watcher), add = (label, steps) => queueGameAbility(state, watcher, label, steps);
+          if (n === "Glaring Fleshraker" && watcher.id !== entering.id && isType(entering, "Creature") && !gameColors(entering).length) add("他の無色クリーチャー：相手に1点", [{ op: "damage", amount: 1, player: "opponent" }]);
           if (n === "Guide of Souls" && watcher.id !== entering.id && isType(entering, "Creature")) add("1点回復・エネルギー1", [{ op: "life", amount: 1 }, { op: "energy", count: 1 }]);
           if (n === "Haliya, Guided by Light" && isType(entering, "Creature|Artifact")) add("1点回復", [{ op: "life", amount: 1 }]);
           if (n === "Kappa Cannoneer" && isType(entering, "Artifact")) add("+1/+1・ブロックされない", [{ op: "source-counter", name: "+1/+1", count: 1 }, { op: "source-keyword", keyword: "unblockable" }]);
@@ -267,9 +292,11 @@ export function engineEndStep(state) {
     if (name(card) === "Ocelot Pride" && state.rules.lifeGained > 0 && verifiedGoldfishCard(card)) queueGameAbility(state, card, "猫を生成・都市の承認ならコピー", [{ op: "ocelot" }]);
     if (name(card) === "Haliya, Guided by Light" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "3点以上回復ならドロー", [{ op: "haliya-draw" }]);
     if (name(card) === "The Ten Rings" && verifiedGoldfishCard(card) && state.hand.length < 10) queueGameAbility(state, card, "手札10枚になるまで引く", [{ op: "ten-rings" }]);
+    if (name(card) === "Moseo, Vein's New Dean" && state.rules.lifeGained > 0 && verifiedGoldfishCard(card)) queueGameAbility(state, card, "このターンの回復量以下のクリーチャーを戻す", [{ op: "moseo-return" }], { targetSpec: { zone: "graveyard", types: ["Creature"], maxManaValue: state.rules.lifeGained, optional: true } });
   }
 }
 export function engineMainStep(state) {
+  for (const card of live(state)) if (name(card) === "Static Prison" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "エネルギー1を払うか生け贄", [{ op: "prison-upkeep" }]);
   for (const card of live(state)) if (name(card) === "The Legend of Roku" && verifiedGoldfishCard(card)) { card.sagaChapter = ++card.counters.lore; queueGameAbility(state, card, `第${card.sagaChapter}章`, card.sagaChapter === 2 ? [{ op: "mana-choice", count: 1 }] : [{ op: "roku-transform" }]); }
   for (const card of live(state)) if (name(card) === "Urza's Saga" && verifiedGoldfishCard(card)) {
     card.counters.lore = (card.counters.lore || 0) + 1; card.sagaChapter = card.counters.lore;
@@ -298,6 +325,7 @@ export function engineBeginningCombat(state) {
   return state.stack.length > before;
 }
 export function engineAttack(state, card, dealtDamage) {
+  if (!dealtDamage && card.kind === "token" && card.oracleText === TOKENS.attackingPest.oracleText) { queueGameAbility(state, card, "攻撃：1点回復", [{ op: "life", amount: 1 }]); return true; }
   if (sameRef(state.rules.ringBearer, ref(card))) {
     if (!dealtDamage && state.rules.ringLevel >= 2) queueGameAbility(state, card, "指輪：1枚引いて1枚捨てる", [draw(), discard(1)]);
     if (dealtDamage && state.rules.ringLevel >= 4) queueGameAbility(state, card, "指輪：相手は3点失う", [{ op: "opponent-life", amount: -3 }]);
@@ -305,6 +333,8 @@ export function engineAttack(state, card, dealtDamage) {
   if (!dealtDamage && /Firebending (\d+)/.test(face(card).oracleText || "")) queueGameAbility(state, card, "火の技", [{ op: "firebending", count: Number(face(card).oracleText.match(/Firebending (\d+)/)[1]) }]);
   if (!verifiedGoldfishCard(card)) return false;
   const n = name(card), add = (label, steps, extra) => queueGameAbility(state, card, label, steps, extra);
+  if (dealtDamage && n === "Carnivorous Cultivator") { add("墓地の土地を手札へ", [{ op: "move-target", destination: "hand" }], { targetSpec: { zone: "graveyard", types: ["Land"] } }); return true; }
+  if (dealtDamage && n === "Moon-Circuit Hacker") { add("任意でドロー・登場ターン以外は捨てる", [{ op: "hacker-draw", enteredSerial: card.enteredSerial }]); return true; }
   if (dealtDamage && n === "Ragavan, Nimble Pilferer") { add("宝物を生成・相手の上1枚を確認", [token("treasure"), { op: "restriction", label: "相手の山札を用意している場合、その上1枚を追放。このターン唱えられる。" }]); return true; }
   if (dealtDamage) return false;
   if (n === "Smaug the Magnificent") { add("宝物の数のダメージ", [{ op: "treasure-damage" }], { targetSpec: damageTarget }); return true; }
@@ -361,6 +391,98 @@ export function continueEngineResolution(state) {
     const op = ctx.steps[ctx.step], source = sourceOf(state, ctx), target = ctx.target?.player ? null : find(state, ctx.target);
     const count = amount(state, op.count, ctx);
     if (op.op === "draw") drawGameCards(state, count);
+    else if (op.op === "mox-entry") {
+      ctx.vars.moxSource = op.source || ctx.source;
+      insertSteps(ctx, [select("モックス・ダイアモンド：捨てる土地（選ばなければモックスは墓地へ）", "hand", { types: ["Land"] }, { destination: "graveyard", reason: "discard", remember: "moxLand" }), { op: "mox-place" }]);
+    }
+    else if (op.op === "mox-place") { const r = ctx.vars.moxSource, c = find(state, r); if (c) move(state, c.id, r.zone, ctx.vars.moxLand.length ? "battlefield" : "graveyard"); }
+    else if (op.op === "aura-enter") {
+      const candidates = engineCandidates(state, { zone: "battlefield", filter: { types: ["Creature"] } });
+      if (find(state, op.source) && candidates.length) { setChoice(state, { kind: "cards", label: "オーラを付けて出す自分のクリーチャー（対象は取らない）", min: 1, max: 1, candidates: candidates.map(({ ref, label }) => ({ ref, label })) }); return; }
+      // An Aura put directly onto the battlefield with nothing legal to
+      // enchant stays in its current zone; it does not enter and then die.
+    }
+    else if (op.op === "sackville-reward" && ctx.vars.selected?.length) insertSteps(ctx, [draw(), token("treasure")]);
+    else if (op.op === "format-targets") {
+      const spec = formatTargetSpec(ctx.sourceName, ctx.cast), candidates = spec ? engineCandidates(state, { ...spec, target: true }) : [];
+      for (const r of ctx.cast.modeTargets || []) {
+        if (!spec || !r.player && !candidates.some(c => sameRef(c.ref, r))) continue;
+        if (spec.effect === "counter") counterTarget(state, { ...ctx, target: r });
+        else if (spec.effect === "counter-unless") { ctx.target = r; insertSteps(ctx, [{ op: "counter-unless", cost: spec.cost }]); }
+        else if (spec.effect === "shrink") { const c = find(state, r); if (c) c.temporaryEffects.push({ power: -2, toughness: -2, turn: state.turn, label: ctx.sourceName }); }
+        else if (spec.effect === "damage") damage(state, r, 1);
+        else if (r.virtual) (state.rules.notices ||= []).push({ text: `${ctx.sourceName}：相手の対象を${spec.destination === "hand" ? "手札へ戻す" : "追放"}（相手側の領域は省略）`, serial: state.rules.turnSerial });
+        else move(state, r.id, r.zone || "battlefield", spec.destination);
+      }
+    }
+    else if (op.op === "lively-dirge") {
+      if (["tutor", "both"].includes(ctx.cast.mode)) insertSteps(ctx, [tutor({}, "graveyard"), ...(ctx.cast.mode === "both" ? [{ op: "dirge-return" }] : [])]);
+      else insertSteps(ctx, [{ op: "dirge-return" }]);
+    }
+    else if (op.op === "prismari") insertSteps(ctx, ctx.cast.mode === "surveil" ? [select("諜報2：墓地に置くカード", "library", {}, { top: 2, max: 2, destination: "graveyard" }), { op: "surveil-order", count: Math.min(2, state.library.length) }, draw()] : [{ op: "format-targets" }]);
+    else if (op.op === "surveil-order") { const remaining = count - (ctx.vars.selected?.length || 0); if (remaining > 1) insertSteps(ctx, [select("上に残す順番（最初に選ぶカードが一番上）", "library", {}, { top: remaining, min: remaining, max: remaining, destination: "libraryTop" })]); }
+    else if (op.op === "theorix") insertSteps(ctx, ctx.cast.mode === "mill" ? [{ op: "mill", count: 3 }, draw()] : [{ op: "format-targets" }]);
+    else if (op.op === "offense") {
+      if (ctx.cast.mode === "self") for (const c of state.battlefield.filter(c => isType(c, "Creature"))) addGameCounters(state, c, "+1/+1", 1);
+      else (state.rules.notices ||= []).push({ text: "相手の各クリーチャーに＋1/＋1カウンター1個（相手側の領域は省略）", serial: state.rules.turnSerial });
+      const r = ctx.cast.modeTargets?.[0], c = find(state, r);
+      if (r?.virtual || c && isType(c, "Creature") && !goldfishKeywords(state, c).has("shroud")) { ctx.target = r; setChoice(state, { kind: "buttons", label: "クリーチャーに与える能力", options: [{ value: "double strike", label: "二段攻撃" }, { value: "lifelink", label: "絆魂" }] }); return; }
+    }
+    else if (op.op === "essence-flux" && target) {
+      const exiled = move(state, target.id, "battlefield", "exile");
+      if (state.exile.includes(exiled)) { const returned = move(state, exiled.id, "exile", "battlefield"); if (isType(returned, "Spirit")) addGameCounters(state, returned, "+1/+1", 1); }
+    }
+    else if (op.op === "spell-mastery-damage") damage(state, ctx.target, state.graveyard.filter(c => isType(c, "Instant|Sorcery")).length >= 2 ? 3 : 2);
+    else if (op.op === "grant-flashback" && target) target.grantedCast = { cost: face(target).manaCost, serial: state.rules.turnSerial, flashback: true };
+    else if (op.op === "aura-resolve" && target) { const aura = move(state, ctx.entryId, "stack", "battlefield"); aura.attachedTo = ref(target); }
+    else if (op.op === "tap-targets") for (const r of ctx.targets) { const c = find(state, r); if (c && isType(c, "Creature") && !goldfishKeywords(state, c).has("shroud")) c.tapped = true; }
+    else if (op.op === "miscreant-draw" && live(state).some(c => c.id !== ctx.source.id && name(c) === "Faerie Miscreant" && isType(c, "Creature"))) drawGameCards(state, 1);
+    else if (op.op === "veil") { setChoice(state, { kind: "buttons", label: "このターン、相手は青か黒の呪文を唱えましたか？", options: [{ value: "no", label: "いいえ（ドローなし）" }, { value: "yes", label: "はい（1枚引く）" }] }); return; }
+    else if (op.op === "starcage-exile" && source) {
+      source.boundCards ||= [];
+      for (const c of [...state.battlefield]) if (isType(c, "Artifact|Creature") && gameManaValue(c) <= 2) { const exiled = move(state, c.id, "battlefield", "exile"); if (state.exile.includes(exiled)) source.boundCards.push(ref(exiled, "exile")); }
+      (state.rules.notices ||= []).push({ text: "相手のマナ総量2以下のアーティファクト／クリーチャーも、この星牢が離れるまで追放（相手側の領域は省略）", serial: state.rules.turnSerial });
+    }
+    else if (op.op === "starcage-robots") {
+      let count = 0;
+      for (const r of (source || ctx.snapshot).boundCards || []) if (find(state, r)) { const moved = move(state, r.id, "exile", "graveyard"); if (state.graveyard.includes(moved)) count++; }
+      makeGameToken(state, { name: "Robot", typeLine: "Token Artifact Creature — Robot", power: "2", toughness: "2" }, count);
+      if (source) move(state, source.id, "battlefield", "graveyard", "effect-sacrifice");
+    }
+    else if (op.op === "lynx-damage") {
+      damage(state, { player: "self" }, state.battlefield.filter(c => isType(c, "Land") && !isType(c, "Basic")).length);
+      setChoice(state, { kind: "number", label: "相手がコントロールする基本でない土地の数", min: 0, max: 99 }); return;
+    }
+    else if (op.op === "dirge-return") insertSteps(ctx, [select("戻すクリーチャーを2枚まで（合計マナ総量4以下）", "graveyard", { types: ["Creature"], maxManaValue: 4 }, { max: 2, totalManaValue: 4, destination: "battlefield" })]);
+    else if (op.op === "stories-discard") {
+      const options = [{ value: "two", label: "手札を2枚捨てる" }];
+      if (state.hand.some(c => isType(c, "Creature"))) options.unshift({ value: "creature", label: "クリーチャー1枚を捨てる" });
+      if (state.hand.length) { setChoice(state, { kind: "buttons", label: "捨て方を選ぶ", options }); return; }
+    }
+    else if (op.op === "prison-upkeep" && source) {
+      setChoice(state, { kind: "buttons", label: "静牢を維持しますか？", options: [...(state.players.self.energy > 0 ? [{ value: "pay", label: "エネルギー1を支払う" }] : []), { value: "sacrifice", label: "静牢を生け贄にする" }] }); return;
+    }
+    else if (op.op === "hacker-draw") { setChoice(state, { kind: "buttons", label: "1枚引きますか？", options: [{ value: "yes", label: op.enteredSerial === state.rules.turnSerial ? "1枚引く" : "1枚引いて1枚捨てる" }, { value: "no", label: "引かない" }] }); return; }
+    else if (op.op === "moseo-return" && target && state.rules.lifeGained > 0 && gameManaValue(target) <= state.rules.lifeGained) move(state, target.id, "graveyard", "battlefield");
+    else if (op.op === "grave-source-battlefield" && source) move(state, source.id, "graveyard", "battlefield");
+    else if (op.op === "oven-food") makeGameToken(state, TOKENS.food, Number(ctx.costCards[0]?.lastKnownToughness ?? ctx.costCards[0]?.toughness) >= 4 ? 2 : 1);
+    else if (op.op === "defeat") { if (target) move(state, target.id, "battlefield", "exile"); changeLife(state, -3, ctx.target?.virtual ? "opponent" : "self"); changeLife(state, 3); }
+    else if (op.op === "monster-role" && target) { const role = makeGameToken(state, TOKENS.monsterRole)[0]; role.attachedTo = ref(target); }
+    else if (op.op === "oracle-look") {
+      // Lock devotion once as this ability resolves, including hybrid symbols.
+      ctx.vars.devotion = state.battlefield.filter(c => !c.faceDown).reduce((n, c) => n + ((face(c).manaCost || "").match(/\{[^}]*U[^}]*\}/g) || []).length, 0);
+      insertSteps(ctx, [select(`信心${ctx.vars.devotion}：上に残すカード（0〜1枚）`, "library", {}, { top: ctx.vars.devotion, destination: "libraryTop", remainder: "libraryBottom", randomRemainder: true })]);
+    }
+    else if (op.op === "oracle-win" && ctx.vars.devotion >= state.library.length) state.rules.win = { kind: "win", label: "タッサの神託：青への信心が山札枚数以上" };
+    else if (op.op === "doomsday") insertSteps(ctx, [select("最後の審判：山札と墓地から5枚を選ぶ", ["library", "graveyard"], {}, { min: 5, max: 5, remember: "doomsday" }), { op: "doomsday-pile" }]);
+    else if (op.op === "doomsday-pile") {
+      const selected = ctx.vars.doomsday || [], ids = new Set(selected.map(c => c.id));
+      for (const zone of ["library", "graveyard"]) for (const c of [...state[zone]]) if (!ids.has(c.id)) move(state, c.id, zone, "exile");
+      for (const c of selected) if (c.ref.zone === "graveyard") move(state, c.id, "graveyard", "libraryTop");
+      const n = state.library.length;
+      insertSteps(ctx, [select("積む順番を選ぶ（最初に選ぶカードが一番上）", "library", {}, { min: n, max: n, destination: "libraryTop" }), { op: "lose-half-life" }]);
+    }
+    else if (op.op === "lose-half-life") changeLife(state, -Math.ceil(state.players.self.life / 2));
     else if (op.op === "half-x-draw") drawGameCards(state, Math.floor(ctx.x / 2));
     else if (op.op === "cryomancer-reflexive") {
       const count = (ctx.vars.selected || []).filter(c => !isType(c, "Land")).length;
@@ -406,7 +528,7 @@ export function continueEngineResolution(state) {
       if (target) { destroy(state, target); makeGameToken(state, { name: "Powerstone", typeLine: "Token Artifact — Powerstone", tapped: true, power: "", toughness: "", oracleText: "{T}: Add {C}. This mana can't be spent to cast a nonartifact spell." }); }
       else if (ctx.target?.virtual) (state.rules.notices ||= []).push({ text: "相手の対象を破壊し、相手がタップ状態のパワーストーンを生成（相手の領域は省略）", serial: state.rules.turnSerial });
     }
-    else if (op.op === "name-card") { setChoice(state, { kind: "name", label: "指定するカード名（英語）", names: [...new Set([...state.library, ...state.hand, ...state.battlefield, ...state.graveyard, ...state.sideboard].map(name))].sort() }); return; }
+    else if (op.op === "name-card") { setChoice(state, { kind: "name", label: op.landOnly ? "土地のカード名を指定（英語）" : "指定するカード名（英語）", names: [...new Set([...state.library, ...state.hand, ...state.battlefield, ...state.graveyard, ...state.sideboard].filter(c => !op.landOnly || isType(c, "Land")).map(name))].sort() }); return; }
     else if (op.op === "beza") { setChoice(state, { kind: "comparisons", label: "ベザ：相手のほうが多いものを選ぶ", options: [{ value: "lands", label: "土地の数（宝物1つ）" }, { value: "creatures", label: "クリーチャーの数（魚2体）" }, { value: "hand", label: "手札枚数（1枚ドロー）" }] }); return; }
     else if (op.op === "arena-mana" && source) { state.manaPool.R += 2; state.rules.hasteMana = (state.rules.hasteMana || 0) + 2; source.exerted = true; }
     else if (op.op === "encampment") (state.rules.encampments ||= []).push(structuredClone(ctx.snapshot));
@@ -425,7 +547,7 @@ export function continueEngineResolution(state) {
     else if (op.op === "pyromancer-tokens") makeGameToken(state, TOKENS.elemental, (ctx.vars.selected || []).filter(c => !isType(c, "Land")).length);
     else if (op.op === "speaker-tutor") { if (ctx.vars.selected?.length) insertSteps(ctx, [tutor({ types: ["Creature"] })]); }
     else if (op.op === "consult") { const size = state.battlefield.filter(c => isType(c, "Land")).length; insertSteps(ctx, [{ ...look(size, {}), min: ctx.cast.kicked ? 2 : 1, max: ctx.cast.kicked ? 2 : 1, randomRemainder: true }]); }
-    else if (op.op === "damage") damage(state, ctx.target, amount(state, op.amount, ctx));
+    else if (op.op === "damage") damage(state, op.player ? { player: op.player } : ctx.target, amount(state, op.amount, ctx));
     else if (op.op === "counter-target") counterTarget(state, ctx, op.destination);
     else if (op.op === "counter-unless") {
       const ferocious = op.ferocious && state.battlefield.some(c => isType(c, "Creature") && Number(goldfishCharacteristics(state, c).power) >= 4);
@@ -636,9 +758,15 @@ export function continueEngineResolution(state) {
 function applySelection(state, ctx, op, refs, seen) {
   const selected = refs.map(r => ({ ...structuredClone(find(state, r)), ref: r })).filter(c => c.id);
   ctx.vars[op.remember || "selected"] = selected;
+  if (op.op === "aura-enter" && selected.length) {
+    const aura = find(state, op.source), creature = find(state, refs[0]);
+    if (aura && creature && isType(creature, "Creature")) { const entered = move(state, aura.id, op.source.zone, "battlefield"); if (state.battlefield.includes(entered)) entered.attachedTo = ref(creature); }
+  }
   // UI order is first-to-draw; library is stored with its top at the end.
   for (const card of op.destination === "libraryTop" ? selected.toReversed() : selected) if (op.destination) {
-    const moved = move(state, card.id, card.ref.zone, op.destination);
+    if (op.destination === "battlefield" && name(card) === "Mox Diamond" && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "mox-entry", source: card.ref }]); continue; }
+    if (op.destination === "battlefield" && name(card) === "Sheltered by Ghosts" && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "aura-enter", source: card.ref }]); continue; }
+    const moved = move(state, card.id, card.ref.zone, op.destination, op.reason || "");
     const actual = ["battlefield", "hand", "graveyard", "exile", "library"].find(zone => state[zone].includes(moved));
     card.ref = ref(moved, actual || card.ref.zone);
     if (actual === "battlefield" && (op.tapped || /enters tapped\./.test(face(moved).oracleText || ""))) moved.tapped = true;
@@ -704,13 +832,14 @@ export function chooseEngine(state, answer) {
   const op = ctx.steps[ctx.step];
   if (choice.kind === "name") {
     if (typeof answer.value !== "string" || !answer.value.trim() || answer.value.length > 160) throw new Error("カード名を入力してください。");
+    if (op.landOnly && [...state.library, ...state.hand, ...state.battlefield, ...state.graveyard, ...state.exile, ...state.sideboard].some(c => name(c).toLowerCase() === answer.value.trim().toLowerCase() && !isType(c, "Land"))) throw new Error("土地のカード名を指定してください。");
     const card = sourceOf(state, ctx); if (card) card.chosenName = choice.names.find(n => n.toLowerCase() === answer.value.trim().toLowerCase()) || answer.value.trim();
   } else if (choice.kind === "comparisons") {
     if (!Array.isArray(answer.values) || new Set(answer.values).size !== answer.values.length || answer.values.some(v => !choice.options.some(o => o.value === v))) throw new Error("比較条件を選んでください。");
     if (answer.values.includes("lands")) makeGameToken(state, TOKENS.treasure);
     if (state.players.opponent.life > state.players.self.life) changeLife(state, 4);
     if (answer.values.includes("creatures")) makeGameToken(state, { name: "Fish", colors: ["U"], typeLine: "Token Creature — Fish", power: "1", toughness: "1" }, 2);
-    if (answer.values.includes("hand")) drawGameCards(state, 1);
+    if (answer.values.includes("hand")) insertSteps(ctx, [draw()]);
   } else if (choice.kind === "copy-target") {
     if (!choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(answer.target))) throw new Error("対象を選んでください。");
     if (op.op === "retarget-copy") ctx.vars.stormCopies[op.index].cast.target = answer.target;
@@ -718,13 +847,14 @@ export function chooseEngine(state, answer) {
   } else if (choice.kind === "cards") {
     const refs = answer.refs;
     if (!Array.isArray(refs) || refs.length < choice.min || refs.length > choice.max || new Set(refs.map(r => r.id)).size !== refs.length || refs.some(r => !choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(r)) || !find(state, r))) throw new Error(`カードを${choice.min}〜${choice.max}枚選んでください。`);
+    if (op.totalManaValue != null && refs.reduce((n, r) => n + gameManaValue(find(state, r)), 0) > op.totalManaValue) throw new Error(`合計マナ総量を${op.totalManaValue}以下にしてください。`);
     applySelection(state, ctx, op, refs, choice.seen);
   } else if (choice.kind === "number") {
     const n = answer.value;
     if (!Number.isInteger(n) || n < choice.min || n > choice.max) throw new Error("範囲内の整数を選んでください。");
-    state.players.self.energy -= n;
-    if (op.op === "energy-damage") damage(state, ctx.target, n);
-    else for (const card of [...state.battlefield]) if (isType(card, "Artifact|Creature|Enchantment") && gameManaValue(card) <= n) destroy(state, card);
+    if (op.op === "lynx-damage") damage(state, { player: "opponent" }, n);
+    else if (op.op === "energy-damage") { state.players.self.energy -= n; damage(state, ctx.target, n); }
+    else { state.players.self.energy -= n; for (const card of [...state.battlefield]) if (isType(card, "Artifact|Creature|Enchantment") && gameManaValue(card) <= n) destroy(state, card); }
   } else if (choice.kind === "mana") {
     if (!Array.isArray(answer.colors) || answer.colors.length !== choice.count || answer.colors.some(c => !(choice.colors || ["W", "U", "B", "R", "G"]).includes(c))) throw new Error("マナの色を選んでください。");
     if (op.sameColor && new Set(answer.colors).size !== 1) throw new Error("同じ色のマナを選んでください。");
@@ -733,6 +863,11 @@ export function chooseEngine(state, answer) {
     const values = choice.multiple ? answer.values : [answer.value];
     if (!Array.isArray(values) || values.length !== (choice.multiple || 1) || new Set(values).size !== values.length || values.some(v => !choice.options.some(o => o.value === v))) throw new Error("選択肢を選んでください。");
     const value = values[0];
+    if (op.op === "veil") { state.rules.uncounterableSerial = state.rules.turnSerial; (state.rules.notices ||= []).push({ text: "このターン、自分と自分のパーマネントは青と黒からの呪禁を得る（相手側の対象選択は省略）", serial: state.rules.turnSerial }); if (value === "yes") insertSteps(ctx, [draw()]); }
+    if (op.op === "offense") { const c = find(state, ctx.target); if (c) c.temporaryEffects.push({ keywords: [value], turn: state.turn, label: ctx.sourceName }); }
+    if (op.op === "stories-discard") insertSteps(ctx, [select("捨てる手札", "hand", value === "creature" ? { types: ["Creature"] } : {}, { min: value === "creature" ? 1 : 2, max: value === "creature" ? 1 : 2, destination: "graveyard" })]);
+    if (op.op === "hacker-draw" && value === "yes") insertSteps(ctx, [draw(), ...(op.enteredSerial === state.rules.turnSerial ? [] : [discard(1)])]);
+    if (op.op === "prison-upkeep") { const source = sourceOf(state, ctx); if (value === "pay") state.players.self.energy--; else if (source) move(state, source.id, "battlefield", "graveyard", "sacrifice"); }
     if (op.op === "copy-target-options" && value === "new") insertSteps(ctx, ctx.vars.stormCopies.map((_, index) => ({ op: "retarget-copy", index })));
     if (op.op === "counter-unless") {
       if (value === "pay") { const plan = planGoldfishPayment(state, { manaCost: op.cost }); if (!plan.payable) throw new Error(plan.reason); for (const a of plan.activations) state.battlefield.find(c => c.id === a.id).tapped = true; state.manaPool = plan.remaining; state.rules.restrictedMana = plan.restrictedMana; state.rules.hasteMana = plan.remainingHasteMana; state.rules.fireMana = plan.remainingFireMana; changeLife(state, -plan.life); }
@@ -742,7 +877,7 @@ export function chooseEngine(state, answer) {
       const plan = planGoldfishPayment(state, { manaCost: op.cost });
       if (!plan.payable) throw new Error(plan.reason);
       for (const activation of plan.activations) state.battlefield.find(c => c.id === activation.id).tapped = true;
-      state.manaPool = plan.remaining; state.rules.restrictedMana = plan.restrictedMana; state.rules.hasteMana = plan.remainingHasteMana; state.rules.fireMana = plan.remainingFireMana; changeLife(state, -plan.life); drawGameCards(state, 1);
+      state.manaPool = plan.remaining; state.rules.restrictedMana = plan.restrictedMana; state.rules.hasteMana = plan.remainingHasteMana; state.rules.fireMana = plan.remainingFireMana; changeLife(state, -plan.life); insertSteps(ctx, [draw()]);
     }
     if (op.op === "guide-attack" && value === "yes") {
       if (state.players.self.energy < 3) throw new Error("エネルギーが足りません。");

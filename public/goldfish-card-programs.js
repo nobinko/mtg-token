@@ -1,6 +1,6 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261019-formats5";
-import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261019-formats5";
-import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261019-formats5";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo3";
+import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-solo3";
+import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-solo3";
 
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function verifiedGoldfishCard(card) {
@@ -50,6 +50,9 @@ export const ENGINE_RULE_NOTES = {
   "The Ten Rings": "終了時、手札10枚までドロー"
 };
 export const TOKENS = {
+  food: { name: "Food", typeLine: "Token Artifact — Food", power: "", toughness: "", oracleText: "{2}, {T}, Sacrifice this artifact: You gain 3 life." },
+  attackingPest: { name: "Pest", typeLine: "Token Creature — Pest", colors: ["B", "G"], power: "1", toughness: "1", oracleText: "Whenever this token attacks, you gain 1 life." },
+  monsterRole: { name: "Monster Role", typeLine: "Token Enchantment — Aura Role", power: "", toughness: "", oracleText: "Enchant creature\nEnchanted creature gets +1/+1 and has trample." },
   map: { name: "Map", typeLine: "Token Artifact — Map", power: "", toughness: "", oracleText: "{1}, {T}, Sacrifice this artifact: Target creature you control explores. Activate only as a sorcery." },
   lander: { name: "Lander", typeLine: "Token Artifact — Lander", power: "", toughness: "", oracleText: "{2}, {T}, Sacrifice this artifact: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle." },
   spawn: { name: "Eldrazi Spawn", typeLine: "Token Creature — Eldrazi Spawn", power: "0", toughness: "1", oracleText: "Sacrifice this creature: Add {C}." },
@@ -153,7 +156,7 @@ const TARGETS = {
   ,Tear: { zone: "battlefield", types: ["Enchantment"], virtualOpponent: true }
 };
 export function engineSpellProgram(card) {
-  if (!verifiedGoldfishCard(card) || !isType(card, "Instant|Sorcery")) return null;
+  if (!verifiedGoldfishCard(card) || !isType(card, "Instant|Sorcery") && !["Sheltered by Ghosts", "Mox Diamond"].includes(cardName(card))) return null;
   const name = cardName(card);
   if (FORMAT_SPELLS[name]) return { id: name, engine: true, ...FORMAT_SPELLS[name], label: "カードの効果を順に解決" };
   if (!SPELLS[name]) return null;
@@ -166,6 +169,7 @@ export function engineCardActions(card) {
   if (!card || card.faceDown || card.automaticAbilities === false) return [];
   const name = cardName(card), result = [];
   if (card.kind === "token") {
+    if (name === "Food") result.push(ability("food", "{2}：食物を生け贄にして3点回復", "{2}", [{ op: "life", amount: 3 }], { tap: true, sacrifice: true }));
     if (name === "Map") result.push(ability("map-explore", "{1}：生け贄にして探検", "{1}", [{ op: "explore" }], { main: true, tap: true, sacrifice: true, targetSpec: { zone: "battlefield", types: ["Creature"] } }));
     if (name === "Lander") result.push(ability("lander", "{2}：基本土地をタップ状態で探す", "{2}", [tutor({ types: ["Basic"], subtypes: ["Plains", "Island", "Swamp", "Mountain", "Forest"] }, "battlefield", { tapped: true })], { tap: true, sacrifice: true }));
     if (["Eldrazi Spawn", "Eldrazi Scion"].includes(name)) result.push(ability("spawn-mana", "生け贄にして {C}", "{0}", [{ op: "mana", colors: ["C"] }], { sacrifice: true, manaAbility: true }));
@@ -173,6 +177,11 @@ export function engineCardActions(card) {
   }
   if (!verifiedGoldfishCard(card)) return result;
   const add = (...args) => result.push(ability(...args));
+  if (name === "Street Wraith") add("wraith-cycle", "2ライフ：サイクリング", "{0}", [draw()], { zone: "hand", discardSelf: true, lifeCost: 2 });
+  if (name === "Edge of Autumn") add("edge-cycle", "土地を生け贄：サイクリング", "{0}", [draw()], { zone: "hand", discardSelf: true, costSelect: { zone: "battlefield", filter: { types: ["Land"] }, count: 1, destination: "graveyard" } });
+  if (name === "Pinnacle Starcage") add("starcage", "{6}{W}{W}：追放したカードを墓地へ・ロボット生成", "{6}{W}{W}", [{ op: "starcage-robots" }]);
+  if (name === "Cauldron Familiar") add("familiar-return", "食物を生け贄：戦場へ戻す", "{0}", [{ op: "grave-source-battlefield" }], { zone: "graveyard", costSelect: { zone: "battlefield", filter: { types: ["Food"] }, count: 1, destination: "graveyard" } });
+  if (name === "Witch's Oven") add("oven", "{T}：クリーチャーを生け贄にして食物を作る", "{0}", [{ op: "oven-food" }], { tap: true, costSelect: { zone: "battlefield", filter: { types: ["Creature"] }, count: 1, destination: "graveyard" } });
   if (name === "Lotus Petal") add("petal", "生け贄：好きな色1マナ", "{0}", [{ op: "mana-choice", count: 1 }], { tap: true, sacrifice: true, manaAbility: true });
   if (name === "Lion's Eye Diamond") add("diamond", "手札をすべて捨てて生け贄：同色3マナ", "{0}", [{ op: "mana-choice", count: 3, sameColor: true }], { sacrifice: true, discardHand: true, manaAbility: true });
   if (name === "Seasoned Cryomancer") add("cryomancer", "墓地から追放：2枚引く", "{3}{U}{U}", [draw(2)], { zone: "graveyard", exileSelf: true });

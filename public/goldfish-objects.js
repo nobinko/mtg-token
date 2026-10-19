@@ -1,5 +1,5 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261019-formats5";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo3";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);
@@ -17,6 +17,7 @@ export function resetGoldfishCardState(card) {
     note: "", groupId: "", temporaryEffects: [], attachedTo: null, automaticAbilities: true, damage: 0 };
   delete next.cast;
   delete next.delvedCards;
+  delete next.castManaByColor;
   delete next.playPermission;
   delete next.exerted;
   for (const key of ["chosenName", "castX", "unearthed", "stationed", "addedArtifactSerial"]) delete next[key];

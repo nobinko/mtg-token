@@ -88,7 +88,49 @@
 - 今回Meleeへの新規再取得は通信エラーだったため、ライブ再取得の成功とは扱わず、ブラウザーに保存してあった大会リストを使用した。固定10種類の入口がなく、大会から実リストへ進めることを確認した。
 - その後2026-10-18に通信の再試行を追加し、サーバー再起動後の国内大会一覧から537件を新規取得して準備表88種類・カード名の未照合0件まで別途確認した。取得経路の詳細は [melee-tournaments.md](melee-tournaments.md#新規取得の通し確認2026-10-18) に記録した。
 
+## Standard・Legacy・Pioneerの追加検証（2026-10-20）
+
+既存の30種類を継続使用した。取得時点の固定資料であり、現在の順位を再取得したものではない。追加実装の主な範囲:
+
+| 動き | 自動処理と選択 |
+| --- | --- |
+| 土地単 | 壌土からの生命の0〜3対象、各ドローの発掘、モックスのダイアモンドの登場前の土地破棄。ヤヴィマヤ／アーボーグの土地タイプとマナ、血染めの月との依存関係。 |
+| Doomsday | 山札・墓地から5枚を残す→残りを追放→順番を選ぶ→ライフ半減。Street Wraith／Edge of Autumnのサイクリング、神託者の信心・山札整理・勝利判定。 |
+| 手札・墓地の活用 | Winternight Storiesの捨て方と調和のタップ軽減、Lively Dirgeの放題・探索・合計マナ総量4以下の蘇生。複数ドローの途中で発掘しても残りの処理を再開。 |
+| 猫かまど | 大釜の使い魔の墓地からの帰還、魔女のかまどの生け贄時のタフネス、食物の起動。The Sackville-Bagginsesの生け贄選択とトークンを生け贄にした誘発。 |
+| 強化・除去 | Monstrous Rageの一時修整・怪物の役割・新しい役割の優先、Sheltered by Ghostsの装着・強化・絆魂。Get Out、Tear Asunder、Prismari／Theorix Charmのモード・対象・解決時の再確認。Practiced Offenseのプレイヤー選択とフラッシュバック。 |
+| その他の局面 | Glaring Fleshrakerの無色呪文と無色クリーチャー登場、Pinnacle Starcage、Petrified Hamlet、Vibrance／Deceitの実際に払った色別マナ、静牢のエネルギー維持、Veil of Summerの条件付きドロー。 |
+
+`test/goldfish-formats.test.js` は43本。うち2本は下記の実リストを使う初手からの決着試験。ほかにリストの出典・本文の検査と、明示的に準備した局面のルール試験がある。対象消失、追加コスト確定前のキャンセル、領域移動、置換と誘発の区別、保存復元を含む。
+
+### 実リストでの決着と実画面
+
+- [Doomsday / WeareVenom](https://mtgtop8.com/event?e=92449&d=902298&f=LE): 60/15枚を保持し、シャッフルの固定シード17から開始。Underground Sea→Dark Ritual→Doomsday、Street WraithでOracleを引き、次ターンのLotus Petalと追加サイクリングから神託者でT2勝利。途中のカード・マナ追加はない。
+- サイド後は同じ実リストのPonder1枚をFlusterstorm1枚と交換し、同じ初手生成からT2勝利まで確認。この交換は処理検証用であり、対面別のサイド案ではない。固定シードによる一経路なので、平均速度・勝率・すべての初手を示さない。
+- ブラウザーは環境検索Legacy・大会日2026-10-19・300リストから、[Legacy Challenge 32 / empiricism](https://www.mtgo.com/decklist/legacy-challenge-32-2026-10-1812856606) の61/15リストを開いた。通常の初手にヤヴィマヤ・不毛の大地・壌土からの生命があり、T1ヤヴィマヤ、T2不毛の大地、土地2枚の自動タップでLoamを0対象で解決。カード・マナを足していない。
+- T3のドローが発掘選択で停止。ひとり回しを閉じて開き直し、保存済みの選択から発掘3を実行。山札53→50、手札5→6、墓地1→3を画面で確認した。`.cache/goldfish-dredge-choice-20261020.png` と `.cache/goldfish-dredge-result-20261020.png` に記録。途中、払えるはずのLoamが止まるヤヴィマヤの欠落と、発掘待ちを「山札が空」と扱う表示を修正した。
+
+### 残る範囲
+
+同じ停止検出用操作者で30種類を再実行した結果は19勝利・1敗北・10停止。勝利は相手の干渉とブロッカーがない設定でライフ等の終了条件に達したという意味で、全能力の実装完了ではない。Doomsdayの1敗北は山札構築を理解しない単純操作者の結果で、上記の選択を指定した勝利経路とは別である。
+
+| 形式 | 最初に停止したカード（型） |
+| --- | --- |
+| Standard | Jace's Machinations（UW）、Impractical Joke（Izzet）、Earthbender Ascension（緑単）、Uldaros Theorix（Reanimator）、Jeskai Revelation（4/5色） |
+| Legacy | Amped Raptor（Boros）、Beseech the Mirror（Storm） |
+| Pioneer | Storm the Festival（緑信心）、Vanishing Verse（Greasefang）、Voldaren Epicure（Boros） |
+
+再現は `node scripts/audit-goldfish-formats.mjs`、詳細は `.cache/goldfish-formats-audit.json`。対象を必要とする呪文に合法な対象がないときは唱えようとしない。これは不足を発見する操作者であり、忍術・搭乗とGreasefang・準備呪文Enroot・相手の領域・Show and TellからのSheltered by Ghosts以外のオーラ登場などを含む全勝ち筋／全サイド後を認証するものではない。未対応の本文を自動処理済みとして進めない。
+
+全体検査446/446成功、43本の局面・決着試験を含む。保存の互換性と従来のModernの決着・サイド後試験も含める。ログ: `.cache/tests-20261020-solo-final.log`。
+
 ## ルールの参照元
+
+- [Ultimate Masters Release Notes](https://magic.wizards.com/en/news/feature/ultimate-masters-release-notes-2018-11-29): 発掘は各ドローに適用し、途中で切削された発掘カードも次のドローに使用できる。
+- [Tarkir: Dragonstorm Mechanics](https://magic.wizards.com/en/news/feature/tarkir-dragonstorm-mechanics): 調和のタップと不特定マナの軽減。
+- [Wilds of Eldraine Release Notes](https://magic.wizards.com/en/news/feature/wilds-of-eldraine-release-notes): 同じプレイヤーが同じ対象に付けた役割は最新のものを残す。
+- [Theros Beyond Death Release Notes](https://magic.wizards.com/en/news/feature/theros-beyond-death-release-notes-2020-01-10): タッサの神託者の信心と勝利条件。
+- [Modern Horizons 2 Release Notes](https://magic.wizards.com/en/news/feature/modern-horizons-2-release-notes-2021-06-04): ヤヴィマヤによる森と緑マナ能力の追加は戦場の土地に適用する。
 
 - [MH3 Release Notes](https://magic.wizards.com/en/news/feature/modern-horizons-3-release-notes): コジレックの命令、魂の導き手の再帰誘発、ラル、授与、土台となるカードの裁定。
 - [Edge of Eternities Release Notes](https://magic.wizards.com/en/news/feature/edge-of-eternities-release-notes): ワープ、量子の謎かけ屋のドロー置換、使者の誘発。

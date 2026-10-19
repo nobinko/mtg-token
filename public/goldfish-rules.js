@@ -1,11 +1,11 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261019-formats5";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261019-formats5";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261019-formats5";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261019-formats5";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261019-formats5";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo3";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo3";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo3";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo3";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo3";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
@@ -157,7 +157,7 @@ export function recordGoldfishCast(state, spell) {
       // A self cast trigger belongs to the spell on the stack. It must never
       // trigger again when another spell is cast after this permanent resolves.
       if (/^When you cast this spell\b/.test(paragraph)) continue;
-      if (verifiedGoldfishCard(card) && ["Pinnacle Emissary", "Stormchaser's Talent", "Artist's Talent", "Ugin, Eye of the Storms", "Ral, Monsoon Mage", "Vexing Bauble"].includes(face(card).name)) continue;
+      if (verifiedGoldfishCard(card) && ["Glaring Fleshraker", "Pinnacle Emissary", "Stormchaser's Talent", "Artist's Talent", "Ugin, Eye of the Storms", "Ral, Monsoon Mage", "Vexing Bauble"].includes(face(card).name)) continue;
       if (isChanneler(card) && paragraph.startsWith("Whenever you cast a noncreature spell, surveil 1.")) continue;
       if (isCutter(card) && paragraph.includes("Whenever you cast your second spell each turn,")) continue;
       if (isSlickshot(card) && paragraph.startsWith("Whenever you cast a noncreature spell,")) continue;
@@ -175,7 +175,7 @@ export function recordGoldfishCast(state, spell) {
 
 function finishAbility(state, message) {
   state.stack.pop();
-  state.rules.pendingChoice = null;
+  if (state.rules.pendingChoice?.type !== "engine-draw") state.rules.pendingChoice = null;
   state.rules.lastAction = message;
 }
 

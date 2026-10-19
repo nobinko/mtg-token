@@ -1,12 +1,12 @@
-import { cloneGoldfishState } from "./goldfish.js?v=20261019-formats5";
-import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261019-formats5";
-import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261019-formats5";
-import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261019-formats5";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261019-formats5";
-import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261019-formats5";
-import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261019-formats5";
-import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261019-formats5";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261019-formats5";
+import { cloneGoldfishState } from "./goldfish.js?v=20261020-solo3";
+import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo3";
+import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-solo3";
+import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo3";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo3";
+import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo3";
+import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-solo3";
+import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-solo3";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
 
 export function goldfishActionTargets(state, card) {
   return state.battlefield.filter((target) => goldfishCanEquip(state, card, target));
@@ -124,7 +124,7 @@ function activateEngineAction(state, card, action, options) {
     if (action.costSelect.destination === "tap") goldfishFindObject(next, cost).tapped = true;
     else moveGoldfishRuleObject(next, cost.id, cost.zone || "battlefield", action.costSelect.destination, (cost.zone || "battlefield") === "battlefield" && action.costSelect.destination === "graveyard" ? "sacrifice" : "");
   }
-  const entry = queueGameAbility(next, card, action.label, action.steps, { activated: true, target: options.target || null, targetSpec: action.targetSpec, allocation: structuredClone(options.allocation), costCards: (options.costCards || []).map(r => structuredClone(goldfishFindObject(state, r))), x: options.x || 0, snapshot: structuredClone(card), source: goldfishReference(card, action.zone) });
+  const entry = queueGameAbility(next, card, action.label, action.steps, { activated: true, target: options.target || null, targetSpec: action.targetSpec, allocation: structuredClone(options.allocation), costCards: (options.costCards || []).map(r => { const c = goldfishFindObject(state, r); return { ...structuredClone(c), lastKnownToughness: goldfishCharacteristics(state, c).toughness }; }), x: options.x || 0, snapshot: structuredClone(card), source: goldfishReference(card, action.zone) });
   if (action.manaAbility) startEngineResolution(next, entry);
   if (!next.rules.pendingChoice) applyGoldfishStateActions(next);
   return flushEngineEvents(next);

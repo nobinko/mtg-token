@@ -1,4 +1,4 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261019-formats5";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo3";
 const face = c => c.faces?.[c.faceIndex || 0] || c;
 const type = (c, t) => new RegExp(`\\b(?:${t})\\b`).test(face(c).typeLine || "");
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
@@ -8,6 +8,7 @@ export function abilityBlockReason(state, card, { zone = "battlefield", manaAbil
   if (zone === "battlefield" && type(card, "Land") && !type(card, "Basic") && hasRuleCard(state, "Blood Moon")) return "血染めの月により、この土地の能力は失われています。";
   if (zone === "battlefield" && type(card, "Creature") && hasRuleCard(state, "Cursed Totem")) return "呪われたトーテム像がクリーチャーの起動を禁止しています。";
   if (!manaAbility && state.battlefield.some(c => !c.faceDown && c.automaticAbilities !== false && ["Pithing Needle", "Disruptor Flute"].includes(face(c).name) && c.chosenName === face(card).name)) return "真髄の針／攪乱のフルートで、この名前の起動は禁止されています。";
+  if (!manaAbility && !hasRuleCard(state, "Blood Moon") && state.battlefield.some(c => face(c).name === "Petrified Hamlet" && hasRuleCard(state, "Petrified Hamlet") && c.chosenName === face(card).name && !c.faceDown && c.automaticAbilities !== false)) return "石化した集落で、この名前のマナ能力以外の起動は禁止されています。";
   return "";
 }
 export function castBlockReason(state, zone = "hand") {

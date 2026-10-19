@@ -1,8 +1,9 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261019-formats5";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261019-formats5";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261019-formats5";
-import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261019-formats5";
-import { drawGameCards } from "./goldfish-events.js?v=20261019-formats5";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261020-solo3";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo3";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
+import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261020-solo3";
+import { drawGameCards } from "./goldfish-events.js?v=20261020-solo3";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261020-solo3";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
@@ -70,6 +71,7 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
     if (target.permanent && !/Creature|Artifact|Enchantment|Land|Planeswalker|Battle/.test(type)) return false;
     if (target.maxX && goldfishManaValue(item) > (options.x || 0)) return false;
     if (target.spell && item.kind === "ability") return false;
+    if (target.ability && item.kind !== "ability") return false;
     if (target.spellOrTriggered && item.kind === "ability" && item.ability?.activated) return false;
     if (target.colorlessSpell && item.kind !== "ability" && gameColors(item).length) return false;
     if (target.colorsAny && !gameColors(item).some(c => target.colorsAny.includes(c))) return false;
@@ -94,6 +96,13 @@ function drawCards(state, count) {
 }
 
 export function applyGoldfishStateActions(state) {
+  // Auras with no legal attachment go to the graveyard; the newest Role a
+  // player controls on one permanent replaces that player's older Roles.
+  for (const card of [...state.battlefield]) if (/\bAura\b/.test(face(card).typeLine || "") && !card.summonedAsBestow) {
+    const attached = goldfishFindObject(state, card.attachedTo);
+    const roles = state.battlefield.filter(c => /\bRole\b/.test(face(c).typeLine || "") && c.attachedTo && card.attachedTo && sameGoldfishTarget(c.attachedTo, card.attachedTo));
+    if (!attached || /\bRole\b/.test(face(card).typeLine || "") && roles.at(-1)?.id !== card.id) moveGoldfishRuleObject(state, card.id, "battlefield", "graveyard");
+  }
   for (const c of state.battlefield) if (face(c).name === "Extinguisher Battleship" && verifiedGoldfishCard(c)) {
     const creature = (c.counters.charge || 0) >= 5;
     if (creature && !c.stationed) { c.originalTypeLine ||= c.typeLine; c.typeLine += " Creature"; c.stationed = true; c.lane = "creature"; }
@@ -249,6 +258,8 @@ export function chooseGoldfishSpellResolution(state, answer, random = Math.rando
 export function canGoldfishAutoResolve(card) {
   if (goldfishSpellProgram(card)) return true;
   const type = face(card).typeLine || "";
+  if (verifiedGoldfishCard(card) && FORMAT_ENTERS[face(card).name] && !/\bAura\b/.test(type)) return true;
+  if (verifiedGoldfishCard(card) && ["Eddymurk Crab", "Vibrance", "Deceit"].includes(face(card).name)) return true;
   if (verifiedGoldfishCard(card) && ["Pithing Needle", "Disruptor Flute", "Chalice of the Void", "The Legend of Roku", "Weapons Manufacturing", "Thought-Knot Seer", "Kraul Harpooner"].includes(face(card).name)) return true;
   if (verifiedGoldfishCard(card) && (/\bPlaneswalker\b/.test(type) || ["Murktide Regent", "Moonshadow", "Engineered Explosives", "Pompous Battlemage", "Stormchaser's Talent", "Artist's Talent", "Isochron Scepter", "Ranger-Captain of Eos", "Seasoned Pyromancer", "Badgermole Cub", "Formidable Speaker"].includes(face(card).name))) return true;
   // Permanents without a resolution choice may enter. Their triggered abilities

@@ -48,4 +48,6 @@ Standard・Legacy・Pioneerの環境上位10種類ずつをMTGTop8から取得�
 
 `node scripts/audit-goldfish-formats.mjs` は30実リストをシャッフルして通常の公開操作APIで進める停止箇所の検出用。マナ・カードを途中で足さず、未対応の手動処理を飛ばさない。結果は `.cache/goldfish-formats-audit.json`。単純な操作者なので、勝ち筋やサイド後を網羅した保証には使用しない。
 
-現状の30本では26本に停止箇所が残る。例: StandardのSeam Rip／Get Out／Winternight Stories、LegacyのThassa's Oracle／Life from the Loam、PioneerのMonstrous Rage／Prismari Charm／搭乗・Greasefang。4本がライフ0まで進んでも、その4デッキの全能力の対応完了を意味しない。上位30種類のコンボ・サイド後を含む全自動化は未完了であり、次は停止した処理と各デッキ固有の勝ち筋を実装・検証する。
+2026-10-19時点の30本では26本に停止箇所が残った。例: StandardのSeam Rip／Get Out／Winternight Stories、LegacyのThassa's Oracle／Life from the Loam、PioneerのMonstrous Rage／Prismari Charm／搭乗・Greasefang。4本がライフ0まで進んでも、その4デッキの全能力の対応完了を意味しない。
+
+2026-10-20に停止箇所の処理を追加した。[追加検証と残る停止カード](goldfish-top10.md#standardlegacypioneerの追加検証2026-10-20) を参照。上位30種類のコンボ・サイド後を含む全自動化は引き続き未完了。

@@ -1,12 +1,12 @@
-import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261019-formats5";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261019-formats5";
-import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261019-formats5";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261019-formats5";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261019-formats5";
-import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261019-formats5";
-import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261019-formats5";
-import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261019-formats5";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261019-formats5";
+import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261020-solo3";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo3";
+import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261020-solo3";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo3";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
+import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261020-solo3";
+import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo3";
+import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261020-solo3";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
 
 export function goldfishAlternativeModes(card, zone) {
   if (!verifiedGoldfishCard(card)) return [];
@@ -21,6 +21,7 @@ export function goldfishAlternativeModes(card, zone) {
   if (n === "Force of Will" && zone === "hand") result.push({ id: "force-will", label: "1ライフ・青い手札1枚を追放", cost: "{0}", zone: "hand", filter: { color: "U" }, count: 1, spellTarget: true, life: 1 });
   if (n === "Daze" && zone === "hand") result.push({ id: "daze", label: "島1枚を手札へ戻して唱える", cost: "{0}", zone: "battlefield", filter: { types: ["Land"], subtypes: ["Island"] }, count: 1, spellTarget: true, returnHand: true });
   if (n === "Ingot Chewer" && zone === "hand") result.push({ id: "evoke", label: "想起 {R}", cost: "{R}", zone: "hand", count: 0 });
+  if (["Vibrance", "Deceit"].includes(n) && zone === "hand") result.push({ id: "evoke", label: n === "Vibrance" ? "想起 {R/G}{R/G}" : "想起 {U/B}{U/B}", cost: n === "Vibrance" ? "{R/G}{R/G}" : "{U/B}{U/B}", zone: "hand", count: 0 });
   return result;
 }
 export function alternativeCandidates(state, card, mode) {
@@ -62,6 +63,7 @@ export function castGoldfishAlternative(state, cardId, modeId, answer = {}) {
   }
   if (zone !== "hand") next = moveGoldfishCards(next, cardId, "hand");
   next = playGoldfishCard(next, cardId, { target: answer.target || null, bestow: mode.id === "bestow", evoked: mode.id === "evoke", flashback: ["harmonize", "flashback-discard"].includes(mode.id), x, colorsSpent: plan.colorsSpent, manaSpent: plan.manaSpent, uncounterable: plan.uncounterable, alternative: mode.id });
+  next.stack.find(c => c.id === cardId).cast.manaByColor = structuredClone(plan.manaByColor || {});
   return flushEngineEvents(next);
 }
 export function chooseGoldfishAlternative(state, answer) {

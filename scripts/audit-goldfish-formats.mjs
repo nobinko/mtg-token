@@ -2,7 +2,7 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { mergeCardMetadata } from '../public/card-metadata.js';
 import { createGoldfishGame, keepGoldfishHand, nextGoldfishTurn, beginGoldfishCombat, resolveGoldfishCombat } from '../public/goldfish.js';
 import { castGoldfishCard, planGoldfishCastPayment, goldfishLandEntryOptions } from '../public/goldfish-mana.js';
-import { goldfishSpellTargets } from '../public/goldfish-spells.js';
+import { goldfishSpellProgram, goldfishSpellTargets } from '../public/goldfish-spells.js';
 import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from '../public/goldfish-fetch.js';
 import { abilityBlockReason } from '../public/goldfish-constraints.js';
 import { goldfishFinish } from '../public/goldfish-sideboard.js';
@@ -38,7 +38,7 @@ for (const format of ['standard', 'legacy', 'pioneer']) {
         }
         for (let step = 0; step < 16 && !goldfishFinish(state); step++) {
           const options = { confirmLife: true, splice: [], pitch: [], replicate: 0 };
-          const card = state.hand.filter(c => !isType(c, 'Land')).find(c => planGoldfishCastPayment(state, c, { ...options, preview: true }).payable);
+          const card = state.hand.filter(c => !isType(c, 'Land')).find(c => planGoldfishCastPayment(state, c, { ...options, preview: true }).payable && (!goldfishSpellProgram(c)?.target || goldfishSpellTargets(state, c, options).length));
           if (!card) break;
           log.push(`T${turn} cast ${card.name}`);
           const targets = goldfishSpellTargets(state, card, options);

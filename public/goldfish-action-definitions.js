@@ -1,6 +1,6 @@
 // Complete, bounded ability clauses. Parsing a cost never implies that every
 // other ability on the card is supported.
-import { engineCardActions } from "./goldfish-card-programs.js?v=20261019-formats5";
+import { engineCardActions } from "./goldfish-card-programs.js?v=20261020-solo3";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const type = (card) => card.faceDown ? "Creature" : String(face(card).typeLine || "");
 const text = (card) => String(face(card).oracleText || "").replace(/\([^)]*\)/g, "");

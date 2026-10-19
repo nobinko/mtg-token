@@ -40,24 +40,24 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js?v=20261019-formats5";
-import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261019-formats5";
+} from "./goldfish.js?v=20261020-solo3";
+import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo3";
 import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText,
-  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261019-formats5";
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261019-formats5";
-import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261019-formats5";
-import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261019-formats5";
-import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261019-formats5";
+  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo3";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo3";
+import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo3";
+import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo3";
+import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo3";
 import { goldfishCardOperations } from "./goldfish-effects.js?v=20261017-mana";
-import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261019-formats5";
+import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo3";
 import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261017-arena";
-import { mergeCardMetadata } from "./card-metadata.js?v=20261019-formats5";
-import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261019-formats5";
-import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261019-formats5";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo3";
+import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo3";
+import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo3";
 
-import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261019-formats5";
-import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261019-formats5";
-import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261019-formats5";
+import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo3";
+import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo3";
+import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo3";
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command", "stack"];
 const ZONE_LABELS = {
   library: "山札",
@@ -74,7 +74,7 @@ const ZONE_LABELS = {
 };
 const LANE_LABELS = { other: "その他", creature: "クリーチャー", land: "土地" };
 const MAX_TIMELINE = 60;
-import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave } from "./goldfish-storage.js?v=20261019-formats5";
+import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave } from "./goldfish-storage.js?v=20261020-solo3";
 
 function normalizeName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
@@ -846,7 +846,7 @@ export function createGoldfishController(dialog) {
         } else if (primary.zone !== "stack") {
           actions.push(["手札へ H", "hand"], ["戦場へ B", "battlefield"]);
           if (selected.length === 1 && primary.zone === "exile" && goldfishPlayDestination(primary.card)) actions.unshift([primary.card.playPermission?.kind === "plot" ? "計画から0マナで唱える" : "追放からプレイ", "exile-play", primary.card.playPermission?.kind === "plot" && !goldfishPlotReady(state, primary.card)]);
-          if (selected.length === 1 && primary.zone === "graveyard" && (goldfishSpellProgram(primary.card)?.flashback || primary.card.grantedCast?.serial === state.rules.turnSerial)) actions.unshift(["墓地から唱える", "flashback"]);
+          if (selected.length === 1 && primary.zone === "graveyard" && (goldfishSpellProgram(primary.card)?.flashback || goldfishSpellProgram(primary.card)?.harmonize || primary.card.grantedCast?.serial === state.rules.turnSerial)) actions.unshift([goldfishSpellProgram(primary.card)?.harmonize ? "調和で唱える" : "墓地から唱える", "flashback"]);
           if (selected.length === 1 && primary.zone === "sideboard" && state.rules.wish === state.rules.turnSerial) actions.unshift(["願いから唱える", "wish-play"]);
         }
         if (selected.length === 1) for (const ability of goldfishCardActions(primary.card).filter((item) => item.zone === primary.zone)) {
@@ -1392,7 +1392,7 @@ export function createGoldfishController(dialog) {
       goldfishLandEntryOptions(card, state).forEach((choice, index) => action(choice.label, () => finishPlay(card.id, { entry: index }), { primary: true, disabled: state.players.self.life < choice.life }));
     } else if (manaMode === "cost") {
       const origin = { fromGraveyard: selected.zone === "graveyard", fromExile: selected.zone === "exile", fromSideboard: selected.zone === "sideboard", state };
-      paragraph(`${origin.fromGraveyard ? "フラッシュバック" : "支払いコスト"} ${goldfishCastingCost(card, origin) || "なし／未取得"} · 自動タップ ${find("#goldfish-auto-tap").checked ? "ON" : "OFF"}`);
+      paragraph(`${origin.fromGraveyard ? goldfishSpellProgram(card)?.harmonize ? "調和（クリーチャーのタップで軽減可）" : "墓地からの支払い" : "支払いコスト"} ${goldfishCastingCost(card, origin) || "なし／未取得"} · 自動タップ ${find("#goldfish-auto-tap").checked ? "ON" : "OFF"}`);
       let xInput;
       if (goldfishManaCost(card).includes("{X}")) {
         const label = document.createElement("label"); label.textContent = "Xの値";
@@ -1448,7 +1448,7 @@ export function createGoldfishController(dialog) {
           topOperation = { ...operation, destinations: operation.destinations ? { ...operation.destinations } : null, cardId: card.id, name: cardDisplayName(card) };
           topCardIds = peekGoldfishLibrary(state, operation.count).map((item) => item.id);
           render(`「${cardDisplayName(card)}」：上から${operation.count}枚。本文に従って行き先を選んでください。`);
-        } else if (operation.kind === "draw") commit(drawGoldfishCards(state, operation.count), `「${cardDisplayName(card)}」：${operation.count}枚ドローしました。`);
+        } else if (operation.kind === "draw") { const next = drawGoldfishCards(state, operation.count); commit(next, next.rules.lastAction); }
         else commit(moveGoldfishTopCards(state, operation.count, "graveyard"), `「${cardDisplayName(card)}」：${operation.count}枚切削しました。`);
       });
       if (/search your library/i.test(oracle.text)) action("山札から探す", () => setLibraryOpen(true, "search"));
@@ -1803,7 +1803,7 @@ export function createGoldfishController(dialog) {
     }
   });
   find("#goldfish-draw").addEventListener("click", () => {
-    try { commit(drawGoldfishCard(state), "1枚引きました。", { select: [], primary: "" }); }
+    try { const next = drawGoldfishCard(state); commit(next, next.rules.lastAction, { select: [], primary: "" }); }
     catch (error) { render(error.message); }
   });
   find("#goldfish-next-turn").addEventListener("click", () => {
@@ -1867,7 +1867,8 @@ export function createGoldfishController(dialog) {
           topCardIds = peekGoldfishLibrary(state, count).map((card) => card.id);
           render(`山札の上から${topCardIds.length}枚を見ています。順番は変えていません。`);
         } else if (action === "hand") {
-          commit(drawGoldfishCards(state, count), `${Math.min(count, state.library.length)}枚引きました。`, { select: [], primary: "" });
+          const next = drawGoldfishCards(state, count);
+          commit(next, next.rules.lastAction, { select: [], primary: "" });
           topCardIds = [];
         } else {
           const moved = Math.min(Math.max(1, Math.trunc(count) || 1), state.library.length);

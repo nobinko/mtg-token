@@ -1,13 +1,15 @@
-import { mergeCardMetadata } from "./card-metadata.js?v=20261019-formats5";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo3";
 import { freshGoldfishRules, cloneGoldfishRules, assertGoldfishChoiceComplete, recordGoldfishCast,
-  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261019-formats5";
-import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261019-formats5";
-import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261019-formats5";
-import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261019-formats5";
-import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261019-formats5";
-import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening } from "./goldfish-engine.js?v=20261019-formats5";
-import { drawGameCards } from "./goldfish-events.js?v=20261019-formats5";
-import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261019-formats5";
+  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-solo3";
+import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo3";
+import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
+import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-solo3";
+import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo3";
+import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening } from "./goldfish-engine.js?v=20261020-solo3";
+import { drawGameCards, chooseGameDraw } from "./goldfish-events.js?v=20261020-solo3";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo3";
+import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-solo3";
+import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo3";
 
 export const GOLDFISH_SCHEMA_VERSION = 2;
 export const GOLDFISH_LANES = ["other", "creature", "land"];
@@ -296,7 +298,9 @@ export function drawGoldfishCards(state, count = 1) {
   assertGoldfishChoiceComplete(state);
   if (state.phase !== "playing") throw new Error("初手をキープしてからドローしてください。");
   const next = cloneGoldfishState(state);
+  const before = next.hand.length;
   drawFromLibrary(next, clampInteger(count, 1, 100, 1));
+  next.rules.lastAction = next.rules.pendingChoice?.type === "engine-draw" ? "ドローか発掘を選んでください。" : `${next.hand.length - before}枚引きました。`;
   return next;
 }
 
@@ -358,6 +362,7 @@ function finishGoldfishTurnProgress(state) {
   flushEngineEvents(state);
   if (state.rules.pendingChoice || state.stack.length) return state;
   if (state.rules.openingComplete) { state.rules.openingComplete = false; if (state.rules.openingDraw) drawGameCards(state, 1); state.rules.openingDraw = false; }
+  if (state.rules.pendingChoice) return state;
   if (state.rules.endTurnEffect) { state.rules.endTurnEffect = false; startNextActiveTurn(state, "opponent"); return state; }
   if (state.rules.resumeCombat) { state.rules.resumeCombat = false; beginGoldfishCombatDraft(state); return state; }
   if (state.rules.afterEndStep) {
@@ -377,9 +382,10 @@ function finishGoldfishTurnProgress(state) {
   if (state.rules.pendingTurnDraw && !state.stack.length) {
     state.rules.pendingTurnDraw = false;
     const count = drawGameCards(state, 1);
-    state.rules.lastAction += count ? ` 通常のドローで${count}枚引きました。` : " 山札が空です。";
-    engineMainStep(state);
+    state.rules.lastAction += state.rules.pendingChoice?.type === "engine-draw" ? " ドローか発掘を選んでください。" : count ? ` 通常のドローで${count}枚引きました。` : " 山札が空です。";
+    state.rules.pendingMainStep = true;
   }
+  if (state.rules.pendingMainStep && !state.rules.pendingChoice && !state.stack.length) { state.rules.pendingMainStep = false; engineMainStep(state); }
   return state;
 }
 
@@ -596,7 +602,8 @@ export function resolveGoldfishSpell(state, { manual = false } = {}) {
   if (!manual && goldfishSpellProgram(card)) {
     const next = cloneGoldfishState(state);
     startGoldfishSpellResolution(next);
-    return dispatchGoldfishEntries(next);
+    if (!next.rules.pendingChoice) applyGoldfishStateActions(next);
+    return finishGoldfishTurnProgress(dispatchGoldfishEntries(next));
   }
   const type = goldfishCardType(card);
   if (!goldfishPlayDestination(card)) throw new Error("カードタイプを確認できません。詳細操作から移動先を選んでください。");
@@ -607,6 +614,7 @@ export function resolveGoldfishSpell(state, { manual = false } = {}) {
     entered.enteredSerial = next.rules.turnSerial;
     entered.warped = !!card.cast?.warp; entered.dashed = !!card.cast?.dash;
     entered.castColors = card.cast?.colorsSpent || [];
+    entered.castManaByColor = card.cast?.manaByColor || {};
     entered.castX = card.cast?.x || 0;
     entered.delvedCards = card.cast?.delvedCards || [];
     if (card.cast?.bestow && goldfishFindObject(next, card.cast.target)) {
@@ -629,6 +637,12 @@ export function chooseGoldfishRule(state, answer) {
     if (!Array.isArray(answer.refs) || answer.refs.length !== choice.min || new Set(answer.refs.map(r => r.id)).size !== answer.refs.length || answer.refs.some(r => r.zone !== "hand" || !goldfishFindObject(next, r))) throw new Error("手札上限まで捨てるカードを選んでください。");
     next.rules.pendingChoice = null;
     for (const r of answer.refs) moveGoldfishRuleObject(next, r.id, "hand", "graveyard");
+  } else if (choice?.type === "engine-draw") {
+    chooseGameDraw(next, answer);
+    if (!next.rules.drawing) {
+      if (next.rules.automation) continueEngineResolution(next);
+      else if (next.rules.resolution) continueGoldfishSpellResolution(next);
+    }
   } else if (choice?.type.startsWith("engine-")) chooseEngine(next, answer);
   else if (choice?.type === "attack") declareGoldfishAttackersDraft(next, answer);
   else if (choice?.type === "bauble-target") {
@@ -646,6 +660,8 @@ export function advanceGoldfishGame(state, { autoOrder = true } = {}) {
   let next = cloneGoldfishState(state);
   const messages = [];
   for (let count = 0; count < 1000; count += 1) {
+    if (next.rules.win) break;
+    if (!next.rules.pendingChoice) applyGoldfishStateActions(next);
     finishGoldfishTurnProgress(next);
     if (!next.stack.length && !next.rules.pendingChoice && next.rules.sacrificeSequence) next = stepGoldfishSacrificeSequence(next);
     if (next.rules.pendingChoice?.type === "order" && autoOrder) {

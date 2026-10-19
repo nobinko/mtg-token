@@ -1,14 +1,36 @@
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261019-formats5";
-import { cardName, isType } from "./goldfish-events.js?v=20261019-formats5";
-import { engineCandidates } from "./goldfish-engine.js?v=20261019-formats5";
-import { sameGoldfishReference } from "./goldfish-objects.js?v=20261019-formats5";
-import { goldfishCastingCost } from "./goldfish-mana.js?v=20261019-formats5";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
+import { cardName, isType } from "./goldfish-events.js?v=20261020-solo3";
+import { engineCandidates } from "./goldfish-engine.js?v=20261020-solo3";
+import { sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo3";
+import { goldfishCastingCost } from "./goldfish-mana.js?v=20261020-solo3";
+import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo3";
 
 // Extra text, modes and additional costs are declared before any payment. The
 // draft is serializable; cancellation never exiles a card or taps a source.
 export function extraCastChoice(state, card, options) {
   if (!verifiedGoldfishCard(card)) return null;
   const name = cardName(card), ctx = { source: { id: card.id }, x: options.x };
+  if (FORMAT_MODES[name]) {
+    const modes = FORMAT_MODES[name];
+    if (options.mode === undefined) return { optionKey: "mode", kind: "buttons", label: "モードを選ぶ", options: modes };
+    if (!modes.some(m => m.value === options.mode)) throw new Error("適正なモードを選んでください。");
+  }
+  const spec = formatTargetSpec(name, options);
+  if (spec) {
+    const candidates = engineCandidates(state, { ...spec, target: true }, ctx).map(({ ref, label }) => ({ ref, label }));
+    if (spec.virtualOpponent) candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の適正な対象（領域は省略）" });
+    if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+    if (candidates.length < spec.min) throw new Error("このモードの適正な対象がありません。コストは支払っていません。");
+    if (options.modeTargets === undefined) return { optionKey: "modeTargets", kind: "cards", label: `対象を${spec.min}〜${spec.max}つ選ぶ`, min: spec.min, max: Math.min(spec.max, candidates.length), candidates };
+    const refs = options.modeTargets;
+    if (!Array.isArray(refs) || refs.length < spec.min || refs.length > spec.max || new Set(refs.map(r => JSON.stringify(r))).size !== refs.length || refs.some(r => !candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(r)))) throw new Error("異なる適正な対象を選んでください。");
+  }
+  if (name === "Winternight Stories" && options.fromGraveyard && !card.grantedCast) {
+    const candidates = engineCandidates(state, { zone: "battlefield", filter: { types: ["Creature"], untapped: true } }).map(({ ref, label }) => ({ ref, label }));
+    if (options.harmonizeTap === undefined && candidates.length) return { optionKey: "harmonizeTap", kind: "cards", label: "調和：タップするクリーチャー（0〜1体・パワー分の不特定マナを軽減）", min: 0, max: 1, candidates };
+    const refs = options.harmonizeTap || [];
+    if (!Array.isArray(refs) || refs.length > 1 || refs.some(r => !candidates.some(c => sameGoldfishReference(c.ref, r)))) throw new Error("調和でタップするクリーチャーを選び直してください。");
+  } else if (options.harmonizeTap?.length) throw new Error("この唱え方では調和のタップを使えません。");
   if (["Bitter Triumph", "Crop Rotation"].includes(name)) {
     if (name === "Bitter Triumph") {
       const modes = [{ value: "discard", label: "手札1枚を捨てる" }, ...(state.players.self.life >= 3 ? [{ value: "life", label: "3ライフを支払う" }] : [])];

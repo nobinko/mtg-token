@@ -1,12 +1,12 @@
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261019-formats5";
-import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261019-formats5";
-import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261019-formats5";
-import { goldfishAttackers } from "./goldfish-combat.js?v=20261019-formats5";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261019-formats5";
-import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261019-formats5";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261019-formats5";
-import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261019-formats5";
-import { engineCandidates } from "./goldfish-engine.js?v=20261019-formats5";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo3";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261020-solo3";
+import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261020-solo3";
+import { goldfishAttackers } from "./goldfish-combat.js?v=20261020-solo3";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-solo3";
+import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261020-solo3";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo3";
+import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261020-solo3";
+import { engineCandidates } from "./goldfish-engine.js?v=20261020-solo3";
 
 // Render only explicit choices. This module never changes game state itself.
 export function renderGoldfishSpellChoice({ state, choice, content, title, action, paragraph, imageUrl, answer, saveDraft }) {
@@ -117,7 +117,7 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
     for (const id of choice.ids) { const card = state.battlefield.find(c => c.id === id); if (card) content.append(cardTile(card, () => answer({ keep: id }))); }
     return true;
   }
-  if (["engine-choice", "engine-target", "engine-entry", "engine-opening", "engine-opening-exile", "cast-preflight", "cleanup"].includes(choice.type)) {
+  if (["engine-choice", "engine-target", "engine-entry", "engine-draw", "engine-opening", "engine-opening-exile", "cast-preflight", "cleanup"].includes(choice.type)) {
     title.textContent = choice.label; paragraph(choice.sourceName, "goldfish-mana-card-name");
     const list = document.createElement("div"); list.className = "goldfish-choice-targets"; content.append(list);
     if (choice.type === "engine-target" && !choice.multipleTargets || choice.kind === "copy-target") {
@@ -128,13 +128,14 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
       }
       if (!choice.min) action("対象にしない", () => answer({ target: null }));
     } else if (choice.kind === "cards") {
+      const key = option => option.ref.id ?? `player:${option.ref.player}${option.ref.virtual ? ":virtual" : ""}`;
       let ids = choice.draft?.ids || [];
-      const confirm = action("選択を確定", () => answer({ refs: ids.map(id => choice.candidates.find(c => c.ref.id === id).ref) }), true);
+      const confirm = action("選択を確定", () => answer({ refs: ids.map(id => choice.candidates.find(c => key(c) === id).ref) }), true);
       const render = () => {
         list.replaceChildren();
         for (const option of choice.candidates) {
-          const card = goldfishFindObject(state, option.ref), index = ids.indexOf(option.ref.id);
-          const select = () => { ids = index >= 0 ? ids.filter(id => id !== option.ref.id) : [...ids, option.ref.id]; saveDraft({ ids }); render(); };
+          const card = goldfishFindObject(state, option.ref), index = ids.indexOf(key(option));
+          const select = () => { ids = index >= 0 ? ids.filter(id => id !== key(option)) : [...ids, key(option)]; saveDraft({ ids }); render(); };
           const label = (index >= 0 ? (index + 1) + ". " : "") + option.label;
           const tile = card ? cardTile(card, select, label) : document.createElement("button");
           if (!card) { tile.type = "button"; tile.textContent = label; tile.addEventListener("click", select); }
