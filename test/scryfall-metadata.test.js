@@ -15,9 +15,11 @@ test("fetchCardMetadata batches names and returns public playtest metadata", asy
       json: async () => ({
         data: [{
           name: "Dryad Arbor",
+          layout: "normal",
           type_line: "Land Creature — Forest Dryad",
           image_uris: { normal: "https://img.test/dryad.jpg" },
           oracle_text: "Dryad Arbor is green.",
+          colors: ["G"],
           power: "1",
           toughness: "1"
         }],
@@ -39,14 +41,19 @@ test("fetchCardMetadata batches names and returns public playtest metadata", asy
       printedName: "Dryad Arbor",
       language: "en",
       typeLine: "Land Creature — Forest Dryad",
+      layout: "normal",
       imageUrl: "https://img.test/dryad.jpg",
       oracleText: "Dryad Arbor is green.",
       manaCost: "",
       power: "1",
       toughness: "1",
+      colors: ["G"],
+      loyalty: "",
       faces: []
     });
     assert.deepEqual(cards[1], { name: "Definitely Missing", unavailable: true });
+    const game = createGoldfishGame(mergeCardMetadata([{ name: "Dryad Arbor", count: 7 }], cards));
+    assert.equal(restoreGoldfishGame(game).hand[0].layout, "normal");
   } finally {
     globalThis.fetch = originalFetch;
   }

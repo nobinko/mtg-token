@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { isPaperLegalCard } from "../lib/card-legality.js";
-import { fetchSearchCandidates } from "../lib/scryfall.js";
+import { fetchSearchCandidates, candidateQueryVersion } from "../lib/scryfall.js";
 import { preparationSources } from "../lib/preparation.js";
 import { chooseTokenPrint } from "../lib/token-prints.js";
 
@@ -15,7 +15,7 @@ test("paper source cards use card legality rather than a remastered set whitelis
 });
 
 test("saved candidates cannot reintroduce banned or digital source cards", async () => {
-  const result = await fetchSearchCandidates("modern", { format: "modern", candidates: [paper, ...invalid], checkedAt: new Date().toISOString() });
+  const result = await fetchSearchCandidates("modern", { format: "modern", candidateQueryVersion, candidates: [paper, ...invalid], checkedAt: new Date().toISOString() });
   assert.deepEqual(result.cards, [paper]);
 });
 

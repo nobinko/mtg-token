@@ -7,6 +7,8 @@ import { once } from "node:events";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const temporary = await mkdtemp(join(tmpdir(), "mtg-audit-fixes-"));
+process.chdir(temporary);
+const { candidateQueryVersion } = await import("../lib/scryfall.js");
 const cacheMode = process.argv.find((arg) => arg.startsWith("--cache="))?.split("=")[1] || "fresh";
 const image = (label, color = "#dae7df") => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="240" height="335"><rect width="240" height="335" rx="14" fill="${color}"/><text x="16" y="45" font-family="sans-serif" font-size="17">${label}</text><text x="16" y="295" font-family="sans-serif" font-size="14">LOCAL TEST FIXTURE</text></svg>`)}`;
 const sets = [{ code: "tcmm", set_type: "token", parent_set_code: "cmm" }, { code: "cmm", name: "Commander Masters", set_type: "masters" }, { code: "fra", name: "Fixture Set", set_type: "expansion", released_at: "2026-10-02" },
@@ -43,8 +45,8 @@ await mkdir(join(temporary, "data"), { recursive: true });
 await mkdir(join(temporary, ".cache", "environment"), { recursive: true });
 await mkdir(join(temporary, ".cache", "scryfall"), { recursive: true });
 await writeFile(join(temporary, "data", "environment-events.json"), JSON.stringify(pack));
-await writeFile(join(temporary, ".cache", "environment", "active.json"), JSON.stringify({ pack, setEvents: [], candidates, format: "modern", checkedAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(), revision: "local-fixture" }));
-if (cacheMode !== "missing") await writeFile(join(temporary, ".cache", "scryfall", "candidates-modern.json"), JSON.stringify({ queryVersion: 3, expiresAt: Date.now() + (cacheMode === "stale" ? -1000 : 86400000), cards: candidates }));
+await writeFile(join(temporary, ".cache", "environment", "active.json"), JSON.stringify({ pack, setEvents: [], candidates, format: "modern", candidateQueryVersion: candidateQueryVersion - 1, checkedAt: new Date(Date.now() - (cacheMode === "old-version" ? 0 : 48 * 60 * 60 * 1000)).toISOString(), revision: "local-fixture" }));
+if (cacheMode !== "missing") await writeFile(join(temporary, ".cache", "scryfall", "candidates-modern.json"), JSON.stringify({ queryVersion: candidateQueryVersion - (cacheMode === "old-version" ? 1 : 0), expiresAt: Date.now() + (cacheMode === "stale" ? -1000 : 86400000), cards: candidates }));
 
 let candidateRequests = 0;
 globalThis.fetch = async (url, options = {}) => {
@@ -79,7 +81,6 @@ globalThis.fetch = async (url, options = {}) => {
   if (token) return Response.json(token);
   throw new Error(`Unmocked fixture request: ${url}`);
 };
-process.chdir(temporary);
 process.env.PORT ||= "0";
 const { server } = await import("../server.mjs");
 if (!server.listening) await once(server, "listening");

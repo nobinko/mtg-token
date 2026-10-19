@@ -13,7 +13,7 @@ const banEvent = {
   changes: { legacy: "Card was banned in Legacy.", standard: "No changes." }
 };
 
-test("setReleaseEventsFromSets keeps only paper expansions and cores", () => {
+test("setReleaseEventsFromSets keeps paper releases and scopes supplemental products to their formats", () => {
   const events = setReleaseEventsFromSets([
     { name: "Big Expansion", set_type: "expansion", released_at: "2026-06-26", digital: false, scryfall_uri: "https://scryfall.com/sets/big" },
     { name: "Core Set", set_type: "core", released_at: "2026-01-01", digital: false },
@@ -22,8 +22,9 @@ test("setReleaseEventsFromSets keeps only paper expansions and cores", () => {
     { name: "Unreleased", set_type: "expansion", digital: false }
   ]);
 
-  assert.deepEqual(events.map((event) => event.title), ["Big Expansion tabletop release", "Core Set tabletop release"]);
+  assert.deepEqual(events.map((event) => event.title), ["Big Expansion tabletop release", "Core Set tabletop release", "Commander Product tabletop release"]);
   assert.equal(events[0].formatsAffected.length, 4);
+  assert.deepEqual(events[2].formatsAffected, ["legacy"]);
   assert.match(events[0].changes.standard, /構築適用日は未確認/);
 });
 
@@ -70,4 +71,17 @@ test("resolveEnvironmentFromEvents refuses to resolve without an affecting event
   const result = resolveEnvironmentFromEvents([banEvent], "modern", "2026-07-18");
   assert.equal(result.resolved, false);
   assert.equal(result.startDate, "");
+});
+
+test("MBC sales date does not erase recent Legacy lists before its official constructed date", () => {
+  const events = setReleaseEventsFromSets([
+    { code: "fra", name: "Reality Fracture", set_type: "expansion", released_at: "2026-10-02" },
+    { code: "mbc", name: "Mystery Booster Commander Edition", set_type: "draft_innovation", released_at: "2026-10-19" }
+  ]);
+  const mbc = events.find(event => event.setCode === "mbc");
+  assert.equal(mbc.date, "2027-01-01");
+  assert.equal(mbc.confirmed, true);
+  assert.match(mbc.sourceUrl, /magic.wizards.com/);
+  assert.equal(resolveEnvironmentFromEvents(events, "legacy", "2026-10-19").startDate, "2026-10-02");
+  assert.equal(resolveEnvironmentFromEvents(events, "legacy", "2027-01-01").startDate, "2027-01-01");
 });

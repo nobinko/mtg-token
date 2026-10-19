@@ -1,5 +1,5 @@
 const normalizeName = (name) => String(name || "").replace(/\s+/g, " ").trim().toLowerCase();
-const FIELDS = ["typeLine", "imageUrl", "oracleText", "manaCost", "power", "toughness", "faces"];
+const FIELDS = ["typeLine", "layout", "imageUrl", "oracleText", "manaCost", "power", "toughness", "colors", "loyalty", "faces"];
 
 export function mergeCardMetadata(rows, cards) {
   const byName = new Map();

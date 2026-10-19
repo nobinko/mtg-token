@@ -1,8 +1,9 @@
-import { createGoldfishController } from "./goldfish-ui.js?v=20260926-gallery-v2";
-import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261002-shared-preparation";
+import { createGoldfishController } from "./goldfish-ui.js?v=20261019-formats5";
+import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261017-auxiliary";
 import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
-import { decksForToken, sourcesForDeck, boardCount } from "./token-decks.js?v=20261003-token-decks";
-import { createTournamentController } from "./tournament-ui.js?v=20261003-stock-ui";
+import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261019-formats6";
+import { createTournamentController } from "./tournament-ui.js?v=20261019-formats5";
+import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261019-formats5";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -314,6 +315,7 @@ function pickObject(object, picked, location = {}) {
 }
 
 function setStatus(message) {
+  statusEl.hidden = false;
   statusEl.textContent = message;
 }
 
@@ -333,7 +335,7 @@ function updateSamplingRecommendation({ applyDeckCount = false } = {}) {
   const profile = eventScaleProfiles[eventScaleSelect.value];
 
   if (applyDeckCount && recommended) {
-    maxPagesInput.value = String(Math.min(recommended, maxAllowed));
+    maxPagesInput.value = String(Math.min(Math.ceil(recommended / 10) * 10, maxAllowed));
   }
 
   const actualCurrent = Number(maxPagesInput.value || 0);
@@ -354,7 +356,7 @@ function updateSamplingRecommendation({ applyDeckCount = false } = {}) {
 
   const explanation = document.createElement("div");
   explanation.className = "sampling-explanation";
-  explanation.textContent = `${profile?.label || "手動設定"}。この数を見ると、使用率${usageThresholdInput.value}%以上のトークン発生源を${confidenceInput.value}%以上の確率で見つけられる想定です。上限600は、0.5%以上のかなり薄い採用まで95%で拾う目安に合わせています。`;
+  explanation.textContent = `${profile?.label || "手動設定"}。使用率${usageThresholdInput.value}%・検出信頼度${confidenceInput.value}%を単純な無作為抽出に当てはめた計算上の目安です。実際は公開された入賞リストから取得するため、採用の偏りや非公開リストを含めた検出率を保証する数値ではありません。取得数は600件まで増やせます。`;
   samplingSummaryEl.append(explanation);
 }
 
@@ -409,7 +411,10 @@ function renderSummary(data) {
 
   const mainLine = document.createElement("div");
   mainLine.textContent = `${data.scannedPages.length}ページを巡回、検索デッキ/リスト ${data.searchedDeckCount || 0}件、ヒットした生成カード ${data.cards.length}枚、現物候補 ${data.objects.length}件（同じ仕様をまとめると ${uniqueCount}種類）。準備済み ${checkedCount}/${data.objects.length}件（別セットで抜いた同じ仕様も含む）。Scryfall照合母集団 ${data.candidateCount}枚。キャッシュ ${cache.hits}件 / 新規取得 ${cache.network}件${cache.staleHits ? ` / 代替使用 ${cache.staleHits}件` : ""}${failedText}${blockedText}${unparsedText}。`;
-  if (data.tournament) mainLine.textContent = mainLine.textContent.replace(/^\d+ページを巡回、/, "大会の提出リストを照合、");
+  if (data.tournament) {
+    const origin = data.tournament.method === "melee-public" ? "Melee公開リスト" : data.tournament.method === "melee-api" ? "本人のMelee API" : "ファイル取り込み";
+    mainLine.textContent = `大会の提出リスト ${data.searchedDeckCount || 0}件を照合。トークン・補助物の発生源 ${data.cards.length}種類、現物候補 ${data.objects.length}件（同じ仕様をまとめると ${uniqueCount}種類）。カード名の未照合 ${data.unresolvedCardCount || 0}件。取得元: ${origin} / 取得日時: ${new Date(data.tournament.fetchedAt).toLocaleString("ja-JP")}。`;
+  }
   summaryEl.append(mainLine);
   if (data.duplicateDeckCount) {
     const duplicateLine = document.createElement("div");
@@ -454,6 +459,25 @@ function renderSummary(data) {
       siteTable.append(chip);
     }
     summaryEl.append(siteTable);
+  }
+  const issues = searchIssues(data);
+  if (issues.length) {
+    const list = document.createElement("ul");
+    list.className = "search-issue-list";
+    for (const issue of issues) {
+      const item = document.createElement("li");
+      const message = document.createElement("p");
+      message.textContent = issue.message;
+      item.append(message);
+      if (/^https?:\/\//i.test(issue.url || "")) {
+        const link = document.createElement("a");
+        link.href = issue.url; link.target = "_blank"; link.rel = "noopener noreferrer";
+        link.textContent = issue.url;
+        item.append(link);
+      }
+      list.append(item);
+    }
+    summaryEl.append(list);
   }
 }
 
@@ -649,11 +673,11 @@ function showDeckCards(deck) {
 }
 
 function openSearchedDeck(deck, object = null) {
-  beginDeckDialog(deck.archetype && deck.archetype !== "Unknown" ? deck.archetype : deck.title,
+  beginDeckDialog(deckDisplayName(deck),
     object ? `${object.japaneseName || object.name}を使うデッキ` : "検索したデッキの画像付きリスト", "");
   if (object) {
     const context = document.createElement("p");
-    context.textContent = `このトークンを出すカード: ${sourcesForDeck(object, deck).map((source) => source.name).join(" / ")}`;
+    context.textContent = `${object.virtual || object.kind === "Marker" ? "この状態を使うカード" : "このトークンを出すカード"}: ${sourcesForDeck(object, deck).map((source) => source.name).join(" / ")}`;
     deckDialogMeta.append(context);
   }
   renderDeckFacts(deck);
@@ -881,24 +905,47 @@ function renderTokenSummary(objects) {
 
   const heading = document.createElement("div");
   heading.className = "deck-summary-heading";
-  heading.textContent = "トークン頻度";
+  heading.textContent = "トークン・補助物の採用頻度";
   tokenSummaryEl.append(heading);
+  const note = document.createElement("p");
+  note.className = "token-rank-note";
+  note.textContent = `集計できた${lastSearchedDeckCount || 0}件のうち、必要になるデッキの割合です。上位12件。名前を押すと準備欄へ移動します。`;
+  tokenSummaryEl.append(note);
 
   const list = document.createElement("div");
   list.className = "token-rank-list";
   for (const object of sortObjects(objects).slice(0, 12)) {
     const priority = tokenPriority(object);
     const row = document.createElement("div");
-    row.className = `token-rank-row ${priority.className}`;
-    const name = document.createElement("span");
-    name.textContent = [object.name, objectCharacteristics(object)].filter(Boolean).join(" — ");
+    row.className = "token-rank-row";
+    const identity = document.createElement("div");
+    identity.className = "token-rank-identity";
+    const name = document.createElement("button");
+    name.type = "button";
+    name.className = "token-rank-name";
+    name.textContent = object.japaneseName && !object.japaneseName.includes("名称要確認") ? object.japaneseName : object.name;
+    name.title = [object.name, objectCharacteristics(object)].filter(Boolean).join(" — ");
+    name.addEventListener("click", () => {
+      let card = [...resultsEl.querySelectorAll(".card")].find(card => card.dataset.objectKey === objectKey(object));
+      if (!card && hideCheckedInput.checked) {
+        hideCheckedInput.checked = false;
+        renderCurrentResults();
+        card = [...resultsEl.querySelectorAll(".card")].find(card => card.dataset.objectKey === objectKey(object));
+      }
+      if (card) { card.tabIndex = -1; card.scrollIntoView({ behavior: "smooth", block: "center" }); card.focus({ preventScroll: true }); }
+    });
+    const detail = document.createElement("span");
+    detail.className = "token-rank-detail";
+    detail.textContent = object.virtual || object.kind === "Marker" ? object.category || "補助物" : objectCharacteristics({ ...object, oracleText: "" }) || object.category || "トークン";
+    identity.append(name, detail);
+    const frequency = document.createElement("div");
+    frequency.className = "token-rank-frequency";
     const percent = document.createElement("strong");
     percent.textContent = `${priority.percent.toFixed(1)}%`;
-    const count = document.createElement("em");
-    count.textContent = `${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks`;
-    const label = document.createElement("b");
-    label.textContent = priority.label;
-    row.append(name, percent, count, label);
+    const count = document.createElement("span");
+    count.textContent = `${object.deckCount || 0} / ${lastSearchedDeckCount || 0}件`;
+    frequency.append(percent, count);
+    row.append(identity, frequency);
     list.append(row);
   }
   tokenSummaryEl.append(list);
@@ -1097,7 +1144,9 @@ function renderSetTimeline() {
   const needed = stockGroups.filter(group => group.objects.some(object => !objectIsPrepared(object))).length;
   document.querySelector("#timeline-counts").textContent = "抜き出し先 " + stockGroups.length + "セット ／ 未準備 " + needed + "セット";
   const note = document.querySelector("#timeline-note");
-  note.textContent = "通常拡張セット・基本セットから、同じ仕様のトークンを抜き出します。セットを押すと準備表へ移動します。";
+  const format = lastSummaryData.format;
+  const products = format === "legacy" ? "通常セットに加え、統率者・指輪物語・モダンホライゾン等のセットも含みます。" : format === "modern" ? "通常セットに加え、指輪物語・モダンホライゾン等も含みます。" : "通常セットから同じ仕様のトークン・補助カードを探しています。";
+  note.textContent = `${products}古いセット版も同じ仕様なら使えます。セットを押すと準備表へ移動します。`;
   if (lastSetTimeline?.warning) note.append(document.createTextNode(lastSetTimeline.warning));
   document.querySelector(".timeline-history").hidden = !sets.length;
 
@@ -1173,14 +1222,14 @@ function renderSetTimeline() {
   }
 }
 
-function renderSourcePreview(container, sourceCards) {
+function renderSourcePreview(container, sourceCards, labelText = "出すカード") {
   container.replaceChildren();
   const cards = sortObjects(sourceCards || []).slice(0, 4);
   if (!cards.length) return;
 
   const label = document.createElement("span");
   label.className = "source-preview-label";
-  label.textContent = "出すカード";
+  label.textContent = labelText;
   container.append(label);
 
   for (const card of cards) {
@@ -1211,8 +1260,8 @@ function renderSourcePreview(container, sourceCards) {
       link.append(preview);
     }
     const span = document.createElement("span");
-    const archetypeText = (card.archetypes || []).slice(0, 2).map((item) => item.name).join(", ");
-    span.textContent = archetypeText ? `${card.name} / ${archetypeText}` : card.name;
+    const deckCount = Number(card.deckCount) || 0;
+    span.textContent = deckCount ? `${card.name} · ${deckCount}リストで採用` : card.name;
     link.append(span);
     container.append(link);
   }
@@ -1239,10 +1288,10 @@ function renderAlternativeContents(details, state) {
     return;
   }
   if (!state.alternatives.length) {
-    message.textContent = "同じ仕様の通常拡張セット・基本セット版は見つかりませんでした。統率者・マスターズなどの特殊製品は候補に含めません。";
+    message.textContent = "準備対象のセットで、同じ仕様の版は見つかりませんでした。通常セットと選択フォーマットに対応する特殊セットを照合しています。";
     return;
   }
-  message.textContent = `通常拡張セット・基本セットの ${state.alternatives.length}セットから抜き出せます。色・サイズ・タイプ・能力が同じ紙の版です。「ここで抜いた」で同じ仕様にも準備チェックを共有します。`;
+  message.textContent = `${state.alternatives.length}セットから抜き出せます。色・サイズ・タイプ・能力が同じ紙の版です。「ここで抜いた」で同じ仕様にも準備チェックを共有します。`;
   const list = document.createElement("div");
   list.className = "alternative-grid";
   for (const print of state.alternatives) {
@@ -1298,7 +1347,7 @@ async function loadAlternativePrints(key, state) {
   try {
     const response = await fetch("/api/token-alternatives", { method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ printId: state.printId, targetDate: state.targetDate, includeCurrentProduct: state.object.printUnconfirmed === true }) });
+      body: JSON.stringify({ printId: state.printId, targetDate: state.targetDate, format: state.format, includeCurrentProduct: state.object.printUnconfirmed === true }) });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "別セット版を取得できませんでした。");
     state.alternatives = data.alternatives || [];
@@ -1314,7 +1363,7 @@ function renderTokenDecks(details, object) {
   const decks = decksForToken(object, searchedDeckIndex);
   details.hidden = !decks.length;
   if (!decks.length) return;
-  details.querySelector("summary").textContent = `このトークンを使うデッキ（画像付き）: ${decks.length}件`;
+  details.querySelector("summary").textContent = `${object.virtual || object.kind === "Marker" ? "この補助物が必要なデッキ" : "このトークンを使うデッキ"}（画像付き）: ${decks.length}件`;
   const key = objectKey(object);
   const list = details.querySelector(".token-deck-list");
   const render = () => {
@@ -1325,13 +1374,13 @@ function renderTokenDecks(details, object) {
       button.className = "token-deck-button";
       button.setAttribute("aria-label", `${deck.title || deck.url}の画像付きデッキリストを開く`);
       const title = document.createElement("strong");
-      title.textContent = deck.archetype && deck.archetype !== "Unknown" ? deck.archetype : deck.title;
+      title.textContent = deckDisplayName(deck);
       const facts = document.createElement("span");
       facts.textContent = [deck.player || deck.title, deck.eventDate,
         `メイン${boardCount(deck.mainboard)}枚・サイド${boardCount(deck.sideboard)}枚`].filter(Boolean).join(" / ");
       const source = document.createElement("span");
       source.className = "token-deck-source";
-      source.textContent = `出すカード: ${sourcesForDeck(object, deck).map((card) => card.name).join(" / ")}`;
+      source.textContent = `${object.virtual || object.kind === "Marker" ? "関連カード" : "出すカード"}: ${sourcesForDeck(object, deck).map((card) => card.name).join(" / ")}`;
       const action = document.createElement("span");
       action.className = "token-deck-action";
       action.textContent = "画像付きで開く →";
@@ -1399,25 +1448,28 @@ function renderObject(object) {
   img.title = imageSource.label;
   imageLink.addEventListener("mouseenter", () => showHoverPreview(img.src));
   imageLink.addEventListener("mouseleave", hideHoverPreview);
-  title.textContent = object.name;
+  title.textContent = object.virtual ? object.japaneseName || object.name : object.name;
   jp.textContent = object.japaneseName || `名称確認: ${object.category || "トークン"}`;
+  jp.hidden = Boolean(object.virtual);
   kind.textContent = object.category || object.kind;
   type.textContent = [object.typeLine, objectCharacteristics(object)].filter(Boolean).join(" / ");
+  type.hidden = Boolean(object.virtual);
   const priority = tokenPriority(object);
   deckCount.textContent = `${priority.label}: ${object.deckCount || 0}/${lastSearchedDeckCount || 0} decks (${priority.percent.toFixed(1)}%)`;
   if (object.preparationOnly) deckCount.textContent = "追加準備候補・採用率未評価";
   deckCount.classList.add(priority.className);
-  setPill.textContent = object.virtual ? "汎用の補助カードで準備" : object.printUnconfirmed ? object.stockStatus === "not-found" ? "通常セット版未確認・別途用意" : "通常セット版の取得が未完了" : `抜き出し先: ${object.set}${object.releasedAt ? ` / ${object.releasedAt}` : ""}`;
+  setPill.textContent = object.virtual ? "汎用の補助カードで準備" : object.printUnconfirmed ? object.stockStatus === "not-found" ? "対象セット版が見つからないため別途用意" : "対象セット版の取得が未完了" : `抜き出し先: ${object.set}${object.releasedAt ? ` / ${object.releasedAt}` : ""}`;
   note.textContent = object.note || "";
   note.hidden = !object.note;
   const alternativeDetails = node.querySelector(".alternative-prints");
   if (!object.virtual && object.printId && !/helper$/i.test(object.typeLine || "")) {
     alternativeDetails.hidden = false;
     const targetDate = lastMetaContext?.targetDate || targetDateInput.value;
-    const alternativeKey = `${object.printId}:${targetDate}`;
+    const format = lastMetaContext?.format || formatSelect.value;
+    const alternativeKey = `${object.printId}:${targetDate}:${format}`;
     alternativeDetails.dataset.alternativeKey = alternativeKey;
     if (!alternativePrintStates.has(alternativeKey)) alternativePrintStates.set(alternativeKey,
-      { printId: object.printId, targetDate, status: "idle", open: false, alternatives: [], object });
+      { printId: object.printId, targetDate, format, status: "idle", open: false, alternatives: [], object });
     const state = alternativePrintStates.get(alternativeKey);
     state.object = object;
     alternativeDetails.open = state.open;
@@ -1439,7 +1491,8 @@ function renderObject(object) {
   bar.append(fill);
   hints.append(bar);
   if (object.preparationOnly) bar.hidden = true;
-  renderSourcePreview(sourcePreview, object.sourceCards);
+  renderSourcePreview(sourcePreview, object.sourceCards, object.virtual || object.kind === "Marker" ? "関連カード" : "出すカード");
+  if (object.virtual || object.kind === "Marker") node.querySelector(".source-details summary").textContent = "関連カード・準備呪文 / 採用元";
   renderTokenDecks(node.querySelector(".token-decks"), object);
 
   for (const sourceCard of object.sourceCards || []) {
@@ -1468,6 +1521,12 @@ function renderObject(object) {
       ? `${sourceCard.name} / ${sourceCard.japaneseName} (${sourceCard.deckCount || 0})`
       : `${sourceCard.name} (${sourceCard.deckCount || 0})`;
     item.append(link);
+    const trackingHints = (sourceCard.hints || []).filter(hint => /^(?:準備呪文:|ワープ:)/.test(hint));
+    if (object.virtual && trackingHints.length) {
+      const detail = document.createElement("small");
+      detail.textContent = trackingHints.join(" / ");
+      item.append(detail);
+    }
     sourceCardList.append(item);
   }
 
@@ -1528,7 +1587,7 @@ function renderGroups(groups, container = resultsEl) {
       symbol.hidden = false;
       symbol.addEventListener("error", () => { symbol.hidden = true; }, { once: true });
     }
-    code.textContent = specialGroup ? group.set === "HELPERS" ? "補助カードで対応" : "通常セット版未確認・取得未完了" : `${printLabel}${group.releasedAt ? `${group.set} / ${group.releasedAt}` : group.set}`;
+    code.textContent = specialGroup ? group.set === "HELPERS" ? "補助カードで対応" : group.objects.every(object => object.stockStatus === "not-found") ? "セットから抜き出せないもの" : "現物の印刷情報を要確認" : `${printLabel}${group.releasedAt ? `${group.set} / ${group.releasedAt}` : group.set}`;
     title.textContent = group.setName;
     const remaining = group.objects.filter((object) => !objectIsPrepared(object)).length;
     count.textContent = `${group.count}種類 / 未準備 ${remaining}`;
@@ -1550,10 +1609,13 @@ function renderPreparationOverview() {
   overview.replaceChildren();
   const objects = [...new Map([...lastObjects, ...lastPreparationObjects].map(object => [preparationKey(object), object])).values()];
   const prepared = objects.filter(objectIsPrepared).length;
-  const unavailable = objects.filter(object => object.printUnconfirmed && !objectIsPrepared(object)).length;
+  const unavailableObjects = objects.filter(object => object.printUnconfirmed && !objectIsPrepared(object));
+  const unavailable = unavailableObjects.length;
+  const outsideStock = unavailableObjects.filter(object => object.stockStatus === "not-found");
+  const unconfirmedPrints = unavailable - outsideStock.length;
   const stats = document.createElement("div");
   stats.className = "preparation-stats";
-  for (const [label, value] of [["必要な種類", objects.length], ["未準備", objects.length - prepared], ["準備済み", prepared], ["別途用意・要確認", unavailable]]) {
+  for (const [label, value] of [["必要な種類", objects.length], ["未準備", objects.length - prepared], ["準備済み", prepared], [unconfirmedPrints ? "別途用意・要確認" : "別途用意", unavailable]]) {
     const stat = document.createElement("div"), count = document.createElement("strong"), caption = document.createElement("span");
     count.textContent = value; caption.textContent = label; stat.append(count, caption); stats.append(stat);
   }
@@ -1572,12 +1634,35 @@ function renderPreparationOverview() {
   document.querySelector("#toolbar-progress-fill").style.width = `${percent}%`;
   const data = lastSummaryData;
   const basis = document.createElement("p");
-  basis.textContent = `${data.tournament ? "この大会の提出リスト" : "環境の公開リスト"} ${data.searchedDeckCount || 0}件から作成。必要数は同じ仕様をまとめた種類数です。`;
+  basis.className = "preparation-basis";
+  basis.textContent = searchCoverageBasis(data);
   overview.append(basis);
   const warnings = [...(data.sourceWarnings || [])];
-  if (data.sourceExhausted && data.requestedDeckCount && data.searchedDeckCount < data.requestedDeckCount) warnings.push(`指定 ${data.requestedDeckCount}件に対し、取得できたリストは ${data.searchedDeckCount}件です。`);
-  if ((data.errors || []).length || data.unparsedDeckCount) warnings.push(`取得・抽出できなかったリストがあります。検索範囲・照合の詳細を確認してください。`);
-  if (unavailable) warnings.push(`通常セット版が見つからない、または取得未完了の ${unavailable}種類は「別途用意するもの」に残しています。`);
+  const coverage = searchCoverageMessage(data);
+  if (coverage.hasIssues) {
+    const notice = document.createElement("div");
+    notice.className = "search-coverage-notice";
+    const title = document.createElement("strong"), explanation = document.createElement("p"), detailButton = document.createElement("button");
+    title.textContent = coverage.title;
+    explanation.textContent = coverage.detail;
+    detailButton.type = "button"; detailButton.className = "ghost-button";
+    detailButton.textContent = searchIssues(data).length ? "除外した取得元・理由を見る" : "取得状況の詳細を見る";
+    detailButton.addEventListener("click", () => {
+      const details = document.querySelector("#search-details");
+      details.open = true;
+      details.scrollIntoView({ behavior: "smooth", block: "start" });
+      details.querySelector("summary").focus({ preventScroll: true });
+    });
+    notice.append(title, explanation, detailButton);
+    overview.append(notice);
+  }
+  if (outsideStock.length) {
+    const note = document.createElement("p");
+    const names = outsideStock.slice(0, 3).map(object => object.japaneseName || object.name).join("、");
+    note.textContent = `対象セット版が見つからない ${outsideStock.length}種類（${names}${outsideStock.length > 3 ? " ほか" : ""}）は「別途用意するもの」で確認できます。`;
+    overview.append(note);
+  }
+  if (unconfirmedPrints) warnings.push(`現物の印刷情報を取得・確認できていない ${unconfirmedPrints}種類があります。「別途用意するもの」で確認してください。`);
   for (const warning of new Set(warnings)) { const p = document.createElement("p"); p.className = "sampling-warn"; p.textContent = warning; overview.append(p); }
 }
 
@@ -1695,7 +1780,9 @@ async function enrichCurrentAssets(runId) {
     }
     renderTokenSummary(lastObjects);
     renderCurrentResults();
-    setStatus("検索完了。日本語画像とカード名の補完も反映しました。");
+    setStatus(searchCoverageMessage(lastSummaryData).hasIssues
+      ? `集計完了（${lastSearchedDeckCount}件）。取得状況の注意点を下に表示しています。日本語画像とカード名も反映しました。`
+      : "検索完了。日本語画像とカード名の補完も反映しました。");
   } catch (error) {
     if (runId !== searchRunId) return;
     if (merged > 0) {
@@ -1941,6 +2028,7 @@ async function init() {
   updateSourcesForFormat();
   applyCardLang(cardLang);
   applyEventScaleProfile();
+  tournamentUI.initialize();
   initLogStream();
 }
 
@@ -2050,11 +2138,18 @@ setSortSelect.addEventListener("change", renderCurrentResults);
 viewModeSelect.addEventListener("change", renderCurrentResults);
 hideCheckedInput.addEventListener("change", renderCurrentResults);
 form.addEventListener("submit", runSearch);
-const tournamentUI = createTournamentController({ form, formatSelect, targetDateInput, onConditionsLoaded: updateSourcesForFormat, onChange: () => {
+const tournamentUI = createTournamentController({ form, formatSelect, targetDateInput, onConditionsLoaded: updateSourcesForFormat, onOpenDeck: openSearchedDeck, onChange: () => {
   searchRunId += 1;
   if (lastSummaryData) { resultFreshnessEl.hidden = false; resultFreshnessEl.textContent = "条件変更前の結果です。選択したリストで再検索してください。"; }
 } });
 printButton.addEventListener("click", () => window.print());
+const displaySettings = document.querySelector(".result-display-settings");
+document.addEventListener("click", event => {
+  if (displaySettings.open && !displaySettings.contains(event.target)) displaySettings.open = false;
+});
+displaySettings.addEventListener("keydown", event => {
+  if (event.key === "Escape") { displaySettings.open = false; displaySettings.querySelector("summary").focus(); }
+});
 document.querySelector("#jump-to-sets").addEventListener("click", () => setTimelineEl.scrollIntoView({ behavior: "smooth", block: "start" }));
 clearCacheButton.addEventListener("click", clearCache);
 updateEnvironmentButton.addEventListener("click", updateEnvironment);

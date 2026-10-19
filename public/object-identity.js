@@ -22,12 +22,26 @@ export function tokenSignature(card) {
 
 // Preparation is shared across printings; aggregation still keeps each set row.
 export function preparationKey(object) {
+  // A reminder's purpose survives a missing image or a different printing.
+  // This never changes physical-token identity (size/color/abilities).
+  if (object.auxiliaryId) return `prep:auxiliary:${object.auxiliaryId}`;
+  return legacyPreparationKey(object);
+}
+
+function legacyPreparationKey(object) {
   if (isVirtualObject(object)) return `prep:helper:${JSON.stringify([object.name, object.typeLine])}`;
   return `prep:physical:${JSON.stringify([object.oracleId || object.printId || object.id, tokenSignature(object)])}`;
 }
 
 export function preparedRecord(object, records) {
-  const record = records.get(preparationKey(object));
+  let record = records.get(preparationKey(object));
+  if (!record && object.auxiliaryId) {
+    record = records.get(legacyPreparationKey(object));
+    for (const name of object.legacyHelperNames || []) {
+      if (record) break;
+      record = records.get(legacyPreparationKey({ virtual: true, name, typeLine: "Marker helper" }));
+    }
+  }
   return record?.picked === true ? record : null;
 }
 
@@ -41,8 +55,9 @@ export function migratePreparedRecords(objects, legacyChecks, records) {
   let changed = false;
   for (const object of objects) {
     const key = preparationKey(object);
-    if (!records.has(key) && legacyChecks.has(objectKey(object))) {
-      setPrepared(object, records, true);
+    const previous = preparedRecord(object, records);
+    if (!records.has(key) && (previous || legacyChecks.has(objectKey(object)))) {
+      setPrepared(object, records, true, previous || {});
       changed = true;
     }
   }

@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { chooseTokenPrint, chooseAlternateTokenPrints, sameTokenIdentity, tokenPrintRank, sourceTokenProducts, stockTokenProduct } from "../lib/token-prints.js";
-import { fetchPreferredTokenPrint, fetchAlternateTokenPrintsById } from "../lib/scryfall.js";
+import { fetchPreferredTokenPrint, fetchAlternateTokenPrintsById, japaneseEmblemNameFromSource } from "../lib/scryfall.js";
+import { japaneseOperationalName } from "../lib/tokens.js";
+
+test("The Ring is a shared reminder, not an emblem named after whichever creature tempted its controller", () => {
+  const name = "The Ring // The Ring Tempts You";
+  assert.equal(japaneseOperationalName({ name, kind: "Emblem", typeLine: "Emblem // Card" }), "指輪（指輪の誘惑）");
+  assert.equal(japaneseEmblemNameFromSource("Boromir, Warden of the Tower", "塔の長官、ボロミア", name), "指輪（指輪の誘惑）");
+});
 
 const setList = [
   { code: "sld", set_type: "box" },
@@ -17,6 +24,12 @@ const setList = [
   { code: "m21", set_type: "core" },
   { code: "tmh3", set_type: "token", parent_set_code: "mh3" },
   { code: "mh3", set_type: "draft_innovation" },
+  { code: "tltr", set_type: "token", parent_set_code: "ltr" },
+  { code: "ltr", set_type: "draft_innovation" },
+  { code: "tacr", set_type: "token", parent_set_code: "acr" },
+  { code: "acr", set_type: "expansion" },
+  { code: "tltc", set_type: "token", parent_set_code: "ltc" },
+  { code: "ltc", set_type: "commander", parent_set_code: "ltr" },
   { code: "ttdc", set_type: "token", parent_set_code: "tdc" },
   { code: "tdc", set_type: "commander", parent_set_code: "tdm" }
 ];
@@ -110,7 +123,7 @@ test("alternate 1/1 Cats must match color, abilities, type, faces and oracle ide
   assert.deepEqual(chooseAlternateTokenPrints(cat, [cat], sets), []);
 });
 
-test("stock suggestions allow expansion and core only, never special fallback or a commander child of an expansion", () => {
+test("stock suggestions without a format preserve ordinary products, never special fallback or a commander child of an expansion", () => {
   const core = { ...regular, id: "core", set: "tm21" };
   const excluded = ["tcmd", "tinr", "tmh3", "ttdc", "unknown"].map(set => ({ ...regular, id: set, set }));
   excluded.push({ ...regular, id: "promo", promo: true }, { ...regular, id: "showcase", frame_effects: ["showcase"] });
@@ -118,6 +131,37 @@ test("stock suggestions allow expansion and core only, never special fallback or
   assert.equal(stockTokenProduct(core, sets).code, "m21");
   assert.equal(chooseTokenPrint(original, excluded, sets, { stockOnly: true }), null);
   assert.deepEqual(chooseAlternateTokenPrints(original, [core, ...excluded], sets).map(card => card.id), ["core"]);
+});
+
+test("Modern supplemental products share ordinary stock groups without leaking Commander, Masters or different token specifications", () => {
+  const products = ["tmh3", "tltr", "tacr"].map((set) => ({ ...regular, set, id: set }));
+  for (const product of products) {
+    assert.equal(stockTokenProduct(product, sets, { format: "modern" }).code, product.set.slice(1));
+    assert.equal(stockTokenProduct(product, sets, { format: "legacy" }).code, product.set.slice(1));
+    assert.equal(stockTokenProduct(product, sets, { format: "standard" }), null);
+    assert.equal(stockTokenProduct(product, sets, { format: "pioneer" }), null);
+  }
+  const commander = { ...regular, set: "tltc", id: "ltr-commander" };
+  assert.equal(stockTokenProduct(commander, sets, { format: "modern" }), null);
+  assert.equal(stockTokenProduct(commander, sets, { format: "legacy" }).code, "ltc", "Never relabel LTC as its parent LTR");
+  assert.equal(stockTokenProduct({ ...regular, set: "ttdc" }, sets, { format: "legacy" }).code, "tdc");
+  assert.equal(stockTokenProduct({ ...regular, set: "tinr" }, sets, { format: "modern" }), null);
+  const excluded = [{ ...products[0], id: "promo-mh3", promo: true }, { ...products[1], id: "future-ltr", released_at: "2099-01-01" },
+    { ...products[1], id: "different-ltr", colors: ["U"] }, commander];
+  assert.deepEqual(new Set(chooseAlternateTokenPrints(original, [...products, ...excluded], sets, { format: "modern" }).map((card) => card.id)), new Set(products.map((card) => card.id)));
+  assert.equal(chooseTokenPrint(original, products, sets, { format: "modern", stockOnly: true, preferredSet: "ltr" }).id, "tltr");
+  assert.equal(chooseTokenPrint(original, products, sets, { format: "standard", stockOnly: true }), null);
+});
+
+test("preferred print cache is isolated by format, including direct supplemental references", async (t) => {
+  const ltr = { ...regular, id: "format-stock-ltr", oracle_id: "format-stock", set: "tltr" };
+  t.mock.method(globalThis, "fetch", async (url) => new URL(url).pathname === "/sets" ? Response.json({ data: setList }) : Response.json({ data: [ltr] }));
+  const modern = await fetchPreferredTokenPrint(ltr, { format: "modern", stockOnly: true });
+  assert.equal(modern.stockStatus, "available");
+  assert.equal(modern.productCode, "ltr");
+  const standard = await fetchPreferredTokenPrint(ltr, { format: "standard", stockOnly: true });
+  assert.equal(standard.stockStatus, "not-found");
+  assert.equal((await fetchPreferredTokenPrint(ltr, { format: "modern", stockOnly: true })).productCode, "ltr");
 });
 
 test("stock lookup does not shortcut Masters references and keeps the needed identity when no ordinary print exists", async (t) => {

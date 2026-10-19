@@ -1,11 +1,24 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { importTournament, meleeTournamentUrl, tournamentSummary, fetchMeleeTournament } from "../lib/tournament.js";
+import { importTournament, restoreTournament, meleeTournamentUrl, tournamentSummary, fetchMeleeTournament } from "../lib/tournament.js";
 
 const url = "https://melee.gg/Tournament/View/411350";
 const options = { url, format: "modern", targetDate: "2026-10-03", name: "大会" };
 const deck = { player: "A", title: "Cat", mainboard: [{ name: "Ocelot Pride", count: 4 }, { name: "Island", count: 56 }], sideboard: [{ name: "Dispel", count: 15 }] };
 const json = (decks, extra = {}) => importTournament({ ...options, ...extra, files: [{ name: "lists.json", content: JSON.stringify(decks) }] });
+
+test("submitted deck names survive imports and restoring an older misclassified snapshot", () => {
+  // The Standard signature used by the old pipeline must not override a source label.
+  const imported = json([{ ...deck, title: "Grixis Reanimator", mainboard: [
+    { name: "Persist", count: 4 }, { name: "Psychic Frog", count: 4 },
+    { name: "Stormchaser's Talent", count: 4 }, { name: "Slickshot Show-Off", count: 4 },
+    { name: "Island", count: 44 }
+  ] }]);
+  assert.equal(imported.decks[0].archetype, "Grixis Reanimator");
+  assert.equal(imported.decks[0].archetypeIdentity.matchedBy, "source-label");
+  imported.decks[0].archetype = "イゼット果敢";
+  assert.equal(restoreTournament(imported).decks[0].archetype, "Grixis Reanimator");
+});
 
 test("Melee URLs are canonicalized without accepting arbitrary network targets", () => {
   assert.equal(meleeTournamentUrl(`${url}/?round=1#Standings`), url);
@@ -56,10 +69,61 @@ test("malformed lists and untranslated names cannot silently become zero-token r
   assert.throws(() => importTournament({ ...options, files: [{ content: "x".repeat(3 * 1024 * 1024 + 1) }] }), /3MB/);
 });
 
-test("URL acquisition explains access denial and never presents a standings page as all entrants", async () => {
+test("URL acquisition explains Melee access denial", async () => {
   const original = globalThis.fetch;
   try {
     globalThis.fetch = async () => new Response("Forbidden", { status: 403 });
-    await assert.rejects(fetchMeleeTournament(url), /自動取得できません.*403/);
+    await assert.rejects(fetchMeleeTournament(url), /取得を許可されません.*403/);
   } finally { globalThis.fetch = original; }
+});
+
+const officialDeck = (overrides = {}) => ({
+  TournamentId: 411350, Game: "MagicTheGathering", FormatName: "Modern",
+  Guid: "00000000-0000-0000-0000-000000000001", OwnerDisplayName: "Example Player", DecklistName: "Example Deck",
+  Records: [{ n: "Ocelot Pride", q: 4, c: 0 }, { n: "Plains", q: 56, c: 0 }, { n: "Dispel", q: 14, c: 99 }, { n: "Kaheera, the Orphanguard", q: 1, c: 4 }],
+  AdminGivenName: "Private staff name", DiscordUsername: "private-handle", OwnerUsername: "private-account", PlayerId: 123456,
+  ...overrides
+});
+
+test("official Melee JSON includes the companion in the sideboard and discards account metadata", () => {
+  const imported = json([officialDeck()], { participants: 1 });
+  assert.equal(imported.deckCount, 1);
+  assert.equal(imported.coverageComplete, true);
+  assert.equal(imported.decks[0].mainboardCount, 60);
+  assert.equal(imported.decks[0].sideboardCount, 15);
+  assert.deepEqual(imported.decks[0].sideboard.at(-1), { name: "Kaheera, the Orphanguard", count: 1 });
+  assert.equal(imported.decks[0].originalUrl, "https://melee.gg/Decklist/View/00000000-0000-0000-0000-000000000001");
+  assert.equal(imported.decks[0].player, "Example Player");
+  for (const privateValue of ["Private staff name", "private-handle", "private-account", "123456", "AdminGivenName", "DiscordUsername", "OwnerUsername", "PlayerId"]) assert.equal(JSON.stringify(imported).includes(privateValue), false);
+});
+
+test("official exports from another tournament, format or game are rejected before import", () => {
+  for (const mismatch of [{ TournamentId: 999 }, { FormatName: "Legacy" }, { Game: "StarWarsUnlimited" }]) {
+    assert.throws(() => json([officialDeck(), officialDeck(mismatch)]), /一致しません/);
+  }
+});
+
+test("official exports deduplicate real deck IDs and report malformed or unknown board records", () => {
+  const imported = json([officialDeck(), officialDeck(), officialDeck({ Guid: "bad" }), officialDeck({ Records: [{ n: "Plains", q: 60, c: 7 }] })], { participants: 3 });
+  assert.equal(imported.deckCount, 1);
+  assert.equal(imported.duplicateDeckCount, 1);
+  assert.equal(imported.failures.length, 2);
+  assert.match(imported.failures[0].message, /識別子/);
+  assert.match(imported.failures[1].message, /未対応のカード区分/);
+  assert.equal(imported.missingCount, 2);
+  assert.equal(imported.coverageComplete, false);
+});
+
+test("browser snapshots revalidate cards and coverage instead of trusting supplied totals", () => {
+  const snapshot = json([deck], { participants: 8, locationScope: "jp", eventScale: "grassroots", location: "東京都・テスト店舗" });
+  const restored = restoreTournament({ ...snapshot, deckCount: 8, coverageComplete: true, missingCount: 0 });
+  assert.equal(restored.deckCount, 1);
+  assert.equal(restored.missingCount, 7);
+  assert.equal(restored.coverageComplete, false);
+  assert.equal(restored.locationScope, "jp");
+  assert.equal(restored.eventScale, "grassroots");
+  assert.equal(restored.fetchedAt, snapshot.fetchedAt);
+  assert.throws(() => restoreTournament({ ...snapshot, targetDate: "2026-02-30" }), /不正/);
+  assert.throws(() => restoreTournament({ ...snapshot, decks: [{ ...deck, mainboard: [{ name: "Island", count: 59 }] }] }), /完全リスト/);
+  assert.equal(restoreTournament({ ...snapshot, failures: [{ name: "B", message: "不足" }], registeredCount: 1 }).coverageComplete, false);
 });

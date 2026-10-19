@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createUpdateStore, confirmedEvents, validateEnvironmentPack } from "../lib/updates.js";
 import { resolveEnvironmentFromEvents } from "../lib/environment.js";
+import { candidateQueryVersion } from "../lib/scryfall.js";
+import { setEventVersion } from "../lib/set-events.js";
 
 const pack = {
   schemaVersion: 1, minimumReaderVersion: 1,
@@ -24,6 +26,8 @@ test("old ZIP reader loads complete history, uses effective date, persists acros
   await store.update("modern", deps);
   const restored = await createUpdateStore(options).read();
   assert.equal(restored.pack.events.length, 2);
+  assert.equal(restored.candidateQueryVersion, candidateQueryVersion);
+  assert.equal(restored.setEventVersion, setEventVersion);
   assert.equal(resolveEnvironmentFromEvents(confirmedEvents(restored.pack), "modern", "2026-08-02").startDate, "2026-06-03");
   assert.equal(resolveEnvironmentFromEvents(confirmedEvents(restored.pack), "modern", "2026-09-07").startDate, "2026-08-04");
   const before = await readFile(options.path, "utf8");

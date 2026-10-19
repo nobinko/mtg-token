@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { findCardMentions } from "../lib/search.js";
 import { buildBulkObjects } from "../lib/tokens.js";
-import { decksForToken, sourcesForDeck, boardCount } from "../public/token-decks.js";
+import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "../public/token-decks.js";
+
+test("tournament dialog and deck buttons use the submitted name even with an old wrong classification", () => {
+  assert.equal(deckDisplayName({ imported: true, title: "Grixis Reanimator", archetype: "イゼット果敢" }), "Grixis Reanimator");
+});
+
+test("MTGO event/player titles survive an incorrect inferred archetype", () => {
+  assert.equal(deckDisplayName({ url: "https://www.mtgo.com/decklist/pioneer-event#mtgo-1", player: "Player", title: "Pioneer Challenge 32 - Player", archetype: "イゼット果敢" }), "Pioneer Challenge 32 - Player");
+  assert.equal(deckDisplayName({ url: "https://mtgtop8.com/event?e=1&d=2&f=PI", title: "Player", archetype: "UR Ensoul" }), "UR Ensoul");
+});
 
 test("tokens open every adopting list beyond display caps, keeping individual decks on the same event page distinct", async () => {
   const pageUrl = "https://www.mtgo.com/decklist/modern-event-2026-10-01";

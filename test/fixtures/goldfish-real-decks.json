@@ -1,0 +1,912 @@
+{
+  "metadata": [
+    {
+      "name": "Abhorrent Oculus",
+      "printedName": "Abhorrent Oculus",
+      "language": "en",
+      "typeLine": "Creature — Eye",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/2/d2705b43-a94a-44c0-8740-82e0b296820c.jpg?1783909500",
+      "oracleText": "As an additional cost to cast this spell, exile six cards from your graveyard.\nFlying\nAt the beginning of each opponent's upkeep, manifest dread. (Look at the top two cards of your library. Put one onto the battlefield face down as a 2/2 creature and the other into your graveyard. Turn it face up any time for its mana cost if it's a creature card.)",
+      "manaCost": "{2}{U}",
+      "power": "5",
+      "toughness": "5",
+      "faces": [],
+      "requestedName": "Abhorrent Oculus"
+    },
+    {
+      "name": "Archon of Cruelty",
+      "printedName": "Archon of Cruelty",
+      "language": "en",
+      "typeLine": "Creature — Archon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/5/95ff951b-a098-409c-86c8-373b6c9f8331.jpg?1789599818",
+      "oracleText": "Flying\nWhenever this creature enters or attacks, target opponent sacrifices a creature or planeswalker of their choice, discards a card, and loses 3 life. You draw a card and gain 3 life.",
+      "manaCost": "{6}{B}{B}",
+      "power": "6",
+      "toughness": "6",
+      "faces": [],
+      "requestedName": "Archon of Cruelty"
+    },
+    {
+      "name": "Arid Mesa",
+      "printedName": "Arid Mesa",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/5/25ac5405-df7b-4097-914a-022cb18e20d4.jpg?1783926797",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Arid Mesa"
+    },
+    {
+      "name": "Blood Crypt",
+      "printedName": "Blood Crypt",
+      "language": "en",
+      "typeLine": "Land — Swamp Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/b/1b7eb998-3ec0-4cbc-a416-5a1e3e5a7316.jpg?1784036817",
+      "oracleText": "({T}: Add {B} or {R}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Blood Crypt"
+    },
+    {
+      "name": "Bloodstained Mire",
+      "printedName": "Bloodstained Mire",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/7/579743fe-f71e-4cb2-8629-d6b02ed1591d.jpg?1783911241",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Bloodstained Mire"
+    },
+    {
+      "name": "Cori-Steel Cutter",
+      "printedName": "Cori-Steel Cutter",
+      "language": "en",
+      "typeLine": "Artifact — Equipment",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/9/490eb213-9ae2-4b45-abec-6f1dfc83792a.jpg?1783907363",
+      "oracleText": "Equipped creature gets +1/+1 and has trample and haste.\nFlurry — Whenever you cast your second spell each turn, create a 1/1 white Monk creature token with prowess. You may attach this Equipment to it. (Whenever you cast a noncreature spell, the token gets +1/+1 until end of turn.)\nEquip {1}{R}",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Cori-Steel Cutter"
+    },
+    {
+      "name": "Dragon's Rage Channeler",
+      "printedName": "Dragon's Rage Channeler",
+      "language": "en",
+      "typeLine": "Creature — Human Shaman",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/c/4ced112a-e775-4f97-97b3-74877e9dce12.jpg?1783926848",
+      "oracleText": "Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium — As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.",
+      "manaCost": "{R}",
+      "power": "1",
+      "toughness": "1",
+      "faces": [],
+      "requestedName": "Dragon's Rage Channeler"
+    },
+    {
+      "name": "Emperor of Bones",
+      "printedName": "Emperor of Bones",
+      "language": "en",
+      "typeLine": "Creature — Skeleton Noble",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/f/df9d9075-2d1e-4848-b661-816d539e05eb.jpg?1783911281",
+      "oracleText": "At the beginning of combat on your turn, exile up to one target card from a graveyard.\n{1}{B}: Adapt 2.\nWhenever one or more +1/+1 counters are put on this creature, put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it. It gains haste. Sacrifice it at the beginning of the next end step.",
+      "manaCost": "{1}{B}",
+      "power": "2",
+      "toughness": "2",
+      "faces": [],
+      "requestedName": "Emperor of Bones"
+    },
+    {
+      "name": "Expressive Iteration",
+      "printedName": "Expressive Iteration",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/6/96f866ec-a163-4095-b088-d93fa0b6f6f7.jpg?1783903226",
+      "oracleText": "Look at the top three cards of your library. Put one of them into your hand, put one of them on the bottom of your library, and exile one of them. You may play the exiled card this turn.",
+      "manaCost": "{U}{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Expressive Iteration"
+    },
+    {
+      "name": "Faithless Looting",
+      "printedName": "Faithless Looting",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/c/fc019ffa-4461-4f3d-ab8d-e4d20e77ca0c.jpg?1783903774",
+      "oracleText": "Draw two cards, then discard two cards.\nFlashback {2}{R} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Faithless Looting"
+    },
+    {
+      "name": "Fatal Push",
+      "printedName": "Fatal Push",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/e/6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7.jpg?1783930180",
+      "oracleText": "Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn.",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Fatal Push"
+    },
+    {
+      "name": "Fiery Islet",
+      "printedName": "Fiery Islet",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/3/a3aab13c-9d9d-4507-ae5d-da979990ae1b.jpg?1783933068",
+      "oracleText": "{T}, Pay 1 life: Add {U} or {R}.\n{1}, {T}, Sacrifice this land: Draw a card.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Fiery Islet"
+    },
+    {
+      "name": "Island",
+      "printedName": "Island",
+      "language": "en",
+      "typeLine": "Basic Land — Island",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/3/1335d293-3dd2-4f13-bd2c-22181f4528ee.jpg?1791578424",
+      "oracleText": "({T}: Add {U}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Island"
+    },
+    {
+      "name": "Lava Dart",
+      "printedName": "Lava Dart",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/1/b16dd041-451d-4914-8c46-aa315a90d802.jpg?1783933110",
+      "oracleText": "Lava Dart deals 1 damage to any target.\nFlashback—Sacrifice a Mountain. (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Lava Dart"
+    },
+    {
+      "name": "Lightning Bolt",
+      "printedName": "Lightning Bolt",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/6/7673784e-db4b-43a1-8d55-1bb9fc1e284f.jpg?1783903008",
+      "oracleText": "Lightning Bolt deals 3 damage to any target.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Lightning Bolt"
+    },
+    {
+      "name": "Lyra, Tolarian Archangel",
+      "printedName": "Lyra, Tolarian Archangel",
+      "language": "en",
+      "typeLine": "Legendary Creature — Angel Wizard",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/5/a5183681-447b-4023-91f7-00e9338f4417.jpg?1789128032",
+      "oracleText": "Flying\nAt the beginning of each end step, if you've drawn three or more cards this turn, create a 3/3 blue Angel creature token with flying.\n{3}{U}{U}: Until end of turn, whenever Lyra deals combat damage to a player, draw two cards.",
+      "manaCost": "{1}{U}{U}",
+      "power": "3",
+      "toughness": "3",
+      "faces": [],
+      "requestedName": "Lyra, Tolarian Archangel"
+    },
+    {
+      "name": "Mishra's Bauble",
+      "printedName": "Mishra's Bauble",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/5/45bbbf9b-8fee-4c32-a513-02dac6ac8a39.jpg?1783930102",
+      "oracleText": "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep.",
+      "manaCost": "{0}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Mishra's Bauble"
+    },
+    {
+      "name": "Monastery Swiftspear",
+      "printedName": "Monastery Swiftspear",
+      "language": "en",
+      "typeLine": "Creature — Human Monk",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/6/d6bfa227-4309-40ed-952c-279595eab17e.jpg?1783920066",
+      "oracleText": "Haste\nProwess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)",
+      "manaCost": "{R}",
+      "power": "1",
+      "toughness": "2",
+      "faces": [],
+      "requestedName": "Monastery Swiftspear"
+    },
+    {
+      "name": "Mountain",
+      "printedName": "Mountain",
+      "language": "en",
+      "typeLine": "Basic Land — Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/5/85177bd7-6c50-48da-b692-ae5fe7bd357c.jpg?1791578439",
+      "oracleText": "({T}: Add {R}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Mountain"
+    },
+    {
+      "name": "Mutagenic Growth",
+      "printedName": "Mutagenic Growth",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/e/2e0861a2-1858-47af-8154-20a977c2b298.jpg?1783938398",
+      "oracleText": "({G/P} can be paid with either {G} or 2 life.)\nTarget creature gets +2/+2 until end of turn.",
+      "manaCost": "{G/P}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Mutagenic Growth"
+    },
+    {
+      "name": "Otherworldly Gaze",
+      "printedName": "Otherworldly Gaze",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/0/40bafd2b-acd4-46f0-abb2-139e2918ae99.jpg?1783909625",
+      "oracleText": "Surveil 3. (Look at the top three cards of your library, then put any number of them into your graveyard and the rest on top of your library in any order.)\nFlashback {1}{U} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Otherworldly Gaze"
+    },
+    {
+      "name": "Persist",
+      "printedName": "Persist",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/7/b7a56356-91bf-42f5-ab21-af2c48e78fc3.jpg?1783904558",
+      "oracleText": "Return target nonlegendary creature card from your graveyard to the battlefield with a -1/-1 counter on it.",
+      "manaCost": "{1}{B}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Persist"
+    },
+    {
+      "name": "Polluted Delta",
+      "printedName": "Polluted Delta",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/e/6e288374-2b71-4ace-b1d2-a19fee6cb4af.jpg?1783911240",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Polluted Delta"
+    },
+    {
+      "name": "Preordain",
+      "printedName": "Preordain",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/d/dd29a0e5-c1de-4e8a-8866-715e9f9cde1f.jpg?1783907099",
+      "oracleText": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Preordain"
+    },
+    {
+      "name": "Psychic Frog",
+      "printedName": "Psychic Frog",
+      "language": "en",
+      "typeLine": "Creature — Frog",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/8/68924203-c3d9-41ce-8ca8-c6dd491eb3ca.jpg?1783911246",
+      "oracleText": "Whenever this creature deals combat damage to a player or planeswalker, draw a card.\nDiscard a card: Put a +1/+1 counter on this creature.\nExile three cards from your graveyard: This creature gains flying until end of turn.",
+      "manaCost": "{U}{B}",
+      "power": "1",
+      "toughness": "2",
+      "faces": [],
+      "requestedName": "Psychic Frog"
+    },
+    {
+      "name": "Raucous Theater",
+      "printedName": "Raucous Theater",
+      "language": "en",
+      "typeLine": "Land — Swamp Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/5/b598c93e-dae1-4d71-a9e4-917abf76d2d0.jpg?1783912823",
+      "oracleText": "({T}: Add {B} or {R}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Raucous Theater"
+    },
+    {
+      "name": "Scalding Tarn",
+      "printedName": "Scalding Tarn",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/1/71e491c5-8c07-449b-b2f1-ffa052e6d311.jpg?1783926793",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Scalding Tarn"
+    },
+    {
+      "name": "Slickshot Show-Off",
+      "printedName": "Slickshot Show-Off",
+      "language": "en",
+      "typeLine": "Creature — Bird Wizard",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/0/7054012b-4f9d-44a0-aaf9-7fd3bddc7b2d.jpg?1783911814",
+      "oracleText": "Flying, haste\nWhenever you cast a noncreature spell, this creature gets +2/+0 until end of turn.\nPlot {1}{R} (You may pay {1}{R} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.)",
+      "manaCost": "{1}{R}",
+      "power": "1",
+      "toughness": "2",
+      "faces": [],
+      "requestedName": "Slickshot Show-Off"
+    },
+    {
+      "name": "Spell Pierce",
+      "printedName": "Spell Pierce",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/d/8dd4374f-0301-4b2e-bc99-2cd19568cb3b.jpg?1783907902",
+      "oracleText": "Counter target noncreature spell unless its controller pays {2}.",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Spell Pierce"
+    },
+    {
+      "name": "Spell Snare",
+      "printedName": "Spell Snare",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/7/b7551b61-656e-4f37-b9da-73174db983b7.jpg?1783904479",
+      "oracleText": "Counter target spell with mana value 2.",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Spell Snare"
+    },
+    {
+      "name": "Steam Vents",
+      "printedName": "Steam Vents",
+      "language": "en",
+      "typeLine": "Land — Island Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/8/a83903c7-fd51-4526-aed2-359e946fea36.jpg?1784036844",
+      "oracleText": "({T}: Add {U} or {R}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Steam Vents"
+    },
+    {
+      "name": "Swamp",
+      "printedName": "Swamp",
+      "language": "en",
+      "typeLine": "Basic Land — Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/2/b233b117-9369-45c1-80c5-cc857386b6be.jpg?1791578437",
+      "oracleText": "({T}: Add {B}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Swamp"
+    },
+    {
+      "name": "Thoughtseize",
+      "printedName": "Thoughtseize",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/2/b281a308-ab6b-47b6-bec7-632c9aaecede.jpg?1783930173",
+      "oracleText": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Thoughtseize"
+    },
+    {
+      "name": "Thundering Falls",
+      "printedName": "Thundering Falls",
+      "language": "en",
+      "typeLine": "Land — Island Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/7/17260fff-b239-4af4-9306-3236ae3fa5a5.jpg?1783912822",
+      "oracleText": "({T}: Add {U} or {R}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Thundering Falls"
+    },
+    {
+      "name": "Tyrranax Rex",
+      "printedName": "Tyrranax Rex",
+      "language": "en",
+      "typeLine": "Creature — Phyrexian Dinosaur",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/f/0fb52b44-da5f-4f7a-a6c2-7924b855e051.jpg?1783918007",
+      "oracleText": "This spell can't be countered.\nTrample, ward {4}, haste\nToxic 4 (Players dealt combat damage by this creature also get four poison counters.)",
+      "manaCost": "{4}{G}{G}{G}",
+      "power": "8",
+      "toughness": "8",
+      "faces": [],
+      "requestedName": "Tyrranax Rex"
+    },
+    {
+      "name": "Undercity Sewers",
+      "printedName": "Undercity Sewers",
+      "language": "en",
+      "typeLine": "Land — Island Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/b/2b5801fb-2026-4f25-98bc-ebb2f99684b9.jpg?1786507741",
+      "oracleText": "({T}: Add {U} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Undercity Sewers"
+    },
+    {
+      "name": "Unearth",
+      "printedName": "Unearth",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/1/b1f73271-b70f-40ae-be64-f8de7805923a.jpg?1783921900",
+      "oracleText": "Return target creature card with mana value 3 or less from your graveyard to the battlefield.\nCycling {2} ({2}, Discard this card: Draw a card.)",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Unearth"
+    },
+    {
+      "name": "Unholy Heat",
+      "printedName": "Unholy Heat",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/e/4e879386-b1f8-4f2a-9820-6e1291746f88.jpg?1783911915",
+      "oracleText": "Unholy Heat deals 2 damage to target creature or planeswalker.\nDelirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Unholy Heat"
+    },
+    {
+      "name": "Violent Urge",
+      "printedName": "Violent Urge",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/4/a47c968b-1edd-45ac-a67c-311647e7e2fc.jpg?1783909460",
+      "oracleText": "Target creature gets +1/+0 and gains first strike until end of turn.\nDelirium — If there are four or more card types among cards in your graveyard, that creature gains double strike until end of turn.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Violent Urge"
+    },
+    {
+      "name": "Watery Grave",
+      "printedName": "Watery Grave",
+      "language": "en",
+      "typeLine": "Land — Island Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/5/5525d6a6-e532-4047-9da4-bfae7927fecc.jpg?1784036860",
+      "oracleText": "({T}: Add {U} or {B}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "faces": [],
+      "requestedName": "Watery Grave"
+    }
+  ],
+  "decks": [
+    {
+      "title": "Izzet Prowess",
+      "player": "Kazuaki Kurokawa",
+      "url": "https://melee.gg/Decklist/View/48482fd8-0ee4-40ae-b51e-b4d4000dac8d",
+      "pageUrl": "https://melee.gg/Decklist/View/48482fd8-0ee4-40ae-b51e-b4d4000dac8d",
+      "sourceUrls": [
+        "https://melee.gg/Tournament/View/411350"
+      ],
+      "imported": true,
+      "originalUrl": "https://melee.gg/Decklist/View/48482fd8-0ee4-40ae-b51e-b4d4000dac8d",
+      "event": "Melee 大会 411350",
+      "eventName": "Melee 大会 411350",
+      "eventDate": "2026-10-03",
+      "format": "modern",
+      "mainboard": [
+        {
+          "name": "Dragon's Rage Channeler",
+          "count": 4
+        },
+        {
+          "name": "Thundering Falls",
+          "count": 1
+        },
+        {
+          "name": "Expressive Iteration",
+          "count": 3
+        },
+        {
+          "name": "Arid Mesa",
+          "count": 3
+        },
+        {
+          "name": "Lightning Bolt",
+          "count": 4
+        },
+        {
+          "name": "Scalding Tarn",
+          "count": 3
+        },
+        {
+          "name": "Preordain",
+          "count": 4
+        },
+        {
+          "name": "Mutagenic Growth",
+          "count": 3
+        },
+        {
+          "name": "Mountain",
+          "count": 3
+        },
+        {
+          "name": "Spell Snare",
+          "count": 2
+        },
+        {
+          "name": "Mishra's Bauble",
+          "count": 4
+        },
+        {
+          "name": "Cori-Steel Cutter",
+          "count": 4
+        },
+        {
+          "name": "Unholy Heat",
+          "count": 1
+        },
+        {
+          "name": "Steam Vents",
+          "count": 3
+        },
+        {
+          "name": "Violent Urge",
+          "count": 1
+        },
+        {
+          "name": "Monastery Swiftspear",
+          "count": 4
+        },
+        {
+          "name": "Fiery Islet",
+          "count": 2
+        },
+        {
+          "name": "Bloodstained Mire",
+          "count": 3
+        },
+        {
+          "name": "Slickshot Show-Off",
+          "count": 4
+        },
+        {
+          "name": "Lava Dart",
+          "count": 4
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Murktide Regent",
+          "count": 1
+        },
+        {
+          "name": "Consign to Memory",
+          "count": 4
+        },
+        {
+          "name": "Spell Pierce",
+          "count": 2
+        },
+        {
+          "name": "Obsidian Charmaw",
+          "count": 1
+        },
+        {
+          "name": "Brazen Borrower // Petty Theft",
+          "count": 1
+        },
+        {
+          "name": "Tormod's Crypt",
+          "count": 2
+        },
+        {
+          "name": "Meltdown",
+          "count": 1
+        },
+        {
+          "name": "Spell Snare",
+          "count": 1
+        },
+        {
+          "name": "Unholy Heat",
+          "count": 2
+        }
+      ],
+      "mainboardCount": 60,
+      "sideboardCount": 15,
+      "cards": [
+        "Dragon's Rage Channeler",
+        "Thundering Falls",
+        "Expressive Iteration",
+        "Arid Mesa",
+        "Lightning Bolt",
+        "Scalding Tarn",
+        "Preordain",
+        "Mutagenic Growth",
+        "Mountain",
+        "Spell Snare",
+        "Mishra's Bauble",
+        "Cori-Steel Cutter",
+        "Unholy Heat",
+        "Steam Vents",
+        "Violent Urge",
+        "Monastery Swiftspear",
+        "Fiery Islet",
+        "Bloodstained Mire",
+        "Slickshot Show-Off",
+        "Lava Dart",
+        "Murktide Regent",
+        "Consign to Memory",
+        "Spell Pierce",
+        "Obsidian Charmaw",
+        "Brazen Borrower // Petty Theft",
+        "Tormod's Crypt",
+        "Meltdown"
+      ],
+      "archetype": "Unknown"
+    },
+    {
+      "title": "Grixis Reanimator",
+      "player": "mekabu2026",
+      "url": "https://melee.gg/Decklist/View/d98e3d16-1628-46d1-902f-b4d600e129c1",
+      "pageUrl": "https://melee.gg/Decklist/View/d98e3d16-1628-46d1-902f-b4d600e129c1",
+      "sourceUrls": [
+        "https://melee.gg/Tournament/View/411350"
+      ],
+      "imported": true,
+      "originalUrl": "https://melee.gg/Decklist/View/d98e3d16-1628-46d1-902f-b4d600e129c1",
+      "event": "Melee 大会 411350",
+      "eventName": "Melee 大会 411350",
+      "eventDate": "2026-10-03",
+      "format": "modern",
+      "mainboard": [
+        {
+          "name": "Thundering Falls",
+          "count": 1
+        },
+        {
+          "name": "Persist",
+          "count": 4
+        },
+        {
+          "name": "Swamp",
+          "count": 2
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Fatal Push",
+          "count": 4
+        },
+        {
+          "name": "Unearth",
+          "count": 4
+        },
+        {
+          "name": "Tyrranax Rex",
+          "count": 1
+        },
+        {
+          "name": "Scalding Tarn",
+          "count": 2
+        },
+        {
+          "name": "Abhorrent Oculus",
+          "count": 3
+        },
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Otherworldly Gaze",
+          "count": 3
+        },
+        {
+          "name": "Undercity Sewers",
+          "count": 1
+        },
+        {
+          "name": "Archon of Cruelty",
+          "count": 4
+        },
+        {
+          "name": "Psychic Frog",
+          "count": 4
+        },
+        {
+          "name": "Spell Pierce",
+          "count": 2
+        },
+        {
+          "name": "Faithless Looting",
+          "count": 4
+        },
+        {
+          "name": "Polluted Delta",
+          "count": 4
+        },
+        {
+          "name": "Watery Grave",
+          "count": 2
+        },
+        {
+          "name": "Raucous Theater",
+          "count": 1
+        },
+        {
+          "name": "Emperor of Bones",
+          "count": 3
+        },
+        {
+          "name": "Lyra, Tolarian Archangel",
+          "count": 1
+        },
+        {
+          "name": "Steam Vents",
+          "count": 1
+        },
+        {
+          "name": "Blood Crypt",
+          "count": 1
+        },
+        {
+          "name": "Bloodstained Mire",
+          "count": 3
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Surgical Extraction",
+          "count": 2
+        },
+        {
+          "name": "Vexing Bauble",
+          "count": 2
+        },
+        {
+          "name": "Consign to Memory",
+          "count": 4
+        },
+        {
+          "name": "Strix Serenade",
+          "count": 1
+        },
+        {
+          "name": "Spell Snare",
+          "count": 2
+        },
+        {
+          "name": "Meltdown",
+          "count": 2
+        },
+        {
+          "name": "Pyroclasm",
+          "count": 2
+        }
+      ],
+      "mainboardCount": 60,
+      "sideboardCount": 15,
+      "cards": [
+        "Thundering Falls",
+        "Persist",
+        "Swamp",
+        "Thoughtseize",
+        "Fatal Push",
+        "Unearth",
+        "Tyrranax Rex",
+        "Scalding Tarn",
+        "Abhorrent Oculus",
+        "Island",
+        "Otherworldly Gaze",
+        "Undercity Sewers",
+        "Archon of Cruelty",
+        "Psychic Frog",
+        "Spell Pierce",
+        "Faithless Looting",
+        "Polluted Delta",
+        "Watery Grave",
+        "Raucous Theater",
+        "Emperor of Bones",
+        "Lyra, Tolarian Archangel",
+        "Steam Vents",
+        "Blood Crypt",
+        "Bloodstained Mire",
+        "Surgical Extraction",
+        "Vexing Bauble",
+        "Consign to Memory",
+        "Strix Serenade",
+        "Spell Snare",
+        "Meltdown",
+        "Pyroclasm"
+      ],
+      "archetype": "Unknown"
+    }
+  ]
+}

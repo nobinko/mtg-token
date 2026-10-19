@@ -2,7 +2,8 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { bodyLimit } from "hono/body-limit";
-import { importTournament, readTournament, saveTournament, tournamentSummary, meleeTournamentUrl, fetchMeleeTournament } from "./lib/tournament.js";
+import { meleeClient } from "./lib/melee.js";
+import { importTournament, restoreTournament, tournamentSummary, meleeTournamentUrl } from "./lib/tournament.js";
 import { fetchTournamentCards } from "./lib/scryfall.js";
 import { maxMatchedCards, seedPageMaxAgeMs } from "./lib/config.js";
 import { passwordGate } from "./lib/auth.js";
@@ -21,6 +22,7 @@ import { preparationWindow, preparationSources, dateOnly } from "./lib/preparati
 import { fetchPreparationSet, fetchJapaneseTokenPrintById, fetchAlternateTokenPrintsById } from "./lib/scryfall.js";
 import { buildArchetypeProfiles, classifyByProfile, matchKnownArchetype, overallArchetypeStats, inferFallbackArchetype, resolveArchetypeIdentity, resolveArchetypeIdentityFromCards, fallbackArchetypeIdentity } from "./lib/archetype.js";
 import { fetchCardMetadata, fetchFinderCandidates, fetchSearchCandidates, fetchJapaneseName, fetchJapanesePrint, fetchJapaneseRelatedObjectName, fetchOfficialJapaneseCard, japaneseEmblemNameFromSource, printedNameFor } from "./lib/scryfall.js";
+import { isPreparationRelatedObject } from "./lib/auxiliary.js";
 import { isVirtualObject } from "./public/object-identity.js";
 import { buildBulkObjects, groupObjectsBySet, japaneseNameFromTypeLine, japaneseOperationalName, tokenHints } from "./lib/tokens.js";
 import { findCardMentions, deckResultsFromPages } from "./lib/search.js";
@@ -65,11 +67,13 @@ function broadcast(line) {
 }
 
 console.log = (...args) => {
+  if (logContext.getStore()?.privateTournament) return;
   _origLog(...args);
   broadcast(args.map(serializeLogArg).join(" "));
 };
 
 console.error = (...args) => {
+  if (logContext.getStore()?.privateTournament) return;
   _origError(...args);
   broadcast("[ERROR] " + args.map(serializeLogArg).join(" "));
 };
@@ -145,23 +149,35 @@ app.get("/api/default-sources", (c) => c.json(defaultSources));
 
 app.get("/api/formats", (c) => c.json(formatOptions));
 
+app.get("/api/melee/tournaments", async c => {
+  try {
+    const result = await meleeClient.catalog({ format: c.req.query("format") || "modern", days: Number(c.req.query("days") || 90), offset: Number(c.req.query("offset") || 0), refresh: c.req.query("refresh") === "1" });
+    c.header("Cache-Control", "private, no-store");
+    return c.json(result);
+  } catch (error) { return c.json({ error: error.message }, [401, 403, 429, 504].includes(error.status) ? error.status : 502); }
+});
+
 app.post("/api/tournament", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => c.json({ error: "リストは合計3MBまでです。" }, 413) }), async c => {
   const body = await c.req.json().catch(() => ({}));
   const url = meleeTournamentUrl(body.url);
   if (!url) return c.json({ error: "Meleeの大会URL（https://melee.gg/Tournament/View/数字）を入力してください。" }, 400);
+  c.header("Cache-Control", "private, no-store");
+  if (["fetch", "fetch-api"].includes(body.action)) {
+    try {
+      const result = await logContext.run({ privateTournament: true }, () => body.action === "fetch-api" ? meleeClient.acquireApi(url, body.credentials) : meleeClient.acquire(url));
+      return c.json(result);
+    } catch (error) { return c.json({ error: error.message }, [401, 403, 429, 504].includes(error.status) ? error.status : 502); }
+  }
   if (body.action === "load") {
-    const saved = await readTournament(url);
-    if (saved) return c.json(tournamentSummary(saved));
-    try { await fetchMeleeTournament(url); }
-    catch (error) { return c.json({ error: error.message }, 502); }
+    return c.json({ error: "保存済みの大会は取り込んだ端末・ブラウザで開いてください。大会URLだけで他の利用者のリストを読み込むことはできません。" }, 410);
   }
   if (body.action !== "import") return c.json({ error: "取り込み操作が不正です。" }, 400);
   if (!["standard", "pioneer", "modern", "legacy"].includes(body.format) || !dateOnly(body.targetDate)) return c.json({ error: "フォーマットと大会日を選んでください。" }, 400);
   let tournament;
   try { tournament = importTournament(body); }
   catch (error) { return c.json({ error: error.message }, 400); }
-  await saveTournament(tournament);
-  return c.json(tournamentSummary(tournament));
+  c.header("Cache-Control", "private, no-store");
+  return c.json({ ...tournamentSummary(tournament), decks: tournament.decks });
 });
 
 app.post("/api/meta-deck", async (c) => {
@@ -316,14 +332,19 @@ app.post("/api/cache/clear", async (c) => {
   return c.json({ ok: true });
 });
 
-app.post("/api/token-cards", async (c) => {
+app.post("/api/token-cards", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => c.json({ error: "大会リストのサイズ上限を超えています。元のファイルを確認してください。" }, 413) }), async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const logRunId = normalizeLogRunId(body.logRunId);
-  return logContext.run({ runId: logRunId }, async () => {
+  return logContext.run({ runId: logRunId, privateTournament: body.sourceMode === "tournament" }, async () => {
   const format = normalizeFormat(body.format);
   const tournamentMode = body.sourceMode === "tournament";
-  const tournament = tournamentMode ? await readTournament(body.tournamentUrl) : null;
-  if (tournamentMode && !tournament) return c.json({ error: "この大会のリストを先に読み込んでください。" }, 400);
+  let tournament = null;
+  if (tournamentMode) {
+    try { tournament = restoreTournament(body.tournamentSnapshot); }
+    catch (error) { return c.json({ error: error.message }, 400); }
+    if (tournament.url !== meleeTournamentUrl(body.tournamentUrl)) return c.json({ error: "選択した大会URLと保存リストが一致しません。" }, 400);
+    c.header("Cache-Control", "private, no-store");
+  }
   if (tournament && (tournament.format !== format || tournament.targetDate !== body.targetDate || tournament.fetchedAt !== body.tournamentRevision)) return c.json({ error: "読み込んだ大会の条件またはリストが変更されています。大会をもう一度読み込んで確認してください。" }, 409);
   const sourceUrls = tournament ? [tournament.url] : Array.isArray(body.sources) && body.sources.length
     ? body.sources
@@ -352,7 +373,7 @@ app.post("/api/token-cards", async (c) => {
       duplicateDeckCount: tournament.duplicateDeckCount, unparsedDeckCount: tournament.failures.length, cacheStats: { hits: 0, network: 0 }, siteStats: {}, deckEntryCount: tournament.deckCount, sourceExhausted: false })
       : crawlSources(sourceUrls, maxChildPages, { useCache, refreshCache, targetDate: crawlTargetDate, environmentStartDate, format })
   ]);
-  const candidates = tournament ? candidateResult.cards.filter(card => tokenHints(card).length || (card.all_parts || []).some(part => /token|emblem/i.test(part.type_line || part.component || ""))) : candidateResult.cards;
+  const candidates = candidateResult.cards.filter(card => tokenHints(card).length || (card.all_parts || []).some(isPreparationRelatedObject));
 
   const allowedDeckUrls = new Set(deckResultsFromPages(crawl.pages).slice(0, maxChildPages).map((deck) => deck.url));
   crawl.pages = crawl.pages.map((page) => ({ ...page, deckEntries: (page.deckEntries || []).filter((deck) => allowedDeckUrls.has(deck.url)) }));
@@ -367,7 +388,7 @@ app.post("/api/token-cards", async (c) => {
 
   // パス1: 巡回で取得したメタゲームページの正確なアーキタイプ名でタイトル照合
   // "Unknown" だけでなく、正規の名前でないデッキ（プレイヤー名混じりなど）も対象にする
-  if (knownArchetypes.size > 0) {
+  if (!tournament && knownArchetypes.size > 0) {
     for (const deck of allDeckEntries) {
       if (!deck.archetype || deck.archetype === "Unknown" || !knownArchetypes.has(deck.archetype)) {
         const matched = matchKnownArchetype(deck.title, knownArchetypes)
@@ -381,7 +402,7 @@ app.post("/api/token-cards", async (c) => {
   // パス1後の正確なラベルをもとにコアカードを学習し、まだ Unknown のデッキを分類する
   const profiles = buildArchetypeProfiles(allDeckEntries);
   for (const deck of allDeckEntries) {
-    if (!deck.archetype || deck.archetype === "Unknown") {
+    if (!tournament && (!deck.archetype || deck.archetype === "Unknown")) {
       deck.archetype = classifyByProfile(deck.cards ?? [], profiles);
     }
   }
@@ -389,7 +410,7 @@ app.post("/api/token-cards", async (c) => {
   // パス3: 土地色＋戦略シグナルによる最終フォールバック
   // 上記すべてで Unknown のままのデッキに "Izzet Midrange" 等の大枠ラベルを付ける。
   for (const deck of allDeckEntries) {
-    if (!deck.archetype || deck.archetype === "Unknown") {
+    if (!tournament && (!deck.archetype || deck.archetype === "Unknown")) {
       deck.archetype = inferFallbackArchetype(deck.cards ?? []);
     }
   }
@@ -397,6 +418,9 @@ app.post("/api/token-cards", async (c) => {
   // パス4: 日本語圏のデッキ名称を保持する ArchetypeIdentity に昇格。
   // 例: "Izzet Prowess" は "イゼット果敢" として表示しつつ、macroPlan / engineTags を保持する。
   for (const deck of allDeckEntries) {
+    // Tournament normalization already preserves the submitted name. Shared
+    // lands or sideboard cards must never relabel an entrant's actual list.
+    if (tournament) continue;
     const identity = resolveArchetypeIdentity(deck.archetype, { confidence: 0.95, matchedBy: "normalized-name" })
       || resolveArchetypeIdentityFromCards(deck.cards ?? [])
       || fallbackArchetypeIdentity(deck.archetype, deck.cards ?? []);
@@ -432,7 +456,7 @@ app.post("/api/token-cards", async (c) => {
     }
     console.log("[sets] original products resolved; selecting matching token prints");
   }
-  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings, preferSourceSet: true, stockOnly: true, targetDate });
+  const objects = await buildBulkObjects(matched, { enrichJapaneseAssets: false, warnings: objectWarnings, preferSourceSet: true, stockOnly: true, format, targetDate });
   let preparationResult = null;
   if (preparation) {
     const warnings = [];
@@ -442,7 +466,7 @@ app.post("/api/token-cards", async (c) => {
       const sources = preparationSources(set.cards, format, preparation.startsAt);
       if (!sources.length) warnings.push("対象フォーマットの候補を確定できません。未収録または使用不可の可能性があります。");
       if (sources.some((source) => source.legalityUnconfirmed)) warnings.push("未発売カードを含みます。当日のフォーマット使用可否は未確認です。");
-      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings, preferSourceSet: true, stockOnly: true, targetDate });
+      const extraObjects = await buildBulkObjects(sources, { enrichJapaneseAssets: false, warnings, preferSourceSet: true, stockOnly: true, format, targetDate });
       preparationResult = { ...preparationResult, setName: set.metadata.name, sourceCount: sources.length, fetchedAt: set.fetchedAt,
         status: "取得済み（公開・収録済み情報の範囲。新メカニズムの網羅性は未確認）",
         objects: extraObjects.map((object) => ({ ...object, preparationOnly: true, note: [object.note, "新セットの追加準備候補。採用実績による推薦ではありません。"].filter(Boolean).join(" ") })) };
@@ -475,6 +499,7 @@ app.post("/api/token-cards", async (c) => {
     sourceUrls,
     scannedPages: crawl.pages.map((page) => page.url),
     errors: crawl.errors,
+    sourceIssues: crawl.sourceIssues || [],
     sourceWarnings: crawl.warnings,
     duplicateDeckCount: crawl.duplicateDeckCount,
     cacheStats: crawl.cacheStats,
@@ -501,11 +526,13 @@ app.post("/api/token-alternatives", async (c) => {
   const printId = String(body.printId || "");
   if (!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(printId)) return c.json({ error: "印刷IDが不正です。" }, 400);
   if (body.targetDate && !dateOnly(body.targetDate)) return c.json({ error: "大会日が不正です。" }, 400);
+  const format = normalizeFormat(body.format, "modern");
+  if (body.format && !formatOptions.some((option) => option.key === body.format)) return c.json({ error: "フォーマットが不正です。" }, 400);
   const now = new Date().toISOString().slice(0, 10);
   const today = body.targetDate && body.targetDate < now ? body.targetDate : now;
   try {
-    const alternatives = await fetchAlternateTokenPrintsById(printId, { today, includeCurrentProduct: body.includeCurrentProduct === true });
-    return c.json({ printId, alternatives, checkedThrough: today });
+    const alternatives = await fetchAlternateTokenPrintsById(printId, { today, includeCurrentProduct: body.includeCurrentProduct === true, format });
+    return c.json({ printId, format, alternatives, checkedThrough: today });
   } catch (error) {
     return c.json({ error: `別セット版を確認できませんでした: ${error.message}` }, 502);
   }

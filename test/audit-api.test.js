@@ -23,7 +23,7 @@ function messageOf(child, type) {
   });
 }
 
-for (const cacheMode of ["fresh", "stale", "missing"]) {
+for (const cacheMode of ["fresh", "stale", "missing", "old-version"]) {
   test(`HTTP search after an expired environment update retains ${cacheMode} cache fallback`, async (t) => {
     const child = fork(fileURLToPath(new URL("../scripts/verify-audit-fixes.mjs", import.meta.url)), [`--cache=${cacheMode}`], { env: { ...process.env, PORT: "0" }, stdio: ["ignore", "pipe", "pipe", "ipc"] });
     let logs = "";
@@ -59,6 +59,7 @@ for (const cacheMode of ["fresh", "stale", "missing"]) {
     child.send("stats");
     assert.equal((await stats).candidateRequests, cacheMode === "fresh" ? 0 : 1);
     if (cacheMode === "missing") assert.match(result.body.candidateWarnings.join(""), /保存した候補/);
+    if (["stale", "old-version"].includes(cacheMode)) assert.match(result.body.candidateWarnings.join(""), /補助物の網羅は未確認/);
 
     if (cacheMode === "fresh") {
       const alternatives = await post("/api/token-alternatives", { printId: stockCat.printId, targetDate: "2026-09-26" });
@@ -66,19 +67,25 @@ for (const cacheMode of ["fresh", "stale", "missing"]) {
       assert.deepEqual(alternatives.body.alternatives.map(print => print.set), ["ELD"]);
       const url = "https://melee.gg/Tournament/View/411350";
       const tournamentInput = { action: "import", url, format: "modern", targetDate: "2026-10-03", name: "Actual field", participants: 537,
-        files: [{ content: JSON.stringify([{ player: "Actual player", mainboard: [{ name: "Ocelot Pride", count: 4 }, { name: "Unresolved Card", count: 1 }, { name: "Island", count: 55 }], sideboard: [] }]) }] };
+        files: [{ content: JSON.stringify([{ title: "Actual submitted deck", player: "Actual player", mainboard: [{ name: "Ocelot Pride", count: 4 }, { name: "Unresolved Card", count: 1 }, { name: "Island", count: 55 }], sideboard: [] }]) }] };
       const imported = await post("/api/tournament", tournamentInput);
       assert.equal(imported.status, 200, logs);
       assert.equal(imported.body.missingCount, 536);
       assert.equal(imported.body.coverageComplete, false);
       const loaded = await post("/api/tournament", { action: "load", url });
-      assert.equal(loaded.body.fetchedAt, imported.body.fetchedAt);
-      const eventInput = { ...input, sourceMode: "tournament", targetDate: tournamentInput.targetDate, tournamentUrl: url, tournamentRevision: imported.body.fetchedAt, preparation: { setCode: "fra", startsAt: "2026-10-02" } };
+      assert.equal(loaded.status, 410, "Even a known URL must not expose another browser's imported lists");
+      assert.equal(loaded.body.decks, undefined);
+      const otherBrowser = await post("/api/tournament", { ...tournamentInput, files: [{ content: JSON.stringify([{ player: "Other browser", mainboard: [{ name: "Mountain", count: 60 }], sideboard: [] }]) }] });
+      assert.equal(otherBrowser.status, 200);
+      const eventInput = { ...input, sourceMode: "tournament", targetDate: tournamentInput.targetDate, tournamentUrl: url, tournamentRevision: imported.body.fetchedAt, tournamentSnapshot: imported.body, preparation: { setCode: "fra", startsAt: "2026-10-02" } };
+      assert.equal((await post("/api/token-cards", { ...eventInput, tournamentSnapshot: undefined })).status, 400, "A URL and revision cannot read a server-held deck");
       const event = await post("/api/token-cards", eventInput);
       assert.equal(event.status, 200, logs);
       assert.equal(event.body.sourceMode, "tournament");
       assert.equal(event.body.searchedDeckCount, 1);
       assert.equal(event.body.searchedDecks[0].player, "Actual player");
+      assert.equal(event.body.searchedDecks[0].archetype, imported.body.decks[0].title, "the search pipeline must preserve the submitted label");
+      assert.equal(event.body.searchedDecks.some(deck => deck.player === "Other browser"), false);
       assert.deepEqual(event.body.sourceUrls, [url]);
       assert.equal(event.body.cards.some(card => card.name.startsWith("Spirit")), false, "Historical fixture decks must not enter the actual field");
       assert.equal(event.body.cards.some(card => card.name === "Ocelot Pride"), true);
@@ -92,7 +99,8 @@ for (const cacheMode of ["fresh", "stale", "missing"]) {
       assert.equal((await post("/api/token-cards", { ...eventInput, tournamentRevision: "old" })).status, 409);
       assert.equal((await post("/api/token-cards", { ...eventInput, tournamentUrl: "https://melee.gg/Tournament/View/999" })).status, 400);
       assert.equal((await post("/api/tournament", { ...tournamentInput, files: [{ content: "bad" }] })).status, 400);
-      assert.equal((await post("/api/tournament", { action: "load", url })).body.fetchedAt, imported.body.fetchedAt, "Failed reimport preserves the saved lists");
+      assert.equal((await post("/api/tournament", { action: "load", url })).status, 410);
+      assert.doesNotMatch(logs, /\[search\].*target=2026-10-03/, "Private tournament searches must not enter the shared console/SSE log");
     }
 
     if (cacheMode !== "fresh") return;

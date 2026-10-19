@@ -1,0 +1,413 @@
+/* The solo table has its own dark playmat, independent of the catalogue theme. */
+.goldfish-dialog {
+  --text: #f1eee5; --text-2: #d6d9d9; --muted: #a7b6bf; --faint: #7d919e;
+  --surface-0: #0b131c; --surface-1: #101c28; --surface-2: #152330;
+  --surface-3: #1b2c3b; --surface-4: #253b4e; --line: #ffffff16;
+  --line-strong: #60788a70; --accent: #e5bc74; --accent-text: #f0d39e;
+  --accent-soft: #e5bc741a; --accent-line: #e5bc7470; --card-image-bg: #111b24;
+  --playmat: transparent; --card-size: clamp(60px, calc((100dvh - 510px) * .33), 112px);
+  inset: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none;
+  margin: 0; padding: 0; border: 0; border-radius: 0; overflow: hidden;
+  color: var(--text); background: #0b1420; color-scheme: dark;
+}
+.goldfish-dialog [hidden] { display: none !important; }
+.goldfish-dialog button { color: var(--text-2); background: #172635; border-color: #758c9a50; }
+.goldfish-dialog button:hover:not(:disabled) { color: #fff; border-color: #d6b47a; background: #294154; }
+.goldfish-dialog button:focus-visible { outline: 3px solid #80d5f4; outline-offset: 3px; }
+.goldfish-dialog button:disabled { opacity: .38; }
+.goldfish-dialog input, .goldfish-dialog select, .goldfish-dialog textarea { color: var(--text); background-color: #0e1923; border-color: #6d839650; }
+.goldfish-dialog .primary-button { color: #211709; background: linear-gradient(120deg, #f6d698, #c38b3e); border-color: #e2bf7d; box-shadow: 0 0 22px #e5b56120; }
+.goldfish-dialog .primary-button:hover:not(:disabled) { color: #161009; background: #f2d192; }
+.goldfish-dialog kbd { color: inherit; background: #0003; border-color: #ffffff26; font-size: 10px; }
+.goldfish-shell { height: 100%; min-height: 0; max-height: none; padding: 0; display: grid; grid-template-rows: 58px minmax(0, 1fr) 32px; overflow: hidden; }
+.goldfish-topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 22px; border-bottom: 1px solid #b8c9d01f; background: #0a111bd9; }
+.goldfish-brand { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.goldfish-brand > div { min-width: 0; }
+.goldfish-brand p { margin: 0; color: var(--accent-text); font-size: 9px; letter-spacing: .22em; }
+.goldfish-brand h2 { font-family: var(--font-body); margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.goldfish-sigil { font-size: 30px; color: var(--accent); }
+.goldfish-topbar-actions { display: flex; gap: 6px; flex: none; }
+.goldfish-topbar-actions button { min-width: 36px; min-height: 34px; padding: 0 12px; font-size: 12px; }
+.goldfish-layout { position: relative; display: block; min-height: 0; margin: 0; overflow: hidden; isolation: isolate; }
+.goldfish-table-column { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 124px; grid-template-rows: 62px minmax(0, 1fr) 78px 194px; gap: 0; height: 100%; min-height: 0; padding: 0 26px; overflow: hidden;
+  background: radial-gradient(ellipse at 48% 30%, #3553675c, transparent 60%), radial-gradient(ellipse at 50% 105%, #46667866, transparent 55%), repeating-linear-gradient(130deg, #ffffff02 0 1px, transparent 1px 65px), #101c29;
+}
+.goldfish-table-column::before { content: ""; position: absolute; inset: 12% 12% 28%; border: 1px solid #93a5b51b; border-radius: 50%; box-shadow: inset 0 0 100px #0002, 0 0 0 18px #b7c4d003, 0 0 0 19px #b7c4d00c; pointer-events: none; z-index: -1; }
+.goldfish-arena-top { grid-column: 1 / -1; position: relative; display: flex; justify-content: center; align-items: center; }
+.goldfish-turn-indicator { position: absolute; left: 0; display: flex; gap: 9px; align-items: baseline; color: var(--muted); font-size: 10px; letter-spacing: .12em; }
+.goldfish-turn-indicator strong { color: var(--accent-text); font: 25px var(--font-num); }
+.goldfish-life { display: flex; align-items: center; justify-content: center; gap: 7px; }
+.goldfish-life > span { color: var(--muted); font-size: 11px; }
+.goldfish-life button { min-width: 30px; width: 30px; min-height: 30px; padding: 0; border-radius: 50%; background: #0a1722; }
+.goldfish-life input { appearance: textfield; width: 58px; min-height: 48px; padding: 3px; border-radius: 50%; border: 1px solid #d1b37c8a; background: radial-gradient(circle at 50% 30%, #33556a, #0d1822); color: #fff3d9; text-align: center; font: 28px var(--font-num); box-shadow: 0 3px 15px #0005; }
+.goldfish-life input::-webkit-inner-spin-button { appearance: none; }
+.goldfish-opponent .goldfish-life input { border-color: #b7908999; background: radial-gradient(circle at 50% 30%, #613e43, #211a23); }
+.goldfish-zone.battlefield-zone { position: relative; grid-area: 2 / 1 / 3 / 2; min-height: 0; padding: 4px 20px 0 0; border: 0; background: none; border-radius: 0; }
+.battlefield-zone .goldfish-zone-header { height: 28px; margin: 0 0 3px; align-items: center; }
+.battlefield-zone .goldfish-zone-header h3 { color: #aabdc7; letter-spacing: .12em; font-size: 10px; }
+.battlefield-zone .goldfish-zone-header button { background: transparent; padding: 0 8px; min-height: 26px; font-size: 10px; border-color: #ffffff13; }
+.goldfish-battlefield-lanes { height: calc(100% - 31px); display: grid; grid-template-columns: minmax(110px, .22fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 18px; }
+.goldfish-battlefield-lane { position: relative; min-height: 0; padding: 4px 0; background: transparent; border: 0; border-top: 1px solid #b6c8d017; border-radius: 0; }
+.goldfish-battlefield-lane h4 { position: absolute; z-index: 1; left: 4px; top: 3px; padding: 0; color: #93a9b9; font-size: 9px; font-weight: 500; letter-spacing: .08em; pointer-events: none; }
+.goldfish-battlefield-lane.other-lane { grid-column: 1; grid-row: 1 / 3; border-right: 1px solid #b6c8d017; }
+.goldfish-battlefield-lane.creature-lane { grid-column: 2; grid-row: 1; }
+.goldfish-battlefield-lane.land-lane { grid-column: 2; grid-row: 2; }
+.battlefield-zone .goldfish-card-zone { height: 100%; min-height: 0; padding: 20px 8px 8px; overflow: auto; align-content: start; justify-content: safe center; gap: 14px; }
+.battlefield-zone .goldfish-card-visual { --fitted-card-size: clamp(58px, calc((100% - (var(--lane-count, 1) - 1) * 14px) / var(--lane-count, 1)), var(--card-size)); width: var(--fitted-card-size); min-width: var(--fitted-card-size); max-width: var(--fitted-card-size); flex: 0 0 var(--fitted-card-size); }
+.goldfish-dialog .goldfish-card-visual { background: transparent; border: 0; border-radius: 8px; }
+.goldfish-dialog .goldfish-card-surface { grid-template-rows: auto; box-shadow: 0 6px 10px #0008; outline: 1px solid #b7c9d02e; }
+.goldfish-dialog .goldfish-card-caption { position: absolute; bottom: 0; left: 0; right: 0; min-height: 0; padding: 5px; background: #09111ded; font-size: 9px; opacity: 0; transition: opacity .15s; }
+.goldfish-dialog .goldfish-card-chip:hover .goldfish-card-caption, .goldfish-dialog .goldfish-card-chip:focus-visible .goldfish-card-caption, .goldfish-dialog .image-unavailable .goldfish-card-caption { opacity: 1; }
+.goldfish-dialog .image-unavailable .goldfish-card-caption { white-space: normal; overflow-wrap: anywhere; }
+.goldfish-dialog .goldfish-card-chip.is-selected { box-shadow: none; }
+.goldfish-dialog .goldfish-card-chip.is-selected .goldfish-card-surface { outline: 2px solid #83d7f4; box-shadow: 0 0 17px #5cc9f46b, 0 5px 12px #0007; }
+.goldfish-dialog .goldfish-card-chip.is-bottom-choice .goldfish-card-surface { outline: 2px solid #ffc16c; }
+.goldfish-dialog .goldfish-card-visual:hover:not(:disabled) { background: transparent; }
+.goldfish-dialog .goldfish-card-badges { inset: auto 3px 4px; }
+.goldfish-dialog .goldfish-empty { align-self: center; margin: auto; color: #708899; font-size: 10px; }
+.goldfish-dialog .battlefield-drop-zone .goldfish-card-visual.is-tapped { margin-inline: 15px; }
+.goldfish-dialog .battlefield-drop-zone .goldfish-card-visual.is-tapped .goldfish-card-surface { transform: rotate(90deg) scale(.82); }
+.goldfish-piles { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding-left: 10px; }
+.goldfish-piles button { min-height: 32px; padding: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+.goldfish-piles strong { color: var(--accent-text); }
+.goldfish-piles .goldfish-deck-pile { position: relative; min-height: 133px; display: flex; flex-direction: column; justify-content: center; gap: 0; border: 3px double #9f875a; background: radial-gradient(ellipse, #334357, #111c29 65%); box-shadow: 3px 3px 0 #0a101a, 4px 4px 0 #556376, 7px 7px 0 #0a101a; margin: 0 6px 9px 0; }
+.goldfish-deck-emblem { font-size: 41px; color: #c5ac7e; line-height: 1; }
+.goldfish-deck-pile strong { font: 25px var(--font-num); }
+.goldfish-player-dock { grid-column: 1 / -1; grid-row: 3; display: grid; grid-template-columns: 190px minmax(0, 1fr) 186px; align-items: center; gap: 18px; border-bottom: 1px solid #b4c8d01a; }
+.goldfish-self .goldfish-life { position: relative; padding-top: 14px; }
+.goldfish-self .goldfish-life > span { position: absolute; top: -1px; left: 0; right: 0; text-align: center; font-size: 9px; letter-spacing: .15em; }
+.goldfish-self .goldfish-life input { width: 66px; min-height: 54px; font-size: 30px; }
+.goldfish-context { min-width: 0; display: grid; align-content: center; gap: 5px; }
+.goldfish-context p { color: var(--text-2); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+#goldfish-context-actions, .goldfish-zone-card-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+#goldfish-context-actions button, .goldfish-zone-card-actions button { min-height: 30px; padding: 0 10px; font-size: 11px; }
+.goldfish-progress-actions { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
+.goldfish-progress-actions button { width: 100%; min-height: 44px; padding: 5px; font-size: 12px; white-space: normal; }
+.goldfish-zone.hand-zone { grid-column: 1 / -1; grid-row: 4; border: 0; border-radius: 0; padding: 0; background: transparent; box-shadow: none; min-height: 0; overflow: visible; }
+.hand-zone header { position: relative; z-index: 1; display: flex; gap: 14px; align-items: center; height: 26px; }
+.hand-zone h3 { font-size: 10px; color: #a7bdcb; }
+.hand-zone header p { font-size: 10px; color: #809baa; }
+.hand-zone .goldfish-card-zone { height: calc(100% - 26px); min-height: 0; padding: 15px 35px 0; align-items: flex-start; justify-content: safe center; overflow: visible; gap: 0; }
+.hand-zone .goldfish-card-visual { flex: 0 0 132px; width: 132px; min-width: 132px; max-width: 132px; margin-left: clamp(-95px, calc((100vw - 200px) / var(--hand-count, 7) - 142px), 8px); transform: translateY(var(--hand-offset, 0px)) rotate(var(--hand-angle, 0deg)); transform-origin: 50% 110%; transition: transform .18s ease; touch-action: pan-x; }
+.hand-zone .goldfish-card-visual:first-child { margin-left: 0; }
+.hand-zone .is-large-hand { overflow-x: auto; overflow-y: hidden; justify-content: start; gap: 8px; }
+.hand-zone .is-large-hand .goldfish-card-visual { margin-left: 0; transform: none; }
+.hand-zone .goldfish-card-visual:hover:not(:disabled), .hand-zone .goldfish-card-visual:focus-visible, .hand-zone .goldfish-card-visual.is-selected { z-index: 5; transform: translateY(-32px) rotate(0) scale(1.12); }
+.goldfish-hand-key { background: #091725e8 !important; font-size: 10px !important; }
+.goldfish-plotted-cards { display: flex; gap: 6px; overflow-x: auto; min-width: 0; flex: 1; padding: 2px; }
+.goldfish-plotted-cards[hidden] { display: none; }
+.goldfish-plotted-cards button { white-space: nowrap; font-size: 10px; padding: 3px 8px; min-height: 24px; color: #c9b6e7; border: 1px solid #8c69bd; background: #261f36; }
+.goldfish-plotted-cards button.is-ready { color: #d9fff7; border-color: #63d9b4; background: #123f36; box-shadow: 0 0 8px #63d9b444; }
+.goldfish-choice-token { flex: 0 0 72px; min-height: 100px; white-space: pre-line; display: grid; place-content: center; text-align: center; border-radius: 7px; border: 1px solid #c8b67c; color: #f6ecd2; background: linear-gradient(145deg,#706746,#253034); font-size: 12px; }
+.goldfish-opening { position: absolute; z-index: 4; left: 50%; top: 48%; transform: translate(-50%, -50%); width: min(520px, 92%); padding: 30px; text-align: center; background: linear-gradient(150deg, #172a39ed, #101d2af5); border: 1px solid #c0a5756b; box-shadow: 0 15px 60px #0005; border-radius: 14px; }
+.goldfish-opening .goldfish-eyebrow { font: 10px var(--font-body); letter-spacing: .25em; color: var(--accent); margin: 0 0 10px; }
+.goldfish-opening h3 { color: #f2e1c2; font: 24px var(--font-display); margin-bottom: 10px; }
+.goldfish-opening p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.goldfish-opening > label { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 14px 0; font-size: 11px; }
+.goldfish-opening select { width: auto; min-height: 34px; padding: 2px 28px 2px 12px; }
+.goldfish-opening > div { display: flex; justify-content: center; gap: 9px; }
+.goldfish-opening button { min-height: 42px; font-size: 12px; padding: 7px 14px; }
+.goldfish-stack-zone { position: absolute; z-index: 6; top: 75px; right: 165px; width: 165px; padding: 10px; border: 1px solid #e7c78a8c; border-radius: 10px; background: #111e2af5; box-shadow: 0 10px 30px #0008; }
+.goldfish-stack-zone h3 { font-size: 12px; color: var(--accent-text); }
+.goldfish-stack-zone p { font-size: 9px; color: var(--muted); margin-top: 6px; }
+.goldfish-stack-zone .goldfish-card-zone { max-height: 195px; overflow: auto; padding: 8px 4px; justify-content: center; }
+.goldfish-stack-zone .goldfish-card-visual { flex: 0 0 100px; max-width: 100px; min-width: 100px; }
+.goldfish-stack-zone .goldfish-card-visual + .goldfish-card-visual { margin-top: -104px; }
+.goldfish-statusbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 18px; background: #090f18; border-top: 1px solid #ffffff13; font-size: 10px; color: var(--muted); }
+.goldfish-statusbar p { min-width: 0; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.goldfish-statusbar > span { flex: none; color: #708895; }
+.goldfish-panel-shade { position: absolute; z-index: 19; inset: 0; width: 100%; height: 100%; border: 0 !important; border-radius: 0; background: #060c16a8 !important; cursor: default; backdrop-filter: blur(3px); }
+.goldfish-hover-preview { position: absolute; z-index: 12; top: 65px; right: 165px; width: min(245px, 28vw); pointer-events: none; filter: drop-shadow(0 12px 20px #000b); }
+.goldfish-hover-preview.is-left { right: auto; left: 26px; }
+.goldfish-hover-preview img { display: block; width: 100%; max-height: calc(100dvh - 210px); object-fit: contain; border-radius: 11px; }
+.goldfish-hover-preview span { display: block; padding: 5px; text-align: center; color: #fff; font-size: 12px; background: #0b1727f0; }
+.goldfish-drawer, .goldfish-inspector, .goldfish-library-browser, .goldfish-game-log, .goldfish-shortcut-help {
+  position: absolute; z-index: 20; top: 16px; right: 18px; bottom: 16px; width: min(430px, calc(100% - 36px)); max-height: none; padding: 20px; border: 1px solid #8ea4b947; border-radius: 14px; background: linear-gradient(135deg, #1c2e3e, #111c28); box-shadow: 0 15px 70px #0009; overflow: auto;
+}
+.goldfish-drawer > header, .goldfish-game-log > header, .goldfish-shortcut-help > header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
+.goldfish-drawer > header h3 { font-size: 19px; }
+.goldfish-drawer > header button, .goldfish-selection-heading button { min-height: 34px; padding: 0 10px; font-size: 11px; }
+.goldfish-inspector { display: block; }
+.goldfish-inspector img { display: block; margin: 12px auto; width: min(100%, 245px); }
+.goldfish-selection-heading { align-items: center; flex-wrap: wrap; }
+.goldfish-selected-name { flex: 1 1 160px; font-size: 15px; }
+.goldfish-selected-detail { margin: 12px 0; }
+.goldfish-card-actions { margin-bottom: 16px; }
+.goldfish-library-browser, .goldfish-zones-browser { width: min(800px, calc(100% - 36px)); }
+.goldfish-library-browser { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+.goldfish-library-results { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; padding: 3px; }
+.goldfish-library-result { grid-template-columns: 90px minmax(0, 1fr); padding: 10px; }
+.goldfish-library-card { width: 90px; min-width: 90px; max-width: 90px; }
+.goldfish-library-result-actions button { min-height: 35px; font-size: 12px; }
+.goldfish-zone-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.goldfish-zone-tabs button { min-height: 36px; padding: 0 12px; font-size: 12px; }
+.goldfish-zone-tabs button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-text); background: #c69a5021; }
+.goldfish-zones-browser h4 { font-size: 13px; margin-bottom: 12px; }
+.goldfish-zones-browser .goldfish-card-zone { gap: 14px; padding: 6px; }
+.goldfish-zones-browser .goldfish-card-visual { flex: 0 0 124px; min-width: 124px; max-width: 124px; }
+.goldfish-zone-card-actions { position: sticky; bottom: -20px; padding: 15px 0; background: #142331; margin-top: 10px; }
+.goldfish-zone-card-actions:empty { display: none; }
+.goldfish-panel-hint { margin: 14px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.goldfish-tools section { border-top: 1px solid var(--line); padding: 16px 0; }
+.goldfish-tools h4 { font-size: 12px; margin-bottom: 12px; color: var(--accent-text); }
+.goldfish-tool-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.goldfish-tool-buttons button { min-height: 36px; padding: 0 12px; font-size: 12px; }
+.goldfish-tools .goldfish-life { justify-content: space-between; margin: 8px 0; }
+.goldfish-tools .goldfish-life > span { margin-right: auto; }
+.goldfish-tools .goldfish-life input { width: 50px; min-height: 35px; font-size: 20px; border-radius: 7px; }
+.goldfish-tools .goldfish-table-tools-grid { padding: 0; }
+.goldfish-tools #goldfish-save-status { display: block; margin-top: 12px; }
+.goldfish-statusbar .save-failed { color: #ffbc7a; font-weight: 700; }
+.goldfish-dialog.is-loading-goldfish .goldfish-layout { visibility: hidden; pointer-events: none; }
+.goldfish-dialog.is-loading-goldfish .goldfish-topbar-actions button:not(#goldfish-close) { opacity: .38; pointer-events: none; }
+@media (max-width: 900px) {
+  .goldfish-table-column { padding: 0 14px; grid-template-columns: minmax(0, 1fr) 98px; grid-template-rows: 58px minmax(0, 1fr) 78px 172px; }
+  .goldfish-battlefield-lanes { grid-template-columns: 94px minmax(0, 1fr); gap: 8px; }
+  .goldfish-zone.battlefield-zone { padding-right: 8px; }
+  .goldfish-player-dock { grid-template-columns: 130px minmax(0, 1fr) 150px; gap: 10px; }
+  .goldfish-piles { padding-left: 4px; }
+  .goldfish-piles .goldfish-deck-pile { min-height: 105px; }
+  .goldfish-deck-emblem { font-size: 28px; }
+  .hand-zone .goldfish-card-visual { flex-basis: 118px; min-width: 118px; width: 118px; max-width: 118px; margin-left: clamp(-85px, calc((100vw - 100px) / var(--hand-count, 7) - 126px), 8px); }
+  .goldfish-stack-zone { right: 126px; width: 140px; }
+  .goldfish-library-results { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .goldfish-dialog { --card-size: 73px; }
+  .goldfish-hover-preview { display: none; }
+  .goldfish-shell { grid-template-rows: 51px minmax(0, 1fr) 38px; }
+  .goldfish-topbar { padding: 6px 10px; gap: 8px; }
+  .goldfish-sigil, .goldfish-topbar-actions button span { display: none; }
+  .goldfish-brand h2 { font-size: 11px; max-width: 132px; }
+  .goldfish-brand p { font-size: 8px; }
+  .goldfish-topbar-actions { gap: 4px; }
+  .goldfish-topbar-actions button { min-width: 29px; min-height: 34px; padding: 0 6px; font-size: 10px; }
+  .goldfish-table-column { padding: 0 10px; grid-template-columns: minmax(0, 1fr); grid-template-rows: 49px minmax(155px, 1fr) 42px 96px 152px; }
+  .goldfish-arena-top { grid-row: 1; }
+  .goldfish-opponent { margin-left: auto; }
+  .goldfish-opponent .goldfish-life > span { font-size: 9px; }
+  .goldfish-life { gap: 4px; }
+  .goldfish-opponent input { width: 42px; min-height: 36px; font-size: 24px; }
+  .goldfish-opponent button { min-width: 28px; width: 28px; min-height: 28px; }
+  .goldfish-zone.battlefield-zone { grid-column: 1; grid-row: 2; padding: 0; }
+  .battlefield-zone .goldfish-zone-header { height: 24px; }
+  .goldfish-battlefield-lanes { height: calc(100% - 27px); grid-template-columns: 82px minmax(0, 1fr); gap: 3px; }
+  .battlefield-zone .goldfish-card-zone { gap: 10px; padding: 17px 5px 8px; }
+  .goldfish-battlefield-lane h4 { font-size: 8px; }
+  .goldfish-piles { grid-column: 1; grid-row: 3; flex-direction: row; gap: 4px; padding: 4px 0; justify-content: start; overflow-x: auto; }
+  .goldfish-piles button { flex: none; gap: 5px; padding: 4px 8px; min-height: 32px; font-size: 10px; white-space: nowrap; }
+  .goldfish-piles .goldfish-deck-pile { min-height: 0; flex-direction: row; border: 1px solid #a78e60; margin: 0; box-shadow: none; gap: 7px; }
+  .goldfish-deck-pile .goldfish-deck-emblem { display: none; }
+  .goldfish-deck-pile strong { font-size: 15px; }
+  .goldfish-player-dock { grid-row: 4; grid-template-columns: 105px minmax(0, 1fr); grid-template-rows: 49px 43px; gap: 0 8px; }
+  .goldfish-self { grid-column: 1; grid-row: 1; }
+  .goldfish-self .goldfish-life { padding-top: 0; }
+  .goldfish-self .goldfish-life > span { display: none; }
+  .goldfish-self .goldfish-life input { width: 47px; min-height: 42px; font-size: 25px; }
+  .goldfish-self .goldfish-life button { min-width: 25px; width: 25px; min-height: 28px; }
+  .goldfish-progress-actions { grid-column: 2; grid-row: 1; justify-self: end; width: 155px; }
+  .goldfish-progress-actions button { min-height: 38px; font-size: 12px; }
+  .goldfish-context { grid-row: 2; grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .goldfish-context p { flex: 1 1 70px; font-size: 10px; }
+  #goldfish-context-actions { flex: none; flex-wrap: nowrap; gap: 4px; }
+  #goldfish-context-actions button { min-height: 33px; font-size: 10px; padding: 0 7px; }
+  .goldfish-zone.hand-zone { grid-row: 5; min-height: 0; }
+  .hand-zone header { height: 24px; }
+  .hand-zone header p { font-size: 8px; }
+  .hand-zone .goldfish-card-zone { height: 128px; padding: 9px 5px; gap: 8px; overflow-x: auto; overflow-y: hidden; justify-content: start; scroll-snap-type: x proximity; }
+  .hand-zone .goldfish-card-visual { flex-basis: 81px; min-width: 81px; width: 81px; max-width: 81px; margin: 0; transform: none; }
+  .hand-zone .goldfish-card-visual:hover:not(:disabled), .hand-zone .goldfish-card-visual:focus-visible, .hand-zone .goldfish-card-visual.is-selected { transform: translateY(-4px); }
+  .goldfish-opening { width: calc(100% - 8px); top: 50%; padding: 14px 10px; }
+  .goldfish-opening .goldfish-eyebrow { font-size: 8px; margin-bottom: 5px; }
+  .goldfish-opening h3 { font-size: 19px; margin-bottom: 4px; }
+  .goldfish-opening p { font-size: 10px; }
+  .goldfish-opening > label { margin: 8px 0; }
+  .goldfish-opening button { font-size: 11px; padding: 5px 10px; min-height: 37px; }
+  .goldfish-stack-zone { top: 52px; right: 13px; width: 120px; padding: 7px; }
+  .goldfish-stack-zone .goldfish-card-zone { max-height: 130px; }
+  .goldfish-stack-zone .goldfish-card-visual { flex-basis: 71px; min-width: 71px; max-width: 71px; }
+  .goldfish-stack-zone .goldfish-card-visual + .goldfish-card-visual { margin-top: -74px; }
+  .goldfish-stack-zone p { display: none; }
+  .goldfish-statusbar { padding: 3px 10px; font-size: 9px; }
+  .goldfish-statusbar p { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .goldfish-statusbar > span { display: none; }
+  .goldfish-drawer, .goldfish-inspector, .goldfish-library-browser, .goldfish-game-log, .goldfish-shortcut-help { position: absolute; top: 5px; bottom: 5px; right: 5px; width: calc(100% - 10px); max-height: none; padding: 15px; }
+  .goldfish-library-result { grid-template-columns: 80px minmax(0, 1fr); padding: 8px; }
+  .goldfish-library-card { width: 80px; min-width: 80px; max-width: 80px; }
+  .goldfish-zones-browser .goldfish-card-visual { flex-basis: 94px; min-width: 94px; max-width: 94px; }
+  .goldfish-zone-tabs { gap: 4px; }
+  .goldfish-zone-tabs button { padding: 0 7px; font-size: 10px; }
+}
+@media (hover: none) { .goldfish-hover-preview { display: none; } }
+@media (max-height: 620px) and (min-width: 601px) {
+  .goldfish-dialog { --card-size: 68px; }
+  .goldfish-table-column { grid-template-rows: 46px minmax(0, 1fr) 62px 135px; }
+  .hand-zone .goldfish-card-visual { flex-basis: 95px; min-width: 95px; width: 95px; max-width: 95px; }
+  .goldfish-opening { padding: 14px; }
+  .goldfish-opening .goldfish-eyebrow { display: none; }
+  .goldfish-piles { overflow: auto; justify-content: start; }
+  .goldfish-piles .goldfish-deck-pile { min-height: 75px; }
+  .goldfish-deck-emblem { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .goldfish-dialog *, .goldfish-dialog *::after { transition: none !important; animation: none !important; }
+}
+
+/* Mana and visible destinations stay on the table; choices open a drawer. */
+.goldfish-table-column { grid-template-columns: minmax(0, 1fr) 220px; grid-template-rows: 56px minmax(0, 1fr) 32px 112px 194px; }
+.goldfish-player-dock { grid-row: 4; grid-template-rows: 34px 74px; gap: 0 18px; }
+.goldfish-zone.hand-zone { grid-row: 5; }
+.goldfish-mana-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.goldfish-mana-bar > button { min-height: 26px; padding: 0 8px; font-size: 10px; }
+#goldfish-mana-pool { display: flex; gap: 5px; }
+.goldfish-mana-bar label { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 11px; color: var(--text-2); }
+.goldfish-mana-bar input { width: 14px; height: 14px; min-height: 0; accent-color: #7fd5ef; }
+.goldfish-mana-legend { margin-left: auto; color: #83b7c9; font-size: 10px; }
+.goldfish-mana-orb { --mana-color: #b6c6cb; min-height: 27px; min-width: 39px; padding: 0 6px; border-radius: 15px; font: 12px var(--font-num); color: var(--mana-color) !important; border-color: color-mix(in srgb, var(--mana-color), transparent 60%) !important; background: #0c1824 !important; }
+.goldfish-mana-orb.mana-W { --mana-color: #ffe5a5; }
+.goldfish-mana-orb.mana-U { --mana-color: #81cff9; }
+.goldfish-mana-orb.mana-B { --mana-color: #c4abdd; }
+.goldfish-mana-orb.mana-R { --mana-color: #ff9984; }
+.goldfish-mana-orb.mana-G { --mana-color: #99dc9f; }
+.goldfish-mana-orb.has-mana { box-shadow: 0 0 10px color-mix(in srgb, var(--mana-color), transparent 65%); border-color: var(--mana-color) !important; }
+.goldfish-card-visual.is-affordable .goldfish-card-surface { outline: 2px solid #90ddff; box-shadow: 0 0 16px #5fc9ff95; }
+.goldfish-card-visual.is-affordable::after { content: "✦"; position: absolute; top: -10px; right: 5px; color: #b3edff; text-shadow: 0 0 6px #00b7ff; }
+.other-lane .goldfish-card-visual { flex-basis: min(100%, var(--card-size)); min-width: 0; max-width: min(100%, var(--card-size)); }
+.goldfish-piles { grid-column: 2; grid-row: 2 / 4; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: minmax(64px, 1fr) 30px minmax(74px, 1fr) 26px; gap: 6px; padding: 0 0 0 6px; overflow: auto; }
+.goldfish-piles .goldfish-deck-pile { grid-area: 1 / 1; min-height: 0; margin: 0; border-width: 1px; box-shadow: none; }
+.goldfish-deck-emblem { font-size: 23px; }
+.goldfish-piles #goldfish-open-library { grid-area: 2 / 1; min-height: 28px; padding: 0 3px; font-size: 10px; }
+.goldfish-piles .goldfish-zone-pile { padding: 5px; min-height: 0; justify-content: center; gap: 6px; border-style: dashed; border-color: #718aa0a0; background: #0a152075; }
+.goldfish-zone-pile[data-goldfish-open-zone="graveyard"] { grid-area: 1 / 2; }
+.goldfish-zone-pile[data-goldfish-open-zone="exile"] { grid-area: 2 / 2; }
+.goldfish-zone-pile img { width: 35px; max-height: 53px; object-fit: contain; border-radius: 3px; }
+.goldfish-zone-pile span { display: block; font-size: 11px; }
+.goldfish-zone-pile small { display: block; font-size: 8px; color: #879eae; }
+.goldfish-zone-pile[data-goldfish-open-zone="exile"] img, .goldfish-zone-pile[data-goldfish-open-zone="exile"] small { display: none; }
+.goldfish-stack-zone { position: static; grid-area: 3 / 1 / 4 / -1; width: auto; min-width: 0; padding: 5px 7px; box-shadow: none; border-style: dashed; background: #0c1926a6; }
+.goldfish-stack-zone h3 { font-size: 10px; margin: 0; }
+.goldfish-stack-zone .goldfish-card-zone { display: flex; flex-wrap: nowrap; justify-content: start; max-height: 110px; min-height: 40px; gap: 5px; padding: 5px 1px 2px; overflow: auto; }
+.goldfish-stack-zone .goldfish-card-visual { flex-basis: 51px; min-width: 51px; max-width: 51px; }
+.goldfish-stack-zone .goldfish-card-visual + .goldfish-card-visual { margin: 0; }
+.goldfish-stack-zone.has-spells { border-style: solid; box-shadow: 0 0 14px #e0be6f22; }
+.goldfish-stack-zone .goldfish-stack-summary { width: 100%; min-width: 0; min-height: 40px; padding: 6px; white-space: normal; overflow-wrap: anywhere; font-size: 11px; color: #f5d793; border: 0; background: transparent; text-align: left; }
+#goldfish-cast-count { min-height: 25px; padding: 2px 9px; font-size: 11px; white-space: nowrap; }
+#goldfish-rules-content { display: flex; flex-direction: column; gap: 14px; }
+#goldfish-rules-content > p { margin: 0; line-height: 1.7; }
+#goldfish-rules-content > button { min-height: 46px; white-space: normal; }
+.goldfish-choice-targets, .goldfish-arrange-list { display: grid; gap: 10px; }
+.goldfish-choice-card { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px; border: 1px solid #47667d; border-radius: 10px; background: #142c3e; color: #f3f6ef; text-align: left; min-width: 0; }
+.goldfish-choice-card img { width: 72px; border-radius: 5px; grid-row: span 2; }
+.goldfish-choice-card > span { font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.goldfish-choice-card[aria-pressed="true"] { border-color: #efca73; background: #4d4632; }
+.goldfish-arrange-controls { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.goldfish-arrange-controls select { min-width: 0; flex: 1; font-size: 12px; padding: 7px 4px; min-height: 40px; }
+.goldfish-arrange-controls button { flex: 0 0 34px; min-width: 34px; padding: 0; min-height: 40px; }
+.goldfish-player-target { min-height: 58px; font-size: 17px; border-color: #d4b467; }
+.goldfish-card-badges .damage-badge { background: #8d302c; color: #fff2e4; }
+.goldfish-trigger-order { padding: 0; margin: 0; list-style: none; display: grid; gap: 10px; }
+.goldfish-trigger-order li { display: grid; grid-template-columns: minmax(0, 1fr) 36px 36px; align-items: center; gap: 6px; padding: 12px; background: #102333; border: 1px solid #48647b; border-radius: 10px; }
+.goldfish-trigger-order span { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.goldfish-trigger-order button { padding: 0; min-height: 38px; }
+.goldfish-rule-card { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.goldfish-rule-card img { width: min(225px, 65vw); border-radius: 12px; box-shadow: 0 6px 24px #0006; }
+.goldfish-monk-preview, .goldfish-monk-face { background: radial-gradient(ellipse at 50% 35%, #e0cf9e, #776341 62%, #293846); color: #fffbec; text-shadow: 0 1px 3px #000; white-space: pre-line; text-align: center; font-weight: 800; }
+.goldfish-monk-preview { display: grid; place-content: center; min-height: 190px; border-radius: 14px; border: 2px solid #d8c18d; font-size: 24px; line-height: 1.8; }
+.goldfish-monk-face { display: grid; place-content: center; width: 100%; aspect-ratio: 5 / 7; font-size: 14px; line-height: 2; }
+.goldfish-card-badges .rules-badge { background: #164b62; color: #c8f8ff; }
+.goldfish-stack-list { padding: 0; margin: 0; list-style: none; display: grid; gap: 12px; }
+.goldfish-stack-list li { border: 1px solid #3e5565; border-radius: 10px; padding: 14px; }
+.goldfish-stack-list li:first-child { border-color: #d3b567; }
+.goldfish-stack-list strong { font-size: 14px; }
+.goldfish-stack-list p { font-size: 12px; line-height: 1.7; color: #b6c6cd; white-space: pre-wrap; }
+.goldfish-stack-list button { font-size: 11px; width: 100%; white-space: normal; }
+.goldfish-auto-trigger-option { display: flex; gap: 9px; align-items: center; font-size: 13px; line-height: 1.6; }
+.goldfish-extra-zones { grid-area: 4 / 1 / 5 / -1; display: flex; gap: 5px; }
+.goldfish-extra-zones button { flex: 1; min-height: 24px; padding: 0 4px; font-size: 10px; }
+.goldfish-library-returns { grid-column: 1; grid-row: 3; display: flex; align-items: center; gap: 5px; padding-right: 16px; }
+.goldfish-library-returns > span { font-size: 9px; color: var(--muted); margin-right: auto; }
+.goldfish-library-returns button { min-height: 26px; padding: 0 9px; font-size: 10px; border-style: dashed; background: #0c182377; }
+.goldfish-dialog.is-dragging-card .goldfish-panel-shade { display: none !important; }
+.goldfish-dialog.is-dragging-card .goldfish-library-browser, .goldfish-dialog.is-dragging-card .goldfish-zones-browser { opacity: .18; pointer-events: none; }
+.goldfish-dialog .is-drop-ready { outline: 1px dashed #75bedb; outline-offset: -2px; }
+.goldfish-dialog .is-drop-over { background: #30526a !important; outline: 2px solid #c1edff; }
+#goldfish-mana-content { display: flex; flex-direction: column; gap: 12px; }
+#goldfish-mana-content > button { min-height: 42px; white-space: normal; }
+#goldfish-mana-content .goldfish-panel-hint { margin: 0; }
+.goldfish-mana-card-name { font-size: 16px; color: var(--accent-text); margin: 0; }
+.goldfish-mana-adjust { display: grid; grid-template-columns: 1fr 52px 52px; align-items: center; gap: 10px; }
+.goldfish-mana-adjust button { min-height: 36px; }
+.goldfish-oracle-text { padding: 14px; border: 1px solid var(--line-strong); border-radius: 8px; font-size: 12px; line-height: 1.7; white-space: pre-wrap; color: var(--text-2); }
+#goldfish-mana-content details { font-size: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+#goldfish-mana-content details p { margin: 12px 0; color: var(--muted); }
+#goldfish-mana-content details button { width: 100%; font-size: 12px; white-space: normal; }
+@media (max-width: 900px) and (min-width: 601px) {
+  .goldfish-table-column { grid-template-columns: minmax(0, 1fr) 180px; grid-template-rows: 52px minmax(0, 1fr) 32px 112px 172px; }
+  .goldfish-mana-legend { display: none; }
+  .goldfish-library-returns > span { display: none; }
+}
+@media (max-width: 600px) {
+  .goldfish-brand h2 { max-width: 90px; }
+  .goldfish-topbar { gap: 4px; padding-inline: 7px; }
+  .goldfish-table-column { grid-template-columns: minmax(0, 1fr); grid-template-rows: 49px minmax(135px, 1fr) 90px 32px 134px 152px; }
+  .goldfish-piles { grid-column: 1; grid-row: 3; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 58px 26px; gap: 4px; padding: 2px 0; overflow: hidden; }
+  .goldfish-piles .goldfish-deck-pile { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 0; }
+  .goldfish-zone-pile[data-goldfish-open-zone="graveyard"] { grid-area: 1 / 2; }
+  .goldfish-zone-pile[data-goldfish-open-zone="exile"] { grid-area: 1 / 3; }
+  .goldfish-piles .goldfish-zone-pile { padding: 3px; gap: 3px; }
+  .goldfish-zone-pile small { display: none; }
+  .goldfish-zone-pile img { width: 22px; max-height: 32px; }
+  .goldfish-stack-zone { grid-area: 1 / 4; padding: 3px; }
+  .goldfish-stack-zone .goldfish-card-zone { max-height: 34px; min-height: 25px; padding: 3px 0; }
+  .goldfish-stack-zone .goldfish-empty { font-size: 8px; }
+  .goldfish-stack-zone .goldfish-card-visual { flex-basis: 20px; min-width: 20px; max-width: 20px; }
+  .goldfish-stack-zone .goldfish-stack-summary { min-height: 25px; padding: 0; font-size: 9px; line-height: 1.3; }
+  #goldfish-cast-count { padding: 2px 5px; font-size: 9px; }
+  .goldfish-piles #goldfish-open-library { grid-area: 2 / 1 / 3 / 3; font-size: 9px; min-height: 24px; }
+  .goldfish-extra-zones { grid-area: 2 / 3 / 3 / 5; }
+  .goldfish-extra-zones button { font-size: 9px; }
+  .goldfish-library-returns { grid-row: 4; grid-column: 1; gap: 4px; padding: 0; }
+  .goldfish-library-returns button { padding: 0 7px; font-size: 9px; }
+  .goldfish-library-returns > span { font-size: 8px; }
+  .goldfish-player-dock { grid-row: 5; grid-template-rows: 35px 49px 46px; gap: 0 8px; }
+  .goldfish-mana-bar { grid-row: 1; gap: 5px; }
+  .goldfish-mana-bar > button { padding: 0 4px; }
+  #goldfish-mana-pool { gap: 3px; }
+  .goldfish-mana-orb { min-width: 28px; min-height: 27px; padding: 0 4px; font-size: 10px; }
+  .goldfish-mana-bar label { font-size: 9px; margin-left: auto; gap: 2px; }
+  .goldfish-mana-legend { display: none; }
+  .goldfish-self, .goldfish-progress-actions { grid-row: 2; }
+  .goldfish-context { grid-row: 3; }
+  #goldfish-context-actions { flex-wrap: wrap; justify-content: end; max-width: 265px; }
+  #goldfish-context-actions button { min-height: 27px; padding: 0 5px; font-size: 9px; }
+  .goldfish-zone.hand-zone { grid-row: 6; }
+  .hand-zone header p { font-size: 7px; }
+}
+@media (max-height: 620px) and (min-width: 601px) {
+  .goldfish-table-column { grid-template-rows: 42px minmax(0, 1fr) 28px 98px 135px; }
+  .goldfish-player-dock { grid-template-rows: 30px 64px; }
+  .goldfish-piles { grid-template-rows: 56px 26px 66px 24px; }
+}
+#goldfish-sideboard-panel { width: min(780px, 100%); }
+#goldfish-sideboard-editor { display: flex; flex-direction: column; min-height: 0; height: calc(100% - 54px); gap: 12px; }
+.goldfish-sideboard-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; min-height: 0; overflow: auto; }
+.goldfish-sideboard-lists h4 { position: sticky; top: 0; background: #14212d; padding: 8px; margin: 0; }
+.goldfish-sideboard-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #ffffff18; }
+.goldfish-sideboard-row span { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 13px; }
+.goldfish-sideboard-row button { flex-shrink: 0; min-height: 36px; }
+.goldfish-sideboard-footer { margin-top: auto; background: #14212d; padding: 10px; }
+.goldfish-sideboard-footer p { margin: 0 0 8px; }
+.goldfish-sideboard-footer button { margin-right: 8px; }
+.goldfish-sideboard-tabs { display: none; }
+#goldfish-finish { color: #ffdf91; padding: 6px 12px; border: 1px solid #9c8150; border-radius: 8px; }
+.goldfish-batch-option { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+@media(max-width: 600px) {
+  .goldfish-sideboard-lists { grid-template-columns: 1fr; }
+  .goldfish-sideboard-tabs { display: flex; gap: 8px; }
+  .goldfish-sideboard-tabs button { flex: 1; font-size: 12px; }
+  .goldfish-sideboard-tabs button[aria-pressed="true"] { background: #7b5d2b; border-color: #e1b866; color: #fff; }
+  .goldfish-sideboard-lists[data-active="side"] [data-direction="main"],
+  .goldfish-sideboard-lists[data-active="main"] [data-direction="side"] { display: none; }
+  .goldfish-sideboard-lists h4 { display: none; }
+  .goldfish-sideboard-footer button { font-size: 11px; }
+}

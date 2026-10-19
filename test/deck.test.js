@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { extractDeckCardNames, extractDeckEntries, extractDeckRows, extractLinks } from "../lib/deck.js";
+import { extractDeckCardNames, extractDeckEntries, extractDeckRows, extractLinks, mtgoDecklistIssue } from "../lib/deck.js";
 
 test("extractDeckCardNames decodes escaped deck-list markup", () => {
   const text = "4 Slickshot Show-Off\\n2 Stormchaser's Talent\\n1 Island (SOS) 42";
@@ -76,6 +76,32 @@ test("extractDeckEntries reads matching magic.gg deck-list cards", () => {
 function mtgoDecklistHtml(data) {
   return `<script>window.MTGO.decklists.data = ${JSON.stringify(data)};</script>`;
 }
+
+test("a metadata-only MTGO event is one unavailable page, not one failed deck", () => {
+  const url = "https://www.mtgo.com/decklist/modern-league-2026-10-1511161";
+  const html = mtgoDecklistHtml({ name: "Modern League", publish_date: "2026-10-15" }) + "<div>4 Unrelated Card</div>";
+  assert.deepEqual(extractDeckEntries(html, url, "Modern League", [], "", "modern"), []);
+  assert.equal(mtgoDecklistIssue(html, url, "modern").kind, "missing-deck-data");
+  assert.equal(mtgoDecklistIssue(html, url, "modern").unit, "page");
+  assert.equal(mtgoDecklistIssue(html, url, "standard"), null);
+  assert.equal(mtgoDecklistIssue(html, "https://www.mtgo.com/decklists", "modern"), null);
+  const broken = '<script>window.MTGO.decklists.data = {broken};</script>';
+  assert.equal(mtgoDecklistIssue(broken, url, "modern").kind, "parse-failed");
+  assert.deepEqual(extractDeckEntries(broken + "<div>4 Unrelated Card</div>", url, "Broken", [], "", "modern"), []);
+});
+
+test("MTGO preserves known empty lists so the crawler can report partial extraction", () => {
+  const url = "https://www.mtgo.com/decklist/modern-challenge-2026-10-15";
+  const html = mtgoDecklistHtml({ format: "CMODERN", starttime: "2026-10-15", decklists: [
+    { player: "Unreadable", main_deck: [] },
+    { player: "Readable", main_deck: [{ qty: 60, card_attributes: { card_name: "Island" } }] }
+  ] });
+  const entries = extractDeckEntries(html, url, "Modern Challenge", [], "", "modern");
+  assert.equal(entries.length, 2);
+  assert.equal(entries[0].cards.length, 0);
+  assert.equal(entries[1].mainboardCount, 60);
+  assert.equal(mtgoDecklistIssue(html, url, "modern"), null);
+});
 
 test("extractDeckEntries labels MTGO decks Unknown instead of the event name", () => {
   const html = mtgoDecklistHtml({

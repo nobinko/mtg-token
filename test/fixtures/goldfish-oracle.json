@@ -1,0 +1,209 @@
+[
+  {
+    "name": "Preordain",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Scry 2, then draw a card. (To scry 2, look at the top two cards of your library, then put any number of them on the bottom and the rest on top in any order.)"
+  },
+  {
+    "name": "Consider",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card."
+  },
+  {
+    "name": "Opt",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Scry 1. (Look at the top card of your library. You may put that card on the bottom.)\nDraw a card."
+  },
+  {
+    "name": "Serum Visions",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Draw a card. Scry 2."
+  },
+  {
+    "name": "Ponder",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card."
+  },
+  {
+    "name": "Brainstorm",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Draw three cards, then put two cards from your hand on top of your library in any order."
+  },
+  {
+    "name": "Expressive Iteration",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{U}{R}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Look at the top three cards of your library. Put one of them into your hand, put one of them on the bottom of your library, and exile one of them. You may play the exiled card this turn."
+  },
+  {
+    "name": "Lightning Bolt",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{R}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Lightning Bolt deals 3 damage to any target."
+  },
+  {
+    "name": "Unholy Heat",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{R}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Unholy Heat deals 2 damage to target creature or planeswalker.\nDelirium — Unholy Heat deals 6 damage instead if there are four or more card types among cards in your graveyard."
+  },
+  {
+    "name": "Mutagenic Growth",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{G/P}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "({G/P} can be paid with either {G} or 2 life.)\nTarget creature gets +2/+2 until end of turn."
+  },
+  {
+    "name": "Lava Dart",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{R}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Lava Dart deals 1 damage to any target.\nFlashback—Sacrifice a Mountain. (You may cast this card from your graveyard for its flashback cost. Then exile it.)"
+  },
+  {
+    "name": "Manamorphose",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{1}{R/G}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Add two mana in any combination of colors.\nDraw a card."
+  },
+  {
+    "name": "Mishra's Bauble",
+    "typeLine": "Artifact",
+    "layout": "normal",
+    "manaCost": "{0}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "{T}, Sacrifice this artifact: Look at the top card of target player's library. Draw a card at the beginning of the next turn's upkeep."
+  },
+  {
+    "name": "Sleight of Hand",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Look at the top two cards of your library. Put one of them into your hand and the other on the bottom of your library."
+  },
+  {
+    "name": "Unearth",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{B}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Return target creature card with mana value 3 or less from your graveyard to the battlefield.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+  },
+  {
+    "name": "Persist",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{1}{B}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Return target nonlegendary creature card from your graveyard to the battlefield with a -1/-1 counter on it."
+  },
+  {
+    "name": "Reanimate",
+    "typeLine": "Sorcery",
+    "layout": "normal",
+    "manaCost": "{B}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to that card's mana value."
+  },
+  {
+    "name": "Vapor Snag",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{U}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Return target creature to its owner's hand. Its controller loses 1 life."
+  },
+  {
+    "name": "Thundering Falls",
+    "typeLine": "Land — Island Mountain",
+    "layout": "normal",
+    "manaCost": "",
+    "power": "",
+    "toughness": "",
+    "oracleText": "({T}: Add {U} or {R}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)"
+  },
+  {
+    "name": "Violent Urge",
+    "typeLine": "Instant",
+    "layout": "normal",
+    "manaCost": "{R}",
+    "power": "",
+    "toughness": "",
+    "oracleText": "Target creature gets +1/+0 and gains first strike until end of turn.\nDelirium — If there are four or more card types among cards in your graveyard, that creature gains double strike until end of turn."
+  },
+  {
+    "name": "Fiery Islet",
+    "typeLine": "Land",
+    "layout": "normal",
+    "manaCost": "",
+    "power": "",
+    "toughness": "",
+    "oracleText": "{T}, Pay 1 life: Add {U} or {R}.\n{1}, {T}, Sacrifice this land: Draw a card."
+  },
+  {
+    "name": "Slickshot Show-Off",
+    "typeLine": "Creature — Bird Wizard",
+    "layout": "normal",
+    "manaCost": "{1}{R}",
+    "power": "1",
+    "toughness": "2",
+    "oracleText": "Flying, haste\nWhenever you cast a noncreature spell, this creature gets +2/+0 until end of turn.\nPlot {1}{R} (You may pay {1}{R} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.)"
+  },
+  {
+    "name": "Psychic Frog",
+    "typeLine": "Creature — Frog",
+    "layout": "normal",
+    "manaCost": "{U}{B}",
+    "power": "1",
+    "toughness": "2",
+    "oracleText": "Whenever this creature deals combat damage to a player or planeswalker, draw a card.\nDiscard a card: Put a +1/+1 counter on this creature.\nExile three cards from your graveyard: This creature gains flying until end of turn."
+  }
+]
