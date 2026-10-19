@@ -40,8 +40,14 @@ try {
   assert.equal(importResponse.status, 200, JSON.stringify(tournament));
   assert.equal(tournament.deckCount, 1);
   assert.equal(tournament.missingCount, 536);
+  assert.equal(importResponse.headers.get("cache-control"), "private, no-store");
+  assert.equal(tournament.decks[0].mainboard[0].name, "Island");
+  const bucket = await mf.getR2Bucket("BUCKET");
+  assert.equal((await bucket.list()).objects.length, 0, "Private imported lists must not be persisted to shared R2.");
   const loadTournament = () => mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ action: "load", url: tournamentUrl }) });
-  assert.equal((await (await loadTournament()).json()).fetchedAt, tournament.fetchedAt);
+  const deniedLoad = await loadTournament();
+  assert.equal(deniedLoad.status, 410, "A tournament URL must not expose another browser's lists.");
+  assert.equal((await deniedLoad.json()).decks, undefined);
   const version = await (await mf.dispatchFetch(`${origin}/api/version`, { headers })).json();
   const buildInfo = JSON.parse(await readFile("dist/build-info.json", "utf8"));
   assert.equal(version.commitSha, buildInfo.commitSha);
@@ -49,8 +55,12 @@ try {
   if (process.argv.includes("--release")) assert.equal(version.dirty, false, "未コミットの変更を含むビルドです。");
   const status = await (await mf.dispatchFetch(`${origin}/api/environment/status`, { headers })).json();
   assert.equal(status.revision, "同梱版");
+  await bucket.put("cache/pages/hosted-verification.json", "page-cache-fixture");
+  await bucket.put("cache/hosted-state-verification.json", "persistent-cache-fixture");
   assert.equal((await mf.dispatchFetch(`${origin}/api/cache/clear`, { method: "POST", headers })).status, 200);
-  assert.equal((await (await loadTournament()).json()).deckCount, 1, "巡回キャッシュ削除で大会リストを消してはいけません。");
+  assert.equal(await bucket.get("cache/pages/hosted-verification.json"), null);
+  assert.equal(await (await bucket.get("cache/hosted-state-verification.json")).text(), "persistent-cache-fixture");
+  assert.equal((await loadTournament()).status, 410, "Cache clearing must not restore shared tournament access.");
   console.log("Hosted Worker: login, protected assets/APIs, D1, R2 and tournament imports verified.");
   if (process.argv.includes("--live-search")) {
     const response = await mf.dispatchFetch(`${origin}/api/token-cards`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ format: "modern", targetDate: "2026-10-03", maxChildPages: 20, useCache: true }) });
