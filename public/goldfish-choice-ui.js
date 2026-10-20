@@ -1,12 +1,12 @@
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30l";
-import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30l";
-import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261021-public30l";
-import { goldfishAttackers } from "./goldfish-combat.js?v=20261021-public30l";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30l";
-import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261021-public30l";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30l";
-import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261021-public30l";
-import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30l";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30m";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30m";
+import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261021-public30m";
+import { goldfishAttackers } from "./goldfish-combat.js?v=20261021-public30m";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30m";
+import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261021-public30m";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30m";
+import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261021-public30m";
+import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30m";
 
 // Render only explicit choices. This module never changes game state itself.
 export function renderGoldfishSpellChoice({ state, choice, content, title, action, paragraph, imageUrl, answer, saveDraft }) {
@@ -55,7 +55,7 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
     if (ability.id.startsWith("engine:")) {
       const data = engineActionOptions(state, card, ability);
       let draft = { ...choice.options, ...choice.draft }, ids = draft.costIds || [];
-      if (ability.x) { const input = document.createElement("input"); input.type = "number"; input.min = "0"; input.max = "99"; input.value = String(draft.x || 0); input.setAttribute("aria-label", "Xの値"); input.addEventListener("input", () => { draft.x = Number(input.value); saveDraft({ ...draft, costIds: ids }); }); content.append(input); }
+      if (ability.x) { const input = document.createElement("input"); input.type = "number"; input.min = String(ability.minX || 0); input.max = "99"; draft.x ??= ability.minX || 0; input.value = String(draft.x); input.setAttribute("aria-label", "Xの値"); input.addEventListener("input", () => { draft.x = Number(input.value); saveDraft({ ...draft, costIds: ids }); }); content.append(input); }
       const list = document.createElement("div"); list.className = "goldfish-choice-targets"; content.append(list);
       const render = () => {
         list.replaceChildren();

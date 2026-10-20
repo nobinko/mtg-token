@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30l";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30l";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30l";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30l";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30l";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30l";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30l";
-import { artifactEntryState, artifactEnd, artifactUpkeep } from "./goldfish-artifact-programs.js?v=20261021-public30l";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30m";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30m";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30m";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30m";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30m";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30m";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30m";
+import { artifactEntryState, artifactEnd, artifactUpkeep } from "./goldfish-artifact-programs.js?v=20261021-public30m";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -21,12 +21,20 @@ const bat = { name: "Bat", colors: ["B"], typeLine: "Token Creature — Bat", po
 const warrior = { name: "Sand Warrior", colors: ["R", "G", "W"], typeLine: "Token Creature — Sand Warrior", power: "1", toughness: "1" };
 const vampire = { name: "Vampire", colors: ["W"], typeLine: "Token Creature — Vampire", power: "1", toughness: "1", oracleText: "Lifelink" };
 const rat = { name: "Rat", colors: ["B"], typeLine: "Token Creature — Rat", power: "1", toughness: "1", oracleText: "This token gets +1/+1 for each other Rat you control." };
+const LAND_CREATURES = {
+  "Mutavault": { cost: "{1}", power: 2, toughness: 2, allCreatureTypes: true },
+  "Restless Reef": { cost: "{2}{U}{B}", power: 4, toughness: 4, types: "Shark", colors: ["U", "B"], keywords: ["deathtouch"] },
+  "Restless Cottage": { cost: "{2}{B}{G}", power: 4, toughness: 4, types: "Horror", colors: ["B", "G"] },
+  "Den of the Bugbear": { cost: "{3}{R}", power: 3, toughness: 2, types: "Goblin", colors: ["R"] },
+  "Lair of the Hydra": { cost: "{X}{G}", types: "Hydra", colors: ["G"], x: true }
+};
 function typeAs(c, type) {
   c.originalTypeLine ||= c.typeLine;
   if (c.faces?.length) { c.originalFaces ||= structuredClone(c.faces); c.faces[c.faceIndex || 0].typeLine = type; }
   c.typeLine = type;
 }
 export const FORMAT_PERMANENT_NAMES = new Set([
+  ...Object.keys(LAND_CREATURES), "Ba Sing Se",
   "Thundertrap Trainer",
   "Death to Our Enemies", "The Fantasticar", "Null Summoner", "Ral Zarek, Guest Lecturer", "Great Hall of the Biblioplex",
   "Chrome Mox", "Sand Scout", "Orcish Bowmasters", "Tamiyo, Inquisitive Student", "Tamiyo, Seasoned Scholar", "Delver of Secrets", "Sneak Attack", "Emrakul, the Aeons Torn", "Kaito, Bane of Nightmares",
@@ -280,6 +288,9 @@ export function formatPermanentAttack(s, c, dealt) {
   }
   if (!active(c)) return false;
   const n = name(c);
+  if (n === "Restless Reef") { add(s, c, "攻撃：選んだプレイヤーが4枚切削", [{ op: "fp-reef-mill" }], { targetSpec: { zone: "none", players: true } }); return true; }
+  if (n === "Restless Cottage") { add(s, c, "攻撃：食物・墓地から最大1枚追放", [token("food"), { op: "move-target", destination: "exile" }], { targetSpec: { zone: "graveyard", optional: true } }); return true; }
+  if (n === "Den of the Bugbear" && c.animated?.denTriggers) { for (let i = 0; i < c.animated.denTriggers; i++) add(s, c, "攻撃：タップして攻撃中のゴブリン", [{ op: "fp-den-goblin" }]); return true; }
   if (["Rottenmouth Viper", "Dragonhawk, Fate's Tempest"].includes(n)) return formatPermanentEnter(s, c);
   if (n === "Phelia, Exuberant Shepherd") { add(s, c, "別の非土地を一時追放", [{ op: "fp-phelia" }], { targetSpec: { zone: "battlefield", permanent: true, notTypes: ["Land"], excludeSelf: true, optional: true, virtualOpponent: true } }); return true; }
   if (n === "Bilbo, Thief in the Night") { add(s, c, "墓地から呪文を唱えてもよい", [select("唱えるアーティファクト／インスタント／ソーサリー", "graveyard", { types: ["Artifact", "Instant", "Sorcery"] }, { remember: "bilbo" }), { op: "fp-bilbo" }]); return true; }
@@ -309,6 +320,11 @@ export function formatPermanentActions(c) {
   if (!active(c) && !c.trollLandAbility) return [];
   const n = name(c), a = [], act = (id, label, cost, steps, extra = {}) => a.push({ id: `engine:fp-${id}`, zone: "battlefield", cost, label, description: label, steps, ...extra });
   const pw = (id, label, loyalty, steps, extra = {}) => act(id, label, "{0}", steps, { main: true, loyalty, ...extra });
+  if (LAND_CREATURES[n]) {
+    const land = LAND_CREATURES[n];
+    act("land-creature", `${land.cost}：${land.x ? "X/X" : `${land.power}/${land.toughness}`}にする（ターン終了まで）`, land.cost, [{ op: "fp-land-creature" }], { reserveSource: true, ...(land.x ? { x: true, minX: 1 } : {}) });
+  }
+  if (n === "Ba Sing Se") act("ba-sing-se", "{2}{G},{T}：土の技2", "{2}{G}", [{ op: "earthbend", count: 2 }], { tap: true, main: true, targetSpec: { zone: "battlefield", types: ["Land"] } });
   if (n === "Great Hall of the Biblioplex" && !isType(c, "Creature")) act("great-hall", "{5}：2/4ウィザードにする（期限なし）", "{5}", [{ op: "fp-great-hall" }]);
   if (n === "Jace, Wielder of Mysteries") { pw("wielder-plus", "+1：対象プレイヤーが2枚切削・1枚引く", 1, [{ op: "fp-jace-mill" }, draw()], { targetSpec: { zone: "none", players: true } }); pw("wielder-ult", "−8：7枚引き、山札が空なら勝利", -8, [draw(7), { op: "fp-jace-win" }]); }
   if (["Ghost Vacuum", "Keen-Eyed Curator", "The Ooze"].includes(n)) act("linked-exile", `${n === "Keen-Eyed Curator" ? "{1}" : "{T}"}：墓地のカードを追放`, n === "Keen-Eyed Curator" ? "{1}" : "{0}", [{ op: "fp-linked-exile" }, ...(n === "The Ooze" ? [{ op: "fp-mutagen", count: 1 }] : [])], { tap: n !== "Keen-Eyed Curator", targetSpec: { zone: "graveyard" } });
@@ -396,6 +412,22 @@ export function formatPermanentKeywords(s, c) {
 export function formatPermanentStep(s, c, op) {
   const source = find(s, c.source), t = find(s, c.target);
   switch (op.op) {
+    case "fp-land-creature":
+      if (source) {
+        const land = LAND_CREATURES[name(source)], baseType = source.animated?.originalTypeLine || source.typeLine;
+        source.originalTypeLine ||= baseType;
+        source.animated = { ...land, serial: s.rules.turnSerial, originalTypeLine: baseType,
+          power: land.x ? c.x : land.power, toughness: land.x ? c.x : land.toughness,
+          denTriggers: name(source) === "Den of the Bugbear" ? (source.animated?.denTriggers || 0) + 1 : 0 };
+        source.typeLine = `${baseType.replace(/\s*—.*$/, "")} Creature${land.types ? ` — ${land.types}` : ""}`;
+        source.lane = "creature";
+      }
+      return true;
+    case "fp-den-goblin": for (const goblin of makeGameToken(s, { name: "Goblin", typeLine: "Token Creature — Goblin", colors: ["R"], power: "1", toughness: "1", tapped: true })) s.rules.combat?.attackers.push(ref(goblin)); return true;
+    case "fp-reef-mill":
+      if (c.target?.player === "self") insert(c, { op: "mill", count: 4 });
+      else { if (s.rules.opponentLibrary != null) s.rules.opponentLibrary = Math.max(0, s.rules.opponentLibrary - 4); note(s, "相手が4枚切削（相手の墓地の実物は省略）"); }
+      return true;
     case "fp-great-hall":
       if (source && !isType(source, "Creature")) {
         source.greatHallAnimated = true;

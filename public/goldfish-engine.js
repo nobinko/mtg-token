@@ -1,16 +1,16 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary, goldfishSelfProtected, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30l";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30l";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30l";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30l";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30l";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30l";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30l";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30l";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30l";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30l";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30l";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30l";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30l";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary, goldfishSelfProtected, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30m";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30m";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30m";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30m";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30m";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30m";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30m";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30m";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30m";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30m";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30m";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30m";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30m";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -19,6 +19,7 @@ export const gameDevotion = (state, color) => state.battlefield.filter(c => !c.f
   .reduce((n, c) => n + ((face(c).manaCost || "").match(/\{[^}]+\}/g) || []).filter(symbol => symbol.includes(color)).length, 0);
 export function gameColors(card, state) {
   let colors = card.faceDown || /\bDevoid\b/.test(face(card).oracleText || "") ? [] : face(card).colors?.length ? face(card).colors : [...new Set((face(card).manaCost || "").match(/[WUBRG]/g) || [])];
+  if (!card.faceDown && card.animated?.colors) colors = card.animated.colors;
   if (!state) return colors;
   const onBattlefield = state.battlefield.some(c => c.id === card.id && (c.incarnation || 0) === (card.incarnation || 0));
   for (const source of live(state).filter(verifiedGoldfishCard)) {
@@ -60,10 +61,12 @@ export function engineStatAdjustments(state, card) {
   for (const aura of state.battlefield) if (name(aura) === "Meltstrider's Resolve" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) data.boostToughness = (data.boostToughness || 0) + 2;
   if (card.earthbent) data.power = data.toughness = 0;
   if (card.animated?.size != null && (card.animated.until > state.rules.turnSerial || card.animated.serial === state.rules.turnSerial)) data.power = data.toughness = card.animated.size;
+  if (card.animated?.power != null && card.animated.serial === state.rules.turnSerial) { data.power = card.animated.power; data.toughness = card.animated.toughness; }
   return data;
 }
 export function engineKeywords(state, card) {
   const result = formatPermanentKeywords(state, card);
+  if (card.animated?.serial === state.rules.turnSerial) result.push(...(card.animated.keywords || []));
   if (card.copiedFlying) result.push("flying");
   if (card.earthbent) result.push("haste");
   if (card.dashed) result.push("haste");

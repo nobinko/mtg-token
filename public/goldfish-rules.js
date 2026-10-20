@@ -1,12 +1,12 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261021-public30l";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261021-public30l";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261021-public30l";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261021-public30l";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30l";
-import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30l";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261021-public30m";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261021-public30m";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261021-public30m";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261021-public30m";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30m";
+import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30m";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
@@ -305,7 +305,7 @@ export function resetGoldfishTurnRules(state) {
   state.rules.castCountKnown = true;
   state.rules.landsPlayed = 0;
   state.rules.combat = null;
-  for (const card of state.battlefield) { card.temporaryEffects = []; card.damage = 0; card.regeneration = 0; if (card.animated && (card.animated.until == null || card.animated.until <= state.rules.turnSerial + 1)) { card.typeLine = card.animated.originalTypeLine || card.typeLine.replace(/ Creature$/, ""); delete card.animated; card.lane = "other"; } }
+  for (const card of state.battlefield) { card.temporaryEffects = []; card.damage = 0; card.regeneration = 0; if (card.animated && (card.animated.until == null || card.animated.until <= state.rules.turnSerial + 1)) { card.typeLine = card.animated.originalTypeLine || card.typeLine.replace(/ Creature$/, ""); delete card.animated; card.lane = /\bLand\b/.test(card.typeLine) ? "land" : "other"; } }
   for (const card of state.battlefield) if (card.copyBase && !card.permanentCopy) { Object.assign(card, card.copyBase); delete card.copyBase; card.lane = "land"; }
   for (const card of state.battlefield) if (card.addedArtifactSerial != null) { card.typeLine = card.originalTypeLine; if (card.originalFaces) card.faces = structuredClone(card.originalFaces); delete card.originalTypeLine; delete card.originalFaces; delete card.addedArtifactSerial; }
 }

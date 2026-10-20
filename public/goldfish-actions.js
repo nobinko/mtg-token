@@ -1,13 +1,13 @@
-import { cloneGoldfishState } from "./goldfish.js?v=20261021-public30l";
-import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30l";
-import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261021-public30l";
-import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261021-public30l";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30l";
-import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261021-public30l";
-import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261021-public30l";
-import { queueGameAbility, addGameCounters, changeLife, isType, cardName, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30l";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30l";
-import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30l";
+import { cloneGoldfishState } from "./goldfish.js?v=20261021-public30m";
+import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30m";
+import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261021-public30m";
+import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261021-public30m";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30m";
+import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261021-public30m";
+import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261021-public30m";
+import { queueGameAbility, addGameCounters, changeLife, isType, cardName, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30m";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30m";
+import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30m";
 
 export function goldfishActionTargets(state, card) {
   return state.battlefield.filter((target) => goldfishCanEquip(state, card, target));
@@ -22,7 +22,12 @@ export function goldfishActionPayment(state, card, action, options = {}) {
       else cost = cost.replace(symbol, "");
     }
   }
-  return planGoldfishPayment(state, { manaCost: cost }, { ...options, creatureAbility: isType(card, "Creature"), abilitySource: card, exclude: [...(action.tap ? [card.id] : []), ...(options.costCards || []).map(ref => ref.id)] });
+  const paymentOptions = { ...options, creatureAbility: isType(card, "Creature"), abilitySource: card, exclude: [...(action.tap ? [card.id] : []), ...(options.costCards || []).map(ref => ref.id)] };
+  if (action.reserveSource) {
+    const reserved = planGoldfishPayment(state, { manaCost: cost }, { ...paymentOptions, exclude: [...paymentOptions.exclude, card.id] });
+    if (reserved.payable) return reserved;
+  }
+  return planGoldfishPayment(state, { manaCost: cost }, paymentOptions);
 }
 export function goldfishActionReason(state, card, action) {
   if (state.phase !== "playing") return "初手をキープしてください。";
@@ -104,6 +109,7 @@ export function engineActionOptions(state, card, action) {
   return { targets, costs };
 }
 function activateEngineAction(state, card, action, options) {
+  if (action.x && options.x != null && (!Number.isInteger(options.x) || options.x < (action.minX || 0) || options.x > 99)) throw new Error(`Xは${action.minX || 0}〜99の整数で指定してください。`);
   const { targets, costs } = engineActionOptions(state, card, action);
   if (action.targetSpec && !action.targetSpec.optional && !targets.length) throw new Error("適正な対象がありません。");
   if (action.costSelect && costs.length < action.costSelect.count) throw new Error("コストにするカードが足りません。");

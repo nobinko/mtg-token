@@ -1,12 +1,12 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30l";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30l";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30l";
-import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30l";
-import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30l";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30l";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30l";
-import { FORMAT_PERMANENT_NAMES, updateKaito } from "./goldfish-format-permanents.js?v=20261021-public30l";
-import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30l";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30m";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30m";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30m";
+import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30m";
+import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30m";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30m";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30m";
+import { FORMAT_PERMANENT_NAMES, updateKaito } from "./goldfish-format-permanents.js?v=20261021-public30m";
+import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30m";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
