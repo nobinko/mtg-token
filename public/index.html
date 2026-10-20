@@ -358,7 +358,7 @@
             </aside>
             <div class="goldfish-library-returns" aria-label="山札に戻す"><span>山札へ戻す</span><button type="button" data-goldfish-drop="libraryTop" data-drop-label="山札の上へ" data-goldfish-action="libraryTop">一番上 ↑</button><button type="button" data-goldfish-drop="libraryBottom" data-drop-label="山札の下へ" data-goldfish-action="libraryBottom">一番下 ↓</button><button type="button" data-goldfish-drop="libraryShuffle" data-drop-label="戻してシャッフル" data-goldfish-action="libraryShuffle">戻して混ぜる ⤨</button></div>
             <div class="goldfish-player-dock">
-              <div class="goldfish-mana-bar"><button id="goldfish-mana-open" type="button" title="マナの手動調整・ステップ終了">マナ</button><div id="goldfish-mana-pool" aria-label="マナプール"></div><label><input id="goldfish-auto-tap" type="checkbox" checked>自動タップ</label><span class="goldfish-mana-legend">光る手札＝印刷コストのマナあり</span></div>
+              <div class="goldfish-mana-bar"><button id="goldfish-mana-open" type="button" title="マナの手動調整・ステップ終了">マナ</button><div id="goldfish-mana-pool" aria-label="マナプール"></div><label><input id="goldfish-auto-tap" type="checkbox" checked>自動タップ</label><span class="goldfish-mana-legend">光る手札＝自動支払いの目安</span></div>
               <div class="goldfish-self"><div class="goldfish-life"><span>自分のライフ</span><button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="life" data-goldfish-delta="-1" aria-label="自分のライフを1減らす">−</button><input id="goldfish-self-life" data-goldfish-tracker-input="self:life" type="number" value="20" aria-label="自分のライフ"><button type="button" data-goldfish-tracker-player="self" data-goldfish-tracker="life" data-goldfish-delta="1" aria-label="自分のライフを1増やす">＋</button></div></div>
               <div id="goldfish-context" class="goldfish-context"><p id="goldfish-context-name">手札をダブルクリックでプレイ</p><div id="goldfish-context-actions"></div></div>
               <div class="goldfish-progress-actions"><button id="goldfish-resolve" class="primary-button" type="button" hidden>解決 <kbd>Space</kbd></button><button id="goldfish-attack" class="primary-button" type="button" hidden>攻撃する</button><button id="goldfish-next-turn" type="button" aria-label="次の自分のターン N" title="次の自分のターンへ。相手のターンに止めるにはツールから。" aria-keyshortcuts="n">次ターン <kbd>N</kbd></button></div>
@@ -532,7 +532,7 @@
                   <button type="button" data-goldfish-random="20">d20</button>
                   <output id="goldfish-random-result">—</output>
                 </div></div></section>
-            <p class="goldfish-panel-hint">基本土地・通常のマナ能力と印刷コストの支払いに対応。果敢・媒介者・コーリ鋼などの誘発は自動で出ます。「呪文 N」からスタックと自動解決の設定を開けます。軽減・追加コストは「支払いを調整」、未対応の能力・対象・タイミングは本文を確認して処理してください。ステップ／フェイズが変わるときは「マナ」からプールを空にします。次のターンでは自動で空になります。Ctrl+Zで支払いもまとめて戻せます。</p>
+            <p class="goldfish-panel-hint">対応するマナ能力・コスト軽減・使途制限を反映して支払います。代替・追加コストや対象は必要な選択をしてから確定します。果敢・媒介者・コーリ鋼などの誘発は自動で出ます。「呪文 N」でスタックと自動解決を設定できます。支払いを変える場合は「支払いを調整」、未対応の処理は本文を確認してください。ステップ／フェイズが変わるときは「マナ」からプールを空にします。次のターンでは自動で空になります。Ctrl+Zで支払いもまとめて戻せます。</p>
           </aside>
         </div>
         <footer class="goldfish-statusbar"><p id="goldfish-message" aria-live="polite"></p><span><kbd>?</kbd> 操作キー · <span id="goldfish-save-indicator" aria-live="polite">自動保存</span></span></footer>
@@ -613,6 +613,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261020-solo7" type="module"></script>
+    <script src="/app.js?v=20261020-final" type="module"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 # フォーマット別の取得・準備表とひとり回しの検証
 
-確認日: 2026-10-19。ローカルの `http://localhost:5177/` を使用。
+取得・準備表の確認日: 2026-10-19。ローカルの `http://localhost:5177/` を使用。ひとり回しの追加検証は末尾に2026-10-20の結果を記載する。
 
 ## トークン・補助カードの準備表
 
@@ -35,7 +35,7 @@ Legacyで、Mystery Booster Commander Editionの販売日2026-10-19を環境の�
 
 Standard・Legacy・Pioneerの環境上位10種類ずつをMTGTop8から取得し、各実リストのメイン・サイド・Oracle本文を検証資料として保存した。Modernの既存資料と合わせた675カード面のカタログは、**本文を確認できた範囲**を表す。675枚の全能力を実装したという意味ではない。
 
-今回追加した処理:
+2026-10-19に追加した処理:
 
 - Force of Willのライフ・追放、Dazeの島を戻す代替コスト。Bitter Triumphの追加コスト、Crop Rotationの生け贄、Murktide Regentの探査・カウンター。選択確定前のキャンセルは支払いを行わない。
 - Dark Ritual／Cabal Ritual、Tendrils of Agonyのストーム、Lotus Petal、Lion's Eye Diamond。LEDは手札を捨てることをコストとして扱い、同じ色3点を1回の色選択で加える。
@@ -50,4 +50,4 @@ Standard・Legacy・Pioneerの環境上位10種類ずつをMTGTop8から取得�
 
 2026-10-19時点の30本では26本に停止箇所が残った。例: StandardのSeam Rip／Get Out／Winternight Stories、LegacyのThassa's Oracle／Life from the Loam、PioneerのMonstrous Rage／Prismari Charm／搭乗・Greasefang。4本がライフ0まで進んでも、その4デッキの全能力の対応完了を意味しない。
 
-2026-10-20に停止箇所の処理を追加した。[追加検証と残る停止カード](goldfish-top10.md#standardlegacypioneerの追加検証2026-10-20) を参照。上位30種類のコンボ・サイド後を含む全自動化は引き続き未完了。
+2026-10-20に停止箇所の処理を追加した。停止検出用の30種類は28勝利・2敗北・手動停止0件。2敗北は単純な操作者による山札切れで、勝ち筋を選ぶ別の経路試験では両デッキとも決着まで進む。Modernを含む4形式40種類で、メイン・サイド後の計80経路を初手から勝利まで確認した。途中のカード・マナ注入や未対応処理のスキップは行わず、各操作で保存・再開する。全初手・全カードの全能力・相手の盤面を網羅した検証とは区別する。[追加処理・実リスト・検証条件](goldfish-top10.md#standardlegacypioneerの追加検証2026-10-20) を参照。

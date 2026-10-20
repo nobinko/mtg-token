@@ -1,4 +1,4 @@
-import { createGoldfishController } from "./goldfish-ui.js?v=20261020-solo7";
+import { createGoldfishController } from "./goldfish-ui.js?v=20261020-final";
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261017-auxiliary";
 import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
 import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261020-solo7";

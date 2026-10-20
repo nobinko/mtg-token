@@ -1050,7 +1050,7 @@ export function createGoldfishController(dialog) {
     } else if (opening) {
       ui.message.textContent = "初手7枚です。戦場へドラッグするとキープして開始します。マリガン・キープのボタンも使えます。";
     } else {
-      ui.message.textContent = "光る手札は印刷コスト分のマナがあります。土地はダブルクリックでマナ、呪文はスタックへドラッグして唱えます。";
+      ui.message.textContent = "光る手札は自動支払いの目安です。土地はダブルクリックでマナ、呪文はスタックへドラッグして唱えます。";
     }
   }
 
@@ -1371,7 +1371,7 @@ export function createGoldfishController(dialog) {
     }
     if (manaMode === "pool" || !selected) {
       title.textContent = "マナプール";
-      paragraph("通常の土地はダブルクリック／Tでマナを出せます。条件付きの能力や宝物などで出したマナは、ここで調整できます。");
+      paragraph("対応する土地はダブルクリック／Tでマナを出せます。宝物などはカードの起動操作を使います。この欄ではマナの手動調整ができます。");
       for (const color of GOLDFISH_MANA_TYPES) {
         const row = document.createElement("div"); row.className = "goldfish-mana-adjust";
         const name = document.createElement("strong"); name.textContent = `${color}  ${state.manaPool[color]}`; row.append(name);
