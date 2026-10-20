@@ -1,12 +1,12 @@
-import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261020-public30d";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30d";
-import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261020-public30d";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-public30d";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30d";
-import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261020-public30d";
-import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-public30d";
-import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261020-public30d";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261020-public30d";
+import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261021-public30e";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30e";
+import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30e";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30e";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30e";
+import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261021-public30e";
+import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30e";
+import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30e";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30e";
 
 export function goldfishAlternativeModes(card, zone) {
   if (!verifiedGoldfishCard(card)) return [];

@@ -105,6 +105,33 @@ test("land entry respects taplands and explicit shock/conditional choices", () =
   assert.equal(goldfishLandEntryOptions(source("This land enters tapped unless you control two or fewer other lands.")).length, 2);
 });
 
+test("common conditional lands determine entry from the actual battlefield and turn", () => {
+  const slow = source("This land enters tapped unless you control two or more other lands.");
+  const creatureLand = source("If you control two or more other lands, this land enters tapped.");
+  const basicCheck = source("This land enters tapped unless you control a basic land.");
+  const town = source("This land enters tapped unless it's your first, second, or third turn of the game.");
+  for (const count of [0, 1, 2, 3]) {
+    const state = game(Array.from({ length: count }, () => dual)).state;
+    assert.equal(goldfishLandEntryOptions(slow, state).length, 1);
+    assert.equal(goldfishLandEntryOptions(slow, state)[0].tapped, count < 2);
+    assert.equal(goldfishLandEntryOptions(creatureLand, state)[0].tapped, count >= 2);
+    assert.equal(goldfishLandEntryOptions(basicCheck, state)[0].tapped, true, "basic land types do not make a shockland basic");
+  }
+  const state = game([island]).state;
+  assert.equal(goldfishLandEntryOptions(basicCheck, state)[0].tapped, false);
+  for (const turn of [1, 2, 3, 4, 9]) {
+    state.turn = turn;
+    assert.equal(goldfishLandEntryOptions(town, state)[0].tapped, turn > 3);
+  }
+  const entered = game([], { ...slow, name: "Shipwreck Marsh", count: 7 });
+  entered.state = moveGoldfishCards(entered.state, entered.state.battlefield.map(c => c.id), "libraryBottom");
+  assert.throws(() => castGoldfishCard(entered.state, entered.id, { entry: 1 }), /土地の出し方/, "an obsolete saved choice cannot bypass the forced tap");
+  const paid = castGoldfishCard(entered.state, entered.id);
+  assert.equal(paid.battlefield.at(-1).tapped, true);
+  const moon = { ...state, battlefield: [{ name: "Blood Moon", typeLine: "Enchantment" }] };
+  assert.equal(goldfishLandEntryOptions(slow, moon)[0].tapped, false);
+});
+
 test("face-specific costs survive normalization and restoration", () => {
   const card = spell("{3}{U}", { faces: [{ name: "Front", typeLine: "Instant", manaCost: "{3}{U}" }, { name: "Back", typeLine: "Sorcery", manaCost: "{R}" }] });
   const { state, id } = game([mountain], card);

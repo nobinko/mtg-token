@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30d";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-public30d";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30d";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-public30d";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-public30d";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30d";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-public30d";
-import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261020-public30d";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30e";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30e";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30e";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30e";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30e";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30e";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30e";
+import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261021-public30e";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);

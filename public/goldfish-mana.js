@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-public30d";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30d";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-public30d";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-public30d";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-public30d";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-public30d";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-public30d";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-public30d";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-public30d";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30d";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-public30d";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-public30d";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-public30d";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-public30d";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-public30d";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30e";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30e";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30e";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30e";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30e";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30e";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30e";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30e";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30e";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30e";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30e";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30e";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30e";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30e";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30e";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -109,6 +109,10 @@ export function goldfishLandEntryOptions(card, state) {
     const needs = text.match(/enters tapped unless you control (?:a|an) (Plains|Island|Swamp|Mountain|Forest)(?: or (?:a|an) (Plains|Island|Swamp|Mountain|Forest))?\./);
     if (needs) { const tapped = !state.battlefield.some(c => gameLandTypes(state, c).some(type => needs.slice(1).includes(type))); return [{ tapped, life: 0, label: tapped ? "条件未達：タップイン" : "条件を満たしてアンタップイン" }]; }
     if (/enters tapped unless you control two or fewer other lands/.test(text)) { const tapped = state.battlefield.filter(c => isType(c, "Land")).length > 2; return [{ tapped, life: 0, label: tapped ? "タップイン" : "アンタップイン" }]; }
+    if (/enters tapped unless you control two or more other lands/.test(text)) { const tapped = state.battlefield.filter(c => isType(c, "Land")).length < 2; return [{ tapped, life: 0, label: tapped ? "土地2枚未満：タップイン" : "土地2枚以上：アンタップイン" }]; }
+    if (/If you control two or more other lands, this land enters tapped\./.test(text)) { const tapped = state.battlefield.filter(c => isType(c, "Land")).length >= 2; return [{ tapped, life: 0, label: tapped ? "土地2枚以上：タップイン" : "土地2枚未満：アンタップイン" }]; }
+    if (/enters tapped unless you control a basic land\./.test(text)) { const tapped = !state.battlefield.some(c => isType(c, "Land") && isType(c, "Basic")); return [{ tapped, life: 0, label: tapped ? "基本土地なし：タップイン" : "基本土地あり：アンタップイン" }]; }
+    if (/enters tapped unless it's your first, second, or third turn of the game\./.test(text)) { const tapped = state.turn > 3; return [{ tapped, life: 0, label: tapped ? "4ターン目以降：タップイン" : "3ターン目まで：アンタップイン" }]; }
   }
   if (/you may pay 2 life\. If you don't, (?:it|[^.]+) enters(?: the battlefield)? tapped\./i.test(text)) {
     return [{ tapped: true, life: 0, label: "タップイン" }, { tapped: false, life: 2, label: "2ライフ払ってアンタップイン" }];
