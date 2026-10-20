@@ -1,6 +1,6 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30e";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30e";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30f";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30f";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);

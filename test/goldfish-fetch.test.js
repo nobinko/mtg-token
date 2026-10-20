@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createGoldfishGame, keepGoldfishHand, peekGoldfishLibrary, restoreGoldfishGame } from "../public/goldfish.js";
+import { createGoldfishGame, keepGoldfishHand, peekGoldfishLibrary, restoreGoldfishGame, endGoldfishTurn } from "../public/goldfish.js";
 import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "../public/goldfish-fetch.js";
 import { goldfishShortcut } from "../public/goldfish-shortcuts.js";
+import { GOLDFISH_METADATA } from "../public/goldfish-metadata.js";
+import { settle } from "./helpers/goldfish-pilot.js";
 
 const delta = { name: "Polluted Delta", typeLine: "Land", oracleText: "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle." };
 const wilds = { name: "Evolving Wilds", typeLine: "Land", oracleText: "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle." };
@@ -17,6 +19,25 @@ function scenario(source = delta, lands = [island, shock, surveil], { life = 20,
     battlefield: [{ ...card, ...source, id: "fetch" }, ...Array.from({ length: others }, (_, index) => ({ ...card, id: `other-${index}` }))],
     library: lands.map((land, index) => ({ ...card, ...land, id: `land-${index}` })) };
 }
+
+test("fetch sacrifices trigger Mayhem Devil as well as putting the land in the graveyard", () => {
+  const state = scenario(delta, [island]);
+  state.battlefield.push({ ...state.battlefield[0], ...GOLDFISH_METADATA.find(c => c.name === "Mayhem Devil"), id: "devil" });
+  const next = resolveGoldfishFetch(state, "fetch", "land-0");
+  assert.ok(next.stack.some(c => c.name === "Mayhem Devil"), "sacrifice trigger must be queued");
+  assert.equal(next.players.self.life, 19);
+  assert.ok(next.graveyard.some(c => c.id === "fetch"));
+  assert.equal(state.graveyard.length, 0);
+});
+
+test("end-step mobilize sacrifices also trigger the sacrifice watcher", () => {
+  const state = scenario(delta, [island]);
+  state.battlefield.push({ ...state.battlefield[0], ...GOLDFISH_METADATA.find(c => c.name === "Mayhem Devil"), id: "devil" });
+  state.battlefield.push({ ...state.battlefield[0], id: "warrior", name: "Warrior", typeLine: "Creature — Warrior", power: "1", toughness: "1", kind: "token", oracleText: "", mobilized: true });
+  const next = settle(endGoldfishTurn(state));
+  assert.equal(next.players.opponent.life, 19);
+  assert.equal(next.battlefield.some(c => c.id === "warrior"), false);
+});
 
 test("fetch recognizes exact single-land abilities, both named and current Oracle, without pretending to pay mana or find two cards", () => {
   assert.equal(goldfishFetchRule(delta).life, 1);

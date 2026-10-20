@@ -9,8 +9,8 @@
     <link rel="icon" href="/favicon.svg?v=20261003-redesign">
     <script src="/theme.js?v=20261003-redesign"></script>
     <script type="module" src="/session.js"></script>
-    <link rel="stylesheet" href="/styles.css?v=20261021-public30e">
-    <link rel="stylesheet" href="/goldfish.css?v=20261021-public30e">
+    <link rel="stylesheet" href="/styles.css?v=20261021-public30f">
+    <link rel="stylesheet" href="/goldfish.css?v=20261021-public30f">
   </head>
   <body>
     <main class="app">
@@ -177,6 +177,16 @@
         <button id="goldfish-resume-last" type="button" class="ghost-button">ひとり回しの続き</button>
         <span id="goldfish-last-session-title"></span>
       </section>
+      <details id="solo-import" class="solo-import">
+        <summary>手元のリストでひとり回し</summary>
+        <form id="solo-import-form">
+          <label for="solo-import-text">デッキリスト（英語カード名）</label>
+          <p>メイン60〜250枚、サイド15枚以下。Arena／MTGOのテキストを貼り付けて始められます。</p>
+          <textarea id="solo-import-text" rows="7" maxlength="50000" spellcheck="false" placeholder="Deck&#10;4 Llanowar Elves&#10;...&#10;&#10;Sideboard&#10;..."></textarea>
+          <button id="solo-import-start" class="secondary-button" type="submit">このリストで始める</button>
+          <p id="solo-import-status" role="status" aria-live="polite"></p>
+        </form>
+      </details>
 
       <section class="status" id="status" role="status" hidden></section>
       <section class="status status-note" id="result-freshness" hidden></section>
@@ -613,6 +623,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261021-public30e" type="module"></script>
+    <script src="/app.js?v=20261021-public30f" type="module"></script>
   </body>
 </html>

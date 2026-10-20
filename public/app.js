@@ -1,9 +1,10 @@
-import { createGoldfishController } from "./goldfish-ui.js?v=20261021-public30e";
+import { createGoldfishController } from "./goldfish-ui.js?v=20261021-public30f";
+import { parseSoloDeck } from "./deck-import.js?v=20261021-public30f";
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261017-auxiliary";
-import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30e";
-import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30e";
-import { createTournamentController } from "./tournament-ui.js?v=20261021-public30e";
-import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30e";
+import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30f";
+import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30f";
+import { createTournamentController } from "./tournament-ui.js?v=20261021-public30f";
+import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30f";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -743,6 +744,18 @@ function renderLastGoldfishSession() {
 }
 renderLastGoldfishSession();
 goldfishDialog.addEventListener("close", renderLastGoldfishSession);
+document.querySelector("#solo-import-text").addEventListener("input", () => { document.querySelector("#solo-import-status").textContent = ""; });
+document.querySelector("#solo-import-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = document.querySelector("#solo-import-start"), status = document.querySelector("#solo-import-status");
+  button.disabled = true;
+  try {
+    const deck = parseSoloDeck(document.querySelector("#solo-import-text").value);
+    status.textContent = `メイン${deck.mainboard.reduce((n, c) => n + c.count, 0)}枚・サイド${deck.sideboard.reduce((n, c) => n + c.count, 0)}枚を読み込みました。`;
+    await goldfishController.open(deck, deck.title);
+  } catch (error) { status.textContent = error.message; }
+  finally { button.disabled = false; renderLastGoldfishSession(); }
+});
 resumeLastGoldfish.addEventListener("click", async () => {
   resumeLastGoldfish.disabled = true;
   try { await goldfishController.resumeLast(); }

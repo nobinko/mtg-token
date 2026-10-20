@@ -416,6 +416,12 @@
 .goldfish-last-session { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; max-width: 940px; margin: 12px auto; padding: 0 4px; }
 .goldfish-last-session[hidden] { display: none; }
 .goldfish-last-session span { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.solo-import { max-width: 940px; margin: 12px auto; padding: 0 4px; color: var(--muted); }
+.solo-import summary { cursor: pointer; padding: 10px 0; }
+.solo-import form { display: grid; gap: 12px; padding: 16px 0; }
+.solo-import form p { margin: 0; font-size: 13px; }
+.solo-import textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+.solo-import button { justify-self: start; }
 .goldfish-batch-option { display: flex; align-items: center; gap: 10px; min-height: 40px; }
 @media(max-width: 600px) {
   .goldfish-sideboard-lists { grid-template-columns: 1fr; }

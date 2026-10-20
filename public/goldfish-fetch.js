@@ -1,8 +1,8 @@
-import { cloneGoldfishState, moveGoldfishCards, setGoldfishCardsTapped, setGoldfishTracker, shuffleGoldfishLibrary } from "./goldfish.js?v=20261021-public30e";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30e";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30e";
-import { recordGoldfishEnter } from "./goldfish-rules.js?v=20261021-public30e";
-import { flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30e";
+import { cloneGoldfishState, moveGoldfishCards, setGoldfishCardsTapped, setGoldfishTracker, shuffleGoldfishLibrary } from "./goldfish.js?v=20261021-public30f";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30f";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30f";
+import { recordGoldfishEnter } from "./goldfish-rules.js?v=20261021-public30f";
+import { flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30f";
 
 const basicTypes = ["Plains", "Island", "Swamp", "Mountain", "Forest"];
 const escapeRegExp = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -86,7 +86,7 @@ export function resolveGoldfishFetch(state, sourceId, targetId, { entry, random 
   const choice = target ? goldfishFetchEntry(state, sourceId, target).choices.find((option, index) => entry ? option.key === entry : index === 0) : null;
   if (target && !choice) throw new Error("この土地の出し方と支払えるライフを確認してください。");
   let next = cloneGoldfishState(state);
-  moveGoldfishRuleObject(next, sourceId, "battlefield", "graveyard");
+  moveGoldfishRuleObject(next, sourceId, "battlefield", "graveyard", "sacrifice");
   next = setGoldfishTracker(next, "self", "life", next.players.self.life - rule.life - (choice?.life || 0));
   if (target) {
     next = moveGoldfishCards(next, [target.id], "battlefield", { lane: "land" });
