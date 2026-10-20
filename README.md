@@ -37,6 +37,7 @@ npm start
 | ひとり回しの開始・再開・操作キー | [ひとり回しの使い方](docs/usage.md#ひとり回し) |
 | 自動処理の範囲、保存と選択の設計 | [docs/goldfish-rules.md](docs/goldfish-rules.md) |
 | 4フォーマット・40種類の実リストによる検証 | [docs/goldfish-top10.md](docs/goldfish-top10.md) |
+| 公開版で3フォーマット・メインとサイド後を操作した記録 | [docs/public-solo-verification-2026-10-20.md](docs/public-solo-verification-2026-10-20.md) |
 | フォーマット別の取得・準備表の確認結果 | [docs/format-verification.md](docs/format-verification.md) |
 | 公開URL、1時間ごとの自動公開、パスワード変更 | [docs/github-deployment.md](docs/github-deployment.md) |
 | 設計思想、データフロー、モジュール責務 | [docs/architecture.md](docs/architecture.md) |

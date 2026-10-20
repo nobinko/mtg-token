@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo9";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo9";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo9";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo9";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo9";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo9";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo9";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo9";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo9";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo9";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo9";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo9";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo9";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo9";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo9";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo10";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo10";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo10";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo10";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo10";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo10";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo10";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo10";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo10";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo10";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo10";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo10";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo10";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo10";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo10";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -228,9 +228,10 @@ function better(a, b) {
 // LED's discard and other non-mana costs remain explicit player choices.
 function sacrificeManaOptions(card, state) {
   if (card.faceDown || card.automaticAbilities === false || abilityBlockReason(state, card, { manaAbility: true })) return [];
+  if (card.tapped || isType(card, "Creature") && !canTapCreature(state, card)) return [];
   const text = String(faceOf(card).oracleText || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
   const petal = cardName(card) === "Lotus Petal" && verifiedGoldfishCard(card);
-  const treasure = isType(card, "Treasure") && text === "{T}, Sacrifice this artifact: Add one mana of any color." && !card.tapped && (!isType(card, "Creature") || canTapCreature(state, card));
+  const treasure = isType(card, "Treasure") && text === "{T}, Sacrifice this artifact: Add one mana of any color.";
   if (!petal && !treasure) return [];
   return COLORS.slice(0, 5).map(color => ({ pool: normalizeGoldfishMana({ [color]: 1 }), life: 0, sacrifice: true }));
 }

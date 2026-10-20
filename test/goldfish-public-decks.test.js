@@ -68,6 +68,18 @@ test("auto payment preserves consumables when reusable lands suffice and respect
   assert.equal(s.players.opponent.life, 17);
   assert.equal(s.battlefield.some(c => c.name === "Treasure"), false);
 });
+test("a tapped Lotus Petal cannot be used by automatic payment", () => {
+  let s = put(put(position({ "Lotus Petal": 1, Boltwave: 1 }), "Lotus Petal", "battlefield"), "Boltwave");
+  card(s, "Lotus Petal").tapped = true;
+  assert.equal(planGoldfishCastPayment(s, card(s, "Boltwave", "hand")).payable, false);
+  const before = structuredClone(s);
+  assert.throws(() => cast(s, "Boltwave"), /マナ/);
+  assert.deepEqual(s, before);
+  card(s, "Lotus Petal").tapped = false;
+  s = cast(s, "Boltwave");
+  assert.equal(s.players.opponent.life, 17);
+  assert.ok(card(s, "Lotus Petal", "graveyard"));
+});
 test("Plasma Bolt uses nonland departures, including the Treasure used to pay it, and resets each turn", () => {
   let s = put(position({ "Plasma Bolt": 3 }, { R: 1 }), "Plasma Bolt");
   s = cast(s, "Plasma Bolt", { target: { player: "opponent" } });
