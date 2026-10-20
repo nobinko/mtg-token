@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30k";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30k";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30k";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30k";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30k";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30k";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30k";
-import { artifactEntryState, artifactEnd, artifactUpkeep } from "./goldfish-artifact-programs.js?v=20261021-public30k";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30l";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30l";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30l";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30l";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30l";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30l";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30l";
+import { artifactEntryState, artifactEnd, artifactUpkeep } from "./goldfish-artifact-programs.js?v=20261021-public30l";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -57,8 +57,9 @@ export function formatPermanentEntryState(s, c) {
   if (c.kumanoCounter) { addGameCounters(s, c, "+1/+1", 1); delete c.kumanoCounter; }
   if (name(c) === "Overlord of the Balemurk" && c.castFormat?.impending === "yes") { c.counters.time = 5; c.impending = true; typeAs(c, "Enchantment — Avatar Horror"); c.lane = "other"; }
 }
-function updateKaito(s, c) {
-  const type = s.rules.activePlayer === "self" && c.counters.loyalty > 0 ? "Legendary Planeswalker Creature — Kaito Ninja" : "Legendary Planeswalker — Kaito";
+export function updateKaito(s, c) {
+  if (name(c) !== "Kaito, Bane of Nightmares" || !active(c)) return;
+  const type = s.rules.activePlayer === "self" && c.counters.loyalty > 0 ? "Legendary Creature — Ninja" : "Legendary Planeswalker — Kaito";
   typeAs(c, type); c.lane = isType(c, "Creature") ? "creature" : "other";
 }
 export function formatPermanentEnter(s, c) {

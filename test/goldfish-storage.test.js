@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { serializeGoldfishSave, parseGoldfishSave, writeGoldfishSave, GOLDFISH_SAVE_PREFIX, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "../public/goldfish-storage.js";
+import { serializeGoldfishSave, parseGoldfishSave, writeGoldfishSave, GOLDFISH_SAVE_PREFIX, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave, createGoldfishSaveRepository } from "../public/goldfish-storage.js";
 import { createGoldfishGame, keepGoldfishHand, drawGoldfishCard, restoreGoldfishGame } from "../public/goldfish.js";
 import { mergeCardMetadata } from "../public/card-metadata.js";
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/goldfish-top10.json", import.meta.url), "utf8"));
@@ -76,4 +76,44 @@ test("an unavailable or corrupt shortcut never replaces a saved game", () => {
   assert.equal(storage.getItem(key), original);
   assert.equal(lastGoldfishSession({ getItem: () => "{broken" }), null);
   assert.throws(() => deckFromGoldfishSave({ version: 2, state: { deckRows: [{ name: "Island", count: -1 }] } }), /不正/);
+});
+
+test("many archived games retain full history even when localStorage is full, including reload and latest shortcut", async () => {
+  const entries = new Map(), archive = { read: async k => entries.get(k) ?? null, write: async rows => { for (const [k, v] of rows) entries.set(k, v); } };
+  const storage = { getItem: () => null, setItem() { throw Object.assign(new Error("quota"), { name: "QuotaExceededError" }); }, length: 0 };
+  const repository = createGoldfishSaveRepository(storage, archive), original = payload();
+  for (let i = 0; i < 30; i++) await repository.save(GOLDFISH_SAVE_PREFIX + i, { ...original, signature: String(i) }, `deck ${i}`);
+  const reload = createGoldfishSaveRepository(storage, archive);
+  assert.equal((await reload.load(GOLDFISH_SAVE_PREFIX + 0)).timeline.length, 12);
+  assert.equal((await reload.load(GOLDFISH_SAVE_PREFIX + 29)).timeline.length, 12);
+  assert.equal((await reload.last()).title, "deck 29");
+});
+
+test("queued saves snapshot their input and legacy/archive reads choose the newer game", async () => {
+  const entries = new Map(), local = new Map(), key = GOLDFISH_SAVE_PREFIX + "test";
+  const storage = { getItem: k => local.get(k) ?? null, setItem: (k, v) => local.set(k, v) };
+  const archive = { read: async k => entries.get(k) ?? null, write: async rows => { await Promise.resolve(); for (const [k, v] of rows) entries.set(k, v); } };
+  const repository = createGoldfishSaveRepository(storage, archive);
+  const game = payload(), first = repository.save(key, game, "original");
+  game.state.turn = 15; game.savedAt = "2026-10-21T00:00:00Z";
+  await first;
+  assert.notEqual((await repository.load(key)).state.turn, 15);
+  local.set(key, serializeGoldfishSave(game));
+  assert.equal((await repository.load(key)).state.turn, 15);
+  const second = repository.save(key, { ...game, savedAt: "2026-10-22T00:00:00Z" }, "latest");
+  await second;
+  assert.equal((await repository.last()).title, "latest");
+  assert.ok(local.has(key), "legacy save is preserved");
+});
+
+test("archive failure falls back to localStorage but total write failure remains visible", async () => {
+  const entries = new Map(), archive = { read: async () => { throw new Error("unavailable"); }, write: async () => { throw new Error("unavailable"); } };
+  const storage = { get length() { return entries.size; }, key: i => [...entries.keys()][i], getItem: k => entries.get(k) ?? null, setItem: (k, v) => entries.set(k, v) };
+  const repository = createGoldfishSaveRepository(storage, archive), key = GOLDFISH_SAVE_PREFIX + "fallback";
+  await repository.save(key, payload(), "fallback");
+  assert.equal((await repository.load(key)).timeline.length, 12);
+  assert.equal((await repository.last()).title, "fallback");
+  storage.setItem = () => { throw Object.assign(new Error("quota"), { name: "QuotaExceededError" }); };
+  await assert.rejects(repository.save(key, payload(), "failed"), /quota/);
+  assert.equal((await repository.load(key)).timeline.length, 12);
 });

@@ -1,6 +1,6 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30k";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30k";
+import { hasRuleCard, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30l";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30l";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);
@@ -85,6 +85,10 @@ export function moveGoldfishRuleObject(state, id, from, destination, reason = ""
   if (card.kind === "copy" && to === "battlefield") card.kind = "token";
   if (to === "battlefield" && from !== to) card.enteredTurn = state.turn;
   if (to === "battlefield" && from !== to) card.enteredSerial = state.rules.turnSerial;
+  // Starting loyalty is part of entering, including ninjutsu and reanimation.
+  // It must exist before state-based actions, not just when ETBs are flushed.
+  const enteringFace = card.faces?.[card.faceIndex || 0] || card;
+  if (to === "battlefield" && from !== to && !card.faceDown && /\bPlaneswalker\b/.test(enteringFace.typeLine || "") && /^\d+$/.test(enteringFace.loyalty || "")) card.counters.loyalty = Number(enteringFace.loyalty);
   if (from !== to) card.incarnation = (card.incarnation || 0) + 1;
   if (!["battlefield", "stack"].includes(to)) card.faceIndex = 0;
   const actual = from === "stack" && original.cast?.flashback && to !== "exile" ? "exile" : to;

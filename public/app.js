@@ -1,10 +1,10 @@
-import { createGoldfishController } from "./goldfish-ui.js?v=20261021-public30k";
-import { parseSoloDeck } from "./deck-import.js?v=20261021-public30k";
+import { createGoldfishController } from "./goldfish-ui.js?v=20261021-public30l";
+import { parseSoloDeck } from "./deck-import.js?v=20261021-public30l";
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261017-auxiliary";
-import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30k";
-import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30k";
-import { createTournamentController } from "./tournament-ui.js?v=20261021-public30k";
-import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30k";
+import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30l";
+import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30l";
+import { createTournamentController } from "./tournament-ui.js?v=20261021-public30l";
+import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30l";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -737,8 +737,8 @@ async function openRepresentativeDeck(entry) {
 
 const goldfishController = createGoldfishController(goldfishDialog);
 const resumeLastGoldfish = document.querySelector("#goldfish-resume-last");
-function renderLastGoldfishSession() {
-  const saved = goldfishController.lastSession();
+async function renderLastGoldfishSession() {
+  const saved = await goldfishController.lastSession();
   document.querySelector("#goldfish-last-session").hidden = !saved;
   document.querySelector("#goldfish-last-session-title").textContent = saved?.title || "";
 }

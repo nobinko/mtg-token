@@ -68,6 +68,20 @@ test("Hacker ninjutsu returns a declared attacker as a cost and draws without di
   assert.equal(s.players.opponent.life, 18); assert.equal(s.hand.length, before + 1);
 });
 
+test("Kaito ninjutsu enters with loyalty before state actions and deals combat damage", () => {
+  let s = put(put(position({ "Kaito, Bane of Nightmares": 1, "Faerie Miscreant": 1 }), "Faerie Miscreant", "battlefield"), "Kaito, Bane of Nightmares");
+  card(s, "Faerie Miscreant").enteredTurn = 0;
+  s = funds(settle(beginGoldfishCombat(s)), { U: 2, B: 1 });
+  s = settle(activateGoldfishAction(s, card(s, "Kaito, Bane of Nightmares", "hand").id, "engine:fp-kaito-ninjutsu", { costCards: [ref(card(s, "Faerie Miscreant"))] }));
+  assert.equal(card(s, "Kaito, Bane of Nightmares").counters.loyalty, 4);
+  assert.equal(card(s, "Kaito, Bane of Nightmares").typeLine, "Legendary Creature — Ninja");
+  assert.ok(card(s, "Faerie Miscreant", "hand"));
+  s = settle(resolveGoldfishCombat(save(s)));
+  assert.equal(s.players.opponent.life, 17);
+  s = settle(activateGoldfishAction(s, card(s, "Kaito, Bane of Nightmares").id, "engine:fp-kaito-plus"));
+  assert.equal(goldfishCharacteristics(s, card(s, "Kaito, Bane of Nightmares")).power, "4");
+});
+
 test("Cultivator casts the Enroot prepared copy and tutors a land to the graveyard", () => {
   const n = "Carnivorous Cultivator // Enroot";
   let s = funds(put(position({ [n]: 1 }), n), { G: 3 });

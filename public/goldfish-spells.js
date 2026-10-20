@@ -1,12 +1,12 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30k";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30k";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30k";
-import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30k";
-import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30k";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30k";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30k";
-import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30k";
-import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30k";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30l";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30l";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30l";
+import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30l";
+import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30l";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30l";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30l";
+import { FORMAT_PERMANENT_NAMES, updateKaito } from "./goldfish-format-permanents.js?v=20261021-public30l";
+import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30l";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
@@ -106,6 +106,7 @@ function drawCards(state, count) {
 }
 
 export function applyGoldfishStateActions(state) {
+  for (const card of state.battlefield) updateKaito(state, card);
   // Auras with no legal attachment go to the graveyard; the newest Role a
   // player controls on one permanent replaces that player's older Roles.
   for (const card of [...state.battlefield]) if (/\bAura\b/.test(face(card).typeLine || "") && !card.summonedAsBestow) {

@@ -95,3 +95,80 @@ export function writeGoldfishSave(storage, key, payload) {
     storage.setItem(key, text);
   }
 }
+
+// IndexedDB has room for many decks and their complete undo histories. Existing
+// localStorage games stay intact and are still read; no automatic pruning.
+export function goldfishArchive(indexedDB) {
+  let database;
+  const open = () => database ||= new Promise((resolve, reject) => {
+    if (!indexedDB) { reject(new Error("このブラウザーでは保存領域を開けません。")); return; }
+    const request = indexedDB.open("mtg-token-finder.goldfish", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("games");
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(new Error("別のタブを閉じて保存を再試行してください。"));
+  });
+  return {
+    async read(key) {
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const request = db.transaction("games").objectStore("games").get(key);
+        request.onsuccess = () => resolve(request.result ?? null);
+        request.onerror = () => reject(request.error);
+      });
+    },
+    async write(entries) {
+      const db = await open();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction("games", "readwrite");
+        for (const [key, value] of entries) transaction.objectStore("games").put(value, key);
+        transaction.oncomplete = () => resolve();
+        transaction.onabort = () => reject(transaction.error || new Error("保存を完了できませんでした。"));
+        transaction.onerror = () => reject(transaction.error);
+      });
+    }
+  };
+}
+
+export function createGoldfishSaveRepository(storage, archive) {
+  let pending = Promise.resolve();
+  const load = async key => {
+    await pending;
+    const candidates = await Promise.allSettled([
+      Promise.resolve().then(() => parseGoldfishSave(storage.getItem(key))),
+      Promise.resolve().then(async () => parseGoldfishSave(await archive.read(key)))
+    ]);
+    const games = candidates.filter(r => r.status === "fulfilled" && r.value?.version === 2).map(r => r.value);
+    return games.sort((a, b) => String(b.savedAt || "").localeCompare(String(a.savedAt || "")))[0] || null;
+  };
+  return {
+    load,
+    save(key, payload, title) {
+      // Capture now: queued writes must not observe subsequent game mutations.
+      const text = serializeGoldfishSave(payload);
+      const link = JSON.stringify({ key, title: String(title || "デッキ").slice(0, 240), savedAt: payload.savedAt });
+      const write = async () => {
+        try { await archive.write([[key, text], [LAST_SESSION_KEY, link]]); }
+        catch {
+          writeGoldfishSave(storage, key, parseGoldfishSave(text));
+          // The game remains valid if only the optional shortcut cannot fit.
+          try { storage.setItem(LAST_SESSION_KEY, link); } catch { /* optional */ }
+        }
+      };
+      const result = pending.then(write);
+      pending = result.catch(() => {});
+      return result;
+    },
+    async last() {
+      await pending;
+      const candidates = await Promise.allSettled([
+        Promise.resolve().then(() => JSON.parse(storage.getItem(LAST_SESSION_KEY))),
+        Promise.resolve().then(async () => JSON.parse(await archive.read(LAST_SESSION_KEY)))
+      ]);
+      const links = candidates.filter(r => r.status === "fulfilled" && r.value?.key?.startsWith(GOLDFISH_SAVE_PREFIX)).map(r => r.value)
+        .sort((a, b) => String(b.savedAt || "").localeCompare(String(a.savedAt || "")));
+      for (const link of links) if (await load(link.key)) return { key: link.key, title: String(link.title || "デッキ").slice(0, 240) };
+      return null;
+    }
+  };
+}

@@ -40,27 +40,27 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js?v=20261021-public30k";
-import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261021-public30k";
-import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261021-public30k";
-import { extraCastChoice } from "./goldfish-modal.js?v=20261021-public30k";
+} from "./goldfish.js?v=20261021-public30l";
+import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261021-public30l";
+import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261021-public30l";
+import { extraCastChoice } from "./goldfish-modal.js?v=20261021-public30l";
 import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText, canPlayGoldfishGraveyard,
-  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261021-public30k";
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30k";
-import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261021-public30k";
-import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30k";
-import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261021-public30k";
-import { goldfishCardOperations } from "./goldfish-effects.js?v=20261021-public30k";
-import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261021-public30k";
-import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261021-public30k";
-import { mergeCardMetadata } from "./card-metadata.js?v=20261021-public30k";
-import { loadCardMetadata } from "./card-metadata-loader.js?v=20261021-public30k";
-import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261021-public30k";
-import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261021-public30k";
+  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261021-public30l";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30l";
+import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261021-public30l";
+import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30l";
+import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261021-public30l";
+import { goldfishCardOperations } from "./goldfish-effects.js?v=20261021-public30l";
+import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261021-public30l";
+import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261021-public30l";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261021-public30l";
+import { loadCardMetadata } from "./card-metadata-loader.js?v=20261021-public30l";
+import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261021-public30l";
+import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261021-public30l";
 
-import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261021-public30k";
-import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261021-public30k";
-import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261021-public30k";
+import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261021-public30l";
+import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261021-public30l";
+import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261021-public30l";
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command", "stack"];
 const ZONE_LABELS = {
   library: "山札",
@@ -77,7 +77,7 @@ const ZONE_LABELS = {
 };
 const LANE_LABELS = { other: "その他", creature: "クリーチャー", land: "土地" };
 const MAX_TIMELINE = 60;
-import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261021-public30k";
+import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, createGoldfishSaveRepository, goldfishArchive, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261021-public30l";
 
 function normalizeName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
@@ -160,6 +160,8 @@ export function createGoldfishController(dialog) {
 
   let activeDeck = null;
   let storageKey = "";
+  const saveRepository = createGoldfishSaveRepository(localStorage, goldfishArchive(window.indexedDB));
+  let currentSaved = null, saveSequence = 0;
   let state = null;
   let selectedIds = new Set();
   let primaryId = "";
@@ -226,17 +228,22 @@ export function createGoldfishController(dialog) {
     };
   }
 
-  function writeSave(payload, manual) {
+  async function writeSave(payload, manual) {
     if (!storageKey) return false;
+    const key = storageKey, sequence = ++saveSequence;
+    const title = ui.title.textContent.replace(/ — ひとり回し$/, "");
+    find("#goldfish-save-indicator").textContent = "保存中…";
     try {
-      writeGoldfishSave(localStorage, storageKey, payload);
-      rememberGoldfishSession(localStorage, storageKey, ui.title.textContent.replace(/ — ひとり回し$/, ""));
+      await saveRepository.save(key, payload, title);
+      if (key !== storageKey || sequence !== saveSequence) return true;
+      currentSaved = { version: 2, signature: payload.signature, state: true };
       ui.saveStatus.textContent = `${manual ? "保存" : "自動保存"} ${displayTime(payload.savedAt)}`;
       find("#goldfish-save-indicator").textContent = "保存済み";
       find("#goldfish-save-indicator").classList.remove("save-failed");
       ui.resume.disabled = false;
       return true;
     } catch (error) {
+      if (key !== storageKey || sequence !== saveSequence) return false;
       ui.saveStatus.textContent = `保存失敗: ${error.message}`;
       find("#goldfish-save-indicator").textContent = "保存できていません：ツールを確認";
       find("#goldfish-save-indicator").classList.add("save-failed");
@@ -244,7 +251,7 @@ export function createGoldfishController(dialog) {
     }
   }
 
-  function saveSession(manual = false) {
+  async function saveSession(manual = false) {
     if (!state || !storageKey) return;
     const savedAt = new Date().toISOString();
     const fullPayload = {
@@ -260,30 +267,12 @@ export function createGoldfishController(dialog) {
       selectedIds: validSelectedIds(),
       primaryId
     };
-    if (writeSave(fullPayload, manual)) return;
-    writeSave({
-      version: 2,
-      signature: deckSignature(activeDeck),
-      autoTap: find("#goldfish-auto-tap").checked,
-      autoTriggers,
-      autoOrder,
-      savedAt,
-      timelineIndex: 0,
-      timeline: [timelineEntry("保存時点")],
-      state,
-      selectedIds: validSelectedIds(),
-      primaryId
-    }, manual);
+    return writeSave(fullPayload, manual);
   }
 
   function hasSavedSession() {
     if (!storageKey) return false;
-    try {
-      const saved = parseGoldfishSave(localStorage.getItem(storageKey));
-      return saved?.version === 2 && saved.signature === deckSignature(activeDeck) && saved.state;
-    } catch {
-      return false;
-    }
+    return currentSaved?.version === 2 && currentSaved.signature === deckSignature(activeDeck) && currentSaved.state;
   }
 
   function pushTimeline(message) {
@@ -1578,13 +1567,16 @@ export function createGoldfishController(dialog) {
 
   async function open(deck, title, { refreshMetadata = false } = {}) {
     const requestId = ++openRequestId;
-    if (state) saveSession(false);
+    if (state) await saveSession(false);
+    if (requestId !== openRequestId) return;
     state = null;
     activeDeck = deck;
     panelName = "";
     libraryOpen = gameLogOpen = shortcutsOpen = false;
     renderPanels();
     storageKey = `${SAVE_PREFIX}${deckSignature(deck)}`;
+    currentSaved = await saveRepository.load(storageKey);
+    if (requestId !== openRequestId) return;
     ui.title.textContent = `${title || deck.title || "デッキ"} — ひとり回し`;
     ui.message.textContent = "土地・クリーチャー等を判別するカード情報を取得しています…";
     find("#goldfish-metadata-retry").hidden = true;
@@ -1597,7 +1589,7 @@ export function createGoldfishController(dialog) {
       if (requestId !== openRequestId) return;
       activeDeck = enrichedDeck;
       setLoading(false);
-      if (hasSavedSession()) resumeSession();
+      if (hasSavedSession()) await resumeSession();
       else resetGame();
       if (enrichedDeck.bundledMetadata) {
         ui.message.textContent += " 照合済みの同梱カード情報を使用しています。";
@@ -1610,7 +1602,7 @@ export function createGoldfishController(dialog) {
       find("#goldfish-metadata-retry").hidden = false;
       const detail = error.name === "AbortError" ? "通信がタイムアウトしました。" : error.message;
       if (hasSavedSession()) {
-        resumeSession();
+        await resumeSession();
         ui.message.textContent = `保存ゲームを再開しました。カード情報の更新に失敗しています: ${detail}`;
       } else {
         resetGame(`カード情報の取得に失敗しました。「カード情報を再取得」でやり直せます。${detail}`);
@@ -1630,10 +1622,12 @@ export function createGoldfishController(dialog) {
     if (dialog.open) dialog.close();
   }
 
-  function resumeSession() {
+  async function resumeSession() {
     try {
+      const key = storageKey;
+      const saved = await saveRepository.load(key);
+      if (key !== storageKey) return;
       panelName = "";
-      const saved = parseGoldfishSave(localStorage.getItem(storageKey));
       if (saved?.version !== 2 || saved.signature !== deckSignature(activeDeck)) throw new Error("このデッキの保存データがありません。");
       find("#goldfish-auto-tap").checked = saved.autoTap !== false;
       autoTriggers = saved.autoTriggers !== false;
@@ -1857,7 +1851,7 @@ export function createGoldfishController(dialog) {
   });
   ui.undo.addEventListener("click", undo);
   ui.redo.addEventListener("click", redo);
-  find("#goldfish-save").addEventListener("click", () => { saveSession(true); render("現在の盤面と操作履歴を保存しました。"); });
+  find("#goldfish-save").addEventListener("click", async () => { if (await saveSession(true)) render("現在の盤面と操作履歴を保存しました。"); });
   ui.resume.addEventListener("click", resumeSession);
   find("#goldfish-metadata-retry").addEventListener("click", () => open(activeDeck, ui.title.textContent.replace(/ — ひとり回し$/, ""), { refreshMetadata: true }));
   ui.openLibrary.addEventListener("click", () => setLibraryOpen(!libraryOpen));
@@ -2076,13 +2070,13 @@ export function createGoldfishController(dialog) {
   });
 
   async function resumeLast() {
-    const link = lastGoldfishSession(localStorage);
+    const link = await saveRepository.last();
     if (!link) throw new Error("このブラウザーに再開できるゲームがありません。");
-    const saved = parseGoldfishSave(localStorage.getItem(link.key));
+    const saved = await saveRepository.load(link.key);
     const deck = deckFromGoldfishSave(saved);
     if (saved.signature !== deckSignature(deck) || link.key !== `${SAVE_PREFIX}${saved.signature}`) throw new Error("保存したゲームとデッキが一致しません。元のリストから開いてください。");
     await open(deck, link.title);
   }
 
-  return { open, close, resumeLast, lastSession: () => lastGoldfishSession(localStorage) };
+  return { open, close, resumeLast, lastSession: () => saveRepository.last() };
 }

@@ -1,12 +1,12 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261021-public30k";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261021-public30k";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261021-public30k";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261021-public30k";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30k";
-import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30k";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261021-public30l";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261021-public30l";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261021-public30l";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261021-public30l";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30l";
+import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30l";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
