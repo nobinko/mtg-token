@@ -54,6 +54,7 @@ import { goldfishCardOperations } from "./goldfish-effects.js?v=20261020-solo10"
 import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo10";
 import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261020-solo10";
 import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo10";
+import { loadCardMetadata } from "./card-metadata-loader.js?v=20261020-public30";
 import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo10";
 import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo10";
 
@@ -1564,14 +1565,8 @@ export function createGoldfishController(dialog) {
   async function enrichDeck(deck) {
     const names = [...new Set([...(deck.mainboard || []), ...(deck.sideboard || [])].map((row) => row.name).filter(Boolean))];
     if (!names.length) return deck;
-    const response = await fetch("/api/card-metadata", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ names })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || "カード種別を取得できませんでした。");
-    return { ...deck, mainboard: mergeCardMetadata(deck.mainboard, data.cards), sideboard: mergeCardMetadata(deck.sideboard, data.cards) };
+    const cards = await loadCardMetadata(names);
+    return { ...deck, mainboard: mergeCardMetadata(deck.mainboard, cards), sideboard: mergeCardMetadata(deck.sideboard, cards) };
   }
 
   function setLoading(loading) {
@@ -1591,6 +1586,7 @@ export function createGoldfishController(dialog) {
     storageKey = `${SAVE_PREFIX}${deckSignature(deck)}`;
     ui.title.textContent = `${title || deck.title || "デッキ"} — ひとり回し`;
     ui.message.textContent = "土地・クリーチャー等を判別するカード情報を取得しています…";
+    find("#goldfish-metadata-retry").hidden = true;
     ui.saveStatus.textContent = hasSavedSession() ? "保存済みゲームあり" : "未保存";
     ui.resume.disabled = !hasSavedSession();
     setLoading(true);
@@ -1606,11 +1602,13 @@ export function createGoldfishController(dialog) {
       if (requestId !== openRequestId) return;
       activeDeck = deck;
       setLoading(false);
+      find("#goldfish-metadata-retry").hidden = false;
+      const detail = error.name === "AbortError" ? "通信がタイムアウトしました。" : error.message;
       if (hasSavedSession()) {
         resumeSession();
-        ui.message.textContent = `保存ゲームを再開しました。カード情報の更新だけ失敗しています: ${error.message}`;
+        ui.message.textContent = `保存ゲームを再開しました。カード情報の更新に失敗しています: ${detail}`;
       } else {
-        resetGame(`カード種別の取得に失敗しました。手動で各エリアへ置けます: ${error.message}`);
+        resetGame(`カード情報の取得に失敗しました。「カード情報を再取得」でやり直せます。${detail}`);
       }
     }
   }
@@ -1856,6 +1854,7 @@ export function createGoldfishController(dialog) {
   ui.redo.addEventListener("click", redo);
   find("#goldfish-save").addEventListener("click", () => { saveSession(true); render("現在の盤面と操作履歴を保存しました。"); });
   ui.resume.addEventListener("click", resumeSession);
+  find("#goldfish-metadata-retry").addEventListener("click", () => open(activeDeck, ui.title.textContent.replace(/ — ひとり回し$/, "")));
   ui.openLibrary.addEventListener("click", () => setLibraryOpen(!libraryOpen));
   find("#goldfish-close-library").addEventListener("click", () => setLibraryOpen(false));
   find("#goldfish-fetch-fail").addEventListener("click", () => finishFetch(null));

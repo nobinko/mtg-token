@@ -131,14 +131,7 @@ export function createDeckGallery(dialog, preview) {
   }
 
   async function requestMetadata(requested, requestedLanguage) {
-    const response = await fetch("/api/card-metadata", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ names: requested, language: requestedLanguage })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "カード画像を取得できませんでした。");
-    return data.cards || [];
+    return loadCardMetadata(requested, { language: requestedLanguage });
   }
 
   async function loadJapanese(token) {
@@ -219,3 +212,4 @@ export function createDeckGallery(dialog, preview) {
     }
   };
 }
+import { loadCardMetadata } from "./card-metadata-loader.js?v=20261020-public30";
