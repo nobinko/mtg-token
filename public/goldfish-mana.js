@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30g";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30g";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30g";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30g";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30g";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30g";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30g";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30g";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30g";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30g";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30g";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30g";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30g";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30g";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30h";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30h";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30h";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30h";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30h";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30h";
+import { cardName, isType, changeLife, goldfishSelfProtected } from "./goldfish-events.js?v=20261021-public30h";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30h";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30h";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30h";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30h";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30h";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30h";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30h";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30h";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -140,6 +140,7 @@ export function goldfishLandManaOptions(card, state, context = {}) {
     if (state && isType(card, "Land") && hasRuleCard(state, "Damping Sphere") && total(pool) >= 2) pool = normalizeGoldfishMana({ C: 1 });
     if (state && isType(card, "Creature")) pool.G += battlefield.filter(c => ["Leyline of Abundance", "Badgermole Cub"].includes(cardName(c)) && !c.faceDown).length;
     if (tapDamage) { life += Number(tapDamage[1]); damage = true; }
+    if (damage && state && goldfishSelfProtected(state)) life = 0;
     if (!result.some((item) => JSON.stringify(item.pool) === JSON.stringify(pool) && item.life === life && item.damage === damage)) result.push({ pool, life, damage });
   };
   for (const [subtype, color] of Object.entries(BASIC)) {

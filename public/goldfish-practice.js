@@ -1,9 +1,9 @@
-import { cloneGoldfishState, advanceGoldfishGame, chooseGoldfishRule } from "./goldfish.js?v=20261021-public30g";
-import { castGoldfishCard, activateGoldfishLand, goldfishLandManaOptions } from "./goldfish-mana.js?v=20261021-public30g";
-import { activateGoldfishAction } from "./goldfish-actions.js?v=20261021-public30g";
-import { activeFace, cardName } from "./goldfish-events.js?v=20261021-public30g";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
-import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30g";
+import { cloneGoldfishState, advanceGoldfishGame, chooseGoldfishRule } from "./goldfish.js?v=20261021-public30h";
+import { castGoldfishCard, activateGoldfishLand, goldfishLandManaOptions } from "./goldfish-mana.js?v=20261021-public30h";
+import { activateGoldfishAction } from "./goldfish-actions.js?v=20261021-public30h";
+import { activeFace, cardName } from "./goldfish-events.js?v=20261021-public30h";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30h";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30h";
 
 export function castPreparedGoldfishSpell(state, cardId, options = {}) {
   const source = state.battlefield.find(c => c.id === cardId);

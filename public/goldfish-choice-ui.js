@@ -1,12 +1,12 @@
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30g";
-import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30g";
-import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261021-public30g";
-import { goldfishAttackers } from "./goldfish-combat.js?v=20261021-public30g";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30g";
-import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261021-public30g";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30g";
-import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261021-public30g";
-import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30g";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30h";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30h";
+import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261021-public30h";
+import { goldfishAttackers } from "./goldfish-combat.js?v=20261021-public30h";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30h";
+import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261021-public30h";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30h";
+import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261021-public30h";
+import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30h";
 
 // Render only explicit choices. This module never changes game state itself.
 export function renderGoldfishSpellChoice({ state, choice, content, title, action, paragraph, imageUrl, answer, saveDraft }) {

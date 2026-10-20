@@ -1,9 +1,9 @@
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30g";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30g";
-import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261021-public30g";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30g";
-import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30g";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30h";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30h";
+import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261021-public30h";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30h";
+import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30h";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30h";
 
 const put = (ctx, ...ops) => ctx.steps.splice(ctx.step + 1, 0, ...ops);
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };
@@ -41,7 +41,7 @@ function targets(s, spec, card) {
   const result = engineCandidates(s, { ...spec, target: true }, { source: ref(card) }).filter(c => c.card.id !== card.id);
   if (spec.copyable) for (let i = result.length - 1; i >= 0; i--) if (result[i].card.kind !== "ability" && !isType(result[i].card, "Instant|Sorcery")) result.splice(i, 1);
   if (spec.singleTarget) for (let i = result.length - 1; i >= 0; i--) if (!singleTarget(result[i].card)) result.splice(i, 1);
-  if (spec.players) result.unshift({ ref: { player: "self" }, label: "自分" }, { ref: { player: "opponent" }, label: "相手" });
+  if (spec.players) result.unshift(...goldfishPlayerTargets(s));
   if (spec.virtualOpponent) result.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の適正な対象（相手側の領域は省略）" });
   return result.map(({ ref, label }) => ({ ref, label }));
 }

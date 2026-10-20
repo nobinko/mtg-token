@@ -1,16 +1,16 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30g";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30g";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30g";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30g";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30g";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30g";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30g";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30g";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30g";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30g";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30g";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30g";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30g";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary, goldfishSelfProtected, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30h";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30h";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30h";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30h";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30h";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30h";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30h";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30h";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30h";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30h";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30h";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30h";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30h";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -127,6 +127,7 @@ function amount(state, value, context) {
 }
 export function damage(state, target, count) {
   if (!target || !count) return;
+  if (target.player === "self" && goldfishSelfProtected(state)) return;
   if (target.virtual) return;
   if (target.player === "opponent") count += live(state).filter(c => name(c) === "Artist's Talent" && c.level >= 3).length * 2;
   if (target.player) changeLife(state, -count, target.player);
@@ -333,7 +334,7 @@ function prepareEngineTargets(state) {
   const entry = state.stack.toReversed().find(e => e.ability?.rule === "engine" && e.ability.targetSpec && e.ability.target === undefined);
   if (!entry) return;
   const spec = entry.ability.targetSpec, candidates = engineCandidates(state, { ...spec, filter: spec, target: true }, { source: entry.ability.source });
-  if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+  if (spec.players) candidates.unshift(...goldfishPlayerTargets(state));
   else if (spec.opponentOnly) candidates.unshift({ ref: { player: "opponent" }, label: "相手" });
   if (spec.virtualOpponent && !(hasRuleCard(state, "Mycosynth Lattice") && (spec.colored || spec.color || spec.colorsAny || spec.monocolored))) for (let i = 0; i < (spec.count || 1); i++) candidates.unshift({ ref: { id: `virtual-${i}`, player: "opponent", virtual: true }, label: `相手の対象${spec.count ? i + 1 : ""}（領域は省略）` });
   if (!candidates.length) { entry.ability.target = null; entry.ability.noTarget = true; prepareEngineTargets(state); return; }
@@ -454,6 +455,7 @@ export function startEngineResolution(state, entry) {
     target: structuredClone(ability?.target || entry.cast?.target || null), targets: structuredClone(ability?.targets || []), allocation: structuredClone(ability?.allocation || []), costCards: structuredClone(ability?.costCards || []), x: ability?.x ?? entry.cast?.x ?? 0, cast: structuredClone(entry.cast || {}), steps: structuredClone(program.steps), step: 0, vars: {}, snapshot: structuredClone(ability?.snapshot || entry), finishZone: "graveyard" };
   if (ability?.noTarget || ability?.targetSpec && ability.target && !ability.target.player && !engineCandidates(state, { ...ability.targetSpec, filter: ability.targetSpec, target: true }, state.rules.automation).some(c => sameRef(c.ref, ability.target))) state.rules.automation.steps = [];
   if (!ability && program.target && !goldfishSpellTargets(state, entry).some(c => sameGoldfishTarget(c.ref, state.rules.automation.target))) state.rules.automation.steps = [];
+  if (ability?.target?.player === "self" && goldfishSelfProtected(state)) state.rules.automation.steps = [];
   if (ability?.allocation) {
     const candidates = engineCandidates(state, { ...ability.targetSpec, filter: ability.targetSpec, target: true });
     state.rules.automation.allocation = ability.allocation.filter(a => a.target.player || candidates.some(c => sameRef(c.ref, a.target)));
@@ -753,7 +755,7 @@ export function continueEngineResolution(state) {
     else if (op.op === "copy-target") {
       const spec = goldfishSpellProgram(ctx.vars.castCopy)?.target;
       const candidates = spec ? engineCandidates(state, { ...spec, filter: spec, target: true }, ctx).map(({ ref, label }) => ({ ref, label })) : [];
-      if (spec?.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+      if (spec?.players) candidates.unshift(...goldfishPlayerTargets(state));
       else if (spec?.virtualOpponent) candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の対象（領域は省略）" });
       if (spec && !candidates.length) delete ctx.vars.castCopy;
       else if (spec) { setChoice(state, { kind: "copy-target", label: "コピーする呪文の対象", candidates, min: 1, max: 1 }); return; }

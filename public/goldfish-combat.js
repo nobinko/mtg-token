@@ -1,9 +1,9 @@
-import { goldfishCharacteristics, goldfishKeywords, recordGoldfishAttack, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30g";
-import { goldfishReference, goldfishFindObject } from "./goldfish-objects.js?v=20261021-public30g";
-import { engineAttackGroup } from "./goldfish-engine.js?v=20261021-public30g";
-import { changeLife } from "./goldfish-events.js?v=20261021-public30g";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30g";
-import { offerCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30g";
+import { goldfishCharacteristics, goldfishKeywords, recordGoldfishAttack, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30h";
+import { goldfishReference, goldfishFindObject } from "./goldfish-objects.js?v=20261021-public30h";
+import { engineAttackGroup } from "./goldfish-engine.js?v=20261021-public30h";
+import { changeLife } from "./goldfish-events.js?v=20261021-public30h";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30h";
+import { offerCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30h";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 export function goldfishAttackers(state) {

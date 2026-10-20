@@ -1,12 +1,12 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30g";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30g";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
-import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261021-public30g";
-import { drawGameCards, cardType } from "./goldfish-events.js?v=20261021-public30g";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30g";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30g";
-import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30g";
-import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30g";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30h";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30h";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30h";
+import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30h";
+import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30h";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30h";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30h";
+import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30h";
+import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30h";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
@@ -89,7 +89,7 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
     if (target.zone === "battlefield" && goldfishKeywords(state, item).has("shroud")) return false;
     return true;
   }).map((item) => ({ ref: goldfishReference(item, target.zone), label: item.name, card: item }));
-  if (target.players) candidates.unshift({ ref: { player: "opponent" }, label: `相手 — ライフ ${state.players.opponent.life}` }, { ref: { player: "self" }, label: `自分 — ライフ ${state.players.self.life}` });
+  if (target.players) candidates.unshift(...goldfishPlayerTargets(state).map(t => ({ ...t, label: `${t.label} — ライフ ${state.players[t.ref.player].life}` })));
   if (target.opponentOnly) candidates.unshift({ ref: { player: "opponent" }, label: `相手 — ライフ ${state.players.opponent.life}` });
   if (target.virtualOpponent && !target.players && !(hasRuleCard(state, "Mycosynth Lattice") && (target.monocolored || target.colorsAny))) candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の対象へ解決（相手側の領域は省略）" });
   return candidates;
@@ -187,7 +187,7 @@ export function continueGoldfishSpellResolution(state) {
       const target = resolution.target?.player ? null : goldfishFindObject(state, resolution.target);
       if (operation.kind === "damage") {
         const amount = operation.delirium && goldfishGraveyardTypes(state).length >= 4 ? operation.delirium : operation.amount;
-        if (resolution.target?.player) state.players[resolution.target.player].life -= amount;
+        if (resolution.target?.player) damage(state, resolution.target, amount);
         else if (target) {
           if (/\bCreature\b/.test(target.faceDown ? "Creature" : face(target).typeLine || "")) target.damage = (target.damage || 0) + amount;
           else {

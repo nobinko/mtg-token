@@ -1,6 +1,6 @@
-import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30g";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30g";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30h";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30h";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30h";
 
 export const activeFace = card => card?.faces?.[card.faceIndex || 0] || card || {};
 export const cardType = card => [card.faceDown ? "Creature" : String(activeFace(card).typeLine || ""), ...(card.temporaryEffects || []).flatMap(e => e.types || []), ...(card.latticeArtifact ? ["Artifact"] : [])].join(" ");
@@ -12,6 +12,11 @@ export function copiableGoldfishValues(card) {
   return out;
 }
 export const isType = (card, type) => new RegExp(`\\b${type}\\b`).test(cardType(card));
+export const goldfishSelfProtected = state => Boolean(state.rules.ringProtection);
+export const goldfishPlayerTargets = state => [
+  { ref: { player: "opponent" }, label: "相手" },
+  ...(!goldfishSelfProtected(state) ? [{ ref: { player: "self" }, label: "自分" }] : []),
+];
 export function emitGameEvent(state, event) { (state.rules.events ||= []).push(structuredClone(event)); }
 export function changeLife(state, amount, player = "self") {
   if (amount > 0 && (hasRuleCard(state, "Sunspine Lynx") || state.rules.cannotGainLife?.[player])) return;

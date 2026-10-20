@@ -1,9 +1,9 @@
 // Adapters for the actual public UW artifact list. Callers verify full Oracle
 // text; costs, zone changes and triggers still use the shared rules engine.
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30g";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30g";
-import { verifiedGoldfishCard, draw, tutor } from "./goldfish-card-programs.js?v=20261021-public30g";
-import { gameManaValue } from "./goldfish-engine.js?v=20261021-public30g";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, copiableGoldfishValues, changeLife, addGameCounters } from "./goldfish-events.js?v=20261021-public30h";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30h";
+import { verifiedGoldfishCard, draw, tutor } from "./goldfish-card-programs.js?v=20261021-public30h";
+import { gameManaValue } from "./goldfish-engine.js?v=20261021-public30h";
 
 const active = c => c && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -14,6 +14,7 @@ const targetNonlandOpponent = { zone: "battlefield", permanent: true, notTypes: 
 const gnome = { name: "Gnome", typeLine: "Token Artifact Creature — Gnome", power: "1", toughness: "1", colors: [], oracleText: "" };
 const doombot = { name: "Doombot", typeLine: "Token Artifact Creature — Robot Villain", power: "3", toughness: "3", colors: [], oracleText: "" };
 export const ARTIFACT_NOTES = {
+  "The One Ring": "唱えて登場：次の自分のターンまでプロテクション（すべて）・負担を増やしてドロー・アップキープのライフ喪失",
   "Simulacrum Synthesizer": "占術2・別のマナ総量3以上のアーティファクトの登場で構築物",
   "Repurposing Bay": "別のアーティファクトを生け贄にし、マナ総量が1大きいものを戦場へ",
   "Candy Trail": "占術2・生け贄で3点回復と1枚ドロー",
@@ -40,6 +41,7 @@ export function artifactEntryState(s, c) {
 export function artifactEnter(s, c) {
   if (!hasArtifactProgram(c)) return false;
   const n = name(c);
+  if (n === "The One Ring" && c.wasCast) add(s, c, "次の自分のターンまでプロテクション（すべて）", [{ op: "artifact-ring-protection" }]);
   if (["Simulacrum Synthesizer", "Candy Trail"].includes(n)) add(s, c, "占術2", [{ op: "format-scry", count: 2 }]);
   if (n === "Clay-Fired Bricks") add(s, c, "基本平地を手札へ・2点回復", [tutor({ basicLand: true, subtypes: ["Plains"] }), { op: "life", amount: 2 }]);
   if (n === "Cosmium Kiln") add(s, c, "1/1ノームを2体", [{ op: "artifact-gnomes" }]);
@@ -58,6 +60,10 @@ export function artifactEvent(s, e) {
     }
   }
   if (e.kind === "move" && e.from === "battlefield") {
+    if (name(e.original) === "The One Ring") for (const entry of s.stack) {
+      const r = entry.ability?.source;
+      if (r?.id === e.original.id && r.incarnation === e.original.incarnation) entry.ability.snapshot = structuredClone(e.original);
+    }
     if (name(e.original) === "Cryogen Relic" && active(e.original)) add(s, e.original, "退場：1枚引く", [draw()]);
     // Opposing objects are intentionally abstract in solo play, but the duration
     // still ends when this exact object leaves, including when used as a cost.
@@ -69,6 +75,11 @@ export function artifactEvent(s, e) {
     note(s, `速度が${s.rules.speed}になりました${s.rules.speed === 4 ? "（最高速度）" : ""}。`);
   }
 }
+export function artifactUpkeep(s) {
+  if (s.rules.activePlayer !== "self") return;
+  for (const c of live(s)) if (name(c) === "The One Ring")
+    add(s, c, "アップキープ：負担の数だけライフを失う", [{ op: "artifact-ring-upkeep" }]);
+}
 export function artifactEnd(s) {
   if (s.rules.activePlayer === "self") for (const c of live(s)) if (name(c) === "The Mind Stone" && c.harnessed)
     add(s, c, "∞：別の非土地を1つまで明滅", [{ op: "artifact-blink" }], { targetSpec: { zone: "battlefield", permanent: true, notTypes: ["Land"], excludeSelf: true, optional: true } });
@@ -78,6 +89,7 @@ export function artifactEnd(s) {
 export function artifactActions(c) {
   if (!active(c)) return [];
   const n = name(c), a = [], act = (id, label, cost, steps, extra = {}) => a.push({ id: `engine:artifact-${id}`, zone: "battlefield", cost, label, description: label, steps, ...extra });
+  if (n === "The One Ring") act("ring", "{T}：負担を1個置き、その数だけ引く", "{0}", [{ op: "artifact-ring-draw" }], { tap: true });
   const craftCost = { "Braided Net": "{1}{U}", "Clay-Fired Bricks": "{5}{W}{W}", "Spring-Loaded Sawblades": "{3}{W}" }[n];
   if (craftCost) act("craft", `作製 ${craftCost}：別のアーティファクトを追放`, craftCost, [{ op: "artifact-craft" }], { main: true, exileSelf: true, craft: true, costSelect: { zone: ["battlefield", "graveyard"], filter: { types: ["Artifact"], excludeSelf: true }, count: 1, destination: "exile" } });
   if (n === "Repurposing Bay") act("bay", "{2},{T}：生け贄よりマナ総量が1大きいアーティファクトを戦場へ", "{2}", [{ op: "artifact-bay" }], { main: true, tap: true, costSelect: { zone: "battlefield", filter: { types: ["Artifact"], excludeSelf: true }, count: 1, destination: "graveyard" } });
@@ -95,6 +107,17 @@ export function artifactActions(c) {
 export function artifactStep(s, c, op) {
   const source = find(s, c.source), target = find(s, c.target);
   switch (op.op) {
+    case "artifact-ring-protection":
+      s.rules.ringProtection = true;
+      note(s, "次の自分のターンまでプロテクション（すべて）：自分へのダメージを軽減し、自分を対象に選べません。ライフの支払い・喪失は通常どおりです。");
+      return true;
+    case "artifact-ring-draw":
+      if (source) addGameCounters(s, source, "burden", 1);
+      insert(c, draw((source || c.snapshot).counters?.burden || 0));
+      return true;
+    case "artifact-ring-upkeep":
+      changeLife(s, -((source || c.snapshot).counters?.burden || 0));
+      return true;
     case "artifact-gnomes": makeGameToken(s, gnome); makeGameToken(s, gnome); return true;
     case "artifact-doombot": makeGameToken(s, doombot); return true;
     case "artifact-exile-opponent":

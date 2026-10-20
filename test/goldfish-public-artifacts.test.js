@@ -9,7 +9,8 @@ import { goldfishCardActions } from "../public/goldfish-action-definitions.js";
 import { goldfishCharacteristics, goldfishKeywords } from "../public/goldfish-rules.js";
 import { goldfishReference as ref, moveGoldfishRuleObject as move, untapGoldfishObject } from "../public/goldfish-objects.js";
 import { changeLife, cardName, makeGameToken } from "../public/goldfish-events.js";
-import { flushEngineEvents } from "../public/goldfish-engine.js";
+import { flushEngineEvents, damage } from "../public/goldfish-engine.js";
+import { goldfishSpellTargets } from "../public/goldfish-spells.js";
 import { abilityBlockReason } from "../public/goldfish-constraints.js";
 import { settle } from "./helpers/goldfish-pilot.js";
 const data = JSON.parse(fs.readFileSync(new URL("./fixtures/goldfish-public-top30.json", import.meta.url)));
@@ -24,6 +25,48 @@ const put = (s, n, z = "hand") => moveGoldfishCards(s, card(s, n, "library").id,
 const funds = s => ["W", "U", "R", "C"].reduce((v, c) => setGoldfishMana(v, c, 20), s);
 const cast = (s, n, decide = () => null) => settle(castGoldfishCard(funds(s), card(s, n, "hand").id), [], decide);
 const reload = s => restoreGoldfishGame(JSON.parse(JSON.stringify(s)));
+
+test("The One Ring grants cast-only protection, draws burden cards and loses life at the next own upkeep", () => {
+  let s = position({ "The One Ring": 1, "Ancient Tomb": 1, "Mana Confluence": 1, "Lightning Bolt": 1 });
+  s = cast(put(s, "The One Ring"), "The One Ring");
+  assert.equal(s.rules.ringProtection, true);
+  s = put(put(put(s, "Ancient Tomb", "battlefield"), "Mana Confluence", "battlefield"), "Lightning Bolt");
+  // A cost-only mana source contrasts damage with paying life; it is not part of the public list.
+  Object.assign(card(s, "Mana Confluence"), { typeLine: "Land", oracleText: "{T}, Pay 1 life: Add one mana of any color." });
+  assert.equal(goldfishLandManaOptions(card(s, "Ancient Tomb"), s)[0].life, 0);
+  assert.equal(goldfishLandManaOptions(card(s, "Mana Confluence"), s)[0].life, 1);
+  assert.ok(!goldfishSpellTargets(s, card(s, "Lightning Bolt", "hand")).some(t => t.ref.player === "self"));
+  const before = s.life, hand = s.hand.length, id = card(s, "The One Ring").id;
+  damage(s, { player: "self" }, 4); assert.equal(s.life, before);
+  changeLife(s, -2); assert.equal(s.life, before - 2, "life loss is not damage");
+  s = settle(activateGoldfishAction(s, id, "engine:artifact-ring"));
+  assert.equal(card(s, "The One Ring").counters.burden, 1); assert.equal(s.hand.length, hand + 1);
+  s = reload(s); assert.equal(s.rules.ringProtection, true);
+  s = settle(endGoldfishTurn(s));
+  assert.equal(s.rules.ringProtection, true); assert.equal(s.life, before - 2, "opponent upkeep does not trigger burden");
+  s = settle(nextGoldfishTurn(s));
+  assert.ok(!s.rules.ringProtection); assert.equal(s.life, before - 3);
+  assert.equal(goldfishLandManaOptions(card(s, "Ancient Tomb"), s)[0].life, 2);
+  const hand2 = s.hand.length;
+  s = settle(activateGoldfishAction(s, id, "engine:artifact-ring"));
+  assert.equal(card(s, "The One Ring").counters.burden, 2); assert.equal(s.hand.length, hand2 + 2);
+});
+
+test("The One Ring blink does not renew protection; a removed source uses its last burden count", () => {
+  let s = position({ "The One Ring": 1 });
+  s = cast(put(s, "The One Ring"), "The One Ring");
+  let ring = card(s, "The One Ring");
+  move(s, ring.id, "battlefield", "exile"); move(s, ring.id, "exile", "battlefield");
+  s = settle(flushEngineEvents(s));
+  assert.ok(s.rules.ringProtection, "old effect survives the source leaving");
+  s = settle(nextGoldfishTurn(s)); assert.ok(!s.rules.ringProtection);
+  ring = card(s, "The One Ring"); ring.counters.burden = 2;
+  const hand = s.hand.length;
+  s = activateGoldfishAction(s, ring.id, "engine:artifact-ring");
+  move(s, ring.id, "battlefield", "graveyard");
+  s = settle(flushEngineEvents(s));
+  assert.equal(s.hand.length, hand + 2, "cannot put a counter on the absent Ring, but still draws its last count");
+});
 
 test("public UW: Synthesizer triggers from another MV3+ artifact, including a second Synthesizer, never itself or its zero-MV token", () => {
   let s = position({ "Simulacrum Synthesizer": 2, "Perilous Snare": 1, "Cryogen Relic": 1 });
