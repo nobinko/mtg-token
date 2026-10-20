@@ -1,7 +1,7 @@
-import { cardName, activeFace, copiableGoldfishValues, queueGameAbility } from "./goldfish-events.js?v=20261021-public30m";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30m";
-import { engineCandidates, gameManaValue } from "./goldfish-engine.js?v=20261021-public30m";
-import { goldfishReference as ref, goldfishFindObject as find, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30m";
+import { cardName, activeFace, copiableGoldfishValues, queueGameAbility } from "./goldfish-events.js?v=20261021-public30n";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30n";
+import { engineCandidates, gameManaValue } from "./goldfish-engine.js?v=20261021-public30n";
+import { goldfishReference as ref, goldfishFindObject as find, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30n";
 
 // Replacement choice: complete before entry counters and any ETB observers.
 export function offerEntryCopy(s, c) {

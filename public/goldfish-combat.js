@@ -1,11 +1,19 @@
-import { goldfishCharacteristics, goldfishKeywords, recordGoldfishAttack, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30m";
-import { goldfishReference, goldfishFindObject } from "./goldfish-objects.js?v=20261021-public30m";
-import { engineAttackGroup } from "./goldfish-engine.js?v=20261021-public30m";
-import { changeLife } from "./goldfish-events.js?v=20261021-public30m";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30m";
-import { offerCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30m";
+import { goldfishCharacteristics, goldfishKeywords, recordGoldfishAttack, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30n";
+import { goldfishReference, goldfishFindObject } from "./goldfish-objects.js?v=20261021-public30n";
+import { engineAttackGroup } from "./goldfish-engine.js?v=20261021-public30n";
+import { changeLife } from "./goldfish-events.js?v=20261021-public30n";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30n";
+import { offerCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30n";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
+export function goldfishCombatControl(state) {
+  const combat = state.rules.combat, extra = combat?.stage === "done" && state.rules.extraCombats > 0;
+  return {
+    visible: state.phase === "playing" && state.rules.activePlayer === "self" && (combat?.stage !== "done" || extra),
+    begin: !combat || extra,
+    label: extra ? `追加戦闘（残り${state.rules.extraCombats}回）` : combat?.stage === "normal" ? "通常ダメージ" : combat ? "戦闘ダメージ" : "攻撃する"
+  };
+}
 export function goldfishAttackers(state) {
   return state.battlefield.filter((card) => /\bCreature\b/.test(card.faceDown ? "Creature" : face(card).typeLine || "")).map((card) => {
     const keywords = goldfishKeywords(state, card);

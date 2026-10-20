@@ -14,6 +14,7 @@ import { route } from "./helpers/goldfish-route.js";
 import { goldfishFinish } from "../public/goldfish-sideboard.js";
 import { beginGoldfishCombat, resolveGoldfishCombat } from "../public/goldfish.js";
 import { castPreparedGoldfishSpell } from "../public/goldfish-practice.js";
+import { goldfishCombatControl } from "../public/goldfish-combat.js";
 
 const fixtures = ["top10", "standard-top10", "legacy-top10", "pioneer-top10"].map(n => JSON.parse(readFileSync(new URL(`./fixtures/goldfish-${n}.json`, import.meta.url))));
 const metadata = fixtures.flatMap(f => f.metadata);
@@ -80,6 +81,20 @@ test("Kaito ninjutsu enters with loyalty before state actions and deals combat d
   assert.equal(s.players.opponent.life, 17);
   s = settle(activateGoldfishAction(s, card(s, "Kaito, Bane of Nightmares").id, "engine:fp-kaito-plus"));
   assert.equal(goldfishCharacteristics(s, card(s, "Kaito, Bane of Nightmares")).power, "4");
+});
+
+test("the visible combat control starts FOMO extra combat and does not offer a third attack", () => {
+  let s = put(position({ "Fear of Missing Out": 2, "Opt": 1, "Island": 1 }), "Fear of Missing Out", "battlefield");
+  s = put(put(put(s, "Fear of Missing Out", "graveyard"), "Opt", "graveyard"), "Island", "graveyard");
+  card(s, "Fear of Missing Out").enteredTurn = 0;
+  s = settle(beginGoldfishCombat(s), [], c => c.type === "engine-target" ? { target: c.candidates.find(x => x.label === "Fear of Missing Out").ref } : null);
+  s = settle(resolveGoldfishCombat(s));
+  assert.deepEqual(goldfishCombatControl(s), { visible: true, begin: true, label: "追加戦闘（残り1回）" });
+  s = settle(beginGoldfishCombat(save(s)));
+  assert.equal(s.rules.extraCombats, 0);
+  s = settle(resolveGoldfishCombat(s));
+  assert.equal(s.players.opponent.life, 16);
+  assert.equal(goldfishCombatControl(s).visible, false);
 });
 
 test("Cultivator casts the Enroot prepared copy and tutors a land to the graveyard", () => {

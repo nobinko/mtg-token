@@ -1,7 +1,7 @@
-import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30m";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30m";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30m";
-import { GOLDFISH_CREATURE_TYPES } from "./goldfish-creature-types.js?v=20261021-public30m";
+import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30n";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30n";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30n";
+import { GOLDFISH_CREATURE_TYPES } from "./goldfish-creature-types.js?v=20261021-public30n";
 
 export const activeFace = card => card?.faces?.[card.faceIndex || 0] || card || {};
 export const cardType = card => [card.faceDown ? "Creature" : String(activeFace(card).typeLine || ""), ...(card.temporaryEffects || []).flatMap(e => e.types || []), ...(card.animated?.allCreatureTypes && !card.faceDown ? GOLDFISH_CREATURE_TYPES : []), ...(card.latticeArtifact ? ["Artifact"] : [])].join(" ");
