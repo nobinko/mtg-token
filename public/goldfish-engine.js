@@ -1,16 +1,16 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo7";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo7";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo7";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo7";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo7";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo7";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo7";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo7";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-solo7";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-solo7";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-solo7";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-solo7";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo7";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo8";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo8";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo8";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo8";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo8";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo8";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo8";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo8";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-solo8";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-solo8";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-solo8";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-solo8";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo8";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -213,6 +213,8 @@ export function engineEnter(state, card) {
 }
 
 export function engineCast(state, spell) {
+  if (spell.cast?.warp) state.rules.warpCast = true;
+  if (!isType(spell, "Creature")) state.rules.noncreatureCast = (state.rules.noncreatureCast || 0) + 1;
   formatPermanentCast(state, spell);
   if (!verifiedGoldfishCard(spell)) return;
   const n = name(spell), sourceSteps = {
@@ -269,6 +271,7 @@ export function flushEngineEvents(state) {
       }
       if (event.kind === "move" && event.from === "battlefield") {
         state.rules.permanentLeft = true;
+        if (!isType(event.original, "Land")) state.rules.nonlandLeft = true;
         if (name(event.original) === "Thought-Knot Seer") queueGameAbility(state, event.original, "相手が1枚引く", [{ op: "opponent-effect", text: "相手が1枚引く" }]);
         if (event.original.name === "Munitions" && event.original.kind === "token") queueGameAbility(state, event.original, "弾薬：2点ダメージ", [{ op: "damage", amount: 2 }], { targetSpec: damageTarget });
         if (event.original.earthbent && ["graveyard", "exile"].includes(event.to)) queueGameAbility(state, event.original, "土の技：タップ状態で戻す", [{ op: "earth-return", target: ref(event.card, event.to) }]);
@@ -320,8 +323,8 @@ function prepareEngineTargets(state) {
   if (spec.virtualOpponent) for (let i = 0; i < (spec.count || 1); i++) candidates.unshift({ ref: { id: `virtual-${i}`, player: "opponent", virtual: true }, label: `相手の対象${spec.count ? i + 1 : ""}（領域は省略）` });
   if (!candidates.length) { entry.ability.target = null; entry.ability.noTarget = true; prepareEngineTargets(state); return; }
   if (spec.divideDamage) {
-    state.rules.pendingChoice = { type: "engine-target", kind: "division", divideDamage: spec.divideDamage, sourceName: entry.name, entryId: entry.id,
-      label: `${spec.divideDamage}点を配分（各対象に1点以上・対象なしも可）`, candidates: candidates.map(({ ref, label }) => ({ ref, label })), optional: !!spec.optional };
+    state.rules.pendingChoice = { type: "engine-target", kind: "division", divideDamage: spec.divideDamage, maxTargets: spec.count, sourceName: entry.name, entryId: entry.id,
+      label: `${spec.divideDamage}点を配分（各対象に1点以上${spec.count ? `・最大${spec.count}対象` : ""}${spec.optional ? "・対象なしも可" : ""}）`, candidates: candidates.map(({ ref, label }) => ({ ref, label })), optional: !!spec.optional };
     return;
   }
   state.rules.pendingChoice = { type: "engine-target", sourceName: entry.name, entryId: entry.id, label: spec.label || (spec.distinctCardTypes ? "各カード・タイプにつき1枚まで対象を選ぶ" : "誘発の対象を選ぶ"), distinctCardTypes: spec.distinctCardTypes, candidates: candidates.map(({ ref, label }) => ({ ref, label })), min: spec.optional ? 0 : spec.count || 1, max: Math.min(spec.count || 1, candidates.length), ...(spec.count ? { kind: "cards", multipleTargets: true } : {}) };
@@ -904,6 +907,7 @@ export function chooseEngine(state, answer) {
     if (choice.divideDamage) {
       const allocation = answer.allocation;
       if (!entry || !Array.isArray(allocation) || new Set(allocation.map(a => JSON.stringify(a.target))).size !== allocation.length ||
+          (choice.maxTargets != null && allocation.length > choice.maxTargets) ||
           allocation.some(a => !Number.isInteger(a.amount) || a.amount < 1 || !choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(a.target))) ||
           (allocation.length ? allocation.reduce((n, a) => n + a.amount, 0) !== choice.divideDamage : !choice.optional)) throw new Error("各対象に1点以上、合計を指定された点数にしてください。");
       entry.ability.allocation = structuredClone(allocation); entry.ability.target = null;

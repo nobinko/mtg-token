@@ -40,26 +40,26 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js?v=20261020-solo7";
-import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo7";
-import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo7";
-import { extraCastChoice } from "./goldfish-modal.js?v=20261020-solo7";
+} from "./goldfish.js?v=20261020-solo8";
+import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo8";
+import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo8";
+import { extraCastChoice } from "./goldfish-modal.js?v=20261020-solo8";
 import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText, canPlayGoldfishGraveyard,
-  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo7";
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo7";
-import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo7";
-import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo7";
-import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo7";
-import { goldfishCardOperations } from "./goldfish-effects.js?v=20261020-solo7";
-import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo7";
-import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261020-solo7";
-import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo7";
-import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo7";
-import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo7";
+  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo8";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo8";
+import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo8";
+import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo8";
+import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo8";
+import { goldfishCardOperations } from "./goldfish-effects.js?v=20261020-solo8";
+import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo8";
+import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261020-solo8";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo8";
+import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo8";
+import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo8";
 
-import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo7";
-import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo7";
-import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo7";
+import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo8";
+import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo8";
+import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo8";
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command", "stack"];
 const ZONE_LABELS = {
   library: "山札",
@@ -76,7 +76,7 @@ const ZONE_LABELS = {
 };
 const LANE_LABELS = { other: "その他", creature: "クリーチャー", land: "土地" };
 const MAX_TIMELINE = 60;
-import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261020-solo7";
+import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261020-solo8";
 
 function normalizeName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
@@ -1419,9 +1419,10 @@ export function createGoldfishController(dialog) {
         try { preflight = extraCastChoice(state, card, { ...origin, x: costX }); } catch {}
         pay.disabled = !plan.payable && !preflight;
         pay.textContent = preflight ? "唱え方・対象・追加コストを選ぶ" : "支払って唱える";
-        const lands = plan.activations?.map(({ id }) => cardDisplayName(findCard(id).card)).join("、");
+        const lands = plan.activations?.filter(a => !a.sacrifice).map(({ id }) => cardDisplayName(findCard(id).card)).join("、");
+        const sacrifices = plan.activations?.filter(a => a.sacrifice).map(({ id }) => cardDisplayName(findCard(id).card)).join("、");
         const usesPool = GOLDFISH_MANA_TYPES.some((color) => (state.manaPool[color] || 0) > (plan.remaining?.[color] || 0));
-        explanation.textContent = preflight ? "モードや代替コストを選んでから、支払えるか確認します。選択が終わるまでマナは使いません。" : plan.payable ? `${lands ? `タップするマナ源：${lands}。` : usesPool ? "プールのマナで支払えます。" : "タップする必要はありません。"}${plan.life ? `ライフが${plan.life}点減ります。` : ""}` : plan.reason;
+        explanation.textContent = preflight ? "モードや代替コストを選んでから、支払えるか確認します。選択が終わるまでマナは使いません。" : plan.payable ? `${lands ? `タップするマナ源：${lands}。` : usesPool ? "プールのマナで支払えます。" : ""}${sacrifices ? `生け贄にしてマナを出す：${sacrifices}。` : ""}${!lands && !usesPool && !sacrifices ? "マナ源を使う必要はありません。" : ""}${plan.life ? `ライフが${plan.life}点減ります。` : ""}` : plan.reason;
       };
       xInput?.addEventListener("input", () => { costX = xInput.value === "" ? NaN : Number(xInput.value); refresh(); });
       refresh();

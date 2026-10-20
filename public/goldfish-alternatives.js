@@ -1,12 +1,12 @@
-import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261020-solo7";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo7";
-import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261020-solo7";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo7";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo7";
-import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261020-solo7";
-import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo7";
-import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261020-solo7";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261020-solo7";
+import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261020-solo8";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo8";
+import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261020-solo8";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo8";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo8";
+import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261020-solo8";
+import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo8";
+import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261020-solo8";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261020-solo8";
 
 export function goldfishAlternativeModes(card, zone) {
   if (!verifiedGoldfishCard(card)) return [];

@@ -1,9 +1,9 @@
-import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261020-solo7";
-import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261020-solo7";
-import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo7";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo7";
+import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261020-solo8";
+import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261020-solo8";
+import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo8";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo8";
 
-export const EXTRA_COST_SPELLS = new Set(["Requiting Hex", "We Say Thee Nay!", "Countersculpt", "Fanatical Offering", "Deadly Dispute", "Stir Up Trouble", "Vicious Rivalry", "Toxic Deluge", "Deadly Cover-Up", "Torch the Tower", "Rottenmouth Viper"]);
+export const EXTRA_COST_SPELLS = new Set(["Demand Answers", "Requiting Hex", "We Say Thee Nay!", "Countersculpt", "Fanatical Offering", "Deadly Dispute", "Stir Up Trouble", "Vicious Rivalry", "Toxic Deluge", "Deadly Cover-Up", "Torch the Tower", "Rottenmouth Viper"]);
 export function extraFormatCostChoice(state, card, format = {}) {
   const name = cardName(card);
   if (format.freeCast === "yes" && (!state.hand.some(c=>c.id===card.id) || state.rules.effectCast)) throw new Error("この唱え方に代替コストを重ねて支払うことはできません。");
@@ -39,6 +39,7 @@ export function extraFormatCostChoice(state, card, format = {}) {
     return null;
   }
   const definitions = {
+    "Demand Answers": { zone: ["hand", "battlefield"], filter: {}, min: 1, label: "追加コスト：捨てる手札1枚、または生け贄にするアーティファクト1つ" },
     "Requiting Hex": { zone: "battlefield", filter: { types: ["Creature"] }, label: "枯朽1：−1/−1カウンターを置くクリーチャー（任意）", min: 0, max: 1 },
     "We Say Thee Nay!": { zone: "battlefield", filter: { types: ["Creature"], untapped: true }, label: "協力2：タップするクリーチャー（任意・合計パワー2以上）", min: 0, max: 99 },
     Countersculpt: { zone: ["hand", "battlefield"], filter: { types: ["Jace"] }, label: "目撃：ジェイスを選ぶ（選ばない場合は追加{1}）", min: 0, max: 1 },
@@ -48,7 +49,9 @@ export function extraFormatCostChoice(state, card, format = {}) {
     "Fanatical Offering": { min: 1 }, "Deadly Dispute": { min: 1 }, "Stir Up Trouble": { min: 0 }
   };
   const d = { zone: "battlefield", filter: { types: ["Artifact", "Creature"] }, max: 1, label: name === "Stir Up Trouble" ? "生け贄（選ばない場合は追加{4}）" : "追加コスト：生け贄にするアーティファクト／クリーチャー", ...definitions[name] };
-  const candidates = engineCandidates(state, d).filter(c => c.card.id !== card.id).map(({ ref, label }) => ({ ref, label }));
+  const candidates = engineCandidates(state, d).filter(c => c.card.id !== card.id)
+    .filter(c => name !== "Demand Answers" || c.ref.zone === "hand" || isType(c.card, "Artifact"))
+    .map(({ ref, label }) => ({ ref, label: name === "Demand Answers" ? `${ref.zone === "hand" ? "捨てる" : "生け贄"}：${label}` : label }));
   if (candidates.length < d.min) throw new Error("追加コストに使えるカードがありません。");
   if (format.cards === undefined) return { optionKey: "format", formatField: "cards", kind: "cards", label: d.label, min: d.min, max: Math.min(d.max, candidates.length), candidates };
   const refs = format.cards;
@@ -74,7 +77,8 @@ export function payFormatExtraCosts(state, card, format = {}) {
     changeLife(state, -format.life);
   }
   for (const r of format.cards || []) {
-    if (name === "Requiting Hex") addGameCounters(state, find(state, r), "-1/-1", 1);
+    if (name === "Demand Answers") move(state, r.id, r.zone || "battlefield", "graveyard", r.zone === "hand" ? "discard" : "sacrifice");
+    else if (name === "Requiting Hex") addGameCounters(state, find(state, r), "-1/-1", 1);
     else if (name === "We Say Thee Nay!") find(state, r).tapped = true;
     else if (name === "Deadly Cover-Up") move(state, r.id, "graveyard", "exile");
     else if (name !== "Countersculpt") move(state, r.id, "battlefield", "graveyard", "sacrifice");

@@ -1,10 +1,10 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo7";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-solo7";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo7";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-solo7";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-solo7";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo7";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-solo7";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo8";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-solo8";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo8";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-solo8";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-solo8";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo8";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-solo8";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -26,6 +26,7 @@ function typeAs(c, type) {
   c.typeLine = type;
 }
 export const FORMAT_PERMANENT_NAMES = new Set([
+  "Death to Our Enemies", "The Fantasticar",
   "Chrome Mox", "Sand Scout", "Orcish Bowmasters", "Tamiyo, Inquisitive Student", "Tamiyo, Seasoned Scholar", "Delver of Secrets", "Sneak Attack", "Emrakul, the Aeons Torn", "Kaito, Bane of Nightmares",
   "Mossborn Hydra", "Sazh's Chocobo", "Mightform Harmonizer", "Icetill Explorer", "Mole Man, Moloid Master", "Sandman, Shifting Scoundrel", "Barrowgoyf",
   "Enduring Curiosity", "Hinterland Sanctifier", "Liliana the Faultless", "Starscape Cleric", "Amalia Benavides Aguirre", "Case of the Uneaten Feast", "Lunar Convocation", "Zoraline, Cosmos Caller", "Enlightened Confidant",
@@ -103,6 +104,8 @@ export function formatPermanentEnter(s, c) {
 }
 export function formatPermanentEvent(s, e, watchers) {
   extensionEvent(s, e);
+  if (e.kind === "counters" && e.name === "plan" && e.count > 0 && e.card.counters.plan - e.count < 4 && e.card.counters.plan >= 4 && active(e.card) && name(e.card) === "Death to Our Enemies")
+    add(s, e.card, "4個目の計画カウンター：生け贄にして7点", [{ op: "fp-enemies-sacrifice" }]);
   if (e.kind === "entered") {
     const entered = e.card;
     for (const c of live(s)) {
@@ -163,6 +166,11 @@ export function formatPermanentCast(s, spell) {
   if (isType(spell, "Creature") && s.rules.kumanoSerial === s.rules.turnSerial) { spell.cast.kumanoCounter = true; delete s.rules.kumanoSerial; }
   if (active(spell) && name(spell) === "Emrakul, the Aeons Torn") add(s, spell, "追加ターン", [{ op: "fp-extra-turn" }]);
   for (const c of live(s)) {
+    if (!isType(spell, "Creature") && name(c) === "Death to Our Enemies") add(s, c, "タップ状態の宝物・計画カウンター", [{ op: "fp-enemies-plan" }]);
+    if (!isType(spell, "Creature") && name(c) === "The Fantasticar") {
+      add(s, c, "ターン終了までクリーチャーにしてもよい", [{ op: "fp-fantasticar-animate" }]);
+      if (s.rules.noncreatureCast === 4) add(s, c, "4つ目の非クリーチャー呪文：構築物4体", [{ op: "fp-fantasticar-sacrifice" }]);
+    }
     if (name(c) === "Hydro-Man, Fluid Felon" && isType(c, "Creature") && gameColors(spell).includes("U")) add(s, c, "青い呪文：＋1/＋1", [{ op: "fp-source-pump", power: 1, toughness: 1 }]);
     if (name(c) === "Colorstorm Stallion" && isType(spell, "Instant|Sorcery")) add(s, c, "＋1/＋1・5マナ以上ならコピー", [{ op: "fp-source-pump", power: 1, toughness: 1 }, ...(spell.cast?.manaSpent >= 5 ? [{ op: "fp-copy-self" }] : [])]);
     if (name(c) === "Ral, Crackling Wit" && !isType(spell, "Creature")) add(s, c, "非クリーチャー呪文：忠誠度＋1", [{ op: "source-counter", name: "loyalty", count: 1 }]);
@@ -364,6 +372,18 @@ export function formatPermanentKeywords(s, c) {
 export function formatPermanentStep(s, c, op) {
   const source = find(s, c.source), t = find(s, c.target);
   switch (op.op) {
+    case "fp-enemies-plan":
+      makeGameToken(s, { ...TOKENS.treasure, tapped: true });
+      if (source) addGameCounters(s, source, "plan", 1);
+      return true;
+    case "fp-enemies-sacrifice":
+      if (source) {
+        move(s, source.id, "battlefield", "graveyard", "effect-sacrifice");
+        queue(s, source, "生け贄にした：7点を1〜2つの対象に配分", [{ op: "divided-damage" }], { targetSpec: { ...damageTarget, count: 2, divideDamage: 7 } });
+      }
+      return true;
+    case "fp-fantasticar-animate": if (source) yesNo(s, c, "ファンタスティカーをターン終了までクリーチャーにしますか？"); return true;
+    case "fp-fantasticar-sacrifice": if (source) yesNo(s, c, "ファンタスティカーを生け贄にして飛行・速攻の4/4構築物4体を出しますか？"); return true;
     case "fp-moloid-mill": yesNo(s, c, "モロイド：1枚切削しますか？"); return true;
     case "fp-sarkhan": if (source) source.temporaryEffects.push({ types: ["Dragon"], keywords: ["flying"], turn: s.turn, label: c.sourceName }); return true;
     case "fp-troll-token": makeGameToken(s, { name: "Troll Warrior", colors: ["G"], typeLine: "Token Creature — Troll Warrior", power: "4", toughness: "4", oracleText: "Trample", tapped: true }); return true;
@@ -528,6 +548,20 @@ export function formatPermanentStep(s, c, op) {
 }
 export function chooseFormatPermanentStep(s, c, op, a) {
   const source = find(s, c.source);
+  if (op.op === "fp-fantasticar-animate") {
+    if (source && a.value === "yes" && !isType(source, "Creature")) {
+      source.animated = { originalTypeLine: source.typeLine };
+      source.typeLine += " Creature"; source.lane = "creature";
+    }
+    return true;
+  }
+  if (op.op === "fp-fantasticar-sacrifice") {
+    if (source && a.value === "yes") {
+      move(s, source.id, "battlefield", "graveyard", "effect-sacrifice");
+      makeGameToken(s, { name: "Construct", typeLine: "Token Artifact Creature — Construct", colors: [], power: "4", toughness: "4", oracleText: "Flying, haste" }, 4);
+    }
+    return true;
+  }
   if (op.op === "fp-moloid-mill") { if (a.value === "yes") insert(c, { op: "mill", count: 1 }); return true; }
   if (op.op === "fp-viper-choice") { if (a.value === "no") changeLife(s, -4, "opponent"); return true; }
   if (op.op === "fp-yuriko") { if (a.value === "surveil") insert(c, ...surveil(2)); else queue(s, source || c.snapshot, "墓地枚数分の−X/−0", [{ op: "fp-yuriko-shrink" }], { targetSpec: { ...creatureTarget, virtualOpponent: true } }); return true; }

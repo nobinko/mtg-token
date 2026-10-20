@@ -1,0 +1,1846 @@
+{
+  "fetchedAt": "2026-10-20T11:56:43.646Z",
+  "source": "Melee public lists selected and played in the deployed app",
+  "decks": [
+    {
+      "rank": 1,
+      "format": "standard",
+      "archetype": "Mono-Red Aggro",
+      "player": "Akira Yamawaki",
+      "url": "https://melee.gg/Decklist/View/0715dbb3-a43f-48b8-92b3-b49f0159a477",
+      "mainboard": [
+        {
+          "name": "Cavern of Souls",
+          "count": 1
+        },
+        {
+          "name": "Lightning Strike",
+          "count": 4
+        },
+        {
+          "name": "The Misty Mountains Cold",
+          "count": 3
+        },
+        {
+          "name": "Burst Lightning",
+          "count": 4
+        },
+        {
+          "name": "Flashback",
+          "count": 2
+        },
+        {
+          "name": "Mountain",
+          "count": 20
+        },
+        {
+          "name": "Demand Answers",
+          "count": 4
+        },
+        {
+          "name": "Plasma Bolt",
+          "count": 4
+        },
+        {
+          "name": "Avengers Disassembled",
+          "count": 3
+        },
+        {
+          "name": "Smaug the Magnificent",
+          "count": 3
+        },
+        {
+          "name": "Death to Our Enemies",
+          "count": 4
+        },
+        {
+          "name": "Vision of Love",
+          "count": 4
+        },
+        {
+          "name": "Boltwave",
+          "count": 4
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Return the Favor",
+          "count": 1
+        },
+        {
+          "name": "Sear",
+          "count": 2
+        },
+        {
+          "name": "Untimely Malfunction",
+          "count": 1
+        },
+        {
+          "name": "Ball Lightning",
+          "count": 1
+        },
+        {
+          "name": "Hexing Squelcher",
+          "count": 2
+        },
+        {
+          "name": "Abrade",
+          "count": 1
+        },
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 1
+        },
+        {
+          "name": "Sunspine Lynx",
+          "count": 4
+        },
+        {
+          "name": "Case of the Crimson Pulse",
+          "count": 1
+        },
+        {
+          "name": "Ghost Vacuum",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "format": "legacy",
+      "archetype": "Sultai Doomsday",
+      "player": "Hiroaki Fukushima",
+      "url": "https://melee.gg/Decklist/View/c0b3e724-4811-42d5-bb06-b4a0001e20c7",
+      "mainboard": [
+        {
+          "name": "Flooded Strand",
+          "count": 1
+        },
+        {
+          "name": "Edge of Autumn",
+          "count": 1
+        },
+        {
+          "name": "Force of Will",
+          "count": 4
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Underground Sea",
+          "count": 4
+        },
+        {
+          "name": "Misty Rainforest",
+          "count": 1
+        },
+        {
+          "name": "Snow-Covered Swamp",
+          "count": 1
+        },
+        {
+          "name": "Lotus Petal",
+          "count": 4
+        },
+        {
+          "name": "Ponder",
+          "count": 4
+        },
+        {
+          "name": "Scalding Tarn",
+          "count": 1
+        },
+        {
+          "name": "Snow-Covered Island",
+          "count": 1
+        },
+        {
+          "name": "Thassa's Oracle",
+          "count": 1
+        },
+        {
+          "name": "Consider",
+          "count": 1
+        },
+        {
+          "name": "Flow State",
+          "count": 3
+        },
+        {
+          "name": "Street Wraith",
+          "count": 1
+        },
+        {
+          "name": "Cavern of Souls",
+          "count": 1
+        },
+        {
+          "name": "Dark Ritual",
+          "count": 4
+        },
+        {
+          "name": "Undercity Sewers",
+          "count": 1
+        },
+        {
+          "name": "The Fantasticar",
+          "count": 4
+        },
+        {
+          "name": "Brainstorm",
+          "count": 4
+        },
+        {
+          "name": "Polluted Delta",
+          "count": 4
+        },
+        {
+          "name": "Doomsday",
+          "count": 4
+        },
+        {
+          "name": "Lion's Eye Diamond",
+          "count": 1
+        },
+        {
+          "name": "Daze",
+          "count": 3
+        },
+        {
+          "name": "Marsh Flats",
+          "count": 1
+        },
+        {
+          "name": "Bloodstained Mire",
+          "count": 1
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Murktide Regent",
+          "count": 2
+        },
+        {
+          "name": "Dauthi Voidwalker",
+          "count": 2
+        },
+        {
+          "name": "Force of Negation",
+          "count": 2
+        },
+        {
+          "name": "Orcish Bowmasters",
+          "count": 2
+        },
+        {
+          "name": "Barrowgoyf",
+          "count": 4
+        },
+        {
+          "name": "Jace, Wielder of Mysteries",
+          "count": 1
+        },
+        {
+          "name": "Engineered Explosives",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "format": "pioneer",
+      "archetype": "Orzhov Greasefang",
+      "player": "OrkishGrill",
+      "url": "https://melee.gg/Decklist/View/444efba3-a50a-496b-91c9-b4d701067fe5",
+      "mainboard": [
+        {
+          "name": "Bleachbone Verge",
+          "count": 2
+        },
+        {
+          "name": "Brightclimb Pathway // Grimclimb Pathway",
+          "count": 2
+        },
+        {
+          "name": "Concealed Courtyard",
+          "count": 4
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "count": 1
+        },
+        {
+          "name": "Fatal Push",
+          "count": 4
+        },
+        {
+          "name": "Fleeting Spirit",
+          "count": 4
+        },
+        {
+          "name": "Geier Reach Sanitarium",
+          "count": 1
+        },
+        {
+          "name": "Godless Shrine",
+          "count": 4
+        },
+        {
+          "name": "Greasefang, Okiba Boss",
+          "count": 4
+        },
+        {
+          "name": "Guardian of New Benalia",
+          "count": 3
+        },
+        {
+          "name": "Iron-Shield Elf",
+          "count": 4
+        },
+        {
+          "name": "Lively Dirge",
+          "count": 1
+        },
+        {
+          "name": "Monument to Endurance",
+          "count": 4
+        },
+        {
+          "name": "Parhelion II",
+          "count": 4
+        },
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Shadowy Backstreet",
+          "count": 2
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "count": 2
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Takenuma, Abandoned Mire",
+          "count": 1
+        },
+        {
+          "name": "The Mycosynth Gardens",
+          "count": 4
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Urborg, Tomb of Yawgmoth",
+          "count": 1
+        },
+        {
+          "name": "Vanishing Verse",
+          "count": 2
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Bitter Triumph",
+          "count": 2
+        },
+        {
+          "name": "Damping Sphere",
+          "count": 1
+        },
+        {
+          "name": "Doorkeeper Thrull",
+          "count": 3
+        },
+        {
+          "name": "Duress",
+          "count": 3
+        },
+        {
+          "name": "Ral Zarek, Guest Lecturer",
+          "count": 2
+        },
+        {
+          "name": "Seam Rip",
+          "count": 1
+        },
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 2
+        },
+        {
+          "name": "Vanishing Verse",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "metadata": [
+    {
+      "name": "Cavern of Souls",
+      "printedName": "Cavern of Souls",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/a/3aad15a2-8a1b-4460-9b06-e85863081878.jpg?1783913719",
+      "oracleText": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Cavern of Souls"
+    },
+    {
+      "name": "Lightning Strike",
+      "printedName": "Lightning Strike",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/8/88b13bc0-da54-4c3b-917c-7c8345a329f5.jpg?1783902927",
+      "oracleText": "Lightning Strike deals 3 damage to any target.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Lightning Strike"
+    },
+    {
+      "name": "The Misty Mountains Cold",
+      "printedName": "The Misty Mountains Cold",
+      "language": "en",
+      "typeLine": "Enchantment — Saga",
+      "layout": "saga",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/d/3d5f35ff-4146-4844-9da5-031461cc8c05.jpg?1784673451",
+      "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)\nI, II, III, IV — Create a Treasure token. Then if you control four or more Treasures, sacrifice this Saga. If you do, create a 6/6 red Dragon creature token with flying. (A Treasure token is an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+      "manaCost": "{2}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Misty Mountains Cold"
+    },
+    {
+      "name": "Burst Lightning",
+      "printedName": "Burst Lightning",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/e/aec5d380-d354-4750-931a-6c91853e2edc.jpg?1783909068",
+      "oracleText": "Kicker {4} (You may pay an additional {4} as you cast this spell.)\nBurst Lightning deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Burst Lightning"
+    },
+    {
+      "name": "Flashback",
+      "printedName": "Flashback",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/b/1b832fda-d7c4-4566-884c-2a8b6da15488.jpg?1783903669",
+      "oracleText": "Target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to its mana cost. (You may cast that card from your graveyard for its flashback cost. Then exile it.)",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Flashback"
+    },
+    {
+      "name": "Mountain",
+      "printedName": "Mountain",
+      "language": "en",
+      "typeLine": "Basic Land — Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/5/85177bd7-6c50-48da-b692-ae5fe7bd357c.jpg?1791578439",
+      "oracleText": "({T}: Add {R}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Mountain"
+    },
+    {
+      "name": "Demand Answers",
+      "printedName": "Demand Answers",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/c/eca092fc-7c67-4a73-989e-5297bbaaea76.jpg?1783912883",
+      "oracleText": "As an additional cost to cast this spell, sacrifice an artifact or discard a card.\nDraw two cards.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Demand Answers"
+    },
+    {
+      "name": "Plasma Bolt",
+      "printedName": "Plasma Bolt",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/1/a1a1834b-76c2-4496-b8c5-18b69ab34c4c.jpg?1783905948",
+      "oracleText": "Plasma Bolt deals 2 damage to any target.\nVoid — Plasma Bolt deals 3 damage instead if a nonland permanent left the battlefield this turn or a spell was warped this turn.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Plasma Bolt"
+    },
+    {
+      "name": "Avengers Disassembled",
+      "printedName": "Avengers Disassembled",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/2/72d3e750-870b-497d-80d7-e3df097db554.jpg?1783902933",
+      "oracleText": "Choose one or both —\n• Avengers Disassembled deals 3 damage to each creature.\n• Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+      "manaCost": "{1}{R}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Avengers Disassembled"
+    },
+    {
+      "name": "Smaug the Magnificent",
+      "printedName": "Smaug the Magnificent",
+      "language": "en",
+      "typeLine": "Legendary Creature — Dragon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/a/6a5d8fad-2ffd-4645-8c49-907999b6cecf.jpg?1783902784",
+      "oracleText": "Flying, haste\nWhenever Smaug attacks, he deals damage equal to the number of Treasures you control to any target.\nAt the beginning of your upkeep, create a Treasure token.",
+      "manaCost": "{2}{R}{R}",
+      "power": "4",
+      "toughness": "3",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Smaug the Magnificent"
+    },
+    {
+      "name": "Death to Our Enemies",
+      "printedName": "Death to Our Enemies",
+      "language": "en",
+      "typeLine": "Enchantment — Plan",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/2/f2a8f518-c0b5-4e15-aab2-49b5ef29fb41.jpg?1783902933",
+      "oracleText": "Whenever you cast a noncreature spell, create a tapped Treasure token and put a plan counter on this enchantment.\nWhen the fourth plan counter is put on this enchantment, sacrifice it. When you do, it deals 7 damage divided as you choose among one or two targets.",
+      "manaCost": "{2}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Death to Our Enemies"
+    },
+    {
+      "name": "Vision of Love",
+      "printedName": "Vision of Love",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/6/5604cee1-a2ea-48ed-88f4-6878bd053fc8.jpg?1783902922",
+      "oracleText": "You may sacrifice an artifact or discard a card. If you do, draw two cards.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Vision of Love"
+    },
+    {
+      "name": "Boltwave",
+      "printedName": "Boltwave",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/d/8d1ec351-5e70-4eb2-b590-6bff94ef8178.jpg?1783909105",
+      "oracleText": "Boltwave deals 3 damage to each opponent.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Boltwave"
+    },
+    {
+      "name": "Return the Favor",
+      "printedName": "Return the Favor",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/9/a9cc02d1-799d-42aa-9bc2-4c05452b63b4.jpg?1783911816",
+      "oracleText": "Spree (Choose one or more additional costs.)\n+ {1} — Copy target instant spell, sorcery spell, activated ability, or triggered ability. You may choose new targets for the copy.\n+ {1} — Change the target of target spell or ability with a single target.",
+      "manaCost": "{R}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Return the Favor"
+    },
+    {
+      "name": "Sear",
+      "printedName": "Sear",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/e/aeb4612c-758b-4492-ba03-eb6741b4176e.jpg?1783904441",
+      "oracleText": "Sear deals 4 damage to target creature or planeswalker.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sear"
+    },
+    {
+      "name": "Untimely Malfunction",
+      "printedName": "Untimely Malfunction",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/5/857bfb0e-17dc-4dda-bc37-3df927a9eae6.jpg?1783909463",
+      "oracleText": "Choose one —\n• Destroy target artifact.\n• Change the target of target spell or ability with a single target.\n• One or two target creatures can't block this turn.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Untimely Malfunction"
+    },
+    {
+      "name": "Ball Lightning",
+      "printedName": "Ball Lightning",
+      "language": "en",
+      "typeLine": "Creature — Elemental",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/f/5f27dbf0-6818-40ea-832d-10686b4c2900.jpg?1783908925",
+      "oracleText": "Trample (This creature can deal excess combat damage to the player or planeswalker it's attacking.)\nHaste (This creature can attack and {T} as soon as it comes under your control.)\nAt the beginning of the end step, sacrifice this creature.",
+      "manaCost": "{R}{R}{R}",
+      "power": "6",
+      "toughness": "1",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ball Lightning"
+    },
+    {
+      "name": "Hexing Squelcher",
+      "printedName": "Hexing Squelcher",
+      "language": "en",
+      "typeLine": "Creature — Goblin Sorcerer",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/7/674960ce-ff33-4d5e-a24a-a4582b2e9809.jpg?1783904442",
+      "oracleText": "This spell can't be countered.\nWard—Pay 2 life.\nSpells you control can't be countered.\nOther creatures you control have \"Ward—Pay 2 life.\"",
+      "manaCost": "{1}{R}",
+      "power": "2",
+      "toughness": "2",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Hexing Squelcher"
+    },
+    {
+      "name": "Abrade",
+      "printedName": "Abrade",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/a/1add1757-c1f8-448a-b279-c6940fb7ad5f.jpg?1783903778",
+      "oracleText": "Choose one —\n• Abrade deals 3 damage to target creature.\n• Destroy target artifact.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Abrade"
+    },
+    {
+      "name": "Soul-Guide Lantern",
+      "printedName": "Soul-Guide Lantern",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/4/f4907e7b-d6d5-4e9b-968f-bce34ae4a577.jpg?1783906018",
+      "oracleText": "When this artifact enters, exile target card from a graveyard.\n{T}, Sacrifice this artifact: Exile each opponent's graveyard.\n{1}, {T}, Sacrifice this artifact: Draw a card.",
+      "manaCost": "{1}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Soul-Guide Lantern"
+    },
+    {
+      "name": "Sunspine Lynx",
+      "printedName": "Sunspine Lynx",
+      "language": "en",
+      "typeLine": "Creature — Elemental Cat",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/9/8995ceaf-b7e0-423c-8f3e-25212d522502.jpg?1783910815",
+      "oracleText": "Players can't gain life.\nDamage can't be prevented.\nWhen this creature enters, it deals damage to each player equal to the number of nonbasic lands that player controls.",
+      "manaCost": "{2}{R}{R}",
+      "power": "5",
+      "toughness": "4",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sunspine Lynx"
+    },
+    {
+      "name": "Case of the Crimson Pulse",
+      "printedName": "Case of the Crimson Pulse",
+      "language": "en",
+      "typeLine": "Enchantment — Case",
+      "layout": "case",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/b/bb18b1de-bc08-4522-b891-6117a8271534.jpg?1783912887",
+      "oracleText": "When this Case enters, discard a card, then draw two cards.\nTo solve — You have no cards in hand. (If unsolved, solve at the beginning of your end step.)\nSolved — At the beginning of your upkeep, discard your hand, then draw two cards.",
+      "manaCost": "{2}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Case of the Crimson Pulse"
+    },
+    {
+      "name": "Ghost Vacuum",
+      "printedName": "Ghost Vacuum",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/a/8ac39c01-127f-4471-bc74-11a90c48e306.jpg?1783909433",
+      "oracleText": "{T}: Exile target card from a graveyard.\n{6}, {T}, Sacrifice this artifact: Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it. Each of them is a 1/1 Spirit in addition to its other types. Activate only as a sorcery.",
+      "manaCost": "{1}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ghost Vacuum"
+    },
+    {
+      "name": "Flooded Strand",
+      "printedName": "Flooded Strand",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/f/8f85e12c-196b-4459-b81f-0c9c854e9f57.jpg?1783911240",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Flooded Strand"
+    },
+    {
+      "name": "Edge of Autumn",
+      "printedName": "Edge of Autumn",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/c/1c72229c-f3da-4e35-af79-14452efe581b.jpg?1783927783",
+      "oracleText": "If you control four or fewer lands, search your library for a basic land card, put it onto the battlefield tapped, then shuffle.\nCycling—Sacrifice a land. (Sacrifice a land, Discard this card: Draw a card.)",
+      "manaCost": "{1}{G}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "G"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Edge of Autumn"
+    },
+    {
+      "name": "Force of Will",
+      "printedName": "Force of Will",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/9/89f612d6-7c59-4a7b-a87d-45f789e88ba5.jpg?1789015964",
+      "oracleText": "You may pay 1 life and exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target spell.",
+      "manaCost": "{3}{U}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Force of Will"
+    },
+    {
+      "name": "Thoughtseize",
+      "printedName": "Thoughtseize",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/2/b281a308-ab6b-47b6-bec7-632c9aaecede.jpg?1783930173",
+      "oracleText": "Target player reveals their hand. You choose a nonland card from it. That player discards that card. You lose 2 life.",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Thoughtseize"
+    },
+    {
+      "name": "Underground Sea",
+      "printedName": "Underground Sea",
+      "language": "en",
+      "typeLine": "Land — Island Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/6/26cee543-6eab-494e-a803-33a5d48d7d74.jpg?1783939214",
+      "oracleText": "({T}: Add {U} or {B}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Underground Sea"
+    },
+    {
+      "name": "Misty Rainforest",
+      "printedName": "Misty Rainforest",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/8/88231c0d-0cc8-44ec-bf95-81d1710ac141.jpg?1783926795",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Misty Rainforest"
+    },
+    {
+      "name": "Snow-Covered Swamp",
+      "printedName": "Snow-Covered Swamp",
+      "language": "en",
+      "typeLine": "Basic Snow Land — Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/a/6aa85af8-15f5-4620-8aea-0b45c28372ed.jpg?1783928166",
+      "oracleText": "({T}: Add {B}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Snow-Covered Swamp"
+    },
+    {
+      "name": "Lotus Petal",
+      "printedName": "Lotus Petal",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/8/f85ab5f9-508e-45de-8fa1-ce1f16552ffc.jpg?1783938446",
+      "oracleText": "{T}, Sacrifice this artifact: Add one mana of any color.",
+      "manaCost": "{0}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Lotus Petal"
+    },
+    {
+      "name": "Ponder",
+      "printedName": "Ponder",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/c/dc69f960-68ba-4315-8146-6a7a82047503.jpg?1783907102",
+      "oracleText": "Look at the top three cards of your library, then put them back in any order. You may shuffle.\nDraw a card.",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ponder"
+    },
+    {
+      "name": "Scalding Tarn",
+      "printedName": "Scalding Tarn",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/1/71e491c5-8c07-449b-b2f1-ffa052e6d311.jpg?1783926793",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Mountain card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Scalding Tarn"
+    },
+    {
+      "name": "Snow-Covered Island",
+      "printedName": "Snow-Covered Island",
+      "language": "en",
+      "typeLine": "Basic Snow Land — Island",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/b/3bfa5ebc-5623-4eec-89ea-dc187489ee4a.jpg?1783928167",
+      "oracleText": "({T}: Add {U}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Snow-Covered Island"
+    },
+    {
+      "name": "Thassa's Oracle",
+      "printedName": "Thassa's Oracle",
+      "language": "en",
+      "typeLine": "Creature — Merfolk Wizard",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/2/726e8b29-13e9-4138-b6a9-d2a0d8188d1c.jpg?1783931575",
+      "oracleText": "When this creature enters, look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your library and the rest on the bottom of your library in a random order. If X is greater than or equal to the number of cards in your library, you win the game. (Each {U} in the mana costs of permanents you control counts toward your devotion to blue.)",
+      "manaCost": "{U}{U}",
+      "power": "1",
+      "toughness": "3",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Thassa's Oracle"
+    },
+    {
+      "name": "Consider",
+      "printedName": "Consider",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/f/4f28e706-c488-4525-ad8a-977a5fa77f80.jpg?1783904806",
+      "oracleText": "Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)\nDraw a card.",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Consider"
+    },
+    {
+      "name": "Flow State",
+      "printedName": "Flow State",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/7/47d6093b-b1b6-4956-8bfd-02cce899f832.jpg?1783903694",
+      "oracleText": "Look at the top three cards of your library. Put one of them into your hand and the rest on the bottom of your library in any order. If there is an instant card and a sorcery card in your graveyard, instead put two of them into your hand and the rest on the bottom of your library in any order.",
+      "manaCost": "{1}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Flow State"
+    },
+    {
+      "name": "Street Wraith",
+      "printedName": "Street Wraith",
+      "language": "en",
+      "typeLine": "Creature — Wraith",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/d/5d09cc57-2275-4b6b-aaf6-a6d781cd9365.jpg?1783918471",
+      "oracleText": "Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)\nCycling—Pay 2 life. (Pay 2 life, Discard this card: Draw a card.)",
+      "manaCost": "{3}{B}{B}",
+      "power": "3",
+      "toughness": "4",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Street Wraith"
+    },
+    {
+      "name": "Dark Ritual",
+      "printedName": "Dark Ritual",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/1/11e12a84-e7be-4afc-a230-c2e644743fa8.jpg?1783903013",
+      "oracleText": "Add {B}{B}{B}.",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Dark Ritual"
+    },
+    {
+      "name": "Undercity Sewers",
+      "printedName": "Undercity Sewers",
+      "language": "en",
+      "typeLine": "Land — Island Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/b/2b5801fb-2026-4f25-98bc-ebb2f99684b9.jpg?1786507741",
+      "oracleText": "({T}: Add {U} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Undercity Sewers"
+    },
+    {
+      "name": "The Fantasticar",
+      "printedName": "The Fantasticar",
+      "language": "en",
+      "typeLine": "Legendary Artifact — Vehicle",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/d/ed0beb69-8441-4104-9990-81bd82f81f9a.jpg?1786399169",
+      "oracleText": "Flying\nWhenever you cast a noncreature spell, you may have The Fantasticar become an artifact creature until end of turn.\nWhenever you cast your fourth noncreature spell each turn, you may sacrifice The Fantasticar. If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste.",
+      "manaCost": "{3}",
+      "power": "4",
+      "toughness": "4",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Fantasticar"
+    },
+    {
+      "name": "Brainstorm",
+      "printedName": "Brainstorm",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/c/ec7d6864-7b6b-4f74-8474-9b9ec96b1d33.jpg?1789599806",
+      "oracleText": "Draw three cards, then put two cards from your hand on top of your library in any order.",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Brainstorm"
+    },
+    {
+      "name": "Polluted Delta",
+      "printedName": "Polluted Delta",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/e/6e288374-2b71-4ace-b1d2-a19fee6cb4af.jpg?1783911240",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for an Island or Swamp card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Polluted Delta"
+    },
+    {
+      "name": "Doomsday",
+      "printedName": "Doomsday",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/2/72cd296e-e550-46bf-9378-586a24c9b2a7.jpg?1783903013",
+      "oracleText": "Search your library and graveyard for five cards and exile the rest. Put the chosen cards on top of your library in any order. You lose half your life, rounded up.",
+      "manaCost": "{B}{B}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Doomsday"
+    },
+    {
+      "name": "Lion's Eye Diamond",
+      "printedName": "Lion's Eye Diamond",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/5/758f95f8-bcb0-43ae-b474-56ebd855951e.jpg?1783939234",
+      "oracleText": "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant.",
+      "manaCost": "{0}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Lion's Eye Diamond"
+    },
+    {
+      "name": "Daze",
+      "printedName": "Daze",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/0/f05e9a3e-8a35-4687-85cb-e31b3927a5e2.jpg?1783937617",
+      "oracleText": "You may return an Island you control to its owner's hand rather than pay this spell's mana cost.\nCounter target spell unless its controller pays {1}.",
+      "manaCost": "{1}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Daze"
+    },
+    {
+      "name": "Marsh Flats",
+      "printedName": "Marsh Flats",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/d/9db3ba6d-eb7f-4f5b-9a3b-c6239c3baa42.jpg?1783926796",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Marsh Flats"
+    },
+    {
+      "name": "Bloodstained Mire",
+      "printedName": "Bloodstained Mire",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/7/579743fe-f71e-4cb2-8629-d6b02ed1591d.jpg?1783911241",
+      "oracleText": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Bloodstained Mire"
+    },
+    {
+      "name": "Murktide Regent",
+      "printedName": "Murktide Regent",
+      "language": "en",
+      "typeLine": "Creature — Dragon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/0/20c4aae1-7665-4df7-bd51-a1d95bf8a17d.jpg?1783926875",
+      "oracleText": "Delve (Each card you exile from your graveyard while casting this spell pays for {1}.)\nFlying\nThis creature enters with a +1/+1 counter on it for each instant and sorcery card exiled with it.\nWhenever an instant or sorcery card leaves your graveyard, put a +1/+1 counter on this creature.",
+      "manaCost": "{5}{U}{U}",
+      "power": "3",
+      "toughness": "3",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Murktide Regent"
+    },
+    {
+      "name": "Dauthi Voidwalker",
+      "printedName": "Dauthi Voidwalker",
+      "language": "en",
+      "typeLine": "Creature — Dauthi Rogue",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/5/3573b9a2-7911-475c-8ae7-25bd0dbb7159.jpg?1783907090",
+      "oracleText": "Shadow (This creature can block or be blocked by only creatures with shadow.)\nIf a card would be put into an opponent's graveyard from anywhere, instead exile it with a void counter on it.\n{T}, Sacrifice this creature: Choose an exiled card an opponent owns with a void counter on it. You may play it this turn without paying its mana cost.",
+      "manaCost": "{B}{B}",
+      "power": "3",
+      "toughness": "2",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Dauthi Voidwalker"
+    },
+    {
+      "name": "Force of Negation",
+      "printedName": "Force of Negation",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/8/1825a719-1b2a-4af9-9cd2-7cb497cd0317.jpg?1783921916",
+      "oracleText": "If it's not your turn, you may exile a blue card from your hand rather than pay this spell's mana cost.\nCounter target noncreature spell. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.",
+      "manaCost": "{1}{U}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Force of Negation"
+    },
+    {
+      "name": "Orcish Bowmasters",
+      "printedName": "Orcish Bowmasters",
+      "language": "en",
+      "typeLine": "Creature — Orc Archer",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/c/7c024bae-5631-4e20-ac69-df392ac9e109.jpg?1783916299",
+      "oracleText": "Flash\nWhen this creature enters and whenever an opponent draws a card except the first one they draw in each of their draw steps, this creature deals 1 damage to any target. Then amass Orcs 1.",
+      "manaCost": "{1}{B}",
+      "power": "1",
+      "toughness": "1",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Orcish Bowmasters"
+    },
+    {
+      "name": "Barrowgoyf",
+      "printedName": "Barrowgoyf",
+      "language": "en",
+      "typeLine": "Creature — Lhurgoyf",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/c/fcf0c46b-a37c-4475-99a1-bff6bc0cf2db.jpg?1787681617",
+      "oracleText": "Deathtouch, lifelink\nBarrowgoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.\nWhenever this creature deals combat damage to a player, you may mill that many cards. If you do, you may put a creature card from among them into your hand.",
+      "manaCost": "{2}{B}",
+      "power": "*",
+      "toughness": "1+*",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Barrowgoyf"
+    },
+    {
+      "name": "Jace, Wielder of Mysteries",
+      "printedName": "Jace, Wielder of Mysteries",
+      "language": "en",
+      "typeLine": "Legendary Planeswalker — Jace",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/a/6adb7d73-4482-4930-8497-cffd169b57e2.jpg?1783933463",
+      "oracleText": "If you would draw a card while your library has no cards in it, you win the game instead.\n+1: Target player mills two cards. Draw a card.\n−8: Draw seven cards. Then if your library has no cards in it, you win the game.",
+      "manaCost": "{1}{U}{U}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "4",
+      "faces": [],
+      "requestedName": "Jace, Wielder of Mysteries"
+    },
+    {
+      "name": "Engineered Explosives",
+      "printedName": "Engineered Explosives",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/2/420bf1e9-f2ec-4dff-b540-e64de71e58be.jpg?1783930110",
+      "oracleText": "Sunburst (This artifact enters with a charge counter on it for each color of mana spent to cast it.)\n{2}, Sacrifice this artifact: Destroy each nonland permanent with mana value equal to the number of charge counters on this artifact.",
+      "manaCost": "{X}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Engineered Explosives"
+    },
+    {
+      "name": "Bleachbone Verge",
+      "printedName": "Bleachbone Verge",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/2/52dcdabd-a186-45fe-9fee-6c0f1afeaf16.jpg?1783907843",
+      "oracleText": "{T}: Add {B}.\n{T}: Add {W}. Activate only if you control a Plains or a Swamp.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Bleachbone Verge"
+    },
+    {
+      "name": "Brightclimb Pathway // Grimclimb Pathway",
+      "printedName": "Brightclimb Pathway // Grimclimb Pathway",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "modal_dfc",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.jpg?1783929313",
+      "oracleText": "{T}: Add {W}.\n\n{T}: Add {B}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [
+        {
+          "name": "Brightclimb Pathway",
+          "printedName": "Brightclimb Pathway",
+          "typeLine": "Land",
+          "oracleText": "{T}: Add {W}.",
+          "manaCost": "",
+          "imageUrl": "https://cards.scryfall.io/normal/front/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.jpg?1783929313",
+          "power": "",
+          "toughness": "",
+          "colors": [],
+          "loyalty": ""
+        },
+        {
+          "name": "Grimclimb Pathway",
+          "printedName": "Grimclimb Pathway",
+          "typeLine": "Land",
+          "oracleText": "{T}: Add {B}.",
+          "manaCost": "",
+          "imageUrl": "https://cards.scryfall.io/normal/back/d/2/d24c3d51-795d-4c01-a34a-3280fccd2d78.jpg?1783929313",
+          "power": "",
+          "toughness": "",
+          "colors": [],
+          "loyalty": ""
+        }
+      ],
+      "requestedName": "Brightclimb Pathway // Grimclimb Pathway"
+    },
+    {
+      "name": "Concealed Courtyard",
+      "printedName": "Concealed Courtyard",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/7/b75df1f0-0513-40e4-a449-454f75de6434.jpg?1783911773",
+      "oracleText": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {W} or {B}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Concealed Courtyard"
+    },
+    {
+      "name": "Eiganjo, Seat of the Empire",
+      "printedName": "Eiganjo, Seat of the Empire",
+      "language": "en",
+      "typeLine": "Legendary Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/c/3/c375a022-5b57-496d-a802-e4ea8376e9e4.jpg?1783923818",
+      "oracleText": "{T}: Add {W}.\nChannel — {2}{W}, Discard this card: It deals 4 damage to target attacking or blocking creature. This ability costs {1} less to activate for each legendary creature you control.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Eiganjo, Seat of the Empire"
+    },
+    {
+      "name": "Fatal Push",
+      "printedName": "Fatal Push",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/e/6e9d8fe4-fd9b-4923-92bf-7dd6b8fa02e7.jpg?1783930180",
+      "oracleText": "Destroy target creature if it has mana value 2 or less.\nRevolt — Destroy that creature if it has mana value 4 or less instead if a permanent left the battlefield under your control this turn.",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Fatal Push"
+    },
+    {
+      "name": "Fleeting Spirit",
+      "printedName": "Fleeting Spirit",
+      "language": "en",
+      "typeLine": "Creature — Spirit",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/b/db9d80f7-9742-4437-a9f4-6717a678f935.jpg?1783924922",
+      "oracleText": "{W}, Exile three cards from your graveyard: This creature gains first strike until end of turn.\nDiscard a card: Exile this creature. Return it to the battlefield under its owner's control at the beginning of the next end step.",
+      "manaCost": "{1}{W}",
+      "power": "3",
+      "toughness": "1",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Fleeting Spirit"
+    },
+    {
+      "name": "Geier Reach Sanitarium",
+      "printedName": "Geier Reach Sanitarium",
+      "language": "en",
+      "typeLine": "Legendary Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/b/4b9c92f0-4242-4a3e-9ede-6a4935f5c75d.jpg?1783913830",
+      "oracleText": "{T}: Add {C}.\n{2}, {T}: Each player draws a card, then discards a card.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Geier Reach Sanitarium"
+    },
+    {
+      "name": "Godless Shrine",
+      "printedName": "Godless Shrine",
+      "language": "en",
+      "typeLine": "Land — Plains Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/f/8fbd1ae0-3d4c-492a-a1ea-85a95fa3d7b6.jpg?1784036826",
+      "oracleText": "({T}: Add {W} or {B}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Godless Shrine"
+    },
+    {
+      "name": "Greasefang, Okiba Boss",
+      "printedName": "Greasefang, Okiba Boss",
+      "language": "en",
+      "typeLine": "Legendary Creature — Rat Pilot",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/6/56a0d43b-4d38-40a7-be6c-8324ab3bf773.jpg?1783923836",
+      "oracleText": "At the beginning of combat on your turn, return target Vehicle card from your graveyard to the battlefield. It gains haste. Return it to its owner's hand at the beginning of your next end step.",
+      "manaCost": "{1}{W}{B}",
+      "power": "4",
+      "toughness": "3",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Greasefang, Okiba Boss"
+    },
+    {
+      "name": "Guardian of New Benalia",
+      "printedName": "Guardian of New Benalia",
+      "language": "en",
+      "typeLine": "Creature — Human Soldier",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/3/43da76ee-fec3-4b2e-915d-10cf8d518d2c.jpg?1783921365",
+      "oracleText": "Enlist (As this creature attacks, you may tap a nonattacking creature you control without summoning sickness. When you do, add its power to this creature's until end of turn.)\nWhenever this creature enlists a creature, scry 2.\nDiscard a card: This creature gains indestructible until end of turn. Tap it.",
+      "manaCost": "{1}{W}",
+      "power": "2",
+      "toughness": "2",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Guardian of New Benalia"
+    },
+    {
+      "name": "Iron-Shield Elf",
+      "printedName": "Iron-Shield Elf",
+      "language": "en",
+      "typeLine": "Creature — Elf Warrior",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/e/9e0140b2-0185-4adb-b365-2611ce89a0e2.jpg?1783904461",
+      "oracleText": "Discard a card: This creature gains indestructible until end of turn. Tap it. (Damage and effects that say \"destroy\" don't destroy it. If its toughness is 0 or less, it still dies.)",
+      "manaCost": "{1}{B}",
+      "power": "3",
+      "toughness": "1",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Iron-Shield Elf"
+    },
+    {
+      "name": "Lively Dirge",
+      "printedName": "Lively Dirge",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/c/0c35a0d3-12f7-46f3-a6b3-02a490d45ca0.jpg?1783911831",
+      "oracleText": "Spree (Choose one or more additional costs.)\n+ {1} — Search your library for a card, put it into your graveyard, then shuffle.\n+ {2} — Return up to two creature cards with total mana value 4 or less from your graveyard to the battlefield.",
+      "manaCost": "{1}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Lively Dirge"
+    },
+    {
+      "name": "Monument to Endurance",
+      "printedName": "Monument to Endurance",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/2/d21433ba-0a14-42bc-ad0b-a4ef823a3295.jpg?1783907848",
+      "oracleText": "Whenever you discard a card, choose one that hasn't been chosen this turn —\n• Draw a card.\n• Create a Treasure token.\n• Each opponent loses 3 life.",
+      "manaCost": "{3}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Monument to Endurance"
+    },
+    {
+      "name": "Parhelion II",
+      "printedName": "Parhelion II",
+      "language": "en",
+      "typeLine": "Legendary Artifact — Vehicle",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/7/871279e6-9a59-470e-8acc-fd5fe4fda5b3.jpg?1783923965",
+      "oracleText": "Flying, first strike, vigilance\nWhenever Parhelion II attacks, create two 4/4 white Angel creature tokens with flying and vigilance that are attacking.\nCrew 4 (Tap any number of creatures you control with total power 4 or more: This Vehicle becomes an artifact creature until end of turn.)",
+      "manaCost": "{6}{W}{W}",
+      "power": "5",
+      "toughness": "5",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Parhelion II"
+    },
+    {
+      "name": "Plains",
+      "printedName": "Plains",
+      "language": "en",
+      "typeLine": "Basic Land — Plains",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/9/09ac862f-0a51-44dd-b86f-9412b8218b13.jpg?1791578423",
+      "oracleText": "({T}: Add {W}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Plains"
+    },
+    {
+      "name": "Shadowy Backstreet",
+      "printedName": "Shadowy Backstreet",
+      "language": "en",
+      "typeLine": "Land — Plains Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/9/69c1b656-1d67-499c-bf0f-417682a86c7d.jpg?1783912827",
+      "oracleText": "({T}: Add {W} or {B}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Shadowy Backstreet"
+    },
+    {
+      "name": "Sheltered by Ghosts",
+      "printedName": "Sheltered by Ghosts",
+      "language": "en",
+      "typeLine": "Enchantment — Aura",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/e/8e8a5cfe-1b3f-4414-b9a4-078bdb4072a7.jpg?1783903800",
+      "oracleText": "Enchant creature you control\nWhen this Aura enters, exile target nonland permanent an opponent controls until this Aura leaves the battlefield.\nEnchanted creature gets +1/+0 and has lifelink and ward {2}.",
+      "manaCost": "{1}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sheltered by Ghosts"
+    },
+    {
+      "name": "Swamp",
+      "printedName": "Swamp",
+      "language": "en",
+      "typeLine": "Basic Land — Swamp",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/2/b233b117-9369-45c1-80c5-cc857386b6be.jpg?1791578437",
+      "oracleText": "({T}: Add {B}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Swamp"
+    },
+    {
+      "name": "Takenuma, Abandoned Mire",
+      "printedName": "Takenuma, Abandoned Mire",
+      "language": "en",
+      "typeLine": "Legendary Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/9/499037cc-a577-41cb-8ca2-5e117945634f.jpg?1783923812",
+      "oracleText": "{T}: Add {B}.\nChannel — {3}{B}, Discard this card: Mill three cards, then return a creature or planeswalker card from your graveyard to your hand. This ability costs {1} less to activate for each legendary creature you control.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Takenuma, Abandoned Mire"
+    },
+    {
+      "name": "The Mycosynth Gardens",
+      "printedName": "The Mycosynth Gardens",
+      "language": "en",
+      "typeLine": "Land — Sphere",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/a/0a6f0408-6758-495f-9d6c-7686a1542fbd.jpg?1783906009",
+      "oracleText": "{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\n{X}, {T}: This land becomes a copy of target nontoken artifact you control with mana value X.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Mycosynth Gardens"
+    },
+    {
+      "name": "Urborg, Tomb of Yawgmoth",
+      "printedName": "Urborg, Tomb of Yawgmoth",
+      "language": "en",
+      "typeLine": "Legendary Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/e/9e1a9e38-6ffc-490f-b0be-23ba4e8204c6.jpg?1783927747",
+      "oracleText": "Each land is a Swamp in addition to its other land types.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Urborg, Tomb of Yawgmoth"
+    },
+    {
+      "name": "Vanishing Verse",
+      "printedName": "Vanishing Verse",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/a/8a475868-a335-45e7-9d59-9dc4c2cea1ae.jpg?1783903743",
+      "oracleText": "Exile target monocolored permanent.",
+      "manaCost": "{W}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Vanishing Verse"
+    },
+    {
+      "name": "Bitter Triumph",
+      "printedName": "Bitter Triumph",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/c/5/c5333556-eea2-41ae-833e-007b9d540700.jpg?1783907094",
+      "oracleText": "As an additional cost to cast this spell, discard a card or pay 3 life.\nDestroy target creature or planeswalker.",
+      "manaCost": "{1}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Bitter Triumph"
+    },
+    {
+      "name": "Damping Sphere",
+      "printedName": "Damping Sphere",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/5/550860b4-887d-423a-8add-816c2a8da615.jpg?1783918418",
+      "oracleText": "If a land is tapped for two or more mana, it produces {C} instead of any other type and amount.\nEach spell a player casts costs {1} more to cast for each other spell that player has cast this turn.",
+      "manaCost": "{2}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Damping Sphere"
+    },
+    {
+      "name": "Doorkeeper Thrull",
+      "printedName": "Doorkeeper Thrull",
+      "language": "en",
+      "typeLine": "Creature — Thrull",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/0/80a1cd28-d2a5-4d1a-aa03-a6a5958ae432.jpg?1783912925",
+      "oracleText": "Flash\nFlying\nArtifacts and creatures entering don't cause abilities to trigger.",
+      "manaCost": "{1}{W}",
+      "power": "1",
+      "toughness": "2",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Doorkeeper Thrull"
+    },
+    {
+      "name": "Duress",
+      "printedName": "Duress",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/4/34c3a894-ee75-4db9-a69f-711bb3cc150a.jpg?1783908930",
+      "oracleText": "Target opponent reveals their hand. You choose a noncreature, nonland card from it. That player discards that card.",
+      "manaCost": "{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Duress"
+    },
+    {
+      "name": "Ral Zarek, Guest Lecturer",
+      "printedName": "Ral Zarek, Guest Lecturer",
+      "language": "en",
+      "typeLine": "Legendary Planeswalker — Ral",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/f/8fbad757-4081-42f7-a460-68ac03e77510.jpg?1789568347",
+      "oracleText": "+1: Surveil 2.\n−1: Any number of target players each discard a card.\n−2: Return target creature card with mana value 3 or less from your graveyard to the battlefield.\n−7: Flip five coins. Target opponent skips their next X turns, where X is the number of coins that came up heads.",
+      "manaCost": "{1}{B}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "3",
+      "faces": [],
+      "requestedName": "Ral Zarek, Guest Lecturer"
+    },
+    {
+      "name": "Seam Rip",
+      "printedName": "Seam Rip",
+      "language": "en",
+      "typeLine": "Enchantment",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/d/9d298847-2d02-4593-b4d3-c5b722edac1e.jpg?1783905989",
+      "oracleText": "When this enchantment enters, exile target nonland permanent an opponent controls with mana value 2 or less until this enchantment leaves the battlefield.",
+      "manaCost": "{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Seam Rip"
+    }
+  ]
+}

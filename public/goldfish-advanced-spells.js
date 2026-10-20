@@ -1,9 +1,9 @@
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo7";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-solo7";
-import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261020-solo7";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo7";
-import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo7";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261020-solo7";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo8";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-solo8";
+import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261020-solo8";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo8";
+import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo8";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261020-solo8";
 
 const put = (ctx, ...ops) => ctx.steps.splice(ctx.step + 1, 0, ...ops);
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };
@@ -13,6 +13,10 @@ const spell = { zone: "stack", spell: true, virtualOpponent: true };
 const damageTarget = { ...creature, types: ["Creature", "Planeswalker", "Battle"], players: true };
 const player = { zone: "none", players: true };
 const spree = {
+  "Avengers Disassembled": [
+    { label: "全クリーチャーに3点", cost: "", effect: "avengers-sweep" },
+    { label: "土地を破壊・基本土地をタップ状態で探してもよい", cost: "", spec: { zone: "battlefield", types: ["Land"], virtualOpponent: true }, effect: "avengers-land" }
+  ],
   "Three Steps Ahead": [
     { label: "打ち消し {1}{U}", cost: "{1}{U}", spec: spell, effect: "counter" },
     { label: "自分のアーティファクト／クリーチャーをコピー {3}", cost: "{3}", spec: { zone: "battlefield", types: ["Artifact", "Creature"] }, effect: "copy-permanent" },
@@ -62,7 +66,7 @@ export function advancedPreflight(s, card, options) {
   const n = name(card), f = options.format || {};
   if (spree[n]) {
     const list = spree[n], max = (1 << list.length) - 1;
-    if (f.modes === undefined) return { optionKey: "format", formatField: "modes", kind: "buttons", label: "放題：使うモードを選ぶ（表示の追加コストを支払う）", options: Array.from({ length: max }, (_, i) => ({ value: String(i + 1), label: list.filter((_, bit) => (i + 1) & (1 << bit)).map(m => m.label).join(" ＋ ") })) };
+    if (f.modes === undefined) return { optionKey: "format", formatField: "modes", kind: "buttons", label: n === "Avengers Disassembled" ? "1つまたは両方のモードを選ぶ" : "放題：使うモードを選ぶ（表示の追加コストを支払う）", options: Array.from({ length: max }, (_, i) => ({ value: String(i + 1), label: list.filter((_, bit) => (i + 1) & (1 << bit)).map(m => m.label).join(" ＋ ") })) };
     if (!/^[1-7]$/.test(String(f.modes)) || Number(f.modes) > max) throw new Error("放題のモードを選び直してください。");
   }
   if (n === "Eldrazi Confluence") for (let i = 0; i < 3; i++) {
@@ -124,6 +128,13 @@ export function advancedStep(s, c, op) {
   }
   if (op.op === "advanced-effect") {
     const r = op.target, t = find(s, r), effect = op.effect;
+    if (effect === "avengers-sweep") put(c, { op: "damage-sweep", amount: 3, filter: { types: ["Creature"] } });
+    if (effect === "avengers-land") {
+      if (t) {
+        destroy(s, t);
+        put(c, { op: "select", label: "基本土地をタップ状態で探す（任意）", zone: "library", filter: { basicLand: true }, min: 0, max: 1, destination: "battlefield", tapped: true, shuffle: true });
+      } else if (r?.virtual) note(s, "相手の土地を破壊。相手は基本土地を探してタップ状態で出し、山札を切り直してもよい");
+    }
     if (effect === "scion") makeGameToken(s, TOKENS.scion);
     if (effect === "loot") put(c, { op: "draw", count: 2 }, discard(1));
     if (effect === "counter") { c.target = r; put(c, { op: "counter-target" }); }

@@ -1,7 +1,7 @@
 // Programs used by the dated Standard, Legacy and Pioneer fixtures. The caller
 // must verify the complete Oracle snapshot before exposing these adapters.
-import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-solo7";
-import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-solo7";
+import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-solo8";
+import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-solo8";
 const creature = { zone: "battlefield", types: ["Creature"], virtualOpponent: true };
 const spell = { zone: "stack", spell: true, virtualOpponent: true };
 const damage = { zone: "battlefield", types: ["Creature", "Planeswalker", "Battle"], players: true };
@@ -10,6 +10,9 @@ const look = (count, take) => select(`上${count}枚から${take}枚を手札へ
 export const FORMAT_SPELLS = {
   ...SIDEBOARD_SPELLS,
   ...ADVANCED_SPELLS,
+  "Demand Answers": { steps: [{ op: "draw", count: 2 }] },
+  Boltwave: { steps: [{ op: "damage", player: "opponent", amount: 3 }] },
+  "Plasma Bolt": { steps: [{ op: "plasma-bolt" }], target: damage },
   ...Object.fromEntries(["Abrade", "Hydroblast", "Pyroblast", "Split Up", "Pick Your Poison", "Warg Tactics", "Boros Charm", "Iroh's Demonstration", "Witherbloom Charm", "Sheoldred's Edict", "Change the Equation", "Fire Magic", "Path of Peril"].map(n => [n, { steps: [{ op: "format-modal" }] }])),
   Enroot: { steps: [select("墓地へ置く土地", "library", { types: ["Land"] }, { destination: "graveyard", shuffle: true })] },
   "Fatehold Charm": { steps: [{ op: "fatehold" }] },

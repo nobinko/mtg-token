@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo7";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo7";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo7";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo7";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo7";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo7";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo7";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo7";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo7";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo7";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo7";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo7";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo7";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo7";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo7";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo8";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo8";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo8";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo8";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo8";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo8";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo8";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo8";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo8";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo8";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo8";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo8";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo8";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo8";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo8";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -90,7 +90,7 @@ export function planGoldfishCastPayment(state, card, options = {}) {
   // Delve pays generic mana after the total cost (including Trinisphere) is
   // determined. It is not a reduction, and cannot pay colored symbols.
   const paymentCost = goldfishCastingCost(card, { ...options, state, delve: [] });
-  return { ...planGoldfishPayment(state, { manaCost: paymentCost }, { ...options, exclude: [...(options.exclude || []), ...(options.harmonizeTap || []).map(r => r.id), ...(cardName(card) === "We Say Thee Nay!" ? options.format?.cards || [] : []).map(r => r.id)], spell: card, genericCredit: options.delve?.length || 0, maximizeColors: ["Prismatic Ending", "Engineered Explosives", "Together as One"].includes(cardName(card)) }), cost };
+  return { ...planGoldfishPayment(state, { manaCost: paymentCost }, { ...options, exclude: [...(options.exclude || []), ...(options.harmonizeTap || []).map(r => r.id), ...(cardName(card) === "We Say Thee Nay!" ? options.format?.cards || [] : []).map(r => r.id)], reserve: [...(options.format?.cards || []), ...(options.costCards || [])].filter(r => (r.zone || "battlefield") === "battlefield").map(r => r.id), spell: card, genericCredit: options.delve?.length || 0, maximizeColors: ["Prismatic Ending", "Engineered Explosives", "Together as One"].includes(cardName(card)) }), cost };
 }
 export const goldfishManaText = (pool) => COLORS.flatMap((color) => pool[color] ? [`${pool[color]}${color}`] : []).join(" ") || "0";
 const total = (pool) => COLORS.reduce((sum, color) => sum + pool[color], 0);
@@ -220,8 +220,19 @@ function coverage(pool, cost, credit = 0) {
   return [...matched, Math.min(cost.generic, total(pool) + credit - matched.reduce((a, b) => a + b, 0))].join(",");
 }
 function better(a, b) {
-  return !b || a.life < b.life || (a.life === b.life && (a.activations.length < b.activations.length ||
-    (a.activations.length === b.activations.length && a.flexibility < b.flexibility)));
+  return !b || a.life < b.life || (a.life === b.life && ((a.sacrifices || 0) < (b.sacrifices || 0) ||
+    (a.sacrifices || 0) === (b.sacrifices || 0) && (a.activations.length < b.activations.length ||
+    (a.activations.length === b.activations.length && a.flexibility < b.flexibility))));
+}
+// Only these complete mana abilities may consume a permanent automatically.
+// LED's discard and other non-mana costs remain explicit player choices.
+function sacrificeManaOptions(card, state) {
+  if (card.faceDown || card.automaticAbilities === false || abilityBlockReason(state, card, { manaAbility: true })) return [];
+  const text = String(faceOf(card).oracleText || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+  const petal = cardName(card) === "Lotus Petal" && verifiedGoldfishCard(card);
+  const treasure = isType(card, "Treasure") && text === "{T}, Sacrifice this artifact: Add one mana of any color." && !card.tapped && (!isType(card, "Creature") || canTapCreature(state, card));
+  if (!petal && !treasure) return [];
+  return COLORS.slice(0, 5).map(color => ({ pool: normalizeGoldfishMana({ [color]: 1 }), life: 0, sacrifice: true }));
 }
 function payPool(pool, cost, credit = 0) {
   const remaining = { ...pool };
@@ -235,12 +246,12 @@ function payPool(pool, cost, credit = 0) {
   return remaining;
 }
 
-export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrexianLife = false, exclude = [], spell, creatureAbility, abilitySource, maximizeColors = false, requiredColors = [], genericCredit = 0 } = {}) {
+export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrexianLife = false, exclude = [], reserve = [], spell, creatureAbility, abilitySource, maximizeColors = false, requiredColors = [], genericCredit = 0 } = {}) {
   if (maximizeColors) {
     let best;
     for (let mask = 0; mask < 32; mask++) {
       const colors = COLORS.slice(0, 5).filter((_, i) => mask & (1 << i));
-      const plan = planGoldfishPayment(state, card, { autoTap, x, phyrexianLife, exclude, spell, creatureAbility, abilitySource, requiredColors: colors, genericCredit });
+      const plan = planGoldfishPayment(state, card, { autoTap, x, phyrexianLife, exclude, reserve, spell, creatureAbility, abilitySource, requiredColors: colors, genericCredit });
       if (plan.payable && (!best?.payable || plan.colorsSpent.length > best.colorsSpent.length || plan.colorsSpent.length === best.colorsSpent.length && better(plan, best))) best = plan;
       else best ||= plan;
     }
@@ -253,8 +264,8 @@ export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrex
     for (const color of COLORS.slice(0, 5)) { v.generic += v[color]; v[color] = 0; }
   }
   const improvise = spell && /\bImprovise\b/.test(faceOf(spell).oracleText || "");
-  const sources = autoTap ? state.battlefield.filter((land) => !land.tapped && !exclude.includes(land.id))
-    .map((land) => ({ id: land.id, options: [...goldfishLandManaOptions(land, state, { spell, creatureAbility, abilitySource }), ...(improvise && isType(land, "Artifact") ? [{ pool: normalizeGoldfishMana(), life: 0, credit: 1 }] : [])] })).filter((source) => source.options.length) : [];
+  const sources = autoTap ? state.battlefield.filter(land => !exclude.includes(land.id))
+    .map(land => ({ id: land.id, options: [...(!land.tapped ? goldfishLandManaOptions(land, state, { spell, creatureAbility, abilitySource }) : []), ...(!reserve.includes(land.id) ? sacrificeManaOptions(land, state) : []), ...(improvise && !land.tapped && isType(land, "Artifact") ? [{ pool: normalizeGoldfishMana(), life: 0, credit: 1 }] : [])] })).filter(source => source.options.length) : [];
   const eldraziUse = spell || abilitySource;
   const eligible = item => item.restriction === "instantSorcery" ? spell && isType(spell, "Instant|Sorcery") : item.restriction === "artifactOrAbility" ? !spell || isType(spell, "Artifact") : item.restriction === "eldrazi" ? eldraziUse && isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse).length : item.restriction === "creatureAbility" ? creatureAbility : item.restriction === "legendary" ? spell && isType(spell, "Legendary") : item.restriction?.startsWith("creature:") ? spell && isType(spell, "Creature") && isType(spell, item.restriction.slice(9)) : true;
   for (const source of sources) source.options = source.options.filter(option => !option.restriction || eligible(option));
@@ -262,7 +273,7 @@ export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrex
   const blocked = restrictions.filter(item => !eligible(item));
   const initialPool = normalizeGoldfishMana(state.manaPool);
   for (const item of blocked) for (const color of COLORS) initialPool[color] = Math.max(0, initialPool[color] - (item.pool[color] || 0));
-  const initial = { pool: initialPool, activations: [], life: 0, flexibility: 0, credit: genericCredit, restrictions: restrictions.filter(eligible) };
+  const initial = { pool: initialPool, activations: [], sacrifices: 0, life: 0, flexibility: 0, credit: genericCredit, restrictions: restrictions.filter(eligible) };
   let best = null;
   const maxLife = Math.max(...parsed.variants.map((variant) => variant.life));
   for (const parsedVariant of parsed.variants.filter((variant) => !phyrexianLife || variant.life === maxLife)) {
@@ -282,7 +293,7 @@ export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrex
           // Never auto-pay down to zero. The manual controls remain available.
           if (life && life >= state.players.self.life) return;
           const proposed = { pool: add(candidate.pool, option.pool), life, credit: candidate.credit + (option.credit || 0), restrictions: [...candidate.restrictions, ...(option.restriction ? [{ restriction: option.restriction, pool: option.pool, uncounterable: option.uncounterable }] : [])],
-            activations: [...candidate.activations, { id: source.id, optionIndex }], flexibility: candidate.flexibility + source.options.length };
+            activations: [...candidate.activations, { id: source.id, optionIndex, ...(option.sacrifice ? { sacrifice: true } : {}) }], sacrifices: candidate.sacrifices + Number(!!option.sacrifice), flexibility: candidate.flexibility + source.options.length };
           const nextKey = coverage(proposed.pool, variant, proposed.credit);
           if (better(proposed, next.get(nextKey))) next.set(nextKey, proposed);
         });
@@ -322,7 +333,10 @@ export function payGoldfishPlan(state, plan) {
 }
 export function payGoldfishPlanDraft(next, plan) {
   if (!plan.payable) throw new Error(plan.reason);
-  for (const activation of plan.activations) next.battlefield.find((land) => land.id === activation.id).tapped = true;
+  for (const activation of plan.activations) {
+    if (activation.sacrifice) moveGoldfishRuleObject(next, activation.id, "battlefield", "graveyard", "sacrifice");
+    else next.battlefield.find(land => land.id === activation.id).tapped = true;
+  }
   next.manaPool = { ...plan.remaining };
   next.rules.restrictedMana = structuredClone(plan.restrictedMana || []);
   next.rules.hasteMana = plan.remainingHasteMana || 0;

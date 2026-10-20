@@ -4,6 +4,7 @@
 
 ## 2026-10-20
 
+- 公開版で取得したStandard赤単・Legacy Doomsday・Pioneer Greasefangの実リストを追加検証。Demand Answersの追加コスト、宝物／Lotus Petalの自動マナ支払いを修正し、Plasma Bolt・Boltwave・Avengers Disassembled・Death to Our Enemies・The Fantasticarを自動処理へ接続。追加コストとマナで同じ宝物を二重消費しない。ライフ支払いが同じなら、使い捨てのマナ源を温存する。
 - 公開版のログイン後検査で、Melee一覧が通信前に502になる不具合を修正。Worker非対応の`redirect: "error"`を`manual`へ変更し、転送応答は追跡せず拒否する。公開用検査に実際のWorker経由の大会一覧・リスト取得と、API認証を転送先へ送らない回帰検査を追加。
 - Modern・Standard・Legacy・Pioneer各10種類について、メイン・サイド後の計80経路を初手から勝利まで検証。追加コスト、解決中の詠唱、コピー・伝説ルール、忠誠度、搭乗、墓地利用、主要コンボを拡張。保存・再開を各操作で挟み、途中の資源注入や手動スキップは行わない。経路・条件は [検証記録](goldfish-top10.md) に記載。
 - 大釜の起動型能力継承、パワーアップ・消尽、奇跡、悪事、対応する登場・死亡・ダメージ誘発を追加。対象へのカウンター追加命令が実行されない不具合も修正。能力別試験を含む全体566件を確認。

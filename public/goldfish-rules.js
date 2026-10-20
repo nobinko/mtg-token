@@ -1,12 +1,12 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo7";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo7";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo7";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo7";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo7";
-import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo7";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo8";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo8";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo8";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo8";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo8";
+import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo8";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
@@ -166,7 +166,7 @@ export function recordGoldfishCast(state, spell) {
       // A self cast trigger belongs to the spell on the stack. It must never
       // trigger again when another spell is cast after this permanent resolves.
       if (/^When you cast this spell\b/.test(paragraph)) continue;
-      if (verifiedGoldfishCard(card) && ["Colorstorm Stallion", "Ral, Crackling Wit", "Song of Creation", "Glaring Fleshraker", "Pinnacle Emissary", "Stormchaser's Talent", "Artist's Talent", "Ugin, Eye of the Storms", "Ral, Monsoon Mage", "Vexing Bauble"].includes(face(card).name)) continue;
+      if (verifiedGoldfishCard(card) && ["Death to Our Enemies", "The Fantasticar", "Colorstorm Stallion", "Ral, Crackling Wit", "Song of Creation", "Glaring Fleshraker", "Pinnacle Emissary", "Stormchaser's Talent", "Artist's Talent", "Ugin, Eye of the Storms", "Ral, Monsoon Mage", "Vexing Bauble"].includes(face(card).name)) continue;
       if (isChanneler(card) && paragraph.startsWith("Whenever you cast a noncreature spell, surveil 1.")) continue;
       if (isCutter(card) && paragraph.includes("Whenever you cast your second spell each turn,")) continue;
       if (isSlickshot(card) && paragraph.startsWith("Whenever you cast a noncreature spell,")) continue;
@@ -292,6 +292,9 @@ export function resetGoldfishTurnRules(state) {
   state.rules.opponentLifeLost = 0;
   state.rules.cardsDrawn = 0;
   state.rules.permanentLeft = false;
+  state.rules.nonlandLeft = false;
+  state.rules.warpCast = false;
+  state.rules.noncreatureCast = 0;
   state.rules.endStepStarted = false;
   state.rules.extraCombats = 0;
   state.rules.beginCombatStarted = false;

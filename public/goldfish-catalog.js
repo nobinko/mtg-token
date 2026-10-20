@@ -7021,5 +7021,142 @@ export const GOLD_FISH_CATALOG = {
     "power": "",
     "toughness": "",
     "loyalty": ""
+  },
+  "Demand Answers": {
+    "oracleText": "As an additional cost to cast this spell, sacrifice an artifact or discard a card.\nDraw two cards.",
+    "manaCost": "{1}{R}",
+    "typeLine": "Instant",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Plasma Bolt": {
+    "oracleText": "Plasma Bolt deals 2 damage to any target.\nVoid — Plasma Bolt deals 3 damage instead if a nonland permanent left the battlefield this turn or a spell was warped this turn.",
+    "manaCost": "{R}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Avengers Disassembled": {
+    "oracleText": "Choose one or both —\n• Avengers Disassembled deals 3 damage to each creature.\n• Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+    "manaCost": "{1}{R}{R}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Death to Our Enemies": {
+    "oracleText": "Whenever you cast a noncreature spell, create a tapped Treasure token and put a plan counter on this enchantment.\nWhen the fourth plan counter is put on this enchantment, sacrifice it. When you do, it deals 7 damage divided as you choose among one or two targets.",
+    "manaCost": "{2}{R}",
+    "typeLine": "Enchantment — Plan",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Boltwave": {
+    "oracleText": "Boltwave deals 3 damage to each opponent.",
+    "manaCost": "{R}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Sear": {
+    "oracleText": "Sear deals 4 damage to target creature or planeswalker.",
+    "manaCost": "{1}{R}",
+    "typeLine": "Instant",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Untimely Malfunction": {
+    "oracleText": "Choose one —\n• Destroy target artifact.\n• Change the target of target spell or ability with a single target.\n• One or two target creatures can't block this turn.",
+    "manaCost": "{1}{R}",
+    "typeLine": "Instant",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Ball Lightning": {
+    "oracleText": "Trample (This creature can deal excess combat damage to the player or planeswalker it's attacking.)\nHaste (This creature can attack and {T} as soon as it comes under your control.)\nAt the beginning of the end step, sacrifice this creature.",
+    "manaCost": "{R}{R}{R}",
+    "typeLine": "Creature — Elemental",
+    "colors": [
+      "R"
+    ],
+    "power": "6",
+    "toughness": "1",
+    "loyalty": ""
+  },
+  "Case of the Crimson Pulse": {
+    "oracleText": "When this Case enters, discard a card, then draw two cards.\nTo solve — You have no cards in hand. (If unsolved, solve at the beginning of your end step.)\nSolved — At the beginning of your upkeep, discard your hand, then draw two cards.",
+    "manaCost": "{2}{R}",
+    "typeLine": "Enchantment — Case",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Snow-Covered Swamp": {
+    "oracleText": "({T}: Add {B}.)",
+    "manaCost": "",
+    "typeLine": "Basic Snow Land — Swamp",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Snow-Covered Island": {
+    "oracleText": "({T}: Add {U}.)",
+    "manaCost": "",
+    "typeLine": "Basic Snow Land — Island",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "The Fantasticar": {
+    "oracleText": "Flying\nWhenever you cast a noncreature spell, you may have The Fantasticar become an artifact creature until end of turn.\nWhenever you cast your fourth noncreature spell each turn, you may sacrifice The Fantasticar. If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste.",
+    "manaCost": "{3}",
+    "typeLine": "Legendary Artifact — Vehicle",
+    "colors": [],
+    "power": "4",
+    "toughness": "4",
+    "loyalty": ""
+  },
+  "Ral Zarek, Guest Lecturer": {
+    "oracleText": "+1: Surveil 2.\n−1: Any number of target players each discard a card.\n−2: Return target creature card with mana value 3 or less from your graveyard to the battlefield.\n−7: Flip five coins. Target opponent skips their next X turns, where X is the number of coins that came up heads.",
+    "manaCost": "{1}{B}{B}",
+    "typeLine": "Legendary Planeswalker — Ral",
+    "colors": [
+      "B"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": "3"
   }
 };
