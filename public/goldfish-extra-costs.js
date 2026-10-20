@@ -1,9 +1,9 @@
-import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261020-public30b";
-import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261020-public30b";
-import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30b";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30b";
+import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261020-public30c";
+import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261020-public30c";
+import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30c";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30c";
 
-export const EXTRA_COST_SPELLS = new Set(["Demand Answers", "Requiting Hex", "We Say Thee Nay!", "Countersculpt", "Fanatical Offering", "Deadly Dispute", "Stir Up Trouble", "Vicious Rivalry", "Toxic Deluge", "Deadly Cover-Up", "Torch the Tower", "Rottenmouth Viper"]);
+export const EXTRA_COST_SPELLS = new Set(["Demand Answers", "Requiting Hex", "We Say Thee Nay!", "Countersculpt", "Fanatical Offering", "Deadly Dispute", "Stir Up Trouble", "Deadly Precision", "Vicious Rivalry", "Toxic Deluge", "Deadly Cover-Up", "Torch the Tower", "Rottenmouth Viper"]);
 export function extraFormatCostChoice(state, card, format = {}) {
   const name = cardName(card);
   if (format.freeCast === "yes" && (!state.hand.some(c=>c.id===card.id) || state.rules.effectCast)) throw new Error("この唱え方に代替コストを重ねて支払うことはできません。");
@@ -46,9 +46,9 @@ export function extraFormatCostChoice(state, card, format = {}) {
     "Deadly Cover-Up": { zone: "graveyard", filter: {}, label: "証拠収集6：追放する墓地のカード（任意）", min: 0, max: 99 },
     "Torch the Tower": { zone: "battlefield", filter: { bargain: true }, label: "協約：生け贄にするカード（任意）", min: 0, max: 1 },
     "Rottenmouth Viper": { zone: "battlefield", filter: { permanent: true, notTypes: ["Land"] }, label: "生け贄にする非土地（1つにつき{1}軽減・任意）", min: 0, max: 99 },
-    "Fanatical Offering": { min: 1 }, "Deadly Dispute": { min: 1 }, "Stir Up Trouble": { min: 0 }
+    "Fanatical Offering": { min: 1 }, "Deadly Dispute": { min: 1 }, "Stir Up Trouble": { min: 0 }, "Deadly Precision": { min: 0 }
   };
-  const d = { zone: "battlefield", filter: { types: ["Artifact", "Creature"] }, max: 1, label: name === "Stir Up Trouble" ? "生け贄（選ばない場合は追加{4}）" : "追加コスト：生け贄にするアーティファクト／クリーチャー", ...definitions[name] };
+  const d = { zone: "battlefield", filter: { types: ["Artifact", "Creature"] }, max: 1, label: ["Stir Up Trouble", "Deadly Precision"].includes(name) ? "生け贄（選ばない場合は追加{4}）" : "追加コスト：生け贄にするアーティファクト／クリーチャー", ...definitions[name] };
   const candidates = engineCandidates(state, d).filter(c => c.card.id !== card.id)
     .filter(c => name !== "Demand Answers" || c.ref.zone === "hand" || isType(c.card, "Artifact"))
     .map(({ ref, label }) => ({ ref, label: name === "Demand Answers" ? `${ref.zone === "hand" ? "捨てる" : "生け贄"}：${label}` : label }));
@@ -64,7 +64,7 @@ export function formatAdditionalMana(card, format = {}) {
   const name = cardName(card);
   if (name === "Starscape Cleric" && format.offspring === "yes") return "{2}{B}";
   if (name === "Countersculpt" && !format.cards?.length) return "{1}";
-  if (name === "Stir Up Trouble" && !format.cards?.length) return "{4}";
+  if (["Stir Up Trouble", "Deadly Precision"].includes(name) && !format.cards?.length) return "{4}";
   return "";
 }
 export function payFormatExtraCosts(state, card, format = {}) {

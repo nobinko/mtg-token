@@ -138,6 +138,177 @@
       "url": "https://mtgtop8.com/event?e=92555&d=903092&f=ST"
     },
     {
+      "rank": 10,
+      "format": "standard",
+      "mainboard": [
+        {
+          "name": "Blazemire Verge",
+          "count": 1
+        },
+        {
+          "name": "Blood Crypt",
+          "count": 1
+        },
+        {
+          "name": "Cori Mountain Monastery",
+          "count": 1
+        },
+        {
+          "name": "Deserted Beach",
+          "count": 1
+        },
+        {
+          "name": "Gloomlake Verge",
+          "count": 2
+        },
+        {
+          "name": "Godless Shrine",
+          "count": 2
+        },
+        {
+          "name": "Great Hall of the Biblioplex",
+          "count": 4
+        },
+        {
+          "name": "Hallowed Fountain",
+          "count": 2
+        },
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Mistrise Village",
+          "count": 1
+        },
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Sacred Foundry",
+          "count": 2
+        },
+        {
+          "name": "Shattered Sanctum",
+          "count": 1
+        },
+        {
+          "name": "Steam Vents",
+          "count": 3
+        },
+        {
+          "name": "Stormcarved Coast",
+          "count": 1
+        },
+        {
+          "name": "Sunbillow Verge",
+          "count": 1
+        },
+        {
+          "name": "Sundown Pass",
+          "count": 1
+        },
+        {
+          "name": "North Wind Avatar",
+          "count": 1
+        },
+        {
+          "name": "Consult the Star Charts",
+          "count": 3
+        },
+        {
+          "name": "Day of Judgment",
+          "count": 2
+        },
+        {
+          "name": "Firebending Lesson",
+          "count": 2
+        },
+        {
+          "name": "Flashback",
+          "count": 2
+        },
+        {
+          "name": "Inevitable Defeat",
+          "count": 4
+        },
+        {
+          "name": "Jeskai Revelation",
+          "count": 4
+        },
+        {
+          "name": "Lightning Helix",
+          "count": 3
+        },
+        {
+          "name": "No More Lies",
+          "count": 3
+        },
+        {
+          "name": "Plunder the Trollshaws",
+          "count": 2
+        },
+        {
+          "name": "Stock Up",
+          "count": 3
+        },
+        {
+          "name": "Together as One",
+          "count": 1
+        },
+        {
+          "name": "Tablet of Discovery",
+          "count": 4
+        }
+      ],
+      "meta": "現時点の準備用ベースライン: 大会日 2026-10-24 は未来のため、2026-10-20 時点の環境に公開された実在リストから選んでいます。大会当日のメタ予測ではありません。取得できた完全リスト同士の枚数差が最小の実在リスト使用者: Josh Schroeder / 大会: 2-slot RCQ / 順位: 2 / 日付: 2026-10-17原リストを開く — 4/5C Control - Josh Schroeder @ mtgtop8.com",
+      "sideboard": [
+        {
+          "name": "Ancient Vendetta",
+          "count": 1
+        },
+        {
+          "name": "Deadly Cover-Up",
+          "count": 1
+        },
+        {
+          "name": "Fire Magic",
+          "count": 2
+        },
+        {
+          "name": "Flashfreeze",
+          "count": 2
+        },
+        {
+          "name": "Get Lost",
+          "count": 2
+        },
+        {
+          "name": "Outrageous Robbery",
+          "count": 1
+        },
+        {
+          "name": "Price of Freedom",
+          "count": 1
+        },
+        {
+          "name": "Return the Favor",
+          "count": 2
+        },
+        {
+          "name": "Strategic Betrayal",
+          "count": 2
+        },
+        {
+          "name": "Ultima",
+          "count": 1
+        }
+      ],
+      "title": "4/5C Control",
+      "url": "https://mtgtop8.com/event?e=92546&d=903032&f=ST"
+    },
+    {
       "rank": 3,
       "format": "standard",
       "mainboard": [
@@ -787,6 +958,260 @@
       ],
       "title": "Jund Aggro",
       "url": "https://mtgtop8.com/event?e=92496&d=902646&f=ST"
+    },
+    {
+      "rank": 8,
+      "format": "standard",
+      "mainboard": [
+        {
+          "name": "Cavern of Souls",
+          "count": 2
+        },
+        {
+          "name": "Gloomlake Verge",
+          "count": 4
+        },
+        {
+          "name": "Restless Reef",
+          "count": 4
+        },
+        {
+          "name": "Shipwreck Marsh",
+          "count": 4
+        },
+        {
+          "name": "Swamp",
+          "count": 7
+        },
+        {
+          "name": "Undercity Sewers",
+          "count": 1
+        },
+        {
+          "name": "Watery Grave",
+          "count": 4
+        },
+        {
+          "name": "Deceit",
+          "count": 4
+        },
+        {
+          "name": "Doomsday Excruciator",
+          "count": 2
+        },
+        {
+          "name": "Emeritus of Ideation",
+          "count": 2
+        },
+        {
+          "name": "Seasoned Cryomancer",
+          "count": 3
+        },
+        {
+          "name": "Superior Spider-Man",
+          "count": 4
+        },
+        {
+          "name": "Uldaros Theorix",
+          "count": 1
+        },
+        {
+          "name": "Bitter Triumph",
+          "count": 3
+        },
+        {
+          "name": "Day of Black Sun",
+          "count": 2
+        },
+        {
+          "name": "Deadly Cover-Up",
+          "count": 1
+        },
+        {
+          "name": "Duress",
+          "count": 3
+        },
+        {
+          "name": "Requiting Hex",
+          "count": 3
+        },
+        {
+          "name": "Strategic Betrayal",
+          "count": 1
+        },
+        {
+          "name": "Theorix Charm",
+          "count": 2
+        },
+        {
+          "name": "Winternight Stories",
+          "count": 3
+        }
+      ],
+      "meta": "現時点の準備用ベースライン: 大会日 2026-10-24 は未来のため、2026-10-20 時点の環境に公開された実在リストから選んでいます。大会当日のメタ予測ではありません。取得できた完全リスト同士の枚数差が最小の実在リスト使用者: James Bowman / 大会: Store Championship / 順位: 1 / 日付: 2026-10-17原リストを開く — Superior Doomsday - James Bowman @ mtgtop8.com",
+      "sideboard": [
+        {
+          "name": "Duress",
+          "count": 1
+        },
+        {
+          "name": "Flashfreeze",
+          "count": 2
+        },
+        {
+          "name": "Ghost Vacuum",
+          "count": 1
+        },
+        {
+          "name": "M.O.D.O.K.",
+          "count": 1
+        },
+        {
+          "name": "Negate",
+          "count": 1
+        },
+        {
+          "name": "Null Summoner",
+          "count": 1
+        },
+        {
+          "name": "Oildeep Gearhulk",
+          "count": 1
+        },
+        {
+          "name": "Preacher of the Schism",
+          "count": 2
+        },
+        {
+          "name": "Requiting Hex",
+          "count": 1
+        },
+        {
+          "name": "Strategic Betrayal",
+          "count": 2
+        },
+        {
+          "name": "Terminal Criticism",
+          "count": 1
+        },
+        {
+          "name": "Torpor Orb",
+          "count": 1
+        }
+      ],
+      "title": "Reanimator",
+      "url": "https://mtgtop8.com/event?e=92495&d=902639&f=ST"
+    },
+    {
+      "rank": 9,
+      "format": "standard",
+      "mainboard": [
+        {
+          "name": "Cavern of Souls",
+          "count": 3
+        },
+        {
+          "name": "Inspiring Vantage",
+          "count": 4
+        },
+        {
+          "name": "Maelstrom of the Spirit Dragon",
+          "count": 3
+        },
+        {
+          "name": "Mountain",
+          "count": 1
+        },
+        {
+          "name": "Multiversal Passage",
+          "count": 4
+        },
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Sacred Foundry",
+          "count": 4
+        },
+        {
+          "name": "Sunbillow Verge",
+          "count": 4
+        },
+        {
+          "name": "Clarion Conqueror",
+          "count": 4
+        },
+        {
+          "name": "Magmatic Hellkite",
+          "count": 4
+        },
+        {
+          "name": "Momo, Friendly Flier",
+          "count": 4
+        },
+        {
+          "name": "Nova Hellkite",
+          "count": 4
+        },
+        {
+          "name": "Sarkhan, Dragon Ascendant",
+          "count": 4
+        },
+        {
+          "name": "Smaug the Magnificent",
+          "count": 4
+        },
+        {
+          "name": "Twinmaw Stormbrood",
+          "count": 2
+        },
+        {
+          "name": "Voice of Victory",
+          "count": 4
+        },
+        {
+          "name": "Burst Lightning",
+          "count": 4
+        },
+        {
+          "name": "Erode",
+          "count": 2
+        }
+      ],
+      "meta": "現時点の準備用ベースライン: 大会日 2026-10-24 は未来のため、2026-10-20 時点の環境に公開された実在リストから選んでいます。大会当日のメタ予測ではありません。取得できた完全リスト同士の枚数差が最小の実在リスト使用者: Rashek / 大会: MTGO League / 順位: 7 / 日付: 2026-10-19原リストを開く — Boros Dragons - Rashek @ mtgtop8.com",
+      "sideboard": [
+        {
+          "name": "Boros Charm",
+          "count": 2
+        },
+        {
+          "name": "Desolation of Smaug",
+          "count": 2
+        },
+        {
+          "name": "Dragonhawk, Fate's Tempest",
+          "count": 1
+        },
+        {
+          "name": "Get Lost",
+          "count": 2
+        },
+        {
+          "name": "Rest in Peace",
+          "count": 3
+        },
+        {
+          "name": "Seam Rip",
+          "count": 4
+        },
+        {
+          "name": "The Legend of Roku",
+          "count": 1
+        }
+      ],
+      "title": "Boros Aggro",
+      "url": "https://mtgtop8.com/event?e=92555&d=903095&f=ST"
     }
   ],
   "metadata": [
@@ -3090,6 +3515,902 @@
       "loyalty": "3",
       "faces": [],
       "requestedName": "Ral Zarek, Guest Lecturer"
+    },
+    {
+      "name": "Ghost Vacuum",
+      "printedName": "Ghost Vacuum",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/a/8ac39c01-127f-4471-bc74-11a90c48e306.jpg?1783909433",
+      "oracleText": "{T}: Exile target card from a graveyard.\n{6}, {T}, Sacrifice this artifact: Put each creature card exiled with this artifact onto the battlefield under your control with a flying counter on it. Each of them is a 1/1 Spirit in addition to its other types. Activate only as a sorcery.",
+      "manaCost": "{1}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ghost Vacuum"
+    },
+    {
+      "name": "Null Summoner",
+      "printedName": "Null Summoner",
+      "language": "en",
+      "typeLine": "Creature — Human Warlock",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/a/3afdc75a-1bf5-4f2f-84eb-d82f77a095cd.jpg?1789127648",
+      "oracleText": "When this creature enters, if you cast it, target opponent reveals their hand. You choose a nonland card from it. Exile that card.\nThreshold — As long as there are seven or more cards in your graveyard, you may cast the exiled card, and mana of any type can be spent to cast that spell.",
+      "manaCost": "{2}{U}{B}",
+      "power": "4",
+      "toughness": "2",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Null Summoner"
+    },
+    {
+      "name": "Oildeep Gearhulk",
+      "printedName": "Oildeep Gearhulk",
+      "language": "en",
+      "typeLine": "Artifact Creature — Construct",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/5/a5e2d09e-b9f5-4a0d-96d3-984b5c2c387d.jpg?1783907855",
+      "oracleText": "Lifelink, ward {1}\nWhen this creature enters, look at target player's hand. You may choose a card from it. If you do, that player discards that card, then draws a card.",
+      "manaCost": "{U}{U}{B}{B}",
+      "power": "4",
+      "toughness": "4",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Oildeep Gearhulk"
+    },
+    {
+      "name": "Preacher of the Schism",
+      "printedName": "Preacher of the Schism",
+      "language": "en",
+      "typeLine": "Creature — Vampire Cleric",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/9/89345f55-2b32-4356-945a-d56dded39909.jpg?1783913774",
+      "oracleText": "Deathtouch\nWhenever this creature attacks the player with the most life or tied for most life, create a 1/1 white Vampire creature token with lifelink.\nWhenever this creature attacks while you have the most life or are tied for most life, you draw a card and you lose 1 life.",
+      "manaCost": "{2}{B}",
+      "power": "2",
+      "toughness": "4",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Preacher of the Schism"
+    },
+    {
+      "name": "Terminal Criticism",
+      "printedName": "Terminal Criticism",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/e/7ebd7e38-b27c-4c6e-aaea-e8ee5ba5e5df.jpg?1789470810",
+      "oracleText": "Destroy target creature or planeswalker that's blue or red. You gain 1 life.",
+      "manaCost": "{1}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Terminal Criticism"
+    },
+    {
+      "name": "Inspiring Vantage",
+      "printedName": "Inspiring Vantage",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/5/85df6b6a-2dcf-4828-a4a8-e07d52e1fddd.jpg?1783911772",
+      "oracleText": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {R} or {W}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Inspiring Vantage"
+    },
+    {
+      "name": "Maelstrom of the Spirit Dragon",
+      "printedName": "Maelstrom of the Spirit Dragon",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/c/4/c4e90bfb-d9a5-48a9-9ff9-b0f50a813eee.jpg?1783907278",
+      "oracleText": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a Dragon spell or an Omen spell.\n{4}, {T}, Sacrifice this land: Search your library for a Dragon card, reveal it, put it into your hand, then shuffle.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Maelstrom of the Spirit Dragon"
+    },
+    {
+      "name": "Mountain",
+      "printedName": "Mountain",
+      "language": "en",
+      "typeLine": "Basic Land — Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/5/85177bd7-6c50-48da-b692-ae5fe7bd357c.jpg?1791578439",
+      "oracleText": "({T}: Add {R}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Mountain"
+    },
+    {
+      "name": "Sacred Foundry",
+      "printedName": "Sacred Foundry",
+      "language": "en",
+      "typeLine": "Land — Mountain Plains",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/7/a7758cc6-4e18-48a5-8720-5f42b5cd9d31.jpg?1784036842",
+      "oracleText": "({T}: Add {R} or {W}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sacred Foundry"
+    },
+    {
+      "name": "Sunbillow Verge",
+      "printedName": "Sunbillow Verge",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/4/94ed132f-b818-4dbf-9b4a-e5acb067e0a4.jpg?1783907839",
+      "oracleText": "{T}: Add {W}.\n{T}: Add {R}. Activate only if you control a Mountain or a Plains.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sunbillow Verge"
+    },
+    {
+      "name": "Clarion Conqueror",
+      "printedName": "Clarion Conqueror",
+      "language": "en",
+      "typeLine": "Creature — Dragon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/8/f892d156-371c-4391-8ae6-25513c5032b0.jpg?1783907419",
+      "oracleText": "Flying\nActivated abilities of artifacts, creatures, and planeswalkers can't be activated.",
+      "manaCost": "{2}{W}",
+      "power": "3",
+      "toughness": "3",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Clarion Conqueror"
+    },
+    {
+      "name": "Magmatic Hellkite",
+      "printedName": "Magmatic Hellkite",
+      "language": "en",
+      "typeLine": "Creature — Dragon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/3/b3b3aec8-d931-4c7f-86b5-1e7dfb717b59.jpg?1783907360",
+      "oracleText": "Flying\nWhen this creature enters, destroy target nonbasic land an opponent controls. Its controller searches their library for a basic land card, puts it onto the battlefield tapped with a stun counter on it, then shuffles. (If a permanent with a stun counter would become untapped, remove one from it instead.)",
+      "manaCost": "{2}{R}{R}",
+      "power": "4",
+      "toughness": "5",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Magmatic Hellkite"
+    },
+    {
+      "name": "Momo, Friendly Flier",
+      "printedName": "Momo, Friendly Flier",
+      "language": "en",
+      "typeLine": "Legendary Creature — Lemur Bat Ally",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/c/4/c472ef84-a632-4ad7-853c-60588a7a4b12.jpg?1783904997",
+      "oracleText": "Flying\nThe first non-Lemur creature spell with flying you cast during each of your turns costs {1} less to cast.\nWhenever another creature you control with flying enters, Momo gets +1/+1 until end of turn.",
+      "manaCost": "{W}",
+      "power": "1",
+      "toughness": "1",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Momo, Friendly Flier"
+    },
+    {
+      "name": "Nova Hellkite",
+      "printedName": "Nova Hellkite",
+      "language": "en",
+      "typeLine": "Creature — Dragon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/2/424af0d0-398c-4d78-9ad5-2171bf1bcbd1.jpg?1783905950",
+      "oracleText": "Flying, haste\nWhen this creature enters, it deals 1 damage to target creature an opponent controls.\nWarp {2}{R} (You may cast this card from your hand for its warp cost. Exile this creature at the beginning of the next end step, then you may cast it from exile on a later turn.)",
+      "manaCost": "{3}{R}{R}",
+      "power": "4",
+      "toughness": "5",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Nova Hellkite"
+    },
+    {
+      "name": "Sarkhan, Dragon Ascendant",
+      "printedName": "Sarkhan, Dragon Ascendant",
+      "language": "en",
+      "typeLine": "Legendary Creature — Human Druid",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/c/2/c2200646-7b7c-489d-bbae-16b03e1d7fb2.jpg?1783907353",
+      "oracleText": "When Sarkhan enters, you may behold a Dragon. If you do, create a Treasure token. (To behold a Dragon, choose a Dragon you control or reveal a Dragon card from your hand.)\nWhenever a Dragon you control enters, put a +1/+1 counter on Sarkhan. Until end of turn, Sarkhan becomes a Dragon in addition to his other types and gains flying.",
+      "manaCost": "{1}{R}",
+      "power": "2",
+      "toughness": "2",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sarkhan, Dragon Ascendant"
+    },
+    {
+      "name": "Twinmaw Stormbrood // Charring Bite",
+      "printedName": "Twinmaw Stormbrood // Charring Bite",
+      "language": "en",
+      "typeLine": "Creature — Dragon",
+      "layout": "adventure",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/9/2999e3b1-6510-42b2-9429-28c07a64a44f.jpg?1783907291",
+      "oracleText": "Flying\nWhen this creature enters, you gain 5 life.\n\nCharring Bite deals 5 damage to target creature without flying. (Then shuffle this card into its owner's library.)",
+      "manaCost": "{5}{W} // {1}{R}",
+      "power": "5",
+      "toughness": "4",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [
+        {
+          "name": "Twinmaw Stormbrood",
+          "printedName": "Twinmaw Stormbrood",
+          "typeLine": "Creature — Dragon",
+          "oracleText": "Flying\nWhen this creature enters, you gain 5 life.",
+          "manaCost": "{5}{W}",
+          "imageUrl": "",
+          "power": "5",
+          "toughness": "4",
+          "colors": [],
+          "loyalty": ""
+        },
+        {
+          "name": "Charring Bite",
+          "printedName": "Charring Bite",
+          "typeLine": "Sorcery — Omen",
+          "oracleText": "Charring Bite deals 5 damage to target creature without flying. (Then shuffle this card into its owner's library.)",
+          "manaCost": "{1}{R}",
+          "imageUrl": "",
+          "power": "",
+          "toughness": "",
+          "colors": [],
+          "loyalty": ""
+        }
+      ],
+      "requestedName": "Twinmaw Stormbrood"
+    },
+    {
+      "name": "Burst Lightning",
+      "printedName": "Burst Lightning",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/e/aec5d380-d354-4750-931a-6c91853e2edc.jpg?1783909068",
+      "oracleText": "Kicker {4} (You may pay an additional {4} as you cast this spell.)\nBurst Lightning deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Burst Lightning"
+    },
+    {
+      "name": "Boros Charm",
+      "printedName": "Boros Charm",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/0/e0d8c9f6-cbbd-4694-b100-01cfb81036cc.jpg?1783908890",
+      "oracleText": "Choose one —\n• Boros Charm deals 4 damage to target player or planeswalker.\n• Permanents you control gain indestructible until end of turn.\n• Target creature gains double strike until end of turn.",
+      "manaCost": "{R}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Boros Charm"
+    },
+    {
+      "name": "Desolation of Smaug",
+      "printedName": "Desolation of Smaug",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/4/2462358b-52c8-49b2-8d97-d65a9188f8f7.jpg?1784376974",
+      "oracleText": "Desolation of Smaug deals 3 damage to each non-Dragon creature.\nAdd four mana in any combination of colors. Spend this mana only to cast Dragon spells.",
+      "manaCost": "{2}{R}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Desolation of Smaug"
+    },
+    {
+      "name": "Dragonhawk, Fate's Tempest",
+      "printedName": "Dragonhawk, Fate's Tempest",
+      "language": "en",
+      "typeLine": "Legendary Creature — Bird Dragon",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/6/8659789c-6a2c-439f-a348-b9b1b06c55b8.jpg?1783910824",
+      "oracleText": "Flying\nWhenever Dragonhawk enters or attacks, exile the top X cards of your library, where X is the number of creatures you control with power 4 or greater. You may play those cards until your next end step. At the beginning of your next end step, Dragonhawk deals 2 damage to each opponent for each of those cards that are still exiled.",
+      "manaCost": "{3}{R}{R}",
+      "power": "5",
+      "toughness": "5",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Dragonhawk, Fate's Tempest"
+    },
+    {
+      "name": "Get Lost",
+      "printedName": "Get Lost",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/2/522aa72b-2b8c-484c-872b-f082101cee35.jpg?1783913812",
+      "oracleText": "Destroy target creature, enchantment, or planeswalker. Its controller creates two Map tokens. (They're artifacts with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")",
+      "manaCost": "{1}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Get Lost"
+    },
+    {
+      "name": "The Legend of Roku // Avatar Roku",
+      "printedName": "The Legend of Roku // Avatar Roku",
+      "language": "en",
+      "typeLine": "Enchantment — Saga",
+      "layout": "transform",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/5/95f2f5af-d405-4534-8683-5a9001f997b4.jpg?1783904959",
+      "oracleText": "(As this Saga enters and after your draw step, add a lore counter.)\nI — Exile the top three cards of your library. Until the end of your next turn, you may play those cards.\nII — Add one mana of any color.\nIII — Exile this Saga, then return it to the battlefield transformed under your control.\n\nFirebending 4 (Whenever this creature attacks, add {R}{R}{R}{R}. This mana lasts until end of combat.)\n{8}: Create a 4/4 red Dragon creature token with flying and firebending 4.",
+      "manaCost": "{2}{R}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [
+        {
+          "name": "The Legend of Roku",
+          "printedName": "The Legend of Roku",
+          "typeLine": "Enchantment — Saga",
+          "oracleText": "(As this Saga enters and after your draw step, add a lore counter.)\nI — Exile the top three cards of your library. Until the end of your next turn, you may play those cards.\nII — Add one mana of any color.\nIII — Exile this Saga, then return it to the battlefield transformed under your control.",
+          "manaCost": "{2}{R}{R}",
+          "imageUrl": "https://cards.scryfall.io/normal/front/9/5/95f2f5af-d405-4534-8683-5a9001f997b4.jpg?1783904959",
+          "power": "",
+          "toughness": "",
+          "colors": [
+            "R"
+          ],
+          "loyalty": ""
+        },
+        {
+          "name": "Avatar Roku",
+          "printedName": "Avatar Roku",
+          "typeLine": "Legendary Creature — Avatar",
+          "oracleText": "Firebending 4 (Whenever this creature attacks, add {R}{R}{R}{R}. This mana lasts until end of combat.)\n{8}: Create a 4/4 red Dragon creature token with flying and firebending 4.",
+          "manaCost": "",
+          "imageUrl": "https://cards.scryfall.io/normal/back/9/5/95f2f5af-d405-4534-8683-5a9001f997b4.jpg?1783904959",
+          "power": "4",
+          "toughness": "4",
+          "colors": [],
+          "loyalty": ""
+        }
+      ],
+      "requestedName": "The Legend of Roku"
+    },
+    {
+      "name": "Blazemire Verge",
+      "printedName": "Blazemire Verge",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/1/d151c8e2-d715-470d-868a-f45191db9fa0.jpg?1783909431",
+      "oracleText": "{T}: Add {B}.\n{T}: Add {R}. Activate only if you control a Swamp or a Mountain.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Blazemire Verge"
+    },
+    {
+      "name": "Cori Mountain Monastery",
+      "printedName": "Cori Mountain Monastery",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/3/9312821a-2059-4f44-9b20-c9522b827e38.jpg?1783907281",
+      "oracleText": "This land enters tapped unless you control a Plains or an Island.\n{T}: Add {R}.\n{3}{R}, {T}: Exile the top card of your library. Until the end of your next turn, you may play that card.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Cori Mountain Monastery"
+    },
+    {
+      "name": "Deserted Beach",
+      "printedName": "Deserted Beach",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/5/6/56dae4c4-3e71-4a32-979b-4e26d9c9e96c.jpg?1788878239",
+      "oracleText": "This land enters tapped unless you control two or more other lands.\n{T}: Add {W} or {U}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Deserted Beach"
+    },
+    {
+      "name": "Great Hall of the Biblioplex",
+      "printedName": "Great Hall of the Biblioplex",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/2/42d92674-2664-411c-b9c5-b04da7c845f4.jpg?1783903620",
+      "oracleText": "{T}: Add {C}.\n{T}, Pay 1 life: Add one mana of any color. Spend this mana only to cast an instant or sorcery spell.\n{5}: If this land isn't a creature, it becomes a 2/4 Wizard creature with \"Whenever you cast an instant or sorcery spell, this creature gets +1/+0 until end of turn.\" It's still a land.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Great Hall of the Biblioplex"
+    },
+    {
+      "name": "Mistrise Village",
+      "printedName": "Mistrise Village",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/4/d44bccbf-6fab-46e4-8ddb-6577e27ec6e8.jpg?1783907277",
+      "oracleText": "This land enters tapped unless you control a Mountain or a Forest.\n{T}: Add {U}.\n{U}, {T}: The next spell you cast this turn can't be countered.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Mistrise Village"
+    },
+    {
+      "name": "Steam Vents",
+      "printedName": "Steam Vents",
+      "language": "en",
+      "typeLine": "Land — Island Mountain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/8/a83903c7-fd51-4526-aed2-359e946fea36.jpg?1784036844",
+      "oracleText": "({T}: Add {U} or {R}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Steam Vents"
+    },
+    {
+      "name": "Stormcarved Coast",
+      "printedName": "Stormcarved Coast",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/d/bd3ae4fa-4c97-410a-8c0a-bd203342595d.jpg?1783903618",
+      "oracleText": "This land enters tapped unless you control two or more other lands.\n{T}: Add {U} or {R}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Stormcarved Coast"
+    },
+    {
+      "name": "Sundown Pass",
+      "printedName": "Sundown Pass",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/3/b34000e9-ff20-4fb4-9d0b-03a172a92457.jpg?1783903618",
+      "oracleText": "This land enters tapped unless you control two or more other lands.\n{T}: Add {R} or {W}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Sundown Pass"
+    },
+    {
+      "name": "North Wind Avatar",
+      "printedName": "North Wind Avatar",
+      "language": "en",
+      "typeLine": "Creature — Dragon Spirit Avatar",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/1/41439cfe-bb3e-42f3-9d81-de9db537ce68.jpg?1783904072",
+      "oracleText": "Flying\nWhen this creature enters, if you cast it, you may put a card you own from outside the game into your hand.",
+      "manaCost": "{2}{U}{U}{R}",
+      "power": "5",
+      "toughness": "5",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "North Wind Avatar"
+    },
+    {
+      "name": "Consult the Star Charts",
+      "printedName": "Consult the Star Charts",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/1/a16a6555-2e3a-4587-aacd-0307d696b26c.jpg?1783905984",
+      "oracleText": "Kicker {1}{U} (You may pay an additional {1}{U} as you cast this spell.)\nLook at the top X cards of your library, where X is the number of lands you control. Put one of those cards into your hand. If this spell was kicked, put two of those cards into your hand instead. Put the rest on the bottom of your library in a random order.",
+      "manaCost": "{1}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Consult the Star Charts"
+    },
+    {
+      "name": "Firebending Lesson",
+      "printedName": "Firebending Lesson",
+      "language": "en",
+      "typeLine": "Instant — Lesson",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/a/fa940e68-010e-4b68-be8a-555d7068f7b4.jpg?1783904958",
+      "oracleText": "Kicker {4} (You may pay an additional {4} as you cast this spell.)\nFirebending Lesson deals 2 damage to target creature. If this spell was kicked, it deals 5 damage to that creature instead.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Firebending Lesson"
+    },
+    {
+      "name": "Flashback",
+      "printedName": "Flashback",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/b/1b832fda-d7c4-4566-884c-2a8b6da15488.jpg?1783903669",
+      "oracleText": "Target instant or sorcery card in your graveyard gains flashback until end of turn. The flashback cost is equal to its mana cost. (You may cast that card from your graveyard for its flashback cost. Then exile it.)",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Flashback"
+    },
+    {
+      "name": "Inevitable Defeat",
+      "printedName": "Inevitable Defeat",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/d/9d677980-b608-407e-9f17-790a81263f15.jpg?1783907309",
+      "oracleText": "This spell can't be countered.\nExile target nonland permanent. Its controller loses 3 life and you gain 3 life.",
+      "manaCost": "{1}{R}{W}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B",
+        "R",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Inevitable Defeat"
+    },
+    {
+      "name": "Jeskai Revelation",
+      "printedName": "Jeskai Revelation",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/c/3cac0ad3-5107-4ed6-a688-d44bbd65e407.jpg?1783907311",
+      "oracleText": "Return target spell or permanent to its owner's hand. Jeskai Revelation deals 4 damage to any target. Create two 1/1 white Monk creature tokens with prowess. Draw two cards. You gain 4 life.",
+      "manaCost": "{4}{U}{R}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R",
+        "U",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Jeskai Revelation"
+    },
+    {
+      "name": "Lightning Helix",
+      "printedName": "Lightning Helix",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/1/4101e3fe-b0e7-4f0f-b9ac-9b61a4d628b3.jpg?1783912843",
+      "oracleText": "Lightning Helix deals 3 damage to any target and you gain 3 life.",
+      "manaCost": "{R}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Lightning Helix"
+    },
+    {
+      "name": "No More Lies",
+      "printedName": "No More Lies",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/e/1e0c695d-62f9-4805-9e2f-7032e8464136.jpg?1783912840",
+      "oracleText": "Counter target spell unless its controller pays {3}. If that spell is countered this way, exile it instead of putting it into its owner's graveyard.",
+      "manaCost": "{W}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U",
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "No More Lies"
+    },
+    {
+      "name": "Plunder the Trollshaws",
+      "printedName": "Plunder the Trollshaws",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/f/afb73190-b9bd-4744-a011-a37cd9c0148d.jpg?1785496438",
+      "oracleText": "Draw a card. If this spell was cast from a graveyard, draw two cards instead.\nFlashback {3}{U} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+      "manaCost": "{1}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Plunder the Trollshaws"
+    },
+    {
+      "name": "Stock Up",
+      "printedName": "Stock Up",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/a/0a786855-6eb4-42c0-a528-4842db46809d.jpg?1783907902",
+      "oracleText": "Look at the top five cards of your library. Put two of them into your hand and the rest on the bottom of your library in any order.",
+      "manaCost": "{2}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Stock Up"
+    },
+    {
+      "name": "Together as One",
+      "printedName": "Together as One",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/c/ac2a8a66-e38c-42ab-83e1-d2d99ee48861.jpg?1783903712",
+      "oracleText": "Converge — Target player draws X cards, Together as One deals X damage to any target, and you gain X life, where X is the number of colors of mana spent to cast this spell.",
+      "manaCost": "{6}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Together as One"
+    },
+    {
+      "name": "Tablet of Discovery",
+      "printedName": "Tablet of Discovery",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/3/13059664-a940-4a66-8100-0c90b884bab4.jpg?1783903664",
+      "oracleText": "When this artifact enters, mill a card. You may play that card this turn. (To mill a card, put the top card of your library into your graveyard.)\n{T}: Add {R}.\n{T}: Add {R}{R}. Spend this mana only to cast instant and sorcery spells.",
+      "manaCost": "{2}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Tablet of Discovery"
+    },
+    {
+      "name": "Ancient Vendetta",
+      "printedName": "Ancient Vendetta",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/3/230301f2-f288-4b13-9f62-e649ad8357bb.jpg?1783907900",
+      "oracleText": "Choose a card name. Search target opponent's graveyard, hand, and library for up to four cards with that name and exile them. Then that player shuffles.",
+      "manaCost": "{3}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ancient Vendetta"
+    },
+    {
+      "name": "Fire Magic",
+      "printedName": "Fire Magic",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/1/415ff6a5-61ef-4b37-ae08-e44476300d4a.jpg?1783906604",
+      "oracleText": "Tiered (Choose one additional cost.)\n• Fire — {0} — Fire Magic deals 1 damage to each creature.\n• Fira — {2} — Fire Magic deals 2 damage to each creature.\n• Firaga — {5} — Fire Magic deals 3 damage to each creature.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Fire Magic"
+    },
+    {
+      "name": "Outrageous Robbery",
+      "printedName": "Outrageous Robbery",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/8/b87813fa-ad12-4062-bb9e-436d8418fba5.jpg?1783912894",
+      "oracleText": "Target opponent exiles the top X cards of their library face down. You may look at and play those cards for as long as they remain exiled. If you cast a spell this way, you may spend mana as though it were mana of any type to cast it.",
+      "manaCost": "{X}{B}{B}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Outrageous Robbery"
+    },
+    {
+      "name": "Price of Freedom",
+      "printedName": "Price of Freedom",
+      "language": "en",
+      "typeLine": "Sorcery — Lesson",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/f/9fbe94e9-a71d-4a31-9210-c599abe08e3f.jpg?1783904953",
+      "oracleText": "Destroy target artifact or land an opponent controls. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.\nDraw a card.",
+      "manaCost": "{1}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Price of Freedom"
+    },
+    {
+      "name": "Return the Favor",
+      "printedName": "Return the Favor",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/9/a9cc02d1-799d-42aa-9bc2-4c05452b63b4.jpg?1783911816",
+      "oracleText": "Spree (Choose one or more additional costs.)\n+ {1} — Copy target instant spell, sorcery spell, activated ability, or triggered ability. You may choose new targets for the copy.\n+ {1} — Change the target of target spell or ability with a single target.",
+      "manaCost": "{R}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Return the Favor"
+    },
+    {
+      "name": "Ultima",
+      "printedName": "Ultima",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/9/39504a0e-f63f-4907-afd7-c4492f6b8a3b.jpg?1783906642",
+      "oracleText": "Destroy all artifacts and creatures. End the turn. (Exile all spells and abilities from the stack, including this card. The player whose turn it is discards down to their maximum hand size. Damage wears off, and \"this turn\" and \"until end of turn\" effects end.)",
+      "manaCost": "{3}{W}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ultima"
     }
   ]
 }

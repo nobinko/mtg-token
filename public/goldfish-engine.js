@@ -1,16 +1,16 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-public30b";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30b";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30b";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-public30b";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-public30b";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30b";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30b";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-public30b";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-public30b";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-public30b";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-public30b";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-public30b";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30b";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-public30c";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30c";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30c";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-public30c";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-public30c";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30c";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30c";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-public30c";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-public30c";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-public30c";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-public30c";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-public30c";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30c";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -324,6 +324,7 @@ function prepareEngineTargets(state) {
   if (!entry) return;
   const spec = entry.ability.targetSpec, candidates = engineCandidates(state, { ...spec, filter: spec, target: true }, { source: entry.ability.source });
   if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+  else if (spec.opponentOnly) candidates.unshift({ ref: { player: "opponent" }, label: "相手" });
   if (spec.virtualOpponent) for (let i = 0; i < (spec.count || 1); i++) candidates.unshift({ ref: { id: `virtual-${i}`, player: "opponent", virtual: true }, label: `相手の対象${spec.count ? i + 1 : ""}（領域は省略）` });
   if (!candidates.length) { entry.ability.target = null; entry.ability.noTarget = true; prepareEngineTargets(state); return; }
   if (spec.divideDamage) {

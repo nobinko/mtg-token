@@ -1,15 +1,15 @@
-import { mergeCardMetadata } from "./card-metadata.js?v=20261020-public30b";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-public30c";
 import { freshGoldfishRules, cloneGoldfishRules, assertGoldfishChoiceComplete, recordGoldfishCast,
-  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-public30b";
-import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30b";
-import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30b";
-import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-public30b";
-import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-public30b";
-import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-public30b";
-import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261020-public30b";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-public30b";
-import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-public30b";
-import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-public30b";
+  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-public30c";
+import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30c";
+import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30c";
+import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-public30c";
+import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-public30c";
+import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-public30c";
+import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261020-public30c";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-public30c";
+import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-public30c";
+import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-public30c";
 
 export const GOLDFISH_SCHEMA_VERSION = 2;
 export const GOLDFISH_LANES = ["other", "creature", "land"];
@@ -376,8 +376,10 @@ function finishGoldfishTurnProgress(state) {
     const endedOwnTurn = state.rules.activePlayer === "self";
     const extra = state.rules.extraTurns > 0;
     if (extra) state.rules.extraTurns--;
-    startNextActiveTurn(state, extra || !endedOwnTurn ? "self" : "opponent");
-    if (destination === "self" && endedOwnTurn && !extra) state.rules.resumeNextTurn = true;
+    const skipOpponent = endedOwnTurn && !extra && state.rules.skippedOpponentTurns > 0;
+    if (skipOpponent) state.rules.skippedOpponentTurns--;
+    startNextActiveTurn(state, extra || skipOpponent || !endedOwnTurn ? "self" : "opponent");
+    if (destination === "self" && endedOwnTurn && !extra && !skipOpponent) state.rules.resumeNextTurn = true;
     if (state.stack.length) return state;
   }
   if (state.rules.pendingOpponentDraw) {

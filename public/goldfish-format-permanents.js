@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30b";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-public30b";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30b";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-public30b";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-public30b";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30b";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-public30b";
-import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261020-public30b";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30c";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-public30c";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30c";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-public30c";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-public30c";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30c";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-public30c";
+import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261020-public30c";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -27,7 +27,7 @@ function typeAs(c, type) {
   c.typeLine = type;
 }
 export const FORMAT_PERMANENT_NAMES = new Set([
-  "Death to Our Enemies", "The Fantasticar",
+  "Death to Our Enemies", "The Fantasticar", "Null Summoner", "Ral Zarek, Guest Lecturer", "Great Hall of the Biblioplex",
   "Chrome Mox", "Sand Scout", "Orcish Bowmasters", "Tamiyo, Inquisitive Student", "Tamiyo, Seasoned Scholar", "Delver of Secrets", "Sneak Attack", "Emrakul, the Aeons Torn", "Kaito, Bane of Nightmares",
   "Mossborn Hydra", "Sazh's Chocobo", "Mightform Harmonizer", "Icetill Explorer", "Mole Man, Moloid Master", "Sandman, Shifting Scoundrel", "Barrowgoyf",
   "Enduring Curiosity", "Hinterland Sanctifier", "Liliana the Faultless", "Starscape Cleric", "Amalia Benavides Aguirre", "Case of the Uneaten Feast", "Lunar Convocation", "Zoraline, Cosmos Caller", "Enlightened Confidant",
@@ -64,6 +64,10 @@ export function formatPermanentEnter(s, c) {
   if (!active(c)) return false;
   if (hasAbilityExtension(c)) { extensionEnter(s, c); return true; }
   const n = name(c), q = (label, ops, extra) => add(s, c, label, ops, extra);
+  if (n === "Null Summoner") {
+    if (c.wasCast) q("相手の手札から非土地1枚を追放", [{ op: "opponent-effect", text: "相手の手札から非土地1枚を追放。墓地7枚以上の間、そのカードを任意の色のマナで唱えられる。ひとり回しでは相手の手札を用意していないため、追放する実物とその唱え直しは省略" }], { targetSpec: { zone: "none", opponentOnly: true } });
+    return true;
+  }
   if (n === "Meltstrider's Resolve") { q("装着先と相手のクリーチャーを格闘", [{ op: "meltstrider-fight" }], { targetSpec: { ...creatureTarget, opposingPermanent: true, optional: true, virtualOpponent: true } }); return true; }
   if (n === "Fury") { q("4点をクリーチャー／PWに配分", [{ op: "divided-damage" }], { targetSpec: { zone: "battlefield", types: ["Creature", "Planeswalker"], count: 4, optional: true, virtualOpponent: true, divideDamage: 4 } }); return true; }
   if (n === "Rottenmouth Viper") { q("枯朽カウンターを置き、相手に選択", [{ op: "source-counter", name: "blight", count: 1 }, { op: "fp-viper" }]); return true; }
@@ -169,6 +173,7 @@ export function formatPermanentCast(s, spell) {
   if (isType(spell, "Creature") && s.rules.kumanoSerial === s.rules.turnSerial) { spell.cast.kumanoCounter = true; delete s.rules.kumanoSerial; }
   if (active(spell) && name(spell) === "Emrakul, the Aeons Torn") add(s, spell, "追加ターン", [{ op: "fp-extra-turn" }]);
   for (const c of live(s)) {
+    if (name(c) === "Great Hall of the Biblioplex" && c.greatHallAnimated && isType(c, "Creature") && isType(spell, "Instant|Sorcery")) add(s, c, "ターン終了まで＋1/＋0", [{ op: "fp-source-pump", power: 1, toughness: 0 }]);
     if (!isType(spell, "Creature") && name(c) === "Death to Our Enemies") add(s, c, "タップ状態の宝物・計画カウンター", [{ op: "fp-enemies-plan" }]);
     if (!isType(spell, "Creature") && name(c) === "The Fantasticar") {
       add(s, c, "ターン終了までクリーチャーにしてもよい", [{ op: "fp-fantasticar-animate" }]);
@@ -298,6 +303,7 @@ export function formatPermanentActions(c) {
   if (!active(c) && !c.trollLandAbility) return [];
   const n = name(c), a = [], act = (id, label, cost, steps, extra = {}) => a.push({ id: `engine:fp-${id}`, zone: "battlefield", cost, label, description: label, steps, ...extra });
   const pw = (id, label, loyalty, steps, extra = {}) => act(id, label, "{0}", steps, { main: true, loyalty, ...extra });
+  if (n === "Great Hall of the Biblioplex" && !isType(c, "Creature")) act("great-hall", "{5}：2/4ウィザードにする（期限なし）", "{5}", [{ op: "fp-great-hall" }]);
   if (n === "Jace, Wielder of Mysteries") { pw("wielder-plus", "+1：対象プレイヤーが2枚切削・1枚引く", 1, [{ op: "fp-jace-mill" }, draw()], { targetSpec: { zone: "none", players: true } }); pw("wielder-ult", "−8：7枚引き、山札が空なら勝利", -8, [draw(7), { op: "fp-jace-win" }]); }
   if (["Ghost Vacuum", "Keen-Eyed Curator", "The Ooze"].includes(n)) act("linked-exile", `${n === "Keen-Eyed Curator" ? "{1}" : "{T}"}：墓地のカードを追放`, n === "Keen-Eyed Curator" ? "{1}" : "{0}", [{ op: "fp-linked-exile" }, ...(n === "The Ooze" ? [{ op: "fp-mutagen", count: 1 }] : [])], { tap: n !== "Keen-Eyed Curator", targetSpec: { zone: "graveyard" } });
   if (n === "Ghost Vacuum") act("vacuum", "{6},{T}・生け贄：追放したクリーチャーを1/1飛行で戻す", "{6}", [{ op: "fp-vacuum" }], { main: true, tap: true, sacrifice: true });
@@ -331,6 +337,12 @@ export function formatPermanentActions(c) {
     pw("ral-otter", "+1：カワウソ生成", 1, [token("otter")]); pw("ral-loot", "−3：3枚引いて2枚捨てる", -3, [draw(3), discard(2)]);
     pw("ral-storm", "−10：3枚引く・ストームの紋章", -10, [draw(3), { op: "fp-storm-emblem" }]);
   }
+  if (n === "Ral Zarek, Guest Lecturer") {
+    pw("guest-surveil", "+1：諜報2", 1, surveil(2));
+    pw("guest-discard", "−1：選んだプレイヤーが1枚捨てる", -1, [{ op: "fp-guest-discard" }], { targetSpec: { zone: "none", players: true, count: 2, optional: true } });
+    pw("guest-return", "−2：墓地のマナ総量3以下のクリーチャーを戦場へ", -2, [{ op: "move-target", destination: "battlefield" }], { targetSpec: { zone: "graveyard", types: ["Creature"], maxManaValue: 3 } });
+    pw("guest-coins", "−7：コイン5回・表の数だけ相手のターンを飛ばす", -7, [{ op: "fp-guest-coins" }], { targetSpec: { zone: "none", opponentOnly: true } });
+  }
   if (n === "Gene Pollinator") act("gene", "別のパーマネントもタップ：好きな色1マナ", "{0}", [{ op: "mana-choice", count: 1 }], { tap: true, manaAbility: true, costSelect: { zone: "battlefield", filter: { permanent: true, untapped: true, excludeSelf: true }, count: 1, destination: "tap" } });
   if (n === "Umbral Collar Zealot") act("zealot", "別のクリーチャー／アーティファクトを生け贄：諜報1", "{0}", surveil(1), { costSelect: { zone: "battlefield", filter: { types: ["Creature", "Artifact"], excludeSelf: true }, count: 1, destination: "graveyard" } });
   if (n === "Lunar Convocation") act("lunar", "2ライフ：1枚引く {1}{B}", "{1}{B}", [draw()], { lifeCost: 2 });
@@ -353,6 +365,7 @@ export function formatPermanentActions(c) {
 export function formatPermanentStats(s, c) {
   const d = {}, n = name(c);
   if (active(c)) {
+    if (c.greatHallAnimated) { d.power = 2; d.toughness = 4; }
     if (n === "Sandman, Shifting Scoundrel") d.power = d.toughness = s.battlefield.filter(x => isType(x, "Land")).length;
     if (n === "Barrowgoyf") { d.power = goldfishGraveyardTypes(s).length; d.toughness = d.power + 1; }
     if (n === "Kaito, Bane of Nightmares" && s.rules.activePlayer === "self" && c.counters.loyalty > 0) { d.power = 3; d.toughness = 4; }
@@ -377,6 +390,12 @@ export function formatPermanentKeywords(s, c) {
 export function formatPermanentStep(s, c, op) {
   const source = find(s, c.source), t = find(s, c.target);
   switch (op.op) {
+    case "fp-great-hall":
+      if (source && !isType(source, "Creature")) {
+        source.greatHallAnimated = true;
+        typeAs(source, "Land Creature — Wizard"); source.lane = "creature";
+      }
+      return true;
     case "fp-enemies-plan":
       makeGameToken(s, { ...TOKENS.treasure, tapped: true });
       if (source) addGameCounters(s, source, "plan", 1);
@@ -514,6 +533,17 @@ export function formatPermanentStep(s, c, op) {
     case "fp-kaito-draw": if (s.rules.opponentLifeLost > 0) insert(c, draw()); return true;
     case "fp-stun": if (t) { t.tapped = true; addGameCounters(s, t, "stun", 2); } return true;
     case "fp-extra-turn": s.rules.extraTurns = (s.rules.extraTurns || 0) + 1; return true;
+    case "fp-guest-discard":
+      if (c.targets?.some(r => r.player === "self")) insert(c, discard(1));
+      if (c.targets?.some(r => r.player === "opponent")) note(s, "相手は手札を1枚捨てる（相手の手札は省略）");
+      return true;
+    case "fp-guest-coins": {
+      const coins = Array.from({ length: 5 }, () => Math.random() < .5);
+      const heads = coins.filter(Boolean).length;
+      s.rules.skippedOpponentTurns = (s.rules.skippedOpponentTurns || 0) + heads;
+      note(s, `コイン：${coins.map(x => x ? "表" : "裏").join("・")}。相手の次の${heads}ターンを飛ばす`);
+      return true;
+    }
     case "fp-emrakul-shuffle": for (const x of [...s.graveyard]) move(s, x.id, "graveyard", "library"); shuffleGameLibrary(s); return true;
     case "fp-sneak": for (const r of (c.vars.sneaked || []).map(x => x.ref)) { const x = find(s, r); if (x && r.zone === "battlefield") { x.temporaryEffects.push({ keywords: ["haste"], turn: s.turn, label: c.sourceName }); (s.rules.sneakSacrifices ||= []).push(r); } } return true;
     case "fp-hydra": if (source) addGameCounters(s, source, "+1/+1", source.counters["+1/+1"] || 0); return true;

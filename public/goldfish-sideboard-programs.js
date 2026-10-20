@@ -13,6 +13,7 @@ export const SIDEBOARD_SPELLS = {
   "Fanatical Offering": { steps: [{ op: "draw", count: 2 }, { op: "token", name: "map" }] },
   "Deadly Dispute": { steps: [{ op: "draw", count: 2 }, { op: "token", name: "treasure" }] },
   "Stir Up Trouble": { steps: [{ op: "destroy-target" }], target: creature },
+  "Deadly Precision": { steps: [{ op: "destroy-target" }], target: creature },
   "Vicious Rivalry": { steps: [{ op: "vicious-rivalry" }] },
   "Toxic Deluge": { steps: [{ op: "deluge-x" }] },
   "Deadly Cover-Up": { steps: [{ op: "sweep", filter: { types: ["Creature"] } }, { op: "cover-up" }] },

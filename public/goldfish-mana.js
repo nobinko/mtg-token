@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-public30b";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30b";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-public30b";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-public30b";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-public30b";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-public30b";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-public30b";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-public30b";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-public30b";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30b";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-public30b";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-public30b";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-public30b";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-public30b";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-public30b";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-public30c";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30c";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-public30c";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-public30c";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-public30c";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-public30c";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-public30c";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-public30c";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-public30c";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30c";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-public30c";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-public30c";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-public30c";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-public30c";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-public30c";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -77,6 +77,11 @@ export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = f
   return "{" + generic + "}" + cost;
 }
 export function planGoldfishCastPayment(state, card, options = {}) {
+  if (options.preview && options.format?.cards === undefined && verifiedGoldfishCard(card) && ["Stir Up Trouble", "Deadly Precision"].includes(cardName(card))) {
+    const choices = [[], ...state.battlefield.filter(c => isType(c, "Artifact|Creature")).map(c => [goldfishReference(c, "battlefield")])];
+    const plans = choices.map(cards => planGoldfishCastPayment(state, card, { ...options, format: { ...options.format, cards } }));
+    return plans.find(p => p.payable) || plans[0];
+  }
   if (cardName(card) === "Hogaak, Arisen Necropolis" && verifiedGoldfishCard(card) && !effectCastPermission(state, card)) return planHogaak(state, card);
   if (options.preview && options.fromGraveyard && goldfishSpellProgram(card)?.harmonize && !card.grantedCast && options.harmonizeTap === undefined) {
     const plans = [[], ...state.battlefield.filter(c => isType(c, "Creature") && !c.tapped).map(c => [goldfishReference(c)])].map(harmonizeTap => planGoldfishCastPayment(state, card, { ...options, preview: false, harmonizeTap }));
@@ -152,6 +157,10 @@ export function goldfishLandManaOptions(card, state, context = {}) {
   if (n === "Floodfarm Verge" && battlefield.some(c => gameLandTypes(state, c).some(t => ["Plains", "Island"].includes(t)))) insert(normalizeGoldfishMana({ U: 1 }));
   if (n === "Gleaming Bastion" && verifiedGoldfishCard(card) && (card.enteredSerial === state?.rules.turnSerial || battlefield.some(c => isType(c, "Basic") && isType(c, "Land")))) for (const color of ["W", "U"]) insert(normalizeGoldfishMana({ [color]: 1 }));
   if (n === "Castle Doom" && verifiedGoldfishCard(card)) for (const color of COLORS.slice(0, 5)) { insert(normalizeGoldfishMana({ [color]: 1 })); result.at(-1).restriction = "artifactSpell"; }
+  if (n === "Great Hall of the Biblioplex" && verifiedGoldfishCard(card)) for (const color of COLORS.slice(0, 5)) {
+    const i = result.length; insert(normalizeGoldfishMana({ [color]: 1 }), 1);
+    if (result.length > i) result.at(-1).restriction = "instantSorcery";
+  }
   if (n === "Gemstone Caverns") { for (const color of card.counters?.luck ? COLORS.slice(0, 5) : ["C"]) insert(normalizeGoldfishMana({ [color]: 1 })); return result; }
   if (n === "Delighted Halfling" && (!context.spell || isType(context.spell, "Legendary"))) for (const color of COLORS.slice(0, 5)) insert(normalizeGoldfishMana({ [color]: 1 }));
   if (n === "Shang-Chi, Master of Kung Fu" && (!context.spell || context.creatureAbility)) for (const color of COLORS.slice(0, 5)) insert(normalizeGoldfishMana({ [color]: 2 }));
