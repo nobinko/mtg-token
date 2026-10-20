@@ -7,6 +7,7 @@ import { castGoldfishCard, planGoldfishCastPayment, setGoldfishMana } from "../p
 import { goldfishReference as ref } from "../public/goldfish-objects.js";
 import { makeGameToken } from "../public/goldfish-events.js";
 import { TOKENS } from "../public/goldfish-card-programs.js";
+import { goldfishCharacteristics } from "../public/goldfish-rules.js";
 import { settle } from "./helpers/goldfish-pilot.js";
 import { route } from "./helpers/goldfish-route.js";
 const fixture = JSON.parse(fs.readFileSync(new URL("./fixtures/goldfish-public-20261020.json", import.meta.url)));
@@ -102,6 +103,10 @@ test("Fantasticar counts earlier casts that turn and creates four fixed 4/4 flyi
   const constructs = s.battlefield.filter(c => c.name === "Construct");
   assert.equal(constructs.length, 4);
   assert.ok(constructs.every(c => c.power === "4" && c.toughness === "4" && c.oracleText === "Flying, haste"));
+  assert.ok(constructs.every(c => goldfishCharacteristics(s, c).power === "4" && goldfishCharacteristics(s, c).toughness === "4"));
+  const [sagaConstruct] = makeGameToken(s, TOKENS.construct);
+  assert.equal(goldfishCharacteristics(s, sagaConstruct).power, "8");
+  assert.ok(constructs.every(c => goldfishCharacteristics(s, c).power === "4"));
 });
 test("Avengers both modes damage creatures and replace the chosen own land with a tapped basic", () => {
   let s = put(put(put(position({ "Avengers Disassembled": 1, "Iron-Shield Elf": 1 }, { R: 3 }), "Avengers Disassembled"), "Iron-Shield Elf", "battlefield"), "Mountain", "battlefield");

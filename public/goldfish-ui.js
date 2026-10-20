@@ -40,26 +40,26 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js?v=20261020-solo8";
-import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo8";
-import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo8";
-import { extraCastChoice } from "./goldfish-modal.js?v=20261020-solo8";
+} from "./goldfish.js?v=20261020-solo9";
+import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo9";
+import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo9";
+import { extraCastChoice } from "./goldfish-modal.js?v=20261020-solo9";
 import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText, canPlayGoldfishGraveyard,
-  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo8";
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo8";
-import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo8";
-import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo8";
-import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo8";
-import { goldfishCardOperations } from "./goldfish-effects.js?v=20261020-solo8";
-import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo8";
-import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261020-solo8";
-import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo8";
-import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo8";
-import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo8";
+  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo9";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo9";
+import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo9";
+import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo9";
+import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo9";
+import { goldfishCardOperations } from "./goldfish-effects.js?v=20261020-solo9";
+import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo9";
+import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261020-solo9";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo9";
+import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo9";
+import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo9";
 
-import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo8";
-import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo8";
-import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo8";
+import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo9";
+import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo9";
+import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo9";
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command", "stack"];
 const ZONE_LABELS = {
   library: "山札",
@@ -76,7 +76,7 @@ const ZONE_LABELS = {
 };
 const LANE_LABELS = { other: "その他", creature: "クリーチャー", land: "土地" };
 const MAX_TIMELINE = 60;
-import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261020-solo8";
+import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261020-solo9";
 
 function normalizeName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();

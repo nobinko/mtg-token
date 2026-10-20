@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo8";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo8";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo8";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo8";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo8";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo8";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo8";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo8";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo8";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo8";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo8";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo8";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo8";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo8";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo8";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo9";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo9";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo9";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo9";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo9";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo9";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo9";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo9";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo9";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo9";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo9";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo9";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo9";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo9";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo9";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;

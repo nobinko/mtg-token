@@ -1,16 +1,16 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo8";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo8";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo8";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo8";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo8";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo8";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo8";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo8";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-solo8";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-solo8";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-solo8";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-solo8";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo8";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo9";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo9";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo9";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo9";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo9";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo9";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo9";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo9";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-solo9";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-solo9";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-solo9";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-solo9";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo9";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -40,7 +40,7 @@ export function engineStatAdjustments(state, card) {
   if (n === "Territorial Kavu") data.power = data.toughness = gameDomain(state);
   if (n === "Nethergoyf") { data.power = goldfishGraveyardTypes(state).length; data.toughness = data.power + 1; }
   if (n === "Wild Nacatl") { const types = new Set(state.battlefield.flatMap(c => gameLandTypes(state, c))); data.boost = Number(types.has("Plains")) + Number(types.has("Mountain")); }
-  if (n === "Construct" && card.kind === "token") data.boost = state.battlefield.filter(c => isType(c, "Artifact")).length;
+  if (card.kind === "token" && /This (?:token|creature) gets \+1\/\+1 for each artifact you control\./.test(face(card).oracleText || "")) data.boost = state.battlefield.filter(c => isType(c, "Artifact")).length;
   if (n === "Fiend Artisan") data.boost = state.graveyard.filter(c => isType(c, "Creature")).length;
   if (n === "Dark Matter Manipulator") data.boostPower = 2 * Math.floor(state.graveyard.length / 7);
   for (const aura of state.battlefield) if (aura.summonedAsBestow && find(state, aura.attachedTo)?.id === card.id) data.boost = (data.boost || 0) + 2;

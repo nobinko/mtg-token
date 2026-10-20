@@ -1,6 +1,6 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo8";
-import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-solo8";
-import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-solo8";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo9";
+import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-solo9";
+import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-solo9";
 
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function verifiedGoldfishCard(card) {
