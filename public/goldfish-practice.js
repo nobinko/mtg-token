@@ -1,26 +1,26 @@
-import { cloneGoldfishState, advanceGoldfishGame, chooseGoldfishRule } from "./goldfish.js?v=20261020-solo3";
-import { castGoldfishCard, activateGoldfishLand, goldfishLandManaOptions } from "./goldfish-mana.js?v=20261020-solo3";
-import { activateGoldfishAction } from "./goldfish-actions.js?v=20261020-solo3";
-import { activeFace, cardName } from "./goldfish-events.js?v=20261020-solo3";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
-import { goldfishFindObject } from "./goldfish-objects.js?v=20261020-solo3";
+import { cloneGoldfishState, advanceGoldfishGame, chooseGoldfishRule } from "./goldfish.js?v=20261020-solo6";
+import { castGoldfishCard, activateGoldfishLand, goldfishLandManaOptions } from "./goldfish-mana.js?v=20261020-solo6";
+import { activateGoldfishAction } from "./goldfish-actions.js?v=20261020-solo6";
+import { activeFace, cardName } from "./goldfish-events.js?v=20261020-solo6";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261020-solo6";
 
 export function castPreparedGoldfishSpell(state, cardId, options = {}) {
   const source = state.battlefield.find(c => c.id === cardId);
-  if (!source?.prepared || !verifiedGoldfishCard(source) || cardName(source) !== "Pompous Battlemage") throw new Error("このカードは準備済みではありません。");
+  if (!source?.prepared || !verifiedGoldfishCard(source) || !["Pompous Battlemage", "Carnivorous Cultivator", "Emeritus of Ideation", "Skycoach Conductor"].includes(cardName(source))) throw new Error("このカードは準備済みではありません。");
   const next = cloneGoldfishState(state), spell = source.faces[1];
-  const copy = { ...structuredClone(source), ...structuredClone(spell), id: "prepared-" + next.nextId++, faces: [], faceIndex: 0, kind: "card", counters: {}, incarnation: 0, prepared: false };
+  const copy = { ...structuredClone(source), ...structuredClone(spell), id: "prepared-" + next.nextId++, faces: [], faceIndex: 0, kind: "card", counters: {}, incarnation: 0, prepared: false, preparedSource: { id: source.id, incarnation: source.incarnation } };
   next.hand.push(copy);
   const cast = castGoldfishCard(next, copy.id, options);
-  if (!cast.stack.some(c => c.id === copy.id)) throw new Error("準備呪文を唱えられませんでした。");
-  cast.stack.find(c => c.id === copy.id).kind = "copy";
-  cast.battlefield.find(c => c.id === cardId).prepared = false;
+  if (!cast.stack.some(c => c.id === copy.id) && !cast.rules.pendingChoice) throw new Error("準備呪文を唱えられませんでした。");
   return cast;
 }
 export function goldfishCombos(state) {
   if (state.phase !== "playing" || state.stack.length || state.rules.pendingChoice) return [];
   const result = [];
   for (const card of state.battlefield.filter(verifiedGoldfishCard)) {
+    if (cardName(card) === "Ygra, Eater of All" && state.battlefield.some(c => cardName(c) === "Cauldron Familiar" && c.ygraFood) && state.graveyard.some(c => cardName(c) === "Cauldron Familiar") && !state.battlefield.some(c => cardName(c) === "Grafdigger's Cage"))
+      result.push({ id: "ygra", cardId: card.id, label: "イグラ＋使い魔2枚：食物として交互に生け贄・帰還" });
     if (cardName(card) === "Basking Broodscale" && state.battlefield.some(c => cardName(c) === "Blade of the Bloodchief" && goldfishFindObject(state, c.attachedTo)?.id === card.id) && state.battlefield.some(c => c.name === "Eldrazi Spawn" && c.kind === "token"))
       result.push({ id: "broodscale", cardId: card.id, label: "落とし子→血の長の刃→落とし子を反復" });
     if (cardName(card) === "Devoted Druid" && state.battlefield.some(c => cardName(c) === "Vizier of Remedies") && goldfishLandManaOptions(card, state).length)
@@ -33,7 +33,13 @@ export function repeatGoldfishCombo(state, comboId, cardId, count) {
   if (!goldfishCombos(state).some(c => c.id === comboId && c.cardId === cardId)) throw new Error("このコンボの条件が揃っていません。");
   let next = cloneGoldfishState(state);
   for (let index = 0; index < count; index++) {
-    if (comboId === "druid") {
+    if (comboId === "ygra") {
+      const cat = next.graveyard.find(c => cardName(c) === "Cauldron Familiar");
+      const food = next.battlefield.find(c => cardName(c) === "Cauldron Familiar" && c.ygraFood);
+      next = advanceGoldfishGame(activateGoldfishAction(next, cat.id, "engine:familiar-return", { costCards: [goldfishReference(food, "battlefield")] }), { autoOrder: true });
+      for (let i = 0; i < 10 && next.rules.pendingChoice?.type === "engine-target" && next.rules.pendingChoice.sourceName === "Mayhem Devil"; i++)
+        next = advanceGoldfishGame(chooseGoldfishRule(next, { target: next.rules.pendingChoice.candidates.find(c => c.ref.player === "opponent" && !c.ref.virtual).ref }), { autoOrder: true });
+    } else if (comboId === "druid") {
       const druid = next.battlefield.find(c => c.id === cardId);
       if (druid.tapped) next = advanceGoldfishGame(activateGoldfishAction(next, cardId, "engine:druid-untap"));
       next = activateGoldfishLand(next, cardId);

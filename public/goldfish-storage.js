@@ -2,6 +2,33 @@
 // state remains ordinary JSON; packing never discards a game or an undo entry.
 const FORMAT = "mtg-token-finder.goldfish.packed.v1";
 export const GOLDFISH_SAVE_PREFIX = "mtg-token-finder.goldfish.v2.";
+const LAST_SESSION_KEY = "mtg-token-finder.goldfish.last-session";
+
+export function rememberGoldfishSession(storage, key, title) {
+  // This small navigation hint is optional. A quota error must not turn a
+  // successfully saved game into a reported failure or remove older games.
+  try {
+    if (key.startsWith(GOLDFISH_SAVE_PREFIX)) storage.setItem(LAST_SESSION_KEY, JSON.stringify({ key, title: String(title || "デッキ").slice(0, 240) }));
+  } catch { /* The game itself has already been saved. */ }
+}
+
+export function lastGoldfishSession(storage) {
+  try {
+    const link = JSON.parse(storage.getItem(LAST_SESSION_KEY));
+    if (typeof link?.key !== "string" || !link.key.startsWith(GOLDFISH_SAVE_PREFIX) || !storage.getItem(link.key)) return null;
+    return { key: link.key, title: String(link.title || "デッキ").slice(0, 240) };
+  } catch { return null; }
+}
+
+export function deckFromGoldfishSave(saved) {
+  if (saved?.version !== 2 || !saved.state) throw new Error("保存したゲームを読み込めませんでした。");
+  // The save key belongs to the originally registered list, even after sideboarding.
+  const mainboard = saved.state.registeredDeck?.main || saved.state.deckRows;
+  const sideboard = saved.state.registeredDeck?.side || saved.state.sideboardRows || [];
+  const valid = rows => Array.isArray(rows) && rows.every(row => typeof row?.name === "string" && row.name.trim() && Number.isInteger(row.count) && row.count > 0);
+  if (!valid(mainboard) || !mainboard.length || !valid(sideboard)) throw new Error("保存したデッキの情報が不正です。");
+  return { mainboard, sideboard };
+}
 
 export function serializeGoldfishSave(payload) {
   const plain = JSON.stringify(payload), nodes = [], index = new Map();

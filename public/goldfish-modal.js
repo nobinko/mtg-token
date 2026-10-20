@@ -1,15 +1,33 @@
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
-import { cardName, isType } from "./goldfish-events.js?v=20261020-solo3";
-import { engineCandidates } from "./goldfish-engine.js?v=20261020-solo3";
-import { sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo3";
-import { goldfishCastingCost } from "./goldfish-mana.js?v=20261020-solo3";
-import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo3";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { cardName, isType } from "./goldfish-events.js?v=20261020-solo6";
+import { engineCandidates } from "./goldfish-engine.js?v=20261020-solo6";
+import { sameGoldfishReference } from "./goldfish-objects.js?v=20261020-solo6";
+import { goldfishCastingCost } from "./goldfish-mana.js?v=20261020-solo6";
+import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo6";
+import { extraFormatCostChoice } from "./goldfish-extra-costs.js?v=20261020-solo6";
+import { advancedPreflight } from "./goldfish-advanced-spells.js?v=20261020-solo6";
 
 // Extra text, modes and additional costs are declared before any payment. The
 // draft is serializable; cancellation never exiles a card or taps a source.
 export function extraCastChoice(state, card, options) {
   if (!verifiedGoldfishCard(card)) return null;
   const name = cardName(card), ctx = { source: { id: card.id }, x: options.x };
+  const additional = extraFormatCostChoice(state, card, options.format);
+  if (additional) return additional;
+  const advanced = advancedPreflight(state, card, options);
+  if (advanced) return advanced;
+  if (name === "Jeskai Revelation") {
+    for (const [key, label, spec] of [
+      ["returnTarget", "手札に戻す呪文／パーマネント", { zone: ["stack", "battlefield"], spell: true, virtualOpponent: true }],
+      ["damageTarget", "4点ダメージを与える対象", { zone: "battlefield", types: ["Creature", "Planeswalker", "Battle"], players: true, virtualOpponent: true }]
+    ]) {
+      const candidates = engineCandidates(state, { ...spec, target: true }, ctx).map(({ ref, label }) => ({ ref, label }));
+      candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の適正な対象（領域は省略）" });
+      if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+      if (options[key] === undefined) return { optionKey: key, kind: "cards", label, min: 1, max: 1, candidates };
+      if (!Array.isArray(options[key]) || options[key].length !== 1 || !candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(options[key][0]))) throw new Error("適正な対象を選び直してください。");
+    }
+  }
   if (FORMAT_MODES[name]) {
     const modes = FORMAT_MODES[name];
     if (options.mode === undefined) return { optionKey: "mode", kind: "buttons", label: "モードを選ぶ", options: modes };
@@ -31,9 +49,14 @@ export function extraCastChoice(state, card, options) {
     const refs = options.harmonizeTap || [];
     if (!Array.isArray(refs) || refs.length > 1 || refs.some(r => !candidates.some(c => sameGoldfishReference(c.ref, r)))) throw new Error("調和でタップするクリーチャーを選び直してください。");
   } else if (options.harmonizeTap?.length) throw new Error("この唱え方では調和のタップを使えません。");
-  if (["Bitter Triumph", "Crop Rotation"].includes(name)) {
+  if (name === "Beseech the Mirror") {
+    const candidates = engineCandidates(state, { zone: "battlefield", filter: { bargain: true } }).map(({ ref, label }) => ({ ref, label }));
+    if (options.costCards === undefined) return { optionKey: "costCards", kind: "cards", label: "協約：生け贄にするアーティファクト・エンチャント・トークン（任意）", min: 0, max: Math.min(1, candidates.length), candidates };
+    if (!Array.isArray(options.costCards) || options.costCards.length > 1 || options.costCards.some(r => !candidates.some(c => sameGoldfishReference(c.ref, r)))) throw new Error("協約の生け贄を選び直してください。");
+  } else if (["Bitter Triumph", "Crop Rotation"].includes(name)) {
     if (name === "Bitter Triumph") {
-      const modes = [{ value: "discard", label: "手札1枚を捨てる" }, ...(state.players.self.life >= 3 ? [{ value: "life", label: "3ライフを支払う" }] : [])];
+      const modes = [...(state.hand.some(c => c.id !== card.id) ? [{ value: "discard", label: "手札1枚を捨てる" }] : []), ...(state.players.self.life >= 3 ? [{ value: "life", label: "3ライフを支払う" }] : [])];
+      if (!modes.length) throw new Error("捨てる手札も、支払う3ライフもありません。");
       if (options.extraCost === undefined) return { optionKey: "extraCost", kind: "buttons", label: "追加コストを選ぶ", options: modes };
       if (!modes.some(m => m.value === options.extraCost)) throw new Error("追加コストを選び直してください。");
     }

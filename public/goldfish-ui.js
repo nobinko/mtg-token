@@ -40,24 +40,26 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js?v=20261020-solo3";
-import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo3";
-import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText,
-  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo3";
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo3";
-import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo3";
-import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo3";
-import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo3";
-import { goldfishCardOperations } from "./goldfish-effects.js?v=20261017-mana";
-import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo3";
-import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261017-arena";
-import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo3";
-import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo3";
-import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo3";
+} from "./goldfish.js?v=20261020-solo6";
+import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261020-solo6";
+import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo6";
+import { extraCastChoice } from "./goldfish-modal.js?v=20261020-solo6";
+import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText, canPlayGoldfishGraveyard,
+  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261020-solo6";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo6";
+import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261020-solo6";
+import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo6";
+import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261020-solo6";
+import { goldfishCardOperations } from "./goldfish-effects.js?v=20261020-solo6";
+import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261020-solo6";
+import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261020-solo6";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo6";
+import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261020-solo6";
+import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261020-solo6";
 
-import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo3";
-import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo3";
-import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo3";
+import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261020-solo6";
+import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261020-solo6";
+import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo6";
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command", "stack"];
 const ZONE_LABELS = {
   library: "山札",
@@ -74,7 +76,7 @@ const ZONE_LABELS = {
 };
 const LANE_LABELS = { other: "その他", creature: "クリーチャー", land: "土地" };
 const MAX_TIMELINE = 60;
-import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave } from "./goldfish-storage.js?v=20261020-solo3";
+import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261020-solo6";
 
 function normalizeName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
@@ -227,6 +229,7 @@ export function createGoldfishController(dialog) {
     if (!storageKey) return false;
     try {
       writeGoldfishSave(localStorage, storageKey, payload);
+      rememberGoldfishSession(localStorage, storageKey, ui.title.textContent.replace(/ — ひとり回し$/, ""));
       ui.saveStatus.textContent = `${manual ? "保存" : "自動保存"} ${displayTime(payload.savedAt)}`;
       find("#goldfish-save-indicator").textContent = "保存済み";
       find("#goldfish-save-indicator").classList.remove("save-failed");
@@ -449,7 +452,12 @@ export function createGoldfishController(dialog) {
       badges.append(badge);
     }
     if (card.damage) { const badge = document.createElement("span"); badge.className = "damage-badge"; badge.textContent = `${card.damage}点ダメージ`; badges.append(badge); }
-    if (card.playPermission) { const badge = document.createElement("span"); badge.className = "rules-badge"; const valid = card.playPermission.serial != null ? card.playPermission.serial === state.rules.turnSerial : card.playPermission.turn === state.turn && state.rules.activePlayer === "self"; badge.textContent = card.playPermission.kind === "plot" ? goldfishPlotReady(state, card) ? "計画済み・0マナ" : "計画済み" : valid ? "このターン使用可" : "期限終了"; badges.append(badge); }
+    if (card.playPermission) {
+      const badge = document.createElement("span"); badge.className = "rules-badge";
+      const p = card.playPermission, persistent = ["adventure", "airbend"].includes(p.kind);
+      const valid = persistent || p.kind === "warp" ? persistent || p.serial < state.rules.turnSerial : p.expires != null ? p.expires >= state.rules.turnSerial : p.serial != null ? p.serial === state.rules.turnSerial : p.turn === state.turn && state.rules.activePlayer === "self";
+      badge.textContent = p.kind === "plot" ? goldfishPlotReady(state, card) ? "計画済み・0マナ" : "計画済み" : p.kind === "airbend" ? "{2}で唱えられる" : p.kind === "adventure" ? "出来事から唱えられる" : p.kind === "warp" ? valid ? "ワープから唱えられる" : "次ターンから使用可" : valid ? "追放から使用可" : "期限終了"; badges.append(badge);
+    }
     if (badges.childElementCount) surface.append(badges);
   }
 
@@ -645,7 +653,11 @@ export function createGoldfishController(dialog) {
     renderZone("goldfish-battlefield-other", "goldfish-other-count", lanes.other, "battlefield", { visual: true });
     renderZone("goldfish-battlefield-creature", "goldfish-creature-count", lanes.creature, "battlefield", { visual: true });
     renderZone("goldfish-battlefield-land", "goldfish-land-count", lanes.land, "battlefield", { visual: true });
-    for (const [lane, cards] of Object.entries(lanes)) find(`#goldfish-battlefield-${lane}`).style.setProperty("--lane-count", String(Math.max(1, cards.length)));
+    for (const [lane, cards] of Object.entries(lanes)) {
+      const zone = find(`#goldfish-battlefield-${lane}`);
+      zone.style.setProperty("--lane-count", String(Math.max(1, cards.length)));
+      zone.parentElement.classList.toggle("is-empty-lane", !cards.length);
+    }
   }
 
   function makeLibraryResult(group, { shuffleLibrary }) {
@@ -846,7 +858,7 @@ export function createGoldfishController(dialog) {
         } else if (primary.zone !== "stack") {
           actions.push(["手札へ H", "hand"], ["戦場へ B", "battlefield"]);
           if (selected.length === 1 && primary.zone === "exile" && goldfishPlayDestination(primary.card)) actions.unshift([primary.card.playPermission?.kind === "plot" ? "計画から0マナで唱える" : "追放からプレイ", "exile-play", primary.card.playPermission?.kind === "plot" && !goldfishPlotReady(state, primary.card)]);
-          if (selected.length === 1 && primary.zone === "graveyard" && (goldfishSpellProgram(primary.card)?.flashback || goldfishSpellProgram(primary.card)?.harmonize || primary.card.grantedCast?.serial === state.rules.turnSerial)) actions.unshift([goldfishSpellProgram(primary.card)?.harmonize ? "調和で唱える" : "墓地から唱える", "flashback"]);
+          if (selected.length === 1 && primary.zone === "graveyard" && canPlayGoldfishGraveyard(state, primary.card)) actions.unshift([goldfishPlayDestination(primary.card) === "battlefield" ? "墓地から土地をプレイ" : goldfishSpellProgram(primary.card)?.harmonize ? "調和で唱える" : "墓地から唱える", "flashback"]);
           if (selected.length === 1 && primary.zone === "sideboard" && state.rules.wish === state.rules.turnSerial) actions.unshift(["願いから唱える", "wish-play"]);
         }
         if (selected.length === 1) for (const ability of goldfishCardActions(primary.card).filter((item) => item.zone === primary.zone)) {
@@ -987,7 +999,7 @@ export function createGoldfishController(dialog) {
     find("#goldfish-stack-zone").classList.toggle("has-spells", Boolean(state.stack.length));
     find("#goldfish-resolve").hidden = !state.stack.length;
     find("#goldfish-resolve").textContent = state.stack.at(-1)?.kind === "ability" ? "誘発を解決 Space" : "呪文を解決 Space";
-    find("#goldfish-cast-count").textContent = state.rules.castCountKnown ? `呪文 ${state.rules.spellsCast} · 土地 ${state.rules.landsPlayed ?? "?"}/1` : "呪文回数を設定";
+    find("#goldfish-cast-count").textContent = state.rules.castCountKnown ? `呪文 ${state.rules.spellsCast} · 土地 ${state.rules.landsPlayed ?? "?"}/${gameLandPlayLimit(state)}${state.rules.dayNight ? ` · ${state.rules.dayNight === "day" ? "昼" : "夜"}` : ""}` : "呪文回数を設定";
     find("#goldfish-next-turn").hidden = Boolean(state.stack.length) || state.phase === "opening";
     const combat = state.rules.combat;
     if (combat && combat.stage !== "done") find("#goldfish-next-turn").hidden = true;
@@ -1154,7 +1166,7 @@ export function createGoldfishController(dialog) {
     const header = find("#goldfish-hand").parentElement.querySelector("header");
     let tray = header.querySelector(".goldfish-plotted-cards");
     if (!tray) { tray = document.createElement("div"); tray.className = "goldfish-plotted-cards"; tray.setAttribute("aria-label", "追放からプレイできるカード"); header.append(tray); }
-    const plotted = state.exile.filter((card) => { const p = card.playPermission; return p && (p.kind === "plot" || p.kind === "warp" || p.expires != null && p.expires >= state.rules.turnSerial || p.serial === state.rules.turnSerial); });
+    const plotted = state.exile.filter((card) => { const p = card.playPermission; return p && (["plot", "warp", "adventure", "airbend"].includes(p.kind) || p.expires != null && p.expires >= state.rules.turnSerial || p.serial === state.rules.turnSerial); });
     tray.replaceChildren(); tray.hidden = !plotted.length;
     header.querySelector("p").hidden = Boolean(plotted.length);
     for (const card of plotted) {
@@ -1403,10 +1415,13 @@ export function createGoldfishController(dialog) {
       const pay = action(selected.zone === "exile" ? "使用許可を確認して支払う" : "支払って唱える", () => finishPlay(card.id, { x: costX, confirmLife: true }), { primary: true });
       const refresh = () => {
         const plan = planGoldfishCastPayment(state, card, { preview: true, autoTap: find("#goldfish-auto-tap").checked, x: costX, ...origin });
-        pay.disabled = !plan.payable;
+        let preflight = null;
+        try { preflight = extraCastChoice(state, card, { ...origin, x: costX }); } catch {}
+        pay.disabled = !plan.payable && !preflight;
+        pay.textContent = preflight ? "唱え方・対象・追加コストを選ぶ" : "支払って唱える";
         const lands = plan.activations?.map(({ id }) => cardDisplayName(findCard(id).card)).join("、");
         const usesPool = GOLDFISH_MANA_TYPES.some((color) => (state.manaPool[color] || 0) > (plan.remaining?.[color] || 0));
-        explanation.textContent = plan.payable ? `${lands ? `タップするマナ源：${lands}。` : usesPool ? "プールのマナで支払えます。" : "タップする必要はありません。"}${plan.life ? `ライフが${plan.life}点減ります。` : ""}` : plan.reason;
+        explanation.textContent = preflight ? "モードや代替コストを選んでから、支払えるか確認します。選択が終わるまでマナは使いません。" : plan.payable ? `${lands ? `タップするマナ源：${lands}。` : usesPool ? "プールのマナで支払えます。" : "タップする必要はありません。"}${plan.life ? `ライフが${plan.life}点減ります。` : ""}` : plan.reason;
       };
       xInput?.addEventListener("input", () => { costX = xInput.value === "" ? NaN : Number(xInput.value); refresh(); });
       refresh();
@@ -2055,5 +2070,14 @@ export function createGoldfishController(dialog) {
     } catch (error) { render(error.message); }
   });
 
-  return { open, close };
+  async function resumeLast() {
+    const link = lastGoldfishSession(localStorage);
+    if (!link) throw new Error("このブラウザーに再開できるゲームがありません。");
+    const saved = parseGoldfishSave(localStorage.getItem(link.key));
+    const deck = deckFromGoldfishSave(saved);
+    if (saved.signature !== deckSignature(deck) || link.key !== `${SAVE_PREFIX}${saved.signature}`) throw new Error("保存したゲームとデッキが一致しません。元のリストから開いてください。");
+    await open(deck, link.title);
+  }
+
+  return { open, close, resumeLast, lastSession: () => lastGoldfishSession(localStorage) };
 }

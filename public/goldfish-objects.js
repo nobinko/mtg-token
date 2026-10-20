@@ -1,5 +1,6 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo3";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo6";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);
@@ -16,11 +17,27 @@ export function resetGoldfishCardState(card) {
   const next = { ...card, tapped: false, faceDown: false, counters: {}, powerOverride: "", toughnessOverride: "",
     note: "", groupId: "", temporaryEffects: [], attachedTo: null, automaticAbilities: true, damage: 0 };
   delete next.cast;
+  delete next.wasCast;
+  delete next.castFrom;
   delete next.delvedCards;
   delete next.castManaByColor;
   delete next.playPermission;
+  delete next.stageAbility;
+  delete next.copyRuleName;
+  delete next.copyEntryChosen;
+  delete next.copiedFlying;
+  delete next.permanentCopy;
+  delete next.ygraFood;
+  if (card.ygraType) next.typeLine = card.ygraType;
+  delete next.ygraType;
+  if (card.ygraFaceTypes && next.faces) {
+    next.faces = structuredClone(next.faces);
+    for (const [index, type] of Object.entries(card.ygraFaceTypes)) next.faces[Number(index)].typeLine = type;
+  }
+  delete next.ygraFaceTypes;
+  delete next.trollLandAbility;
   delete next.exerted;
-  for (const key of ["chosenName", "castX", "unearthed", "stationed", "addedArtifactSerial"]) delete next[key];
+  for (const key of ["chosenName", "castX", "unearthed", "stationed", "addedArtifactSerial", "monumentSerial", "monumentModes", "suppressedKeywords", "suppressedBy", "lostAbilitiesOriginal", "exileOnDeathSerial", "trollAura", "castFormat", "manaSpent", "impending", "unlockedDoors", "linkedExile", "solved", "scoutSerial"]) delete next[key];
   if (card.originalTypeLine) { next.typeLine = card.originalTypeLine; delete next.originalTypeLine; }
   if (card.originalFaces) { next.faces = structuredClone(card.originalFaces); delete next.originalFaces; }
   for (const key of ["prepared", "warped", "dashed", "level", "loyaltyUsed", "enteredSerial", "enteredTurn", "earthbent", "grantedCast", "imprinted", "regeneration", "sagaChapter", "sagaAbilities", "summonedAsBestow", "boundCards", "animated", "evoked", "mobilized", "attackedSerial", "castColors", "chosenType"]) delete next[key];
@@ -28,6 +45,7 @@ export function resetGoldfishCardState(card) {
 }
 
 export function cleanGoldfishAttachments(state) {
+  for (const card of state.battlefield) if (card.suppressedBy && !goldfishFindObject(state, card.suppressedBy)) { card.automaticAbilities = card.lostAbilitiesOriginal; delete card.suppressedBy; delete card.suppressedKeywords; delete card.lostAbilitiesOriginal; }
   for (const card of state.battlefield) if (card.attachedTo && !goldfishFindObject(state, card.attachedTo)) {
     card.attachedTo = null;
     if (card.summonedAsBestow) { card.typeLine = card.originalTypeLine; delete card.originalTypeLine; card.summonedAsBestow = false; card.lane = "creature"; }
@@ -39,14 +57,24 @@ export function moveGoldfishRuleObject(state, id, from, destination, reason = ""
   const index = state[from].findIndex((card) => card.id === id);
   if (index < 0) throw new Error("処理するカードが元の領域にありません。");
   const before = state[from][index], beforeFace = before.faces?.[before.faceIndex || 0] || before;
+  if (from === "hand" && destination === "graveyard" && !reason) reason = "discard";
+  const madnessCost = reason === "discard" && beforeFace.name === "Fiery Temper" && verifiedGoldfishCard(before) ? "{R}" : null;
+  if (madnessCost) destination = "exile";
+  if (from === "battlefield" && ["sacrifice", "effect-sacrifice"].includes(reason)) {
+    state.rules.permanentsSacrificed = (state.rules.permanentsSacrificed || 0) + 1;
+    if (/\bArtifact\b/.test(beforeFace.typeLine)) state.rules.artifactsSacrificed = (state.rules.artifactsSacrificed || 0) + 1;
+  }
+  const discardWatchers = reason === "discard" ? state.battlefield.filter(c => (c.faces?.[c.faceIndex || 0] || c).name === "Monument to Endurance").map(c => structuredClone(c)) : [];
   if (destination === "battlefield" && ["graveyard", "library"].includes(from) && /Creature/.test(beforeFace.typeLine || "") && hasRuleCard(state, "Grafdigger's Cage")) return before;
-  if (destination === "graveyard" && hasRuleCard(state, "Rest in Peace")) destination = "exile";
+  if (destination === "graveyard" && (hasRuleCard(state, "Rest in Peace") || state.rules.gaeaWillSerial === state.rules.turnSerial)) destination = "exile";
+  if (from === "battlefield" && destination === "graveyard" && (before.exileOnDeathSerial === state.rules.turnSerial || before.counters?.finality)) destination = "exile";
   const graveyardWatchers = from === "graveyard" ? state.battlefield.filter(c => (c.faces?.[c.faceIndex || 0] || c).name === "Murktide Regent" && !c.faceDown && c.automaticAbilities !== false).map(c => structuredClone(c)) : [];
   const sacrificeWatchers = reason === "sacrifice" && from === "battlefield" ? state.battlefield.filter(c => (c.faces?.[c.faceIndex || 0] || c).name === "Biotech Specialist" && !c.faceDown && c.automaticAbilities !== false).map(c => structuredClone(c)) : [];
   const original = state[from].splice(index, 1)[0];
   if (from === "battlefield" && original.unearthed && destination !== "exile" && destination !== "battlefield") destination = "exile";
   const to = destination.startsWith("library") ? "library" : destination;
   const card = resetGoldfishCardState(original);
+  if (card.kind === "copy" && to === "battlefield") card.kind = "token";
   if (to === "battlefield" && from !== to) card.enteredTurn = state.turn;
   if (to === "battlefield" && from !== to) card.enteredSerial = state.rules.turnSerial;
   if (from !== to) card.incarnation = (card.incarnation || 0) + 1;
@@ -57,6 +85,6 @@ export function moveGoldfishRuleObject(state, id, from, destination, reason = ""
     else state[actual].push(card);
   }
   cleanGoldfishAttachments(state);
-  if (from !== actual) (state.rules.events ||= []).push({ kind: "move", from, to: actual, original: structuredClone(original), card: structuredClone(card), ...(reason ? { reason } : {}), ...(graveyardWatchers.length ? { graveyardWatchers } : {}), ...(sacrificeWatchers.length ? { sacrificeWatchers } : {}) });
+  if (from !== actual) (state.rules.events ||= []).push({ kind: "move", batch: state.rules.movementBatch ?? state.rules.nextEventId++, from, to: actual, original: structuredClone(original), card: structuredClone(card), ...(reason ? { reason } : {}), ...(madnessCost ? { madnessCost } : {}), ...(discardWatchers.length ? { discardWatchers } : {}), ...(graveyardWatchers.length ? { graveyardWatchers } : {}), ...(sacrificeWatchers.length ? { sacrificeWatchers } : {}) });
   return card;
 }

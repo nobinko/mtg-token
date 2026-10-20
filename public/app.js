@@ -1,9 +1,9 @@
-import { createGoldfishController } from "./goldfish-ui.js?v=20261020-solo3";
+import { createGoldfishController } from "./goldfish-ui.js?v=20261020-solo6";
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261017-auxiliary";
 import { createDeckGallery } from "./deck-gallery.js?v=20260926-gallery-v2";
-import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261020-solo3";
-import { createTournamentController } from "./tournament-ui.js?v=20261020-solo3";
-import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261020-solo3";
+import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261020-solo6";
+import { createTournamentController } from "./tournament-ui.js?v=20261020-solo6";
+import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261020-solo6";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -735,6 +735,20 @@ async function openRepresentativeDeck(entry) {
 }
 
 const goldfishController = createGoldfishController(goldfishDialog);
+const resumeLastGoldfish = document.querySelector("#goldfish-resume-last");
+function renderLastGoldfishSession() {
+  const saved = goldfishController.lastSession();
+  document.querySelector("#goldfish-last-session").hidden = !saved;
+  document.querySelector("#goldfish-last-session-title").textContent = saved?.title || "";
+}
+renderLastGoldfishSession();
+goldfishDialog.addEventListener("close", renderLastGoldfishSession);
+resumeLastGoldfish.addEventListener("click", async () => {
+  resumeLastGoldfish.disabled = true;
+  try { await goldfishController.resumeLast(); }
+  catch (error) { setStatus(error.message); }
+  finally { resumeLastGoldfish.disabled = false; renderLastGoldfishSession(); }
+});
 
 function openGoldfish(deck) {
   if (deckDialog.open) deckDialog.close();

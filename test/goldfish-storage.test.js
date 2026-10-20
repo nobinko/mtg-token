@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { serializeGoldfishSave, parseGoldfishSave, writeGoldfishSave, GOLDFISH_SAVE_PREFIX } from "../public/goldfish-storage.js";
+import { serializeGoldfishSave, parseGoldfishSave, writeGoldfishSave, GOLDFISH_SAVE_PREFIX, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "../public/goldfish-storage.js";
 import { createGoldfishGame, keepGoldfishHand, drawGoldfishCard, restoreGoldfishGame } from "../public/goldfish.js";
 import { mergeCardMetadata } from "../public/card-metadata.js";
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/goldfish-top10.json", import.meta.url), "utf8"));
@@ -46,4 +46,34 @@ test("unpacking does not alias independent mutable queues or history snapshots",
   assert.deepEqual(saved.entered, []); assert.deepEqual(saved.encampments, []);
   assert.deepEqual(saved.snapshots[1].hand, []);
   assert.equal(saved.snapshots[1].note, input.snapshots[1].note);
+});
+
+test("resuming a postboard game uses its original list while retaining the exchanged game and pending choice", () => {
+  const game = payload(), registered = structuredClone(game.state.registeredDeck);
+  game.state.deckRows = [{ name: "Island", count: 60 }];
+  game.state.sideboardRows = [];
+  game.state.pendingChoice = { kind: "legend", options: ["original", "copy"] };
+  const entries = new Map(), storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
+  const key = GOLDFISH_SAVE_PREFIX + game.signature;
+  writeGoldfishSave(storage, key, game);
+  rememberGoldfishSession(storage, key, "大会のデッキ");
+  assert.deepEqual(lastGoldfishSession(storage), { key, title: "大会のデッキ" });
+  const saved = parseGoldfishSave(storage.getItem(lastGoldfishSession(storage).key));
+  assert.deepEqual(deckFromGoldfishSave(saved), { mainboard: registered.main, sideboard: registered.side });
+  assert.deepEqual(saved.state.pendingChoice, game.state.pendingChoice);
+  assert.deepEqual(saved.state.deckRows, game.state.deckRows);
+  entries.delete(key);
+  assert.equal(lastGoldfishSession(storage), null);
+});
+
+test("an unavailable or corrupt shortcut never replaces a saved game", () => {
+  const entries = new Map(), storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
+  const key = GOLDFISH_SAVE_PREFIX + "game", original = serializeGoldfishSave(payload());
+  storage.setItem(key, original);
+  rememberGoldfishSession(storage, "unrelated", "wrong");
+  assert.equal(lastGoldfishSession(storage), null);
+  rememberGoldfishSession({ setItem() { throw new Error("quota"); } }, key, "title");
+  assert.equal(storage.getItem(key), original);
+  assert.equal(lastGoldfishSession({ getItem: () => "{broken" }), null);
+  assert.throws(() => deckFromGoldfishSave({ version: 2, state: { deckRows: [{ name: "Island", count: -1 }] } }), /不正/);
 });

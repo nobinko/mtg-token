@@ -1,11 +1,30 @@
 // Programs used by the dated Standard, Legacy and Pioneer fixtures. The caller
 // must verify the complete Oracle snapshot before exposing these adapters.
+import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-solo6";
+import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-solo6";
 const creature = { zone: "battlefield", types: ["Creature"], virtualOpponent: true };
 const spell = { zone: "stack", spell: true, virtualOpponent: true };
 const damage = { zone: "battlefield", types: ["Creature", "Planeswalker", "Battle"], players: true };
 const select = (label, zone, filter, rest) => ({ op: "select", label, zone, filter, min: 0, max: 1, ...rest });
 const look = (count, take) => select(`上${count}枚から${take}枚を手札へ`, "library", {}, { top: count, min: take, max: take, destination: "hand", remainder: "libraryBottom" });
 export const FORMAT_SPELLS = {
+  ...SIDEBOARD_SPELLS,
+  ...ADVANCED_SPELLS,
+  ...Object.fromEntries(["Abrade", "Hydroblast", "Pyroblast", "Split Up", "Pick Your Poison", "Warg Tactics", "Boros Charm", "Iroh's Demonstration", "Witherbloom Charm", "Sheoldred's Edict", "Change the Equation", "Fire Magic", "Path of Peril"].map(n => [n, { steps: [{ op: "format-modal" }] }])),
+  Enroot: { steps: [select("墓地へ置く土地", "library", { types: ["Land"] }, { destination: "graveyard", shuffle: true })] },
+  "Fatehold Charm": { steps: [{ op: "fatehold" }] },
+  "Firebending Lesson": { steps: [{ op: "kicked-damage", normal: 2, kicked: 5 }], target: creature },
+  "Forth Eorlingas!": { steps: [{ op: "token", name: "knight", count: "x" }, { op: "forth-monarch" }] },
+  "Burning Wish": { steps: [select("サイドボードのソーサリーを手札へ", "sideboard", { types: ["Sorcery"] }, { destination: "hand" }), { op: "finish-zone", zone: "exile" }] },
+  "Gamble": { steps: [select("山札から手札へ", "library", {}, { destination: "hand" }), { op: "random-discard" }, { op: "shuffle-library" }] },
+  "Echo of Eons": { steps: [{ op: "echo-eons" }, { op: "draw", count: 7 }], flashback: "{2}{U}" },
+  "Gaea's Will": { steps: [{ op: "gaea-will" }] },
+  "Vanishing Verse": { steps: [{ op: "move-target", destination: "exile" }], target: { zone: "battlefield", permanent: true, monocolored: true, virtualOpponent: true } },
+  "Impractical Joke": { steps: [{ op: "no-prevention" }, { op: "format-targets" }] },
+  "Storm the Festival": { steps: [select("上5枚からマナ総量5以下のパーマネントを2枚まで", "library", { permanent: true, maxManaValue: 5 }, { top: 5, max: 2, destination: "battlefield", remainder: "libraryBottom", randomRemainder: true })], flashback: "{7}{G}{G}{G}" },
+  "Jace's Machinations": { steps: [{ op: "empower-jace", count: 8, instant: true }] },
+  "Jeskai Revelation": { steps: [{ op: "jeskai-revelation" }] },
+  "Beseech the Mirror": { steps: [select("山札から探すカード", "library", {}, { destination: "exile", shuffle: true, remember: "beseech" }), { op: "beseech-cast" }, { op: "beseech-hand" }] },
   "Get Out": { steps: [{ op: "format-targets" }] },
   "Tear Asunder": { steps: [{ op: "format-targets" }] },
   "Life from the Loam": { steps: [{ op: "format-targets" }] },
@@ -47,6 +66,15 @@ export const FORMAT_SPELLS = {
   "Tendrils of Agony": { steps: [{ op: "drain-target", count: 2 }], target: { zone: "none", players: true } }
 };
 export const FORMAT_ENTERS = {
+  "Cavalier of Thorns": [select("上5枚から土地を1枚出す", "library", { types: ["Land"] }, { top: 5, min: 1, destination: "battlefield", remainder: "graveyard" })],
+  "Atraxa, Grand Unifier": [select("上10枚から各カード・タイプ1枚ずつ", "library", {}, { top: 10, max: 8, distinctCardTypes: true, destination: "hand", remainder: "libraryBottom", randomRemainder: true })],
+  "Doomsday Excruciator": [{ op: "excruciator" }],
+  "Stitcher's Supplier": [{ op: "mill", count: 3 }],
+  "Sapling Nursery": [],
+  "Amped Raptor": [{ op: "energy", count: 2 }, { op: "raptor-exile" }],
+  "Uldaros Theorix": [{ op: "uldaros" }],
+  "Earthbender Ascension": [{ op: "ascension-earthbend" }, select("基本土地をタップ状態で探す", "library", { types: ["Basic", "Land"], basicLand: true }, { destination: "battlefield", tapped: true, shuffle: true })],
+  "Voldaren Epicure": [{ op: "damage", amount: 1, player: "opponent" }, { op: "token", name: "blood" }],
   "The Sackville-Bagginses": [select("生け贄にする別のクリーチャーかアーティファクト（0〜1枚）", "battlefield", { types: ["Creature", "Artifact"], excludeSelf: true }, { destination: "graveyard", reason: "effect-sacrifice" }), { op: "sackville-reward" }],
   "Cauldron Familiar": [{ op: "opponent-life", amount: -1 }, { op: "life", amount: 1 }],
   "Moseo, Vein's New Dean": [{ op: "token", name: "attackingPest" }],
@@ -87,6 +115,20 @@ export const FORMAT_NOTES = {
 // Modal targets are declared before payment and revalidated at resolution.
 // A mode with no target (e.g. Dirge's search) deliberately has no target spec.
 export const FORMAT_MODES = {
+  Abrade: [{ value: "damage", label: "クリーチャーに3点" }, { value: "destroy", label: "アーティファクトを破壊" }],
+  Hydroblast: [{ value: "counter", label: "赤の呪文なら打ち消す" }, { value: "destroy", label: "赤のパーマネントなら破壊" }],
+  Pyroblast: [{ value: "counter", label: "青の呪文なら打ち消す" }, { value: "destroy", label: "青のパーマネントなら破壊" }],
+  "Split Up": [{ value: "tapped", label: "タップ状態のクリーチャーを全破壊" }, { value: "untapped", label: "アンタップ状態のクリーチャーを全破壊" }],
+  "Pick Your Poison": [{ value: "artifact", label: "相手はアーティファクトを生け贄" }, { value: "enchantment", label: "相手はエンチャントを生け贄" }, { value: "flying", label: "相手は飛行クリーチャーを生け贄" }],
+  "Warg Tactics": [{ value: "destroy", label: "飛行クリーチャーを破壊" }, { value: "boost", label: "自分のクリーチャーにカウンター・呪禁・トランプル" }],
+  "Boros Charm": [{ value: "damage", label: "プレイヤーかプレインズウォーカーに4点" }, { value: "protect", label: "自分のパーマネントに破壊不能" }, { value: "double", label: "クリーチャーに二段攻撃" }],
+  "Iroh's Demonstration": [{ value: "all", label: "相手の全クリーチャーに1点" }, { value: "damage", label: "クリーチャーに4点" }],
+  "Witherbloom Charm": [{ value: "sacrifice", label: "パーマネントを生け贄にして2枚引く" }, { value: "life", label: "5点回復" }, { value: "destroy", label: "マナ総量2以下の土地以外を破壊" }],
+  "Sheoldred's Edict": [{ value: "creature", label: "相手はトークンでないクリーチャーを生け贄" }, { value: "token", label: "相手はクリーチャー・トークンを生け贄" }, { value: "planeswalker", label: "相手はプレインズウォーカーを生け贄" }],
+  "Change the Equation": [{ value: "small", label: "マナ総量2以下の呪文を打ち消す" }, { value: "color", label: "マナ総量6以下の赤／緑の呪文を打ち消す" }],
+  "Fire Magic": [{ value: "fire", label: "ファイア：全クリーチャーに1点" }, { value: "fira", label: "追加{2}：全クリーチャーに2点" }, { value: "firaga", label: "追加{5}：全クリーチャーに3点" }],
+  "Path of Peril": [{ value: "small", label: "マナ総量2以下のクリーチャーを全破壊" }, { value: "cleave", label: "切除{4}{W}{B}：クリーチャーを全破壊" }],
+  "Fatehold Charm": [{ value: "draw", label: "1枚引き、ジェイスに忠誠度2" }, { value: "return", label: "呪文かクリーチャーを手札へ" }, { value: "pump", label: "自分のクリーチャー全体に＋1/＋2" }],
   "Theorix Charm": [{ value: "mill", label: "3枚切削・1枚引く" }, { value: "counter", label: "非クリーチャー呪文を打ち消す（{2}で回避）" }, { value: "shrink", label: "クリーチャー1体に−2/−2" }],
   "Practiced Offense": [{ value: "self", label: "自分のクリーチャー全員に＋1/＋1カウンター" }, { value: "opponent", label: "相手のクリーチャー全員に＋1/＋1カウンター" }],
   "Prismari Charm": [{ value: "surveil", label: "諜報2・1枚引く" }, { value: "damage", label: "1〜2つの対象に各1点" }, { value: "return", label: "土地でないパーマネントを手札へ" }],
@@ -94,6 +136,16 @@ export const FORMAT_MODES = {
   "Lively Dirge": [{ value: "tutor", label: "追加{1}：山札から墓地へ" }, { value: "return", label: "追加{2}：墓地から合計マナ総量4以下を2体まで戻す" }, { value: "both", label: "追加{3}：両方（探索してから戻す）" }]
 };
 export function formatTargetSpec(name, options = {}) {
+  const mode = options.mode, one = spec => ({ min: 1, max: 1, ...spec });
+  if (name === "Abrade") return one(mode === "damage" ? { ...creature, effect: "damage", amount: 3 } : { zone: "battlefield", types: ["Artifact"], virtualOpponent: true, effect: "destroy" });
+  if (["Hydroblast", "Pyroblast"].includes(name)) return one({ zone: mode === "counter" ? "stack" : "battlefield", ...(mode === "counter" ? { spell: true } : { permanent: true }), virtualOpponent: true, effect: mode === "counter" ? "counter" : "destroy", conditionalColor: name === "Hydroblast" ? "R" : "U" });
+  if (name === "Warg Tactics") return one(mode === "destroy" ? { ...creature, keywords: ["flying"], effect: "destroy" } : { zone: "battlefield", types: ["Creature"], effect: "warg-boost" });
+  if (name === "Boros Charm") return mode === "protect" ? null : one(mode === "damage" ? { zone: "battlefield", types: ["Planeswalker"], players: true, effect: "damage", amount: 4 } : { ...creature, effect: "double-strike" });
+  if (name === "Iroh's Demonstration") return mode === "all" ? null : one({ ...creature, effect: "damage", amount: 4 });
+  if (name === "Witherbloom Charm") return mode === "destroy" ? one({ zone: "battlefield", permanent: true, notTypes: ["Land"], maxManaValue: 2, virtualOpponent: true, effect: "destroy" }) : null;
+  if (name === "Change the Equation") return one({ ...spell, maxManaValue: mode === "small" ? 2 : 6, ...(mode === "color" ? { colorsAny: ["R", "G"] } : {}), effect: "counter" });
+  if (name === "Fatehold Charm" && options.mode === "return") return { zone: ["stack", "battlefield"], spellOrCreature: true, virtualOpponent: true, min: 1, max: 1, destination: "hand" };
+  if (name === "Impractical Joke") return { zone: "battlefield", types: ["Creature", "Planeswalker"], virtualOpponent: true, min: 0, max: 1, effect: "damage", amount: 3 };
   if (name === "Practiced Offense") return { ...creature, min: 1, max: 1 };
   if (name === "Theorix Charm") return options.mode === "mill" ? null : options.mode === "counter"
     ? { zone: "stack", spell: true, notTypes: ["Creature"], virtualOpponent: true, min: 1, max: 1, effect: "counter-unless", cost: "{2}" }

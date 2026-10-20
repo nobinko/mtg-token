@@ -1,11 +1,15 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo3";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo3";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo3";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo3";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo3";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo3";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo3";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-solo6";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo6";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-solo6";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-solo6";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo6";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo6";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-solo6";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-solo6";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-solo6";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-solo6";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-solo6";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -29,8 +33,9 @@ export function gameLandTypes(state, card) {
   return [...new Set(types)];
 }
 export const gameDomain = state => new Set(state.battlefield.flatMap(card => gameLandTypes(state, card))).size;
+export const gameLandPlayLimit = state => 1 + live(state).filter(c => verifiedGoldfishCard(c) && /You may play an additional land on each of your turns\./.test(face(c).oracleText)).length;
 export function engineStatAdjustments(state, card) {
-  const n = name(card), data = {};
+  const n = name(card), data = formatPermanentStats(state, card);
   if (n === "Territorial Kavu") data.power = data.toughness = gameDomain(state);
   if (n === "Nethergoyf") { data.power = goldfishGraveyardTypes(state).length; data.toughness = data.power + 1; }
   if (n === "Wild Nacatl") { const types = new Set(state.battlefield.flatMap(c => gameLandTypes(state, c))); data.boost = Number(types.has("Plains")) + Number(types.has("Mountain")); }
@@ -41,17 +46,18 @@ export function engineStatAdjustments(state, card) {
   for (const aura of state.battlefield) if (aura.kind === "token" && aura.name === "Monster Role" && sameRef(aura.attachedTo, ref(card))) data.boost = (data.boost || 0) + 1;
   for (const aura of state.battlefield) if (name(aura) === "Sheltered by Ghosts" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) data.boostPower = (data.boostPower || 0) + 1;
   if (card.earthbent) data.power = data.toughness = 0;
-  if (card.animated && (card.animated.until > state.rules.turnSerial || card.animated.serial === state.rules.turnSerial)) data.power = data.toughness = card.animated.size;
+  if (card.animated?.size != null && (card.animated.until > state.rules.turnSerial || card.animated.serial === state.rules.turnSerial)) data.power = data.toughness = card.animated.size;
   return data;
 }
 export function engineKeywords(state, card) {
-  const result = [];
+  const result = formatPermanentKeywords(state, card);
+  if (card.copiedFlying) result.push("flying");
   if (card.earthbent) result.push("haste");
   if (card.dashed) result.push("haste");
   for (const aura of state.battlefield) if (aura.summonedAsBestow && find(state, aura.attachedTo)?.id === card.id) result.push("flying", "haste");
   for (const aura of state.battlefield) if (aura.kind === "token" && aura.name === "Monster Role" && sameRef(aura.attachedTo, ref(card))) result.push("trample");
   for (const aura of state.battlefield) if (name(aura) === "Sheltered by Ghosts" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) result.push("lifelink", "ward {2}");
-  for (const key of ["flying", "trample", "haste", "vigilance", "lifelink", "hexproof", "first strike"]) if (card.counters?.[key] > 0) result.push(key);
+  for (const key of ["flying", "trample", "haste", "vigilance", "lifelink", "hexproof", "deathtouch", "reach", "first strike"]) if (card.counters?.[key] > 0) result.push(key);
   if (has(state, "Scion of Draco")) {
     const colors = has(state, "Leyline of the Guildpact") ? ["W", "U", "B", "R", "G"] : gameColors(card);
     for (const [color, keyword] of Object.entries({ W: "vigilance", U: "hexproof", B: "lifelink", R: "first strike", G: "trample" })) if (colors.includes(color)) result.push(keyword);
@@ -68,8 +74,11 @@ export function engineCandidates(state, operation, context = {}) {
     if (operation.top != null) cards = operation.top > 0 ? cards.slice(-operation.top).toReversed() : [];
     return cards.filter(card => {
       if (f.spell && card.kind === "ability" || f.ability && card.kind !== "ability") return false;
+      if (f.spellOrCreature && (zone === "stack" ? card.kind === "ability" : !isType(card, "Creature"))) return false;
       if (f.types?.length && !f.types.some(type => isType(card, type) || zone !== "battlefield" && type === "Creature" && name(card) === "Grist, the Hunger Tide")) return false;
       if (f.notTypes?.some(type => isType(card, type))) return false;
+      if (f.notSubtypes?.some(type => isType(card, type))) return false;
+      if (f.opposingPermanent) return false;
       if (f.nonBasic && isType(card, "Basic")) return false;
       if (f.sameName && card.name !== f.sameName) return false;
       if (f.historic && !isType(card, "Artifact|Legendary|Saga")) return false;
@@ -78,7 +87,15 @@ export function engineCandidates(state, operation, context = {}) {
       if (f.permanent && !isType(card, "Creature|Artifact|Enchantment|Land|Planeswalker|Battle")) return false;
       if (f.colorless && gameColors(card).length) return false;
       if (f.colored && !gameColors(card).length) return false;
+      if (f.monocolored && gameColors(card).length !== 1) return false;
+      if (f.basicLand && (!isType(card, "Basic") || !isType(card, "Land"))) return false;
+      if (f.bargain && card.kind !== "token" && !isType(card, "Artifact|Enchantment")) return false;
+      if (f.keywords?.some(k => !goldfishKeywords(state, card).has(k))) return false;
+      if (f.withoutFlying && goldfishKeywords(state, card).has("flying")) return false;
+      if (f.attackingOrBlocking && !state.rules.combat?.attackers?.some(r => sameRef(r, ref(card)))) return false;
+      if (f.notColors && gameColors(card).some(c => f.notColors.includes(c))) return false;
       if (f.color && !gameColors(card).includes(f.color)) return false;
+      if (f.colorsAny && !gameColors(card).some(c => f.colorsAny.includes(c))) return false;
       if (f.maxManaValue != null && gameManaValue(card) > f.maxManaValue) return false;
       if (f.minManaValue != null && gameManaValue(card) < f.minManaValue) return false;
       if (f.maxX && gameManaValue(card) > x) return false;
@@ -95,18 +112,19 @@ export function engineCandidates(state, operation, context = {}) {
 function amount(state, value, context) {
   return value === "x" ? context.x || 0 : value === "creatures" ? state.battlefield.filter(c => isType(c, "Creature")).length : value === "domain" ? gameDomain(state) : value === "metalcraft" ? state.battlefield.filter(c => isType(c, "Artifact")).length >= 3 ? 4 : 2 : value;
 }
-function damage(state, target, count) {
+export function damage(state, target, count) {
   if (!target || !count) return;
   if (target.virtual) return;
   if (target.player === "opponent") count += live(state).filter(c => name(c) === "Artist's Talent" && c.level >= 3).length * 2;
   if (target.player) changeLife(state, -count, target.player);
   else {
     const card = find(state, target);
-    if (card && isType(card, "Creature")) card.damage = (card.damage || 0) + count;
+    if (card && isType(card, "Creature")) card.damage = (name(card) === "Wolverine, Fierce Fighter" && verifiedGoldfishCard(card) && card.automaticAbilities !== false ? 0 : card.damage || 0) + count;
     else if (card && isType(card, "Planeswalker")) card.counters.loyalty = Math.max(0, (card.counters.loyalty || 0) - count);
+    else if (card && isType(card, "Battle")) card.counters.defense = Math.max(0, (card.counters.defense || 0) - count);
   }
 }
-function destroy(state, card) {
+export function destroy(state, card) {
   if (!card || goldfishKeywords(state, card).has("indestructible")) return;
   if (card.regeneration) { card.regeneration -= 1; card.damage = 0; card.tapped = true; if (state.rules.combat) state.rules.combat.attackers = state.rules.combat.attackers.filter(c => c.id !== card.id); }
   else move(state, card.id, "battlefield", "graveyard");
@@ -121,8 +139,11 @@ function counterTarget(state, ctx, destination = "graveyard") {
 }
 export function engineEnter(state, card) {
   if (!card || card.faceDown || card.automaticAbilities === false) return false;
-  const n = name(card);
+  if (offerEntryCopy(state, card)) return true;
+  let n = name(card);
   if (isType(card, "Planeswalker") && card.counters.loyalty == null && /^\d+$/.test(face(card).loyalty || "")) card.counters.loyalty = Number(face(card).loyalty);
+  formatPermanentEntryState(state, card);
+  n = name(card);
   if (isType(card, "Class")) card.level ||= 1;
   emitGameEvent(state, { kind: "entered", card });
   if (isType(card, "Land") && !isType(card, "Basic") && has(state, "Blood Moon")) return true;
@@ -145,6 +166,7 @@ export function engineEnter(state, card) {
     return true;
   }
   if (entryTriggersBlocked(state, card)) return true;
+  if (formatPermanentEnter(state, card)) return true;
   if (n === "Faerie Miscreant") { if (live(state).some(c => c.id !== card.id && name(c) === n && isType(c, "Creature"))) add("別のフェアリーの悪党がいれば1枚引く", [{ op: "miscreant-draw" }]); return true; }
   if (n === "Eddymurk Crab") { add("クリーチャーを2体までタップ", [{ op: "tap-targets" }], { targetSpec: { zone: "battlefield", types: ["Creature"], count: 2, optional: true, virtualOpponent: true } }); return true; }
   if (["Vibrance", "Deceit"].includes(n)) {
@@ -155,6 +177,7 @@ export function engineEnter(state, card) {
     if (n === "Deceit" && spent.B >= 2) add("黒2マナで唱えた：相手の手札破壊", [{ op: "opponent-effect", text: "相手の手札を公開して土地でないカード1枚を選んで捨てさせる" }]);
     return true;
   }
+  if (n === "Uldaros Theorix") { if (card.wasCast) add("墓地の各カード・タイプを追放してコピー", FORMAT_ENTERS[n], { targetSpec: { zone: "graveyard", notTypes: ["Land"], count: 8, optional: true, distinctCardTypes: true } }); return true; }
   if (FORMAT_ENTERS[n]) { add("戦場に出たとき", FORMAT_ENTERS[n], { x: card.castX || 0 }); return true; }
   if (n === "Rest in Peace") { add("全墓地を追放", [{ op: "exile-graveyard" }, { op: "opponent-effect", text: "相手の墓地を追放" }]); return true; }
   if (n === "Ingot Chewer") { add("アーティファクトを破壊", [{ op: "destroy-target" }], { targetSpec: { zone: "battlefield", types: ["Artifact"], virtualOpponent: true } }); return true; }
@@ -186,6 +209,7 @@ export function engineEnter(state, card) {
 }
 
 export function engineCast(state, spell) {
+  formatPermanentCast(state, spell);
   if (!verifiedGoldfishCard(spell)) return;
   const n = name(spell), sourceSteps = {
     "Sowing Mycospawn": [tutor({ types: ["Land"] }, "battlefield")],
@@ -204,6 +228,7 @@ export function engineCast(state, spell) {
     if (!verifiedGoldfishCard(card)) continue;
     const add = (label, steps, extra) => queueGameAbility(state, card, label, steps, extra);
     if (name(card) === "Glaring Fleshraker" && !gameColors(spell).length) add("無色の呪文：落とし子を生成", [token("spawn")]);
+    if (name(card) === "Song of Creation") add("呪文を唱えた：2枚引く", [draw(2)]);
     if (name(card) === "Pinnacle Emissary" && isType(spell, "Artifact")) add("ドローン生成", [token("drone")]);
     if (name(card) === "Stormchaser's Talent" && card.level >= 3 && isType(spell, "Instant|Sorcery")) add("カワウソ生成", [token("otter")]);
     if (name(card) === "Artist's Talent" && !isType(spell, "Creature")) add("任意で手札交換", [discard(1, { min: 0, remember: "selected" }), { op: "draw-selected" }]);
@@ -225,6 +250,10 @@ export function flushEngineEvents(state) {
       for (const card of live(state).filter(c => name(c) === "Moonshadow" && verifiedGoldfishCard(c))) queueGameAbility(state, card, "−1/−1カウンターを取り除く", [{ op: "source-counter", name: "-1/-1", count: -1 }]);
     }
     for (const event of events) {
+      if (event.kind !== "entered" || !entryTriggersBlocked(state, event.card)) formatPermanentEvent(state, event, watchers);
+      if (event.madnessCost) queueGameAbility(state, event.original, "マッドネス：今唱えるか、墓地へ置く", [{ op: "effect-cast", card: ref(event.card, "exile"), cost: event.madnessCost, declineZone: "graveyard" }]);
+      if (event.reason === "discard") for (const c of (event.discardWatchers || []).filter(verifiedGoldfishCard)) queueGameAbility(state, c, "捨てた：このターン未選択のモード", [{ op: "monument" }]);
+      if (["sacrifice", "effect-sacrifice"].includes(event.reason) && isType(event.original, "Artifact|Creature|Enchantment|Land|Planeswalker|Battle")) for (const c of watchers.filter(c => name(c) === "Mayhem Devil" && verifiedGoldfishCard(c))) queueGameAbility(state, c, "生け贄：1点ダメージ", [{ op: "damage", amount: 1 }], { targetSpec: damageTarget });
       if (["sacrifice", "effect-sacrifice"].includes(event.reason) && event.original?.kind === "token") for (const c of watchers.filter(c => name(c) === "The Sackville-Bagginses" && verifiedGoldfishCard(c))) queueGameAbility(state, c, "トークンを生け贄：相手は1点失う", [{ op: "opponent-life", amount: -1 }]);
       if (event.reason === "sacrifice" && isType(event.original, "Artifact")) for (const c of (event.sacrificeWatchers || []).filter(c => verifiedGoldfishCard(c))) queueGameAbility(state, c, "アーティファクトを生け贄：相手に2点", [{ op: "damage", amount: 2 }], { target: { player: "opponent" } });
       if (event.kind === "draw") for (const c of (event.watchers || []).filter(c => name(c) === "Sheoldred, the Apocalypse" && verifiedGoldfishCard(c))) queueGameAbility(state, c, "ドロー：2点回復", [{ op: "life", amount: 2 }]);
@@ -247,6 +276,8 @@ export function flushEngineEvents(state) {
         for (const watcher of live(state)) {
           if (!verifiedGoldfishCard(watcher)) continue;
           const n = name(watcher), add = (label, steps) => queueGameAbility(state, watcher, label, steps);
+          if (n === "Earthbender Ascension" && isType(entering, "Land")) add("上陸：探索カウンター", [{ op: "ascension-quest" }]);
+          if (n === "Sapling Nursery" && isType(entering, "Land")) add("上陸：ツリーフォーク生成", [token("treefolk")]);
           if (n === "Glaring Fleshraker" && watcher.id !== entering.id && isType(entering, "Creature") && !gameColors(entering).length) add("他の無色クリーチャー：相手に1点", [{ op: "damage", amount: 1, player: "opponent" }]);
           if (n === "Guide of Souls" && watcher.id !== entering.id && isType(entering, "Creature")) add("1点回復・エネルギー1", [{ op: "life", amount: 1 }, { op: "energy", count: 1 }]);
           if (n === "Haliya, Guided by Light" && isType(entering, "Creature|Artifact")) add("1点回復", [{ op: "life", amount: 1 }]);
@@ -262,11 +293,14 @@ export function flushEngineEvents(state) {
     }
     for (const death of deaths) if (name(death.original) === "Haywire Mite" && verifiedGoldfishCard(death.original)) queueGameAbility(state, death.original, "2点回復", [{ op: "life", amount: 2 }]);
     for (const death of deaths) if (name(death.original) === "Greedy Freebooter" && verifiedGoldfishCard(death.original)) queueGameAbility(state, death.original, "占術1・宝物", [{ op: "format-scry", count: 1 }, token("treasure")]);
+    for (const death of deaths) if (name(death.original) === "Stitcher's Supplier" && verifiedGoldfishCard(death.original)) queueGameAbility(state, death.original, "死亡：3枚切削", [{ op: "mill", count: 3 }]);
+    for (const death of deaths) if (name(death.original) === "Cavalier of Thorns" && verifiedGoldfishCard(death.original)) queueGameAbility(state, death.original, "死亡：追放して他の墓地1枚を上へ", [{ op: "cavalier-death", dead: ref(death.card, "graveyard") }], { targetSpec: { zone: "graveyard", excludeSelf: true } });
     for (const event of events) if (event.kind === "move" && event.from === "battlefield" && event.to === "graveyard" && name(event.original) === "Nihil Spellbomb" && verifiedGoldfishCard(event.original)) {
       queueGameAbility(state, event.original, "{B}を払って1枚引いてもよい", [{ op: "optional-draw-cost", cost: "{B}" }]);
     }
   }
   if (!state.rules.cityBlessing && state.battlefield.length >= 10 && live(state).some(c => /\bAscend\b/.test(face(c).oracleText || ""))) state.rules.cityBlessing = true;
+  formatPermanentState(state);
   prepareEngineTargets(state);
   return state;
 }
@@ -279,16 +313,30 @@ function prepareEngineTargets(state) {
   if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
   if (spec.virtualOpponent) for (let i = 0; i < (spec.count || 1); i++) candidates.unshift({ ref: { id: `virtual-${i}`, player: "opponent", virtual: true }, label: `相手の対象${spec.count ? i + 1 : ""}（領域は省略）` });
   if (!candidates.length) { entry.ability.target = null; entry.ability.noTarget = true; prepareEngineTargets(state); return; }
-  state.rules.pendingChoice = { type: "engine-target", sourceName: entry.name, entryId: entry.id, label: spec.label || "誘発の対象を選ぶ", candidates: candidates.map(({ ref, label }) => ({ ref, label })), min: spec.optional ? 0 : spec.count || 1, max: spec.count || 1, ...(spec.count ? { kind: "cards", multipleTargets: true } : {}) };
+  if (spec.divideDamage) {
+    state.rules.pendingChoice = { type: "engine-target", kind: "division", divideDamage: spec.divideDamage, sourceName: entry.name, entryId: entry.id,
+      label: `${spec.divideDamage}点を配分（各対象に1点以上・対象なしも可）`, candidates: candidates.map(({ ref, label }) => ({ ref, label })), optional: !!spec.optional };
+    return;
+  }
+  state.rules.pendingChoice = { type: "engine-target", sourceName: entry.name, entryId: entry.id, label: spec.label || (spec.distinctCardTypes ? "各カード・タイプにつき1枚まで対象を選ぶ" : "誘発の対象を選ぶ"), distinctCardTypes: spec.distinctCardTypes, candidates: candidates.map(({ ref, label }) => ({ ref, label })), min: spec.optional ? 0 : spec.count || 1, max: Math.min(spec.count || 1, candidates.length), ...(spec.count ? { kind: "cards", multipleTargets: true } : {}) };
 }
 
 export function engineEndStep(state) {
   if (state.rules.endStepStarted) return;
   state.rules.endStepStarted = true;
+  formatPermanentEnd(state);
+  for (const r of state.rules.delayedSpiritReturns || []) { const c = find(state, r); if (c) queueGameAbility(state, c, "終了ステップ：戦場へ戻す", [{ op: "move-target", destination: "battlefield" }], { target: r }); }
+  state.rules.delayedSpiritReturns = [];
+  if (state.rules.activePlayer === "self") {
+    for (const r of state.rules.delayedVehicleReturns || []) { const c = find(state, r); if (c) queueGameAbility(state, c, "脂牙：手札に戻す", [{ op: "move-target", destination: "hand" }], { target: r }); }
+    state.rules.delayedVehicleReturns = [];
+    if (state.rules.monarch === "self") queueGameAbility(state, { name: "統治者" }, "終了ステップ：1枚引く", [draw()]);
+  }
   for (const card of live(state)) {
     if (card.warped || card.dashed || card.unearthed) queueGameAbility(state, card, card.dashed ? "疾駆：手札へ" : "終了時：追放", [{ op: "delayed-return", warp: !!card.warped, unearth: !!card.unearthed }]);
     if (card.mobilized) queueGameAbility(state, card, "動員：生け贄", [{ op: "sacrifice-source" }]);
     if (state.rules.activePlayer !== "self") continue;
+    if (name(card) === "Song of Creation" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "手札をすべて捨てる", [discard(state.hand.length)]);
     if (name(card) === "Ocelot Pride" && state.rules.lifeGained > 0 && verifiedGoldfishCard(card)) queueGameAbility(state, card, "猫を生成・都市の承認ならコピー", [{ op: "ocelot" }]);
     if (name(card) === "Haliya, Guided by Light" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "3点以上回復ならドロー", [{ op: "haliya-draw" }]);
     if (name(card) === "The Ten Rings" && verifiedGoldfishCard(card) && state.hand.length < 10) queueGameAbility(state, card, "手札10枚になるまで引く", [{ op: "ten-rings" }]);
@@ -296,6 +344,11 @@ export function engineEndStep(state) {
   }
 }
 export function engineMainStep(state) {
+  for (const card of live(state).filter(c => verifiedGoldfishCard(c) && ["The Misty Mountains Cold", "Kumano Faces Kakkazan"].includes(name(c)))) {
+    card.counters.lore = (card.counters.lore || 0) + 1;
+    queueGameAbility(state, card, `第${card.counters.lore}章`, [{ op: name(card) === "Kumano Faces Kakkazan" ? "fp-kumano" : "fp-mountains", chapter: card.counters.lore }]);
+  }
+  for (const card of Object.values(state.rules.paradigms || {})) queueGameAbility(state, card, "パラダイム：コピーを唱えてもよい", [{ op: "paradigm-copy", card }]);
   for (const card of live(state)) if (name(card) === "Static Prison" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "エネルギー1を払うか生け贄", [{ op: "prison-upkeep" }]);
   for (const card of live(state)) if (name(card) === "The Legend of Roku" && verifiedGoldfishCard(card)) { card.sagaChapter = ++card.counters.lore; queueGameAbility(state, card, `第${card.sagaChapter}章`, card.sagaChapter === 2 ? [{ op: "mana-choice", count: 1 }] : [{ op: "roku-transform" }]); }
   for (const card of live(state)) if (name(card) === "Urza's Saga" && verifiedGoldfishCard(card)) {
@@ -304,6 +357,8 @@ export function engineMainStep(state) {
   }
 }
 export function engineUpkeep(state) {
+  formatPermanentUpkeep(state);
+  if (state.rules.activePlayer === "self") for (const card of live(state)) if (name(card) === "Doomsday Excruciator" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "アップキープ：1枚引く", [draw()]);
   if (state.rules.activePlayer === "self") for (const card of live(state)) if (name(card) === "Smaug the Magnificent" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "宝物を生成", [token("treasure")]);
   for (const card of live(state)) if (verifiedGoldfishCard(card) && (name(card) === "Duskwatch Recruiter" && state.rules.previousSpellsCast === 0 || name(card) === "Krallenhorde Howler" && state.rules.previousSpellsCast >= 2)) queueGameAbility(state, card, "前のターンの呪文数で変身", [{ op: "transform-source" }]);
 }
@@ -321,10 +376,14 @@ function finishOpening(state) {
 }
 export function engineBeginningCombat(state) {
   const before = state.stack.length;
+  formatPermanentCombat(state);
   for (const card of live(state)) if (name(card) === "Ouroboroid" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "パワー分のカウンターを全員へ", [{ op: "ouroboroid" }]);
+  for (const card of live(state)) if (name(card) === "Greasefang, Okiba Boss" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "墓地の機体を戻し、速攻を与える", [{ op: "greasefang" }], { targetSpec: { zone: "graveyard", types: ["Vehicle"] } });
   return state.stack.length > before;
 }
 export function engineAttack(state, card, dealtDamage) {
+  if (formatPermanentAttack(state, card, dealtDamage)) return true;
+  if (dealtDamage && state.rules.forthSerial === state.rules.turnSerial) state.rules.monarch = "self";
   if (!dealtDamage && card.kind === "token" && card.oracleText === TOKENS.attackingPest.oracleText) { queueGameAbility(state, card, "攻撃：1点回復", [{ op: "life", amount: 1 }]); return true; }
   if (sameRef(state.rules.ringBearer, ref(card))) {
     if (!dealtDamage && state.rules.ringLevel >= 2) queueGameAbility(state, card, "指輪：1枚引いて1枚捨てる", [draw(), discard(1)]);
@@ -337,6 +396,7 @@ export function engineAttack(state, card, dealtDamage) {
   if (dealtDamage && n === "Moon-Circuit Hacker") { add("任意でドロー・登場ターン以外は捨てる", [{ op: "hacker-draw", enteredSerial: card.enteredSerial }]); return true; }
   if (dealtDamage && n === "Ragavan, Nimble Pilferer") { add("宝物を生成・相手の上1枚を確認", [token("treasure"), { op: "restriction", label: "相手の山札を用意している場合、その上1枚を追放。このターン唱えられる。" }]); return true; }
   if (dealtDamage) return false;
+  if (n === "Parhelion II") { add("攻撃：天使2体を攻撃状態で生成", [{ op: "parhelion-attack" }]); return true; }
   if (n === "Smaug the Magnificent") { add("宝物の数のダメージ", [{ op: "treasure-damage" }], { targetSpec: damageTarget }); return true; }
   if (n === "Ulamog, the Ceaseless Hunger") { add("相手の山札20枚を追放", [{ op: "opponent-effect", text: "相手の山札の上20枚を追放" }]); return true; }
   if (n === "Cityscape Leveler") { add("パーマネントを破壊・パワーストーン", [{ op: "leveler" }], { targetSpec: { zone: "battlefield", permanent: true, notTypes: ["Land"], optional: true, virtualOpponent: true } }); return true; }
@@ -349,6 +409,7 @@ export function engineAttack(state, card, dealtDamage) {
   return false;
 }
 export function engineAttackGroup(state) {
+  formatPermanentAttackGroup(state);
   if (!state.rules.combat?.attackers.length) return;
   for (const card of live(state)) if (name(card) === "Guide of Souls" && verifiedGoldfishCard(card)) queueGameAbility(state, card, "エネルギー3で攻撃クリーチャーを強化", [{ op: "guide-attack" }]);
   for (const source of state.rules.encampments || []) queueGameAbility(state, source, "野営地：戦士2体で攻撃", [{ op: "mobilize", count: 2 }]);
@@ -380,8 +441,14 @@ export function startEngineResolution(state, entry) {
 function finishEngineResolution(state) {
   const ctx = state.rules.automation;
   if (ctx.isAbility) state.stack = state.stack.filter(e => e.id !== ctx.entryId);
-  else if (state.stack.some(c => c.id === ctx.entryId)) { move(state, ctx.entryId, "stack", ctx.finishZone); if (ctx.finishZone === "library") shuffleGameLibrary(state); }
+  else if (state.stack.some(c => c.id === ctx.entryId)) { const card = move(state, ctx.entryId, "stack", ctx.finishZone); if (ctx.finishZone === "library") shuffleGameLibrary(state); if (ctx.vars.adventure && state.exile.includes(card)) card.playPermission = { kind: "adventure" }; }
   state.rules.automation = null; state.rules.pendingChoice = null;
+  const waiting = state.rules.waitingCastTriggers || [];
+  if (waiting.length) {
+    state.stack.push(...waiting);
+    if (waiting.length > 1) state.rules.pendingChoice = { type: "order", entryIds: waiting.toReversed().map(c => c.id) };
+    delete state.rules.waitingCastTriggers;
+  }
   state.rules.lastAction = `${ctx.sourceName}：解決しました。`;
 }
 
@@ -407,10 +474,14 @@ export function continueEngineResolution(state) {
       const spec = formatTargetSpec(ctx.sourceName, ctx.cast), candidates = spec ? engineCandidates(state, { ...spec, target: true }) : [];
       for (const r of ctx.cast.modeTargets || []) {
         if (!spec || !r.player && !candidates.some(c => sameRef(c.ref, r))) continue;
+        if (spec.conditionalColor && !r.player && !gameColors(find(state, r)).includes(spec.conditionalColor)) continue;
         if (spec.effect === "counter") counterTarget(state, { ...ctx, target: r });
         else if (spec.effect === "counter-unless") { ctx.target = r; insertSteps(ctx, [{ op: "counter-unless", cost: spec.cost }]); }
         else if (spec.effect === "shrink") { const c = find(state, r); if (c) c.temporaryEffects.push({ power: -2, toughness: -2, turn: state.turn, label: ctx.sourceName }); }
-        else if (spec.effect === "damage") damage(state, r, 1);
+        else if (spec.effect === "damage") damage(state, r, spec.amount || 1);
+        else if (spec.effect === "destroy" && !r.player) destroy(state, find(state, r));
+        else if (spec.effect === "double-strike" && !r.player) find(state, r).temporaryEffects.push({ keywords: ["double strike"], turn: state.turn, label: ctx.sourceName });
+        else if (spec.effect === "warg-boost" && !r.player) { const c = find(state, r); addGameCounters(state, c, "+1/+1", 1); c.temporaryEffects.push({ keywords: ["trample", "hexproof"], turn: state.turn, label: ctx.sourceName }); }
         else if (r.virtual) (state.rules.notices ||= []).push({ text: `${ctx.sourceName}：相手の対象を${spec.destination === "hand" ? "手札へ戻す" : "追放"}（相手側の領域は省略）`, serial: state.rules.turnSerial });
         else move(state, r.id, r.zone || "battlefield", spec.destination);
       }
@@ -539,7 +610,7 @@ export function continueEngineResolution(state) {
       const candidates = engineCandidates(state, op, ctx);
       const min = Math.min(op.min ?? 0, candidates.length), max = op.max === "all" ? candidates.length : Math.min(op.max ?? 1, candidates.length);
       const seen = op.top != null ? (op.top > 0 ? state[op.zone].slice(-op.top).toReversed().map(c => ref(c, op.zone)) : []) : null;
-      if (candidates.length) { setChoice(state, { kind: "cards", label: op.label, candidates: candidates.map(({ ref, label }) => ({ ref, label })), min, max, seen }); return; }
+      if (candidates.length) { setChoice(state, { kind: "cards", label: op.label, distinctCardTypes: op.distinctCardTypes, candidates: candidates.map(({ ref, label }) => ({ ref, label })), min, max, seen }); return; }
       applySelection(state, ctx, op, [], seen);
     }
     else if (op.op === "draw-selected") drawGameCards(state, (ctx.vars.selected?.length || 0) + (op.extra || 0));
@@ -681,7 +752,7 @@ export function continueEngineResolution(state) {
     }
     else if (op.op === "earthbend") {
       const card = target;
-      if (card) { card.earthbent = true; if (!isType(card, "Creature")) { card.originalTypeLine ||= card.typeLine; card.originalFaces ||= structuredClone(card.faces); card.typeLine += " Creature"; if (card.faces?.length) card.faces[card.faceIndex || 0].typeLine += " Creature"; } card.lane = "creature"; addGameCounters(state, card, "+1/+1", 1); }
+      if (card) { card.earthbent = true; if (!isType(card, "Creature")) { card.originalTypeLine ||= card.typeLine; card.originalFaces ||= structuredClone(card.faces); card.typeLine += " Creature"; if (card.faces?.length) card.faces[card.faceIndex || 0].typeLine += " Creature"; } card.lane = "creature"; addGameCounters(state, card, "+1/+1", op.count || 1); }
     }
     else if (op.op === "earth-return") { const card = find(state, op.target); if (card) move(state, card.id, op.target.zone, "battlefield").tapped = true; }
     else if (op.op === "craterhoof") { const creatures = state.battlefield.filter(c => isType(c, "Creature")); for (const card of creatures) card.temporaryEffects.push({ power: creatures.length, toughness: creatures.length, keywords: ["trample"], turn: state.turn, label: ctx.sourceName }); }
@@ -745,6 +816,7 @@ export function continueEngineResolution(state) {
       const types = [...new Set([...state.library, ...state.hand, ...state.battlefield, ...state.graveyard].filter(c => isType(c, "Creature")).flatMap(c => (cardType(c).split("—")[1] || "").trim().split(/\s+/)).filter(Boolean))].sort();
       setChoice(state, { kind: "buttons", label: "魂の洞窟：クリーチャー・タイプ", options: types.map(value => ({ value, label: value })) }); return;
     }
+    else if (runFormatStep(state, ctx, op) && state.rules.pendingChoice) return;
     ctx.step++;
   }
   if (ctx && !state.rules.pendingChoice) {
@@ -763,6 +835,7 @@ function applySelection(state, ctx, op, refs, seen) {
     if (aura && creature && isType(creature, "Creature")) { const entered = move(state, aura.id, op.source.zone, "battlefield"); if (state.battlefield.includes(entered)) entered.attachedTo = ref(creature); }
   }
   // UI order is first-to-draw; library is stored with its top at the end.
+  state.rules.movementBatch = state.rules.nextEventId++;
   for (const card of op.destination === "libraryTop" ? selected.toReversed() : selected) if (op.destination) {
     if (op.destination === "battlefield" && name(card) === "Mox Diamond" && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "mox-entry", source: card.ref }]); continue; }
     if (op.destination === "battlefield" && name(card) === "Sheltered by Ghosts" && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "aura-enter", source: card.ref }]); continue; }
@@ -777,9 +850,11 @@ function applySelection(state, ctx, op, refs, seen) {
     for (const r of rest.toReversed()) if (find(state, r)) move(state, r.id, r.zone, op.remainder);
   }
   if (op.shuffle) shuffleGameLibrary(state);
+  delete state.rules.movementBatch;
 }
 export function chooseEngine(state, answer) {
   const choice = state.rules.pendingChoice;
+  if (choice?.type === "engine-combat-crew") { chooseCombatCrew(state, answer); return; }
   if (choice?.type === "engine-entry") {
     const source = find(state, choice.card), value = answer.value;
     if (typeof value !== "string" || !value.trim() || value.length > 160 || choice.kind === "buttons" && !choice.options.some(o => o.value === value)) throw new Error("戦場に出る際の選択を確定してください。");
@@ -811,6 +886,7 @@ export function chooseEngine(state, answer) {
     for (const r of answer.refs) move(state, r.id, "hand", "exile");
     state.rules.pendingChoice = null; finishOpening(state); return;
   }
+  if (choice?.type === "engine-copy-entry") { recordGoldfishEnter(state, chooseEntryCopy(state, answer)); return; }
   if (choice?.type === "engine-legend") {
     if (!choice.ids.includes(answer.keep)) throw new Error("残す伝説のパーマネントを選んでください。");
     for (const id of choice.ids) if (id !== answer.keep && state.battlefield.some(c => c.id === id)) move(state, id, "battlefield", "graveyard");
@@ -818,9 +894,18 @@ export function chooseEngine(state, answer) {
   }
   if (choice?.type === "engine-target") {
     const entry = state.stack.find(e => e.id === choice.entryId);
+    if (choice.divideDamage) {
+      const allocation = answer.allocation;
+      if (!entry || !Array.isArray(allocation) || new Set(allocation.map(a => JSON.stringify(a.target))).size !== allocation.length ||
+          allocation.some(a => !Number.isInteger(a.amount) || a.amount < 1 || !choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(a.target))) ||
+          (allocation.length ? allocation.reduce((n, a) => n + a.amount, 0) !== choice.divideDamage : !choice.optional)) throw new Error("各対象に1点以上、合計を指定された点数にしてください。");
+      entry.ability.allocation = structuredClone(allocation); entry.ability.target = null;
+      state.rules.pendingChoice = null; prepareEngineTargets(state); return;
+    }
     if (choice.multipleTargets) {
       const refs = answer.refs;
       if (!entry || !Array.isArray(refs) || refs.length < choice.min || refs.length > choice.max || new Set(refs.map(r => JSON.stringify(r))).size !== refs.length || refs.some(r => !choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(r)))) throw new Error("異なる適正な対象を選んでください。");
+      if (entry.ability.targetSpec.distinctCardTypes && !distinctCardTypes(refs.map(r => find(state, r)))) throw new Error("同じカード・タイプに2枚は割り当てられません。");
       entry.ability.targets = refs; entry.ability.target = null; state.rules.pendingChoice = null; prepareEngineTargets(state); return;
     }
     const target = answer.target || null;
@@ -830,6 +915,7 @@ export function chooseEngine(state, answer) {
   const ctx = state.rules.automation;
   if (!ctx || choice?.type !== "engine-choice" || choice.entryId !== ctx.entryId) throw new Error("解決中の選択が一致しません。");
   const op = ctx.steps[ctx.step];
+  if (op.op === "effect-cast") { chooseFormatStep(state, ctx, op, answer); if (!state.rules.pendingChoice && state.rules.automation) continueEngineResolution(state); return; }
   if (choice.kind === "name") {
     if (typeof answer.value !== "string" || !answer.value.trim() || answer.value.length > 160) throw new Error("カード名を入力してください。");
     if (op.landOnly && [...state.library, ...state.hand, ...state.battlefield, ...state.graveyard, ...state.exile, ...state.sideboard].some(c => name(c).toLowerCase() === answer.value.trim().toLowerCase() && !isType(c, "Land"))) throw new Error("土地のカード名を指定してください。");
@@ -842,27 +928,32 @@ export function chooseEngine(state, answer) {
     if (answer.values.includes("hand")) insertSteps(ctx, [draw()]);
   } else if (choice.kind === "copy-target") {
     if (!choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(answer.target))) throw new Error("対象を選んでください。");
-    if (op.op === "retarget-copy") ctx.vars.stormCopies[op.index].cast.target = answer.target;
+    if (chooseFormatStep(state, ctx, op, answer)) {}
+    else if (op.op === "retarget-copy") ctx.vars.stormCopies[op.index].cast.target = answer.target;
     else ctx.vars.copyTarget = answer.target;
   } else if (choice.kind === "cards") {
     const refs = answer.refs;
     if (!Array.isArray(refs) || refs.length < choice.min || refs.length > choice.max || new Set(refs.map(r => r.id)).size !== refs.length || refs.some(r => !choice.candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(r)) || !find(state, r))) throw new Error(`カードを${choice.min}〜${choice.max}枚選んでください。`);
     if (op.totalManaValue != null && refs.reduce((n, r) => n + gameManaValue(find(state, r)), 0) > op.totalManaValue) throw new Error(`合計マナ総量を${op.totalManaValue}以下にしてください。`);
-    applySelection(state, ctx, op, refs, choice.seen);
+    if (op.distinctCardTypes && !distinctCardTypes(refs.map(r => find(state, r)))) throw new Error("各カード・タイプにつき1枚ずつ選んでください。");
+    if (!chooseFormatStep(state, ctx, op, answer)) applySelection(state, ctx, op, refs, choice.seen);
   } else if (choice.kind === "number") {
     const n = answer.value;
     if (!Number.isInteger(n) || n < choice.min || n > choice.max) throw new Error("範囲内の整数を選んでください。");
-    if (op.op === "lynx-damage") damage(state, { player: "opponent" }, n);
+    if (chooseFormatStep(state, ctx, op, answer)) {}
+    else if (op.op === "lynx-damage") damage(state, { player: "opponent" }, n);
     else if (op.op === "energy-damage") { state.players.self.energy -= n; damage(state, ctx.target, n); }
     else { state.players.self.energy -= n; for (const card of [...state.battlefield]) if (isType(card, "Artifact|Creature|Enchantment") && gameManaValue(card) <= n) destroy(state, card); }
   } else if (choice.kind === "mana") {
     if (!Array.isArray(answer.colors) || answer.colors.length !== choice.count || answer.colors.some(c => !(choice.colors || ["W", "U", "B", "R", "G"]).includes(c))) throw new Error("マナの色を選んでください。");
     if (op.sameColor && new Set(answer.colors).size !== 1) throw new Error("同じ色のマナを選んでください。");
     for (const color of answer.colors) state.manaPool[color]++;
+    chooseFormatStep(state, ctx, op, answer);
   } else if (choice.kind === "buttons") {
     const values = choice.multiple ? answer.values : [answer.value];
     if (!Array.isArray(values) || values.length !== (choice.multiple || 1) || new Set(values).size !== values.length || values.some(v => !choice.options.some(o => o.value === v))) throw new Error("選択肢を選んでください。");
     const value = values[0];
+    chooseFormatStep(state, ctx, op, answer);
     if (op.op === "veil") { state.rules.uncounterableSerial = state.rules.turnSerial; (state.rules.notices ||= []).push({ text: "このターン、自分と自分のパーマネントは青と黒からの呪禁を得る（相手側の対象選択は省略）", serial: state.rules.turnSerial }); if (value === "yes") insertSteps(ctx, [draw()]); }
     if (op.op === "offense") { const c = find(state, ctx.target); if (c) c.temporaryEffects.push({ keywords: [value], turn: state.turn, label: ctx.sourceName }); }
     if (op.op === "stories-discard") insertSteps(ctx, [select("捨てる手札", "hand", value === "creature" ? { types: ["Creature"] } : {}, { min: value === "creature" ? 1 : 2, max: value === "creature" ? 1 : 2, destination: "graveyard" })]);

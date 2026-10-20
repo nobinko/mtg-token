@@ -1,8 +1,8 @@
-import { cloneGoldfishState } from "./goldfish.js?v=20261020-solo3";
-import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261020-solo3";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-solo3";
-import { goldfishReference as ref, goldfishFindObject as find } from "./goldfish-objects.js?v=20261020-solo3";
-import { isType } from "./goldfish-events.js?v=20261020-solo3";
+import { cloneGoldfishState } from "./goldfish.js?v=20261020-solo6";
+import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261020-solo6";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-solo6";
+import { goldfishReference as ref, goldfishFindObject as find } from "./goldfish-objects.js?v=20261020-solo6";
+import { isType } from "./goldfish-events.js?v=20261020-solo6";
 
 export function beginGoldfishSacrificeSequence(state, sourceId, cardIds) {
   if (state.rules.pendingChoice || state.stack.length || state.rules.sacrificeSequence) throw new Error("いまの解決を終えてからまとめて起動してください。");

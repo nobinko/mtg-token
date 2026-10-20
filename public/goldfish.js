@@ -1,15 +1,15 @@
-import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo3";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo6";
 import { freshGoldfishRules, cloneGoldfishRules, assertGoldfishChoiceComplete, recordGoldfishCast,
-  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-solo3";
-import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo3";
-import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
-import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-solo3";
-import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo3";
-import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening } from "./goldfish-engine.js?v=20261020-solo3";
-import { drawGameCards, chooseGameDraw } from "./goldfish-events.js?v=20261020-solo3";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo3";
-import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-solo3";
-import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo3";
+  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-solo6";
+import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo6";
+import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo6";
+import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-solo6";
+import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo6";
+import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo6";
+import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261020-solo6";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo6";
+import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-solo6";
+import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo6";
 
 export const GOLDFISH_SCHEMA_VERSION = 2;
 export const GOLDFISH_LANES = ["other", "creature", "land"];
@@ -353,7 +353,7 @@ function startNextActiveTurn(state, player) {
     state.turn += 1;
     for (const card of state.battlefield) { if (!card.exerted) untapGoldfishObject(card); delete card.exerted; }
     state.rules.pendingTurnDraw = true;
-  }
+  } else state.rules.pendingOpponentDraw = true;
   recordGoldfishUpkeep(state);
   state.rules.lastAction = player === "self" ? `自分のターン${state.turn}。アンタップしました。` : "相手のターンへ進みました。";
 }
@@ -363,17 +363,29 @@ function finishGoldfishTurnProgress(state) {
   if (state.rules.pendingChoice || state.stack.length) return state;
   if (state.rules.openingComplete) { state.rules.openingComplete = false; if (state.rules.openingDraw) drawGameCards(state, 1); state.rules.openingDraw = false; }
   if (state.rules.pendingChoice) return state;
-  if (state.rules.endTurnEffect) { state.rules.endTurnEffect = false; startNextActiveTurn(state, "opponent"); return state; }
+  if (state.rules.endTurnEffect) { state.rules.endTurnEffect = false; state.rules.afterEndStep = state.rules.activePlayer === "self" ? "opponent" : "self"; }
   if (state.rules.resumeCombat) { state.rules.resumeCombat = false; beginGoldfishCombatDraft(state); return state; }
   if (state.rules.afterEndStep) {
-    const limit = hasRuleCard(state, "The Ten Rings") ? 10 : 7;
+    const limit = state.rules.noMaximumHandSize ? Infinity : hasRuleCard(state, "The Ten Rings") ? 10 : 7;
     if (state.rules.activePlayer === "self" && state.hand.length > limit) {
       state.rules.pendingChoice = { type: "cleanup", kind: "cards", sourceName: "クリンナップ", label: `手札上限${limit}枚：${state.hand.length - limit}枚を捨てる`, min: state.hand.length - limit, max: state.hand.length - limit, candidates: state.hand.map(c => ({ ref: goldfishReference(c, "hand"), label: c.name })) }; return state;
     }
     const destination = state.rules.afterEndStep; delete state.rules.afterEndStep;
-    startNextActiveTurn(state, "opponent");
-    if (destination === "self") state.rules.resumeNextTurn = true;
+    const endedOwnTurn = state.rules.activePlayer === "self";
+    const extra = state.rules.extraTurns > 0;
+    if (extra) state.rules.extraTurns--;
+    startNextActiveTurn(state, extra || !endedOwnTurn ? "self" : "opponent");
+    if (destination === "self" && endedOwnTurn && !extra) state.rules.resumeNextTurn = true;
     if (state.stack.length) return state;
+  }
+  if (state.rules.pendingOpponentDraw) {
+    state.rules.pendingOpponentDraw = false;
+    if (state.rules.opponentLibrary != null) {
+      if (state.rules.opponentLibrary <= 0) state.rules.opponentEmptyDraw = true;
+      else state.rules.opponentLibrary--;
+    }
+    if (hasRuleCard(state, "The Theorist, Jace Beleren")) for (const c of state.battlefield.filter(c => cardName(c) === "The Theorist, Jace Beleren" && c.automaticAbilities !== false)) queueGameAbility(state, c, "相手のドロー・ステップ：1枚引く", [{ op: "draw", count: 1 }]);
+    if (state.rules.pendingChoice || state.stack.length) return state;
   }
   if (state.rules.resumeNextTurn) {
     state.rules.resumeNextTurn = false;
@@ -550,6 +562,7 @@ export function goldfishPlayDestination(card) {
 }
 
 export function goldfishCastTiming(state, card) {
+  if (state.rules.effectCast?.card.id === card.id && state.rules.effectCast.entryId === state.rules.automation?.entryId) return true;
   const fast = /\bInstant\b/.test(goldfishCardType(card)) || /^Flash(?:\s|$)/m.test(card.oracleText || "") || /\bSorcery\b/.test(goldfishCardType(card)) && state.rules.sorceryFlashUntil > state.rules.turnSerial;
   return fast || (!state.stack.length && !state.rules.pendingTurnDraw && !state.rules.resumeNextTurn && state.rules.activePlayer !== "opponent" && !(state.rules.combat && state.rules.combat.stage !== "done"));
 }
@@ -567,7 +580,7 @@ export function playGoldfishCard(state, cardId, { target, flashback = false, ...
   if (destination === "stack") { const blocked = castBlockReason(state); if (blocked) throw new Error(blocked); }
   if (destination === "battlefield") {
     if (state.rules.landsPlayed == null) throw new Error("このターンに土地をプレイした回数を設定してください。");
-    if (state.rules.landsPlayed >= 1) throw new Error("このターンの土地はプレイ済みです。追加の土地プレイは回数を手動修正できます。");
+    if (state.rules.landsPlayed >= gameLandPlayLimit(state)) throw new Error("このターンの土地はプレイ済みです。プレイできる回数を使い切りました。");
     if (state.stack.length) throw new Error("スタックを解決してから土地をプレイしてください。");
   }
   const next = moveGoldfishCards(state, [cardId], destination, { lane: defaultGoldfishLane(type, card.name) });
@@ -611,10 +624,16 @@ export function resolveGoldfishSpell(state, { manual = false } = {}) {
   const next = moveGoldfishCards(state, [card.id], destination, { lane: defaultGoldfishLane(type, card.name) });
   if (destination === "battlefield") {
     const entered = next.battlefield.find((item) => item.id === card.id);
+    if (entered.kind === "copy") entered.kind = "token";
     entered.enteredSerial = next.rules.turnSerial;
     entered.warped = !!card.cast?.warp; entered.dashed = !!card.cast?.dash;
     entered.castColors = card.cast?.colorsSpent || [];
+    entered.wasCast = !!card.cast;
+    entered.castFrom = card.cast?.fromZone;
     entered.castManaByColor = card.cast?.manaByColor || {};
+    entered.castFormat = structuredClone(card.cast?.format || {});
+    entered.kumanoCounter = card.cast?.kumanoCounter;
+    entered.manaSpent = card.cast?.manaSpent;
     entered.castX = card.cast?.x || 0;
     entered.delvedCards = card.cast?.delvedCards || [];
     if (card.cast?.bestow && goldfishFindObject(next, card.cast.target)) {

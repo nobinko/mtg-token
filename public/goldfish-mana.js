@@ -1,28 +1,43 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo3";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo3";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo3";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo3";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo3";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature } from "./goldfish-engine.js?v=20261020-solo3";
-import { cardName, isType } from "./goldfish-events.js?v=20261020-solo3";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo3";
-import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo3";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo6";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo6";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo6";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo6";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo6";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo6";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo6";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo6";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo6";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo6";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo6";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo6";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo6";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo6";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
 export const goldfishManaCost = (card) => String(faceOf(card).manaCost || "");
-export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = false, warp = false, dash = false, kicked = false, state, x = 0, splice = [], pitch = [], replicate = 0, fuse = false, baseCost, delve = [], mode, harmonizeTap = [] } = {}) {
+export const canPlayGoldfishGraveyard = (s, c) => s.rules.gaeaWillSerial === s.rules.turnSerial || c.grantedCast?.serial === s.rules.turnSerial || Boolean(goldfishSpellProgram(c)?.flashback || goldfishSpellProgram(c)?.harmonize) || isType(c, "Land") && s.battlefield.some(x => verifiedGoldfishCard(x) && /You may play lands from your graveyard\./.test(faceOf(x).oracleText));
+export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = false, warp = false, dash = false, kicked = false, state, x = 0, splice = [], pitch = [], replicate = 0, fuse = false, baseCost, delve = [], mode, harmonizeTap = [], format = {} } = {}) {
   let cost = fuse ? "{1}{R}{W}" : baseCost ?? goldfishManaCost(card);
   if (fromExile && card.playPermission?.kind === "plot") cost = "{0}";
   if (fromExile && card.playPermission?.free) cost = "{0}";
+  if (fromExile && card.playPermission?.cost) cost = card.playPermission.cost;
   if (fromGraveyard) { const fb = card.grantedCast?.cost || goldfishSpellProgram(card)?.harmonize || goldfishSpellProgram(card)?.flashback; cost = fb === "mountain" ? "{0}" : fb || ""; }
+  if (fromGraveyard && state && state.rules.gaeaWillSerial === state.rules.turnSerial) cost = goldfishManaCost(card);
   if (warp || dash) cost = String(faceOf(card).oracleText || "").match(new RegExp((warp ? "Warp" : "Dash") + " ((?:\\{[^}]+\\})+)"))?.[1] || "";
+  if (cardName(card) === "Overlord of the Balemurk" && format.impending === "yes") cost = "{1}{B}";
+  if (["Snuff Out", "Massacre", "Force of Vigor"].includes(cardName(card)) && format.freeCast === "yes") cost = "{0}";
+  if (state && effectCastPermission(state, card)) cost = effectCastPermission(state, card).cost || "{0}";
+  if (baseCost === undefined && !warp && !dash && state && !fromExile && !fromGraveyard && state.battlefield.some(c => cardName(c) === "Omniscience" && verifiedGoldfishCard(c))) cost = "{0}";
   if (kicked) cost += String(faceOf(card).oracleText || "").match(/Kicker ((?:\{[^}]+\})+)/)?.[1] || "";
   cost += "{1}{R}".repeat(splice.length);
   if (replicate) cost += `{${replicate}}`;
   if (cardName(card) === "Lively Dirge" && verifiedGoldfishCard(card)) cost += `{${mode === "both" ? 3 : mode === "return" ? 2 : 1}}`;
+  if (cardName(card) === "Fire Magic" && verifiedGoldfishCard(card)) cost += `{${mode === "firaga" ? 5 : mode === "fira" ? 2 : 0}}`;
+  if (cardName(card) === "Path of Peril" && mode === "cleave" && verifiedGoldfishCard(card)) cost = "{4}{W}{B}";
+  if (verifiedGoldfishCard(card)) cost += formatAdditionalMana(card, format) + advancedMana(card, format);
   if (!state || !cost) return cost;
   let reduction = cardName(card) === "March of Otherworldly Light" ? pitch.length * 2 : 0;
   if (fromGraveyard && goldfishSpellProgram(card)?.harmonize && !card.grantedCast && harmonizeTap.length) {
@@ -30,12 +45,20 @@ export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = f
     if (tapped) reduction += Math.max(0, Number(goldfishCharacteristics(state, tapped).power) || 0);
   }
   const n = cardName(card), text = faceOf(card).oracleText || "";
+  if (n === "Rottenmouth Viper" && verifiedGoldfishCard(card)) reduction += format.cards?.length || 0;
   if (n === "Scion of Draco") reduction += gameDomain(state) * 2;
   if (n === "Leyline Binding") reduction += gameDomain(state);
+  if (n === "Sapling Nursery" && verifiedGoldfishCard(card)) reduction += state.battlefield.filter(c => gameLandTypes(state, c).includes("Forest")).length;
+  if (n === "Sunderflock" && verifiedGoldfishCard(card)) reduction += Math.max(0, ...state.battlefield.filter(c => isType(c, "Elemental")).map(gameManaValue));
+  if (n === "Stormwing Entity" && verifiedGoldfishCard(card) && state.rules.instantSorceryCast > 0) { reduction += 2; cost = cost.replace("{U}", ""); }
   if (verifiedGoldfishCard(card) && ["Eddymurk Crab", "Hearth Elemental"].includes(n)) reduction += state.graveyard.filter(c => isType(c, "Instant|Sorcery")).length;
   if (n === "Emry, Lurker of the Loch" || /Affinity for artifacts/.test(text)) reduction += state.battlefield.filter(c => isType(c, "Artifact")).length;
   if (n === "Emrakul, the Promised End") reduction += new Set(state.graveyard.flatMap(c => (c.typeLine || "").match(/\b(?:Artifact|Battle|Creature|Enchantment|Instant|Kindred|Land|Planeswalker|Sorcery)\b/g) || [])).size;
   for (const c of state.battlefield.filter(c => !c.faceDown && c.automaticAbilities !== false)) {
+    if (cardName(c) === "Momo, Friendly Flier" && verifiedGoldfishCard(c) && state.rules.activePlayer === "self" && !state.rules.firstFlyingCreature && isType(card, "Creature") && !isType(card, "Lemur") && /\bFlying\b/i.test(text)) reduction++;
+    if (verifiedGoldfishCard(c) && cardName(c) === "Bilbo, Thief in the Night" && (fromExile || fromGraveyard)) reduction++;
+    if (verifiedGoldfishCard(c) && cardName(c) === "It That Heralds the End" && !gameColors(card).length && gameManaValue({ ...card, cast: { x } }) >= 7) reduction++;
+    if (cardName(c) === "Eye of Ugin" && verifiedGoldfishCard(c) && isType(card, "Eldrazi") && !gameColors(card).length) reduction += 2;
     if (cardName(c) === "Ruby Medallion" && gameColors(card).includes("R")) reduction++;
     if (cardName(c) === "Ral, Monsoon Mage" && isType(card, "Instant|Sorcery")) reduction++;
     if (cardName(c) === "Artist's Talent" && c.level >= 2 && !isType(card, "Creature")) reduction++;
@@ -45,6 +68,7 @@ export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = f
   let generic = 0;
   cost = cost.replace(/\{X\}/g, "{" + x + "}").replace(/\{(\d+)\}/g, (_, n) => { generic += Number(n); return ""; });
   if (hasRuleCard(state, "Damping Sphere")) generic += state.rules.spellsCast;
+  generic += state.battlefield.filter(c => cardName(c) === "Sphere of Resistance" && verifiedGoldfishCard(c)).length;
   generic += state.battlefield.filter(c => cardName(c) === "Disruptor Flute" && c.chosenName === n && !c.faceDown && c.automaticAbilities !== false).length * 3;
   generic = Math.max(0, generic - reduction);
   if (state.battlefield.some(c => cardName(c) === "Trinisphere" && !c.tapped)) generic = Math.max(generic, 3 - (cost.match(/\{/g) || []).length);
@@ -52,6 +76,7 @@ export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = f
   return "{" + generic + "}" + cost;
 }
 export function planGoldfishCastPayment(state, card, options = {}) {
+  if (cardName(card) === "Hogaak, Arisen Necropolis" && verifiedGoldfishCard(card) && !effectCastPermission(state, card)) return planHogaak(state, card);
   if (options.preview && options.fromGraveyard && goldfishSpellProgram(card)?.harmonize && !card.grantedCast && options.harmonizeTap === undefined) {
     const plans = [[], ...state.battlefield.filter(c => isType(c, "Creature") && !c.tapped).map(c => [goldfishReference(c)])].map(harmonizeTap => planGoldfishCastPayment(state, card, { ...options, preview: false, harmonizeTap }));
     return plans.find(p => p.payable) || plans[0];
@@ -61,11 +86,11 @@ export function planGoldfishCastPayment(state, card, options = {}) {
     options = { ...options, delve: state.graveyard.filter(c => c.id !== card.id).slice(0, generic).map(c => goldfishReference(c, "graveyard")) };
   }
   const cost = goldfishCastingCost(card, { ...options, state });
-  if (!(verifiedGoldfishCard(card) && ["March of Otherworldly Light", "Bitter Triumph", "Crop Rotation"].includes(cardName(card))) && /\bAs an additional cost to cast\b/i.test(faceOf(card).oracleText || "")) return { cost, supported: false, payable: false, reason: "このカードには追加コストがあります。本文を確認し、追加コストを処理してから手動支払いで唱えてください。" };
+  if (!(verifiedGoldfishCard(card) && (["March of Otherworldly Light", "Bitter Triumph", "Crop Rotation"].includes(cardName(card)) || EXTRA_COST_SPELLS.has(cardName(card)))) && /\bAs an additional cost to cast\b/i.test(faceOf(card).oracleText || "")) return { cost, supported: false, payable: false, reason: "このカードには追加コストがあります。本文を確認し、追加コストを処理してから手動支払いで唱えてください。" };
   // Delve pays generic mana after the total cost (including Trinisphere) is
   // determined. It is not a reduction, and cannot pay colored symbols.
   const paymentCost = goldfishCastingCost(card, { ...options, state, delve: [] });
-  return { ...planGoldfishPayment(state, { manaCost: paymentCost }, { ...options, exclude: [...(options.exclude || []), ...(options.harmonizeTap || []).map(r => r.id)], spell: card, genericCredit: options.delve?.length || 0, maximizeColors: ["Prismatic Ending", "Engineered Explosives"].includes(cardName(card)) }), cost };
+  return { ...planGoldfishPayment(state, { manaCost: paymentCost }, { ...options, exclude: [...(options.exclude || []), ...(options.harmonizeTap || []).map(r => r.id), ...(cardName(card) === "We Say Thee Nay!" ? options.format?.cards || [] : []).map(r => r.id)], spell: card, genericCredit: options.delve?.length || 0, maximizeColors: ["Prismatic Ending", "Engineered Explosives", "Together as One"].includes(cardName(card)) }), cost };
 }
 export const goldfishManaText = (pool) => COLORS.flatMap((color) => pool[color] ? [`${pool[color]}${color}`] : []).join(" ") || "0";
 const total = (pool) => COLORS.reduce((sum, color) => sum + pool[color], 0);
@@ -92,6 +117,7 @@ export function goldfishLandEntryOptions(card, state) {
 // Only complete, unconditional land abilities are recognized. In particular,
 // produced_mana alone loses spending restrictions, activation costs and choices.
 export function goldfishLandManaOptions(card, state, context = {}) {
+  if (card.automaticAbilities === false || state && abilityBlockReason(state, card, { manaAbility: true })) return [];
   const face = faceOf(card);
   const type = state && isType(card, "Land") ? "Land — " + gameLandTypes(state, card).join(" ") : face.typeLine || "";
   if (card.faceDown || (!state && (!/\bLand\b/.test(type) || /\bCreature\b/.test(type))) || (state && isType(card, "Creature") && !canTapCreature(state, card))) return [];
@@ -117,6 +143,10 @@ export function goldfishLandManaOptions(card, state, context = {}) {
   if (n === "Eldrazi Temple" && (!eldraziUse || isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse).length)) insert(normalizeGoldfishMana({ C: 2 }));
   if (n === "Ugin's Labyrinth") insert(normalizeGoldfishMana({ C: card.imprinted && state?.exile.some(c => c.id === card.imprinted.id && c.incarnation === card.imprinted.incarnation) ? 2 : 1 }));
   if (n === "Mox Opal" && battlefield.filter(c => isType(c, "Artifact")).length >= 3) for (const color of COLORS.slice(0, 5)) insert(normalizeGoldfishMana({ [color]: 1 }));
+  if (n === "Chrome Mox" && verifiedGoldfishCard(card)) { const imprinted = goldfishFindObject(state, card.imprinted); if (imprinted) for (const color of gameColors(imprinted)) insert(normalizeGoldfishMana({ [color]: 1 })); }
+  if (card.hydroLand && verifiedGoldfishCard(card)) insert(normalizeGoldfishMana({ U: 1 }));
+  if (n === "Tablet of Discovery" && verifiedGoldfishCard(card) && (!context.spell || isType(context.spell, "Instant|Sorcery"))) { const i = result.length; insert(normalizeGoldfishMana({ R: 2 })); if (result.length > i) result.at(-1).restriction = "instantSorcery"; }
+  if (state && isType(card, "Forest") && battlefield.some(c => c.trollAura && goldfishFindObject(state, c.attachedTo)?.id === card.id)) insert(normalizeGoldfishMana({ G: 2 }));
   if (n === "Powerstone" && (!context.spell || isType(context.spell, "Artifact"))) insert(normalizeGoldfishMana({ C: 1 }));
   if (n === "Floodfarm Verge" && battlefield.some(c => gameLandTypes(state, c).some(t => ["Plains", "Island"].includes(t)))) insert(normalizeGoldfishMana({ U: 1 }));
   if (n === "Gemstone Caverns") { for (const color of card.counters?.luck ? COLORS.slice(0, 5) : ["C"]) insert(normalizeGoldfishMana({ [color]: 1 })); return result; }
@@ -216,7 +246,7 @@ export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrex
   const sources = autoTap ? state.battlefield.filter((land) => !land.tapped && !exclude.includes(land.id))
     .map((land) => ({ id: land.id, options: [...goldfishLandManaOptions(land, state, { spell, creatureAbility, abilitySource }), ...(improvise && isType(land, "Artifact") ? [{ pool: normalizeGoldfishMana(), life: 0, credit: 1 }] : [])] })).filter((source) => source.options.length) : [];
   const eldraziUse = spell || abilitySource;
-  const eligible = item => item.restriction === "artifactOrAbility" ? !spell || isType(spell, "Artifact") : item.restriction === "eldrazi" ? eldraziUse && isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse).length : item.restriction === "creatureAbility" ? creatureAbility : item.restriction === "legendary" ? spell && isType(spell, "Legendary") : item.restriction?.startsWith("creature:") ? spell && isType(spell, "Creature") && isType(spell, item.restriction.slice(9)) : true;
+  const eligible = item => item.restriction === "instantSorcery" ? spell && isType(spell, "Instant|Sorcery") : item.restriction === "artifactOrAbility" ? !spell || isType(spell, "Artifact") : item.restriction === "eldrazi" ? eldraziUse && isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse).length : item.restriction === "creatureAbility" ? creatureAbility : item.restriction === "legendary" ? spell && isType(spell, "Legendary") : item.restriction?.startsWith("creature:") ? spell && isType(spell, "Creature") && isType(spell, item.restriction.slice(9)) : true;
   for (const source of sources) source.options = source.options.filter(option => !option.restriction || eligible(option));
   const restrictions = structuredClone(state.rules.restrictedMana || []);
   const blocked = restrictions.filter(item => !eligible(item));
@@ -287,8 +317,7 @@ export function payGoldfishPlanDraft(next, plan) {
   next.rules.restrictedMana = structuredClone(plan.restrictedMana || []);
   next.rules.hasteMana = plan.remainingHasteMana || 0;
   next.rules.fireMana = plan.remainingFireMana || 0;
-  next.players.self.life -= plan.life;
-  next.life = next.players.self.life;
+  changeLife(next, -plan.life);
 }
 
 export function activateGoldfishLand(state, cardId, optionIndex = 0) {
@@ -298,13 +327,12 @@ export function activateGoldfishLand(state, cardId, optionIndex = 0) {
   if (!land || land.tapped) throw new Error("アンタップ状態の土地を選んでください。");
   const option = goldfishLandManaOptions(land, state)[optionIndex];
   if (!option) throw new Error("このマナ能力は手動で処理してください。");
-  if (option.life && state.players.self.life <= option.life) throw new Error("ライフが不足しています。必要なら手動で処理してください。");
+  if (option.life && state.players.self.life < option.life) throw new Error("ライフが不足しています。");
   const next = cloneGoldfishState(state);
   next.battlefield.find((card) => card.id === cardId).tapped = true;
   next.manaPool = add(next.manaPool, option.pool);
   if (option.restriction) (next.rules.restrictedMana ||= []).push({ restriction: option.restriction, pool: option.pool, uncounterable: option.uncounterable });
-  next.players.self.life -= option.life;
-  next.life = next.players.self.life;
+  changeLife(next, -option.life);
   return next;
 }
 
@@ -339,10 +367,16 @@ export function chooseGoldfishCast(state, answer) {
   const next = cloneGoldfishState(state);
   if (!goldfishFindObject(next, choice.card)) throw new Error("選択中のカードが移動しています。戻す操作で確認してください。");
   next.rules.pendingChoice = null;
-  if (answer.cancel) { next.rules.lastAction = "プレイを取り消しました。コストは支払っていません。"; return next; }
+  if (answer.cancel) {
+    const pendingCard = goldfishFindObject(next, choice.card);
+    if (pendingCard?.preparedSource) next.hand = next.hand.filter(c => c.id !== pendingCard.id);
+    if (next.rules.effectCast) { completeEffectCast(next); continueEngineResolution(next); }
+    next.rules.lastAction = "プレイを取り消しました。コストは支払っていません。"; return next;
+  }
   const options = { ...(choice.castOptions || choice.options) };
   if (choice.type === "cast-preflight") {
-    if (choice.optionKey) options[choice.optionKey] = choice.kind === "cards" ? answer.refs : answer.value;
+    if (choice.formatField) options.format = { ...options.format, [choice.formatField]: choice.kind === "cards" ? answer.refs : answer.value };
+    else if (choice.optionKey) options[choice.optionKey] = choice.kind === "cards" ? answer.refs : answer.value;
     else options.command = { ...options.command, [choice.field]: choice.field === "modes" ? answer.values : choice.kind === "cards" ? answer.refs : answer.value };
   }
   else if (choice.type === "cast-target") options.target = answer.target;
@@ -355,25 +389,31 @@ export function chooseGoldfishCast(state, answer) {
   return castGoldfishCard(next, choice.card.id, options);
 }
 
-export function castGoldfishCard(state, cardId, { autoTap = true, x = 0, confirmLife = false, manual = false, entry = 0, fromExile = false, fromGraveyard = false, fromSideboard = false, warp = false, dash = false, kicked = false, target, sacrifice, phyrexianLife = false, command, splice, pitch, mode, modeTargets, gravePlayers, replicate, fuse = false, fuseArtifact, fuseEnchantment, extraCost, costCards, delve, harmonizeTap } = {}) {
+export function castGoldfishCard(state, cardId, { autoTap = true, x = 0, confirmLife = false, manual = false, entry = 0, fromExile = false, fromGraveyard = false, fromSideboard = false, warp = false, dash = false, kicked = false, target, sacrifice, phyrexianLife = false, command, splice, pitch, mode, modeTargets, gravePlayers, replicate, fuse = false, fuseArtifact, fuseEnchantment, extraCost, costCards, delve, harmonizeTap, returnTarget, damageTarget, format = {} } = {}) {
   assertGoldfishChoiceComplete(state);
   if (fromExile && fromGraveyard) throw new Error("唱える領域が不正です。");
   const zone = fromSideboard ? "sideboard" : fromExile ? "exile" : fromGraveyard ? "graveyard" : "hand";
   const card = state[zone].find((item) => item.id === cardId);
+  if (card && cardName(card) === "Hogaak, Arisen Necropolis" && verifiedGoldfishCard(card) && !effectCastPermission(state, card)) return castGoldfishAlternative(state, cardId, "hogaak");
+  const effect = card && effectCastPermission(state, card);
+  if (state.rules.effectCast && !effect) throw new Error("この効果で指定されたカードを唱えてください。");
+  if (effect && (x !== 0 || warp || dash || manual || fuse)) throw new Error("この効果ではマナ・コストを払わず、Xは0で唱えます。");
   if (card && !isType(card, "Land")) { const blocked = castBlockReason(state, zone); if (blocked) throw new Error(blocked); }
   if (!card || state.phase !== "playing") throw new Error("初手をキープし、手札のカードを選んでください。");
   const plotted = fromExile && card.playPermission?.kind === "plot";
   if (plotted && !goldfishPlotReady(state, card)) throw new Error("計画したカードは、後の自分のターンのメインでスタックが空のときに唱えられます。");
   const permission = card.playPermission;
-  const expired = permission?.kind === "warp" ? permission.serial >= state.rules.turnSerial : permission?.expires != null ? permission.expires < state.rules.turnSerial : permission?.serial != null ? permission.serial !== state.rules.turnSerial : permission?.turn !== state.turn || state.rules.activePlayer === "opponent";
+  const expired = ["adventure", "airbend"].includes(permission?.kind) ? false : permission?.kind === "warp" ? permission.serial >= state.rules.turnSerial : permission?.expires != null ? permission.expires < state.rules.turnSerial : permission?.serial != null ? permission.serial !== state.rules.turnSerial : permission?.turn !== state.turn || state.rules.activePlayer === "opponent";
   if (fromExile && !plotted && permission && expired) throw new Error("この追放カードをプレイできる期限は終了しています。");
   if (fromSideboard && state.rules.wish !== state.rules.turnSerial) throw new Error("このターンの願いの許可が必要です。");
   if (plotted && x !== 0) throw new Error("計画からマナ・コストを払わず唱える場合、Xは0です。");
   if (fromExile && permission?.free && x !== 0) throw new Error("マナ・コストを支払わずに唱える場合、Xは0です。");
   if (plotted && /(?:As an additional cost to cast|\bKicker\b|\bSpree\b)/i.test(faceOf(card).oracleText || "")) throw new Error("この計画カードの追加コストは本文の操作で確認してください。");
   const definition = goldfishSpellProgram(card);
-  if (fromGraveyard && !definition?.flashback && !definition?.harmonize && card.grantedCast?.serial !== state.rules.turnSerial) throw new Error("このカードの墓地からの唱え方は手動処理です。");
-  const options = { autoTap, x, confirmLife, manual, entry, fromExile, fromGraveyard, fromSideboard, warp, dash, kicked, target, sacrifice, phyrexianLife, command, splice, pitch, mode, modeTargets, gravePlayers, replicate, fuse, fuseArtifact, fuseEnchantment, extraCost, costCards, delve, harmonizeTap };
+  const gaea = state.rules.gaeaWillSerial === state.rules.turnSerial || isType(card, "Land") && state.battlefield.some(c => verifiedGoldfishCard(c) && /You may play lands from your graveyard\./.test(faceOf(c).oracleText));
+  if (!fromExile && !fromGraveyard && !warp && !dash && x && state.battlefield.some(c => cardName(c) === "Omniscience" && verifiedGoldfishCard(c))) throw new Error("全知でマナ・コストを払わず唱える場合、Xは0です。");
+  if (fromGraveyard && !effect && !gaea && !definition?.flashback && !definition?.harmonize && card.grantedCast?.serial !== state.rules.turnSerial) throw new Error("このカードの墓地からの唱え方は手動処理です。");
+  const options = { autoTap, x, confirmLife, manual, entry, fromExile, fromGraveyard, fromSideboard, warp, dash, kicked, target, sacrifice, phyrexianLife, command, splice, pitch, mode, modeTargets, gravePlayers, replicate, fuse, fuseArtifact, fuseEnchantment, extraCost, costCards, delve, harmonizeTap, returnTarget, damageTarget, format };
   const requestChoice = (type) => {
     const next = cloneGoldfishState(state);
     next.rules.pendingChoice = { type, card: goldfishReference(card, zone), sourceName: card.name, options: structuredClone(options) };
@@ -390,10 +430,17 @@ export function castGoldfishCard(state, cardId, { autoTap = true, x = 0, confirm
   if (goldfishPlayDestination(card) === "battlefield" && state.rules.landsPlayed == null) return requestChoice("land-count");
   let paidPlan;
   const place = (value) => {
-    const next = playGoldfishCard(zone !== "hand" ? moveGoldfishCards(value, [cardId], "hand") : value, cardId, { target, flashback: fromGraveyard && (Boolean(definition?.flashback || definition?.harmonize) || card.grantedCast?.flashback), warp, dash, kicked, x, command, spliced: (splice || []).map(r => structuredClone(goldfishFindObject(state, r))), delvedCards: (delve || []).map(r => structuredClone(goldfishFindObject(state, r))), mode, modeTargets, gravePlayers, replicate, fuse, fuseArtifact, fuseEnchantment, hasteMana: paidPlan?.hasteMana, uncounterable: paidPlan?.uncounterable, serial: value.rules.turnSerial, colorsSpent: paidPlan?.colorsSpent || [], manaSpent: paidPlan?.manaSpent ?? (manual ? null : 0) });
+    const next = playGoldfishCard(zone !== "hand" ? moveGoldfishCards(value, [cardId], "hand") : value, cardId, { target, flashback: fromGraveyard && !gaea && (Boolean(definition?.flashback || definition?.harmonize) || card.grantedCast?.flashback), warp, dash, kicked, x, command, spliced: (splice || []).map(r => structuredClone(goldfishFindObject(state, r))), delvedCards: (delve || []).map(r => structuredClone(goldfishFindObject(state, r))), mode, modeTargets, gravePlayers, replicate, fuse, fuseArtifact, fuseEnchantment, returnTarget, damageTarget, format, bargained: cardName(card) === "Beseech the Mirror" && costCards?.length === 1, fromZone: zone, hasteMana: paidPlan?.hasteMana, uncounterable: paidPlan?.uncounterable, serial: value.rules.turnSerial, colorsSpent: paidPlan?.colorsSpent || [], manaSpent: paidPlan?.manaSpent ?? (manual ? null : 0) });
     if (fromSideboard) delete next.rules.wish;
     const spell = next.stack.find(c => c.id === cardId);
+    if (effect?.flashback && spell) spell.cast.flashback = true;
     if (spell?.cast) spell.cast.manaByColor = structuredClone(paidPlan?.manaByColor || {});
+    if (spell && card.preparedSource) {
+      const source = goldfishFindObject(next, card.preparedSource);
+      if (!source?.prepared) throw new Error("準備状態が変わりました。");
+      source.prepared = false; spell.kind = "copy"; delete spell.preparedSource;
+    }
+    if (effect) { completeEffectCast(next, true); continueEngineResolution(next); }
     return next;
   };
   if (fromGraveyard && definition?.flashback === "mountain") {
@@ -416,8 +463,7 @@ export function castGoldfishCard(state, cardId, { autoTap = true, x = 0, confirm
     const next = place(state);
     const entered = next.battlefield.find((land) => land.id === cardId);
     if (entered) entered.tapped = choice.tapped;
-    next.players.self.life -= choice.life;
-    next.life = next.players.self.life;
+    changeLife(next, -choice.life);
     return next;
   }
   const plan = planGoldfishCastPayment(state, card, options);
@@ -425,8 +471,9 @@ export function castGoldfishCard(state, cardId, { autoTap = true, x = 0, confirm
   if (!plan.payable) throw new Error(plan.reason);
   if (plan.life && !confirmLife) throw new Error(`コストの支払いでライフが${plan.life}点減ります。支払いを確認してください。`);
   const paid = payGoldfishPlan(state, plan);
+  if (verifiedGoldfishCard(card)) payFormatExtraCosts(paid, card, format);
   for (const r of harmonizeTap || []) goldfishFindObject(paid, r).tapped = true;
-  if (verifiedGoldfishCard(card) && cardName(card) === "Bitter Triumph" && extraCost === "life") { if (paid.players.self.life < 3) throw new Error("追加コストのライフが足りません。"); paid.players.self.life -= 3; paid.life = paid.players.self.life; }
+  if (verifiedGoldfishCard(card) && cardName(card) === "Bitter Triumph" && extraCost === "life") { if (paid.players.self.life < 3) throw new Error("追加コストのライフが足りません。"); changeLife(paid, -3); }
   for (const r of costCards || []) moveGoldfishRuleObject(paid, r.id, r.zone || "battlefield", "graveyard", (r.zone || "battlefield") === "battlefield" ? "sacrifice" : "discard");
   for (const r of delve || []) moveGoldfishRuleObject(paid, r.id, "graveyard", "exile");
   for (const r of pitch || []) moveGoldfishRuleObject(paid, r.id, "hand", "exile");

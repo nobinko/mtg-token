@@ -9,8 +9,8 @@
     <link rel="icon" href="/favicon.svg?v=20261003-redesign">
     <script src="/theme.js?v=20261003-redesign"></script>
     <script type="module" src="/session.js"></script>
-    <link rel="stylesheet" href="/styles.css?v=20261020-solo3">
-    <link rel="stylesheet" href="/goldfish.css?v=20261020-solo3">
+    <link rel="stylesheet" href="/styles.css?v=20261020-solo6">
+    <link rel="stylesheet" href="/goldfish.css?v=20261020-solo6">
   </head>
   <body>
     <main class="app">
@@ -173,6 +173,11 @@
         </section>
       </section>
 
+      <section id="goldfish-last-session" class="goldfish-last-session" hidden aria-label="保存したひとり回し">
+        <button id="goldfish-resume-last" type="button" class="ghost-button">ひとり回しの続き</button>
+        <span id="goldfish-last-session-title"></span>
+      </section>
+
       <section class="status" id="status" role="status" hidden></section>
       <section class="status status-note" id="result-freshness" hidden></section>
 
@@ -324,7 +329,8 @@
           <div class="goldfish-table-column">
             <div class="goldfish-arena-top">
               <div class="goldfish-opponent"><div class="goldfish-life"><span>相手のライフ</span><button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="life" data-goldfish-delta="-1" aria-label="相手のライフを1減らす">−</button><input id="goldfish-opponent-life" data-goldfish-tracker-input="opponent:life" type="number" value="20" aria-label="相手のライフ"><button type="button" data-goldfish-tracker-player="opponent" data-goldfish-tracker="life" data-goldfish-delta="1" aria-label="相手のライフを1増やす">＋</button></div></div>
-              <div class="goldfish-turn-indicator"><span>TURN</span><strong id="goldfish-turn">—</strong><span id="goldfish-turn-side"></span><button id="goldfish-cast-count" type="button" title="スタック・誘発と唱えた回数">呪文 0</button><span id="goldfish-finish" role="status" hidden></span></div>
+              <div class="goldfish-turn-indicator"><span>TURN</span><strong id="goldfish-turn">—</strong><span id="goldfish-turn-side"></span><button id="goldfish-cast-count" type="button" title="スタック・誘発と唱えた回数">呪文 0</button></div>
+              <span id="goldfish-finish" role="status" hidden></span>
             </div>
             <section class="battlefield-zone goldfish-zone" aria-label="戦場">
               <header class="goldfish-zone-header"><h3>戦場 <span id="goldfish-battlefield-count">0</span></h3><div><button id="goldfish-untap-all" type="button" aria-keyshortcuts="u">全アンタップ <kbd>U</kbd></button><button id="goldfish-tap-all" type="button">全タップ</button></div></header>
@@ -607,6 +613,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261020-solo3" type="module"></script>
+    <script src="/app.js?v=20261020-solo6" type="module"></script>
   </body>
 </html>

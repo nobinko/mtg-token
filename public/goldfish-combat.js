@@ -1,8 +1,9 @@
-import { goldfishCharacteristics, goldfishKeywords, recordGoldfishAttack, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261020-solo3";
-import { goldfishReference, goldfishFindObject } from "./goldfish-objects.js?v=20261020-solo3";
-import { engineAttackGroup } from "./goldfish-engine.js?v=20261020-solo3";
-import { changeLife } from "./goldfish-events.js?v=20261020-solo3";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo3";
+import { goldfishCharacteristics, goldfishKeywords, recordGoldfishAttack, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261020-solo6";
+import { goldfishReference, goldfishFindObject } from "./goldfish-objects.js?v=20261020-solo6";
+import { engineAttackGroup } from "./goldfish-engine.js?v=20261020-solo6";
+import { changeLife } from "./goldfish-events.js?v=20261020-solo6";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo6";
+import { offerCombatCrew } from "./goldfish-format-runtime.js?v=20261020-solo6";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 export function goldfishAttackers(state) {
@@ -22,7 +23,7 @@ export function beginGoldfishCombatDraft(state) {
     if (state.rules.combat.stage === "done" && state.rules.extraCombats > 0) { state.rules.extraCombats--; state.rules.combat = null; }
     else throw new Error("このターンの攻撃は宣言済みです。");
   }
-  state.rules.pendingChoice = { type: "attack", sourceName: "攻撃クリーチャー", cardIds: goldfishAttackers(state).map((item) => item.card.id) };
+  if (!offerCombatCrew(state)) state.rules.pendingChoice = { type: "attack", sourceName: "攻撃クリーチャー", cardIds: goldfishAttackers(state).map((item) => item.card.id) };
 }
 
 export function declareGoldfishAttackersDraft(state, answer) {
@@ -71,7 +72,7 @@ export function resolveGoldfishCombatDraft(state) {
     if (keywords.has("lifelink")) gain += amount;
     if (amount) recordGoldfishAttack(state, card, true);
   }
-  state.players.opponent.life -= damage; state.players.opponent.poison += poison;
+  changeLife(state, -damage, "opponent"); state.players.opponent.poison += poison;
   changeLife(state, gain);
   combat.stage = firstStep ? "normal" : "done";
   if (combat.stage === "done") { state.manaPool.R = 0; state.rules.fireMana = 0; }

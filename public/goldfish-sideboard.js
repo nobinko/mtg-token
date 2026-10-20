@@ -1,4 +1,4 @@
-import { createGoldfishGame } from "./goldfish.js?v=20261020-solo3";
+import { createGoldfishGame } from "./goldfish.js?v=20261020-solo6";
 
 // Registered rows, not cards currently in zones: a Wish, token or stolen card
 // must never become part of the next game's deck.
@@ -32,9 +32,9 @@ export function goldfishFinish(state) {
   if (state.rules.win) return state.rules.win;
   if (state.phase !== "playing" || state.rules.pendingChoice || state.stack.length || state.rules.sacrificeSequence) return null;
   const selfLost = state.players.self.life <= 0 || state.players.self.poison >= 10 || state.rules.emptyDraw;
-  const opponentLost = state.players.opponent.life <= 0 || state.players.opponent.poison >= 10;
+  const opponentLost = state.players.opponent.life <= 0 || state.players.opponent.poison >= 10 || state.rules.opponentEmptyDraw;
   if (selfLost && opponentLost) return { kind: "draw", label: "両者の敗北条件に到達" };
   if (selfLost) return { kind: "loss", label: state.rules.emptyDraw ? "山札が空の状態でドローしました" : "自分の敗北条件に到達" };
-  if (opponentLost) return { kind: "win", label: state.players.opponent.poison >= 10 ? "相手の毒が10個に到達" : "相手のライフを0以下にしました" };
+  if (opponentLost) return { kind: "win", label: state.rules.opponentEmptyDraw ? "相手が山札のない状態でドローしました" : state.players.opponent.poison >= 10 ? "相手の毒が10個に到達" : "相手のライフを0以下にしました" };
   return null;
 }

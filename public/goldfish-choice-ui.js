@@ -1,12 +1,12 @@
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo3";
-import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261020-solo3";
-import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261020-solo3";
-import { goldfishAttackers } from "./goldfish-combat.js?v=20261020-solo3";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-solo3";
-import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261020-solo3";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo3";
-import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261020-solo3";
-import { engineCandidates } from "./goldfish-engine.js?v=20261020-solo3";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-solo6";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261020-solo6";
+import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261020-solo6";
+import { goldfishAttackers } from "./goldfish-combat.js?v=20261020-solo6";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-solo6";
+import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261020-solo6";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo6";
+import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261020-solo6";
+import { engineCandidates } from "./goldfish-engine.js?v=20261020-solo6";
 
 // Render only explicit choices. This module never changes game state itself.
 export function renderGoldfishSpellChoice({ state, choice, content, title, action, paragraph, imageUrl, answer, saveDraft }) {
@@ -66,8 +66,12 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
           }
         } else if (ability.targetSpec) {
           for (const option of data.targets) {
-            const selected = JSON.stringify(draft.target) === JSON.stringify(option.ref);
-            const select = () => { draft.target = option.ref; saveDraft({ ...draft, costIds: ids }); render(); };
+            const selected = ability.targetSpec.count ? (draft.targets || []).some(r=>JSON.stringify(r) === JSON.stringify(option.ref)) : JSON.stringify(draft.target) === JSON.stringify(option.ref);
+            const select = () => {
+              if (ability.targetSpec.count) { draft.targets ||= []; if(selected) draft.targets = draft.targets.filter(r=>JSON.stringify(r)!==JSON.stringify(option.ref)); else if(draft.targets.length < ability.targetSpec.count) draft.targets.push(option.ref); }
+              else draft.target = option.ref;
+              saveDraft({ ...draft, costIds: ids }); render();
+            };
             if (option.card) list.append(cardTile(option.card, select, (selected ? "✓ " : "") + option.label));
             else { const button = document.createElement("button"); button.type = "button"; button.textContent = (selected ? "✓ " : "") + option.label; button.addEventListener("click", select); list.append(button); }
           }
@@ -80,7 +84,7 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
       render();
       const payment = goldfishActionPayment(state, card, ability, draft);
       paragraph("支払い " + payment.cost + ((payment.life || ability.lifeCost) ? "・ライフ " + ((payment.life || 0) + (ability.lifeCost || 0)) : ""));
-      action("確定して起動", () => answer({ ...draft, x: Number(draft.x || 0), target: draft.target || null, costCards: data.costs.filter(c => ids.includes(c.ref.id)).map(c => c.ref), confirmLife: true }), true);
+      action("確定して起動", () => answer({ ...draft, x: Number(draft.x || 0), target: draft.target || null, ...(ability.targetSpec?.count ? {targets:draft.targets||[]} : {}), costCards: data.costs.filter(c => ids.includes(c.ref.id)).map(c => c.ref), confirmLife: true }), true);
       action("キャンセル", () => answer({ cancel: true }));
       return true;
     }
@@ -114,13 +118,45 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
   }
   if (choice.type === "engine-legend") {
     title.textContent = "伝説のルール：残す1枚を選ぶ"; paragraph(choice.sourceName);
-    for (const id of choice.ids) { const card = state.battlefield.find(c => c.id === id); if (card) content.append(cardTile(card, () => answer({ keep: id }))); }
+    const list = document.createElement("div"); list.className = "goldfish-choice-targets"; content.append(list);
+    for (const id of choice.ids) {
+      const card = state.battlefield.find(c => c.id === id);
+      if (!card) continue;
+      const details = [];
+      if (card.copyBase?.name) details.push(`元のカード：${card.copyBase.name}`);
+      details.push(card.tapped ? "タップ状態" : "アンタップ状態");
+      const counters = Object.entries(card.counters || {}).filter(([, count]) => count > 0);
+      details.push(counters.length ? counters.map(([type, count]) => `${type === "ice" ? "氷" : type} ${count}`).join("・") : "カウンターなし");
+      list.append(cardTile(card, () => answer({ keep: id }), `${choice.sourceName} — ${details.join("／")}`));
+    }
     return true;
   }
-  if (["engine-choice", "engine-target", "engine-entry", "engine-draw", "engine-opening", "engine-opening-exile", "cast-preflight", "cleanup"].includes(choice.type)) {
+  if (["engine-choice", "engine-target", "engine-entry", "engine-copy-entry", "engine-draw", "engine-combat-crew", "engine-opening", "engine-opening-exile", "cast-preflight", "cleanup"].includes(choice.type)) {
     title.textContent = choice.label; paragraph(choice.sourceName, "goldfish-mana-card-name");
     const list = document.createElement("div"); list.className = "goldfish-choice-targets"; content.append(list);
-    if (choice.type === "engine-target" && !choice.multipleTargets || choice.kind === "copy-target") {
+    if (choice.kind === "division") {
+      let allocation = structuredClone(choice.draft?.allocation || []);
+      const confirm = action("配分を確定", () => answer({ allocation }), true);
+      const update = () => {
+        const total = allocation.reduce((n, a) => n + a.amount, 0);
+        confirm.textContent = allocation.length ? `${total}/${choice.divideDamage}点で確定` : "対象にしない";
+        confirm.disabled = allocation.length ? total !== choice.divideDamage : !choice.optional;
+        saveDraft({ allocation });
+      };
+      for (const option of choice.candidates) {
+        const row = document.createElement("label"); row.textContent = option.label;
+        const input = document.createElement("input"); input.type = "number"; input.min = "0"; input.max = String(choice.divideDamage);
+        input.value = String(allocation.find(a => JSON.stringify(a.target) === JSON.stringify(option.ref))?.amount || 0);
+        input.setAttribute("aria-label", `${option.label}へのダメージ`);
+        input.addEventListener("input", () => {
+          allocation = allocation.filter(a => JSON.stringify(a.target) !== JSON.stringify(option.ref));
+          if (Number(input.value) > 0) allocation.push({ target: option.ref, amount: Number(input.value) });
+          update();
+        });
+        row.append(input); list.append(row);
+      }
+      update();
+    } else if (choice.type === "engine-target" && !choice.multipleTargets || choice.kind === "copy-target") {
       for (const option of choice.candidates) {
         const card = goldfishFindObject(state, option.ref);
         if (card) list.append(cardTile(card, () => answer({ target: option.ref })));

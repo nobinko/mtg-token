@@ -1,10 +1,10 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo3";
-import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-solo3";
-import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-solo3";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo6";
+import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-solo6";
+import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-solo6";
 
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function verifiedGoldfishCard(card) {
-  const data = face(card), expected = GOLD_FISH_CATALOG[data.name];
+  const data = face(card), expected = GOLD_FISH_CATALOG[card.copyRuleName || data.name];
   return !!expected && card.automaticAbilities !== false && !card.faceDown && normalized(data.oracleText) === normalized(expected.oracleText);
 }
 // These are ability-level descriptions, never a claim of whole-card coverage.
@@ -50,6 +50,12 @@ export const ENGINE_RULE_NOTES = {
   "The Ten Rings": "終了時、手札10枚までドロー"
 };
 export const TOKENS = {
+  knight: { name: "Human Knight", colors: ["R"], typeLine: "Token Creature — Human Knight", power: "2", toughness: "2", oracleText: "Trample, haste" },
+  treefolk: { name: "Treefolk", colors: ["G"], typeLine: "Token Creature — Treefolk", power: "3", toughness: "4", oracleText: "Reach" },
+  angel: { name: "Angel", colors: ["W"], typeLine: "Token Creature — Angel", power: "4", toughness: "4", oracleText: "Flying, vigilance" },
+  blood: { name: "Blood", typeLine: "Token Artifact — Blood", oracleText: "{1}, {T}, Discard a card, Sacrifice this artifact: Draw a card." },
+  jace: { name: "Jace", colors: ["U"], typeLine: "Token Planeswalker — Jace", oracleText: "−1: Surveil 1.\n−3: Draw a card.", loyalty: "0" },
+  monk: { name: "Monk", colors: ["W"], typeLine: "Token Creature — Monk", power: "1", toughness: "1", oracleText: "Prowess" },
   food: { name: "Food", typeLine: "Token Artifact — Food", power: "", toughness: "", oracleText: "{2}, {T}, Sacrifice this artifact: You gain 3 life." },
   attackingPest: { name: "Pest", typeLine: "Token Creature — Pest", colors: ["B", "G"], power: "1", toughness: "1", oracleText: "Whenever this token attacks, you gain 1 life." },
   monsterRole: { name: "Monster Role", typeLine: "Token Enchantment — Aura Role", power: "", toughness: "", oracleText: "Enchant creature\nEnchanted creature gets +1/+1 and has trample." },
@@ -169,7 +175,13 @@ export function engineCardActions(card) {
   if (!card || card.faceDown || card.automaticAbilities === false) return [];
   const name = cardName(card), result = [];
   if (card.kind === "token") {
+    if (name === "Blood") result.push(ability("blood-loot", "{1}：1枚捨て、血を生け贄にして1枚引く", "{1}", [draw()], { tap: true, sacrifice: true, costSelect: { zone: "hand", filter: {}, count: 1, destination: "graveyard" } }));
+    if (name === "Jace" && card.oracleText === TOKENS.jace.oracleText) {
+      result.push(ability("jace-token-surveil", "−1：諜報1", "{0}", [select("諜報1：墓地へ置くか、上に残す", "library", {}, { top: 1, destination: "graveyard" })], { main: true, loyalty: -1 }));
+      result.push(ability("jace-token-draw", "−3：1枚引く", "{0}", [draw()], { main: true, loyalty: -3 }));
+    }
     if (name === "Food") result.push(ability("food", "{2}：食物を生け贄にして3点回復", "{2}", [{ op: "life", amount: 3 }], { tap: true, sacrifice: true }));
+    if (name === "Mutagen") result.push(ability("mutagen", "{1},{T}・生け贄：＋1/＋1カウンター", "{1}", [{ op: "target-counter", name: "+1/+1", count: 1 }], { main: true, tap: true, sacrifice: true, targetSpec: { zone: "battlefield", types: ["Creature"] } }));
     if (name === "Map") result.push(ability("map-explore", "{1}：生け贄にして探検", "{1}", [{ op: "explore" }], { main: true, tap: true, sacrifice: true, targetSpec: { zone: "battlefield", types: ["Creature"] } }));
     if (name === "Lander") result.push(ability("lander", "{2}：基本土地をタップ状態で探す", "{2}", [tutor({ types: ["Basic"], subtypes: ["Plains", "Island", "Swamp", "Mountain", "Forest"] }, "battlefield", { tapped: true })], { tap: true, sacrifice: true }));
     if (["Eldrazi Spawn", "Eldrazi Scion"].includes(name)) result.push(ability("spawn-mana", "生け贄にして {C}", "{0}", [{ op: "mana", colors: ["C"] }], { sacrifice: true, manaAbility: true }));
@@ -177,6 +189,20 @@ export function engineCardActions(card) {
   }
   if (!verifiedGoldfishCard(card)) return result;
   const add = (...args) => result.push(ability(...args));
+  if (["Seasoned Hallowblade", "Iron-Shield Elf", "Guardian of New Benalia"].includes(name)) add("discard-indestructible", "1枚捨てる：タップして破壊不能", "{0}", [{ op: "source-keyword", keyword: "indestructible" }, { op: "tap-source" }], { costSelect: { zone: "hand", filter: {}, count: 1, destination: "graveyard" } });
+  if (name === "Fleeting Spirit") {
+    add("spirit-firststrike", "{W}・墓地3枚を追放：先制攻撃", "{W}", [{ op: "source-keyword", keyword: "first strike" }], { costSelect: { zone: "graveyard", filter: {}, count: 3, destination: "exile" } });
+    add("spirit-blink", "1枚捨てる：終了ステップまで追放", "{0}", [{ op: "spirit-blink" }], { costSelect: { zone: "hand", filter: {}, count: 1, destination: "graveyard" } });
+  }
+  const crew = face(card).oracleText.match(/\bCrew (\d+)/);
+  if (crew) add("crew", `搭乗${crew[1]}：合計パワー${crew[1]}以上をタップ`, "{0}", [{ op: "crew" }], { costSelect: { zone: "battlefield", filter: { types: ["Creature"], untapped: true }, count: 1, variable: true, minPower: Number(crew[1]), destination: "tap" } });
+  if (name === "Moon-Circuit Hacker") add("ninjutsu", "忍術 {U}：攻撃クリーチャーを手札へ戻して登場", "{U}", [{ op: "ninjutsu" }], { zone: "hand", ninjutsu: true, costSelect: { zone: "battlefield", filter: { types: ["Creature"], attacking: true }, count: 1, destination: "hand" } });
+  if (name === "Sapling Nursery") add("nursery", "{1}{G}・追放：森とツリーフォークに破壊不能", "{1}{G}", [{ op: "nursery-protection" }], { exileSelf: true });
+  if (name === "The Theorist, Jace Beleren") {
+    add("theorist-plus", "＋1：イリュージョンを生成", "{0}", [{ op: "theorist-token" }], { main: true, loyalty: 1 });
+    add("theorist-minus", "−2：相手の置物を戻す", "{0}", [{ op: "opponent-effect", text: "各対戦相手のアーティファクトまたはクリーチャーを最大1つずつ手札へ" }], { main: true, loyalty: -2 });
+    add("theorist-ultimate", "−6：3枚引き、手札枚数分のカウンター", "{0}", [draw(3), { op: "theorist-counters" }], { main: true, loyalty: -6 });
+  }
   if (name === "Street Wraith") add("wraith-cycle", "2ライフ：サイクリング", "{0}", [draw()], { zone: "hand", discardSelf: true, lifeCost: 2 });
   if (name === "Edge of Autumn") add("edge-cycle", "土地を生け贄：サイクリング", "{0}", [draw()], { zone: "hand", discardSelf: true, costSelect: { zone: "battlefield", filter: { types: ["Land"] }, count: 1, destination: "graveyard" } });
   if (name === "Pinnacle Starcage") add("starcage", "{6}{W}{W}：追放したカードを墓地へ・ロボット生成", "{6}{W}{W}", [{ op: "starcage-robots" }]);
@@ -184,6 +210,7 @@ export function engineCardActions(card) {
   if (name === "Witch's Oven") add("oven", "{T}：クリーチャーを生け贄にして食物を作る", "{0}", [{ op: "oven-food" }], { tap: true, costSelect: { zone: "battlefield", filter: { types: ["Creature"] }, count: 1, destination: "graveyard" } });
   if (name === "Lotus Petal") add("petal", "生け贄：好きな色1マナ", "{0}", [{ op: "mana-choice", count: 1 }], { tap: true, sacrifice: true, manaAbility: true });
   if (name === "Lion's Eye Diamond") add("diamond", "手札をすべて捨てて生け贄：同色3マナ", "{0}", [{ op: "mana-choice", count: 3, sameColor: true }], { sacrifice: true, discardHand: true, manaAbility: true });
+  if (name === "Simian Spirit Guide") add("spirit-guide", "手札から追放：{R}", "{0}", [{ op: "mana", colors: ["R"] }], { zone: "hand", exileSelf: true, manaAbility: true });
   if (name === "Seasoned Cryomancer") add("cryomancer", "墓地から追放：2枚引く", "{3}{U}{U}", [draw(2)], { zone: "graveyard", exileSelf: true });
   if (name === "Leyline of Abundance") add("leyline-counters", "{6}{G}{G}：全クリーチャーに＋1/＋1カウンター", "{6}{G}{G}", [{ op: "team-counters", count: 1 }]);
   if (name === "High Noon") add("high-noon", "{4}{R}・生け贄：5点ダメージ", "{4}{R}", [{ op: "damage", amount: 5 }], { sacrifice: true, targetSpec: damageTarget });

@@ -45,7 +45,7 @@
 
 相手の手札・山札・戦場・ブロッカー・優先権はモデル化していない。相手のカードを対象にする除去・打ち消し等には「相手の対象」を選べる入口を用意し、自己側の支払い・誘発・呪文数を処理して続行する。相手のカードが実在するか、対象条件に合うかは判定しない。相手のライフへの火力とブロックなしの戦闘ダメージは実際に更新する。
 
-検証範囲は、このスナップショットの10リストの主要ルートと下記の能力別場面。全カードの全相互作用、任意の継続的効果・置換の組み合わせ、完全な優先権や全ステップを備えた対戦エンジンの完成を意味しない。未知のOracleや対応外の効果には本文確認と盤面修正を残している。
+検証範囲は、Modernと後述のStandard・Legacy・Pioneer各10種類、計40リストの主要ルートと能力別場面。全カードの全相互作用、任意の継続的効果・置換の組み合わせ、完全な優先権や全ステップを備えた対戦エンジンの完成を意味しない。未知のOracleや対応外の効果には本文確認と盤面修正を残している。
 
 ## 検証と再取得
 
@@ -82,7 +82,7 @@
 - `goldfish-postboard.test.js`: 残る9種類で実際にサイドから入れ替え、指定初手・ドロー順から決着へ進める。ルビーのサイド後と合わせて10種類。入れ替えは処理検証用であり、対面別の推奨サイドプランではない。
 - `goldfish-endgame-boundaries.test.js`: 6場面。登録枚数・構成の保持、セプターの追加支払い・詠唱制限・キッカー、外科的摘出の相手側対象、砲撃20回、途中のアジャニ変身選択・保存再開・古い対象の拒否を検証。ここでは能力検証用の盤面を準備する。
 - 自動処理が不足していた豊穣の力線の全体強化を追加。難題の予見者・クロールの銛撃ちの登場時の誤停止、地ならし屋で相手に渡すパワーストーンが自分の戦場に出る誤り、圧縮保存復元後の配列共有を修正した。
-- 最新の全体検査は **395/395成功**、ビルド成功。ログは `.cache/top10-endgame-full-test.log`、`.cache/top10-endgame-build.log`。localhost接続・一時ファイル置換を使う既存検査を含め、通常の権限で実行した。
+- この段階の全体検査は **395/395成功**、ビルド成功。ログは `.cache/top10-endgame-full-test.log`、`.cache/top10-endgame-build.log`。localhost接続・一時ファイル置換を使う既存検査を含め、通常の権限で実行した。
 - 実画面は保存済み横浜大会の **TakahashiRyoma / Boros Energy** で確認。血染めの月1枚→High Noon1枚の交換、61枚時の開始禁止、60枚に戻して初手、Undo/Redo、再読込後の同じ初手を確認した。390pxでは「入れる／抜く」を切り替えられる。画像は `.cache/goldfish-sideboard-mobile.png`。
 - 同デッキでフェッチ2回・ショックランド・魂の導き手・ラガバンを通常の支払いで展開し、砲撃で2体を選び、ライフ20→18・墓地2枚増・呪文数不変を確認。砲撃だけは操作検証用に山札検索で手札へ移してから唱えた。画像は `.cache/goldfish-batch-result.png`。この画面検査を無作為の初手だけの検証とは扱わない。
 - 今回Meleeへの新規再取得は通信エラーだったため、ライブ再取得の成功とは扱わず、ブラウザーに保存してあった大会リストを使用した。固定10種類の入口がなく、大会から実リストへ進めることを確認した。
@@ -110,19 +110,44 @@
 - ブラウザーは環境検索Legacy・大会日2026-10-19・300リストから、[Legacy Challenge 32 / empiricism](https://www.mtgo.com/decklist/legacy-challenge-32-2026-10-1812856606) の61/15リストを開いた。通常の初手にヤヴィマヤ・不毛の大地・壌土からの生命があり、T1ヤヴィマヤ、T2不毛の大地、土地2枚の自動タップでLoamを0対象で解決。カード・マナを足していない。
 - T3のドローが発掘選択で停止。ひとり回しを閉じて開き直し、保存済みの選択から発掘3を実行。山札53→50、手札5→6、墓地1→3を画面で確認した。`.cache/goldfish-dredge-choice-20261020.png` と `.cache/goldfish-dredge-result-20261020.png` に記録。途中、払えるはずのLoamが止まるヤヴィマヤの欠落と、発掘待ちを「山札が空」と扱う表示を修正した。
 
-### 残る範囲
+### 停止を解消した継続実装と決着の検証
 
-同じ停止検出用操作者で30種類を再実行した結果は19勝利・1敗北・10停止。勝利は相手の干渉とブロッカーがない設定でライフ等の終了条件に達したという意味で、全能力の実装完了ではない。Doomsdayの1敗北は山札構築を理解しない単純操作者の結果で、上記の選択を指定した勝利経路とは別である。
+前段階で止まった10種類の処理を実装し、その先の選択・起動・勝ち筋も追加した。2026-10-20の再実行では、停止検出用の30種類は **28勝利・2敗北・手動停止0件**。青白とDoomsdayの敗北は、勝ち筋を組み立てない単純な操作者による山札切れである。両者も以下の勝ち筋を選ぶ試験ではメイン・サイド後とも勝利する。停止検査を勝率測定とは扱わない。
 
-| 形式 | 最初に停止したカード（型） |
+| 追加した処理 | 選択と自動処理 |
 | --- | --- |
-| Standard | Jace's Machinations（UW）、Impractical Joke（Izzet）、Earthbender Ascension（緑単）、Uldaros Theorix（Reanimator）、Jeskai Revelation（4/5色） |
-| Legacy | Amped Raptor（Boros）、Beseech the Mirror（Storm） |
-| Pioneer | Storm the Festival（緑信心）、Vanishing Verse（Greasefang）、Voldaren Epicure（Boros） |
+| 解決中に唱える効果 | Amped Raptorのエネルギー、Beseech the Mirrorの協約と即時詠唱、Uldarosのタイプ別対象・合計マナ総量6以下のコピー。唱えるかを選んでから支払い、親の解決後に詠唱誘発へ戻る。 |
+| 墓地・代替コスト | Hogaakの召集・探査、狂気のFiery Temper、想起、Snuff Out／Force of Vigor、放題、証拠収集、枯朽、新生、兆候、贈り物、Rottenmouth Viperの生け贄軽減。通常マナ不足でも、先に代替コストや軽減を選べる。 |
+| 主要コンボ | Omniscience→Emrakulの詠唱・追加ターン、Stage＋Depthsの伝説ルール・氷なし誘発、Beseech→Gaea's Will→儀式再使用→Tendrils、Greasefang→Parhelionの搭乗と攻撃、Ygra＋使い魔2体の実際の食物生け贄・吸収反復。 |
+| 戦場の継続処理 | Tamiyoの3枚目ドロー・変身、Kaitoと各PWの忠誠度、昼夜、回復とAmaliaの探検、上陸、部屋の開放、Overlordの時間カウンター、Intiの追放期限、龍と英雄譚、Furyの登場時配分、Moloidの攻撃切削。 |
+| 起動とコピー | 忍術、機体の搭乗、水の技のタップ支払い、準備呪文、Hearse／Vacuum／Curatorの関連する追放カード、Old-Growth Trollの森への帰還と土地生け贄、Sandmanの墓地帰還。Superior Spider-Man／Mockingbirdは登場前にコピー先を選び、コピー可能な特性だけを引き継ぐ。 |
+| サイド後 | 取り込んだ実リストから実際にカードを交換。打ち消し・除去・墓地対策・禁止能力・代替支払いを通し、サイドカードを唱えた上で決着まで継続する。 |
 
-再現は `node scripts/audit-goldfish-formats.mjs`、詳細は `.cache/goldfish-formats-audit.json`。対象を必要とする呪文に合法な対象がないときは唱えようとしない。これは不足を発見する操作者であり、忍術・搭乗とGreasefang・準備呪文Enroot・相手の領域・Show and TellからのSheltered by Ghosts以外のオーラ登場などを含む全勝ち筋／全サイド後を認証するものではない。未対応の本文を自動処理済みとして進めない。
+**4フォーマット × 10種類 × メイン／サイド後 = 80経路**を確認した。原リストの登録枚数を維持し、試験中にカード・マナを追加せず、未対応効果を承認して飛ばすこともない。勝ち筋の試験では、開始前に初手・ドロー順を指定するものと固定シードでシャッフルするものを区別している。各試験は一経路であり、全初手・全サイドプラン・すべての採用カードの全能力の保証ではない。
 
-全体検査446/446成功、43本の局面・決着試験を含む。保存の互換性と従来のModernの決着・サイド後試験も含める。ログ: `.cache/tests-20261020-solo-final.log`。
+- Modern10種類: 前節の `goldfish-finishes.test.js`、`goldfish-winning-lines.test.js`、`goldfish-postboard.test.js`。
+- Standard10種類、Legacy5種類、Pioneer9種類: `goldfish-format-winning-lines.test.js` の48本。各リストの中心カードと交換したサイドカードを実際に唱え、各操作後に圧縮保存・復元を挟む。
+- Legacy Doomsday: `goldfish-formats.test.js` のメイン／サイド後。HogaakとPioneer Greasefang: `goldfish-format-continuations.test.js` の4経路。
+- Legacy Show and Tell、Lands、Storm: `goldfish-legacy-combos.test.js` の6経路。同ファイルにはPioneer JundのYgra＋使い魔という別のメイン／サイド後ルートも2本追加。
+- `goldfish-format-permanents.test.js`: コピー・マナ制限・対象消失・代替コスト・忠誠度・昼夜・死亡・関連追放等34場面。ここは能力試験用の盤面を準備する。初手からの勝利経路とは数え分ける。
+
+停止検査の再現は `node scripts/audit-goldfish-formats.mjs`。結果は `.cache/goldfish-formats-audit.json`。ひとり回し関連365件の検査成功を `.cache/goldfish-solo4-all.log` に記録した。
+
+保存ゲームへの直接再開を追加した後の全体検査は **550/550成功**。ログは `.cache/tests-solo5-final.log`。再開用リンクの破損・保存容量不足が元の保存ゲームを変更しないこと、サイド後も登録時のリストから同じゲームを復元することを追加検証した。
+
+### 継続実装のブラウザー確認
+
+Legacy・大会日2026-10-19で検索した300リストから、前述のempiricismの61/15枚を開いた。保存済みのT4ドローで発掘3を選び、手札のStageを土地としてプレイ、輪作の緑マナを自動支払いしWastelandを生け贄、Dark Depthsを探索した。T5に自動で2マナを払いStageでコピー。氷10個の原本と、氷なしのコピーを区別して伝説ルールの選択画面へ進んだ。
+
+この選択途中でページを再読込し、同じ実リストから再開してコピー側を残すと、Marit Lageを自動生成。T6のブロックなしの攻撃で相手20→0を確認した。山札検索によるカードの注入、手動のマナ／ライフ変更はしていない。390pxでもUndoで20に戻し、Redoで0と決着表示を復元した。
+
+- `.cache/goldfish-legend-choice-solo4.png`: コピー元と氷の数を表示した選択。
+- `.cache/goldfish-depths-win-solo6.png`: コンボからの決着、表示修正後。
+- `.cache/goldfish-depths-mobile-solo6.png`: 390pxの盤面、表示修正後。
+
+同名の伝説を選び分けられなかった表示、戦場カードの高さによる見切れ、勝利表示とライフ欄の重なりをこの画面確認で修正した。確認済みの勝ち筋・能力を上記に列挙し、完全な対戦エンジンとの互換性とは区別する。
+
+トップ画面に「ひとり回しの続き」を追加。ゲームを閉じる→ページ再読込→同ボタンの1回クリックで、上記のT6・相手ライフ0・手札8・墓地8・山札44の盤面へ復帰した。大会検索をやり直す必要はない。最後に開いたゲームへの参照だけを保存し、複数デッキの保存データは保持する。表示確認後のブラウザー実行エラーは0件。
 
 ## ルールの参照元
 
@@ -130,6 +155,10 @@
 - [Tarkir: Dragonstorm Mechanics](https://magic.wizards.com/en/news/feature/tarkir-dragonstorm-mechanics): 調和のタップと不特定マナの軽減。
 - [Wilds of Eldraine Release Notes](https://magic.wizards.com/en/news/feature/wilds-of-eldraine-release-notes): 同じプレイヤーが同じ対象に付けた役割は最新のものを残す。
 - [Theros Beyond Death Release Notes](https://magic.wizards.com/en/news/feature/theros-beyond-death-release-notes-2020-01-10): タッサの神託者の信心と勝利条件。
+- [Modern Horizons Release Notes](https://magic.wizards.com/en/news/feature/modern-horizons-release-notes-2019-05-31): Hogaakのマナを使えない制約・召集・探査。
+- [Bloomburrow Release Notes](https://magic.wizards.com/en/news/feature/bloomburrow-release-notes): Mockingbirdのコピー条件、新生、Ygraの食物化。
+- [Spider-Man Release Notes](https://magic.wizards.com/en/news/feature/spider-man-release-notes): Superior Spider-Manのコピーと追放の誘発。
+- [Aether Revolt Mechanics](https://magic.wizards.com/en/news/feature/aether-revolt-mechanics-2017-01-02): 搭乗は能力であり、召喚酔いの別クリーチャーもタップできる。
 - [Modern Horizons 2 Release Notes](https://magic.wizards.com/en/news/feature/modern-horizons-2-release-notes-2021-06-04): ヤヴィマヤによる森と緑マナ能力の追加は戦場の土地に適用する。
 
 - [MH3 Release Notes](https://magic.wizards.com/en/news/feature/modern-horizons-3-release-notes): コジレックの命令、魂の導き手の再帰誘発、ラル、授与、土台となるカードの裁定。

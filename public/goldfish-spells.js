@@ -1,9 +1,10 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261020-solo3";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo3";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo3";
-import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261020-solo3";
-import { drawGameCards } from "./goldfish-events.js?v=20261020-solo3";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261020-solo3";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261020-solo6";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo6";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261020-solo6";
+import { drawGameCards } from "./goldfish-events.js?v=20261020-solo6";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261020-solo6";
+import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261020-solo6";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
@@ -64,8 +65,11 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
     const type = item.faceDown ? "Creature" : data.typeLine || "";
     if (target.types?.length && !target.types.some((name) => new RegExp(`\\b${name}\\b`).test(type))) return false;
     if (target.nonBasic && /\bBasic\b/.test(type)) return false;
+    if (target.opposingPermanent) return false;
+    if (target.notSubtypes?.some(t => new RegExp(`\\b${t}\\b`).test(type))) return false;
     if (target.nonlegendary && /\bLegendary\b/.test(type)) return false;
     if (target.maxManaValue != null && goldfishManaValue(item) > target.maxManaValue) return false;
+    if (target.minManaValue != null && goldfishManaValue(item) < target.minManaValue) return false;
     if (target.manaValue != null && goldfishManaValue(item) !== target.manaValue) return false;
     if (target.notTypes?.some(name => type.split(/[ —]+/).includes(name))) return false;
     if (target.permanent && !/Creature|Artifact|Enchantment|Land|Planeswalker|Battle/.test(type)) return false;
@@ -74,7 +78,11 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
     if (target.ability && item.kind !== "ability") return false;
     if (target.spellOrTriggered && item.kind === "ability" && item.ability?.activated) return false;
     if (target.colorlessSpell && item.kind !== "ability" && gameColors(item).length) return false;
+    if (target.monocolored && gameColors(item).length !== 1) return false;
     if (target.colorsAny && !gameColors(item).some(c => target.colorsAny.includes(c))) return false;
+    if (target.notColors && gameColors(item).some(c => target.notColors.includes(c))) return false;
+    if (target.withoutFlying && goldfishKeywords(state, item).has("flying")) return false;
+    if (target.attackingOrBlocking && !state.rules.combat?.attackers?.some(r => r.id === item.id && r.incarnation === item.incarnation)) return false;
     // Shroud disallows our targets too. Opposing permanents are not invented.
     if (target.zone === "battlefield" && goldfishKeywords(state, item).has("shroud")) return false;
     return true;
@@ -259,6 +267,7 @@ export function canGoldfishAutoResolve(card) {
   if (goldfishSpellProgram(card)) return true;
   const type = face(card).typeLine || "";
   if (verifiedGoldfishCard(card) && FORMAT_ENTERS[face(card).name] && !/\bAura\b/.test(type)) return true;
+  if (verifiedGoldfishCard(card) && (FORMAT_PERMANENT_NAMES.has(face(card).name) || ["Superior Spider-Man", "Mockingbird"].includes(face(card).name)) && !/\bAura\b/.test(type)) return true;
   if (verifiedGoldfishCard(card) && ["Eddymurk Crab", "Vibrance", "Deceit"].includes(face(card).name)) return true;
   if (verifiedGoldfishCard(card) && ["Pithing Needle", "Disruptor Flute", "Chalice of the Void", "The Legend of Roku", "Weapons Manufacturing", "Thought-Knot Seer", "Kraul Harpooner"].includes(face(card).name)) return true;
   if (verifiedGoldfishCard(card) && (/\bPlaneswalker\b/.test(type) || ["Murktide Regent", "Moonshadow", "Engineered Explosives", "Pompous Battlemage", "Stormchaser's Talent", "Artist's Talent", "Isochron Scepter", "Ranger-Captain of Eos", "Seasoned Pyromancer", "Badgermole Cub", "Formidable Speaker"].includes(face(card).name))) return true;

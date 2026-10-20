@@ -12,9 +12,9 @@ import { serializeGoldfishSave, parseGoldfishSave } from "../../public/goldfish-
 // A declared opening/draw order, never a midgame card or mana injection.
 // Every card comes from this dated real 75. Tutors and later shuffles still use
 // the engine normally. Natural shuffled games are tested separately.
-export function route(rank, opening, draws = [], swaps = {}, decide = () => null) {
-  const d = fixture.decks.find(d => d.rank === rank), log = [];
-  let s = createGoldfishGame(mergeCardMetadata(d.mainboard, fixture.metadata), { sideboardRows: mergeCardMetadata(d.sideboard, fixture.metadata), random: () => .7 });
+export function route(rank, opening, draws = [], swaps = {}, decide = () => null, source = fixture) {
+  const d = source.decks.find(d => d.rank === rank), log = [];
+  let s = createGoldfishGame(mergeCardMetadata(d.mainboard, source.metadata), { sideboardRows: mergeCardMetadata(d.sideboard, source.metadata), random: () => .7 });
   if (Object.keys(swaps).length) {
     const counts = Object.fromEntries(s.deckRows.map(c => [c.name, c.count]));
     for (const [n, delta] of Object.entries(swaps)) counts[n] = (counts[n] || 0) + delta;
@@ -25,7 +25,7 @@ export function route(rank, opening, draws = [], swaps = {}, decide = () => null
   };
   assert.equal(opening.length, 7);
   s.hand = opening.map(pick); const top = draws.map(pick); s.library = [...cards, ...top.reverse()];
-  assert.equal(s.hand.length + s.library.length, 60); assert.equal(s.sideboard.length, d.sideboard.reduce((n, c) => n + c.count, 0));
+  assert.equal(s.hand.length + s.library.length, d.mainboard.reduce((n, c) => n + c.count, 0)); assert.equal(s.sideboard.length, d.sideboard.reduce((n, c) => n + c.count, 0));
   const save = value => restoreGoldfishGame(parseGoldfishSave(serializeGoldfishSave(value)));
   const update = (next, text) => { log.push(`T${s.turn || 1} ${text}`); s = settle(next, log, decide);
     s = save(s); return s; };

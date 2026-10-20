@@ -1,11 +1,11 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo3";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo3";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo3";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo3";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo3";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo6";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo6";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo6";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo6";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
@@ -55,6 +55,7 @@ export function isGoldfishBauble(card) {
 
 export function goldfishKeywords(state, card) {
   const result = new Set();
+  if (card.suppressedKeywords) return result;
   for (const keyword of engineKeywords(state, card)) result.add(keyword);
   if (!card.faceDown && card.automaticAbilities !== false) {
     const lines = withoutReminder(textOf(card)).toLowerCase().split("\n");
@@ -157,7 +158,7 @@ export function recordGoldfishCast(state, spell) {
       // A self cast trigger belongs to the spell on the stack. It must never
       // trigger again when another spell is cast after this permanent resolves.
       if (/^When you cast this spell\b/.test(paragraph)) continue;
-      if (verifiedGoldfishCard(card) && ["Glaring Fleshraker", "Pinnacle Emissary", "Stormchaser's Talent", "Artist's Talent", "Ugin, Eye of the Storms", "Ral, Monsoon Mage", "Vexing Bauble"].includes(face(card).name)) continue;
+      if (verifiedGoldfishCard(card) && ["Colorstorm Stallion", "Ral, Crackling Wit", "Song of Creation", "Glaring Fleshraker", "Pinnacle Emissary", "Stormchaser's Talent", "Artist's Talent", "Ugin, Eye of the Storms", "Ral, Monsoon Mage", "Vexing Bauble"].includes(face(card).name)) continue;
       if (isChanneler(card) && paragraph.startsWith("Whenever you cast a noncreature spell, surveil 1.")) continue;
       if (isCutter(card) && paragraph.includes("Whenever you cast your second spell each turn,")) continue;
       if (isSlickshot(card) && paragraph.startsWith("Whenever you cast a noncreature spell,")) continue;
@@ -169,7 +170,8 @@ export function recordGoldfishCast(state, spell) {
   state.stack.push(...triggers.toReversed());
   // The player orders simultaneous abilities before anyone receives priority.
   const simultaneous = state.stack.slice(firstTrigger).toReversed();
-  if (simultaneous.length > 1) rules.pendingChoice = { type: "order", entryIds: simultaneous.map((entry) => entry.id) };
+  if (rules.automation) (rules.waitingCastTriggers ||= []).push(...state.stack.splice(firstTrigger));
+  else if (simultaneous.length > 1) rules.pendingChoice = { type: "order", entryIds: simultaneous.map((entry) => entry.id) };
   rules.lastAction = `${spell.name} を唱えました（このターン ${rules.spellsCast} 回目）。誘発 ${simultaneous.length} 件。`;
 }
 
@@ -271,19 +273,29 @@ export function resetGoldfishTurnRules(state) {
   state.rules.hasteMana = 0;
   state.rules.encampments = [];
   state.rules.previousSpellsCast = state.rules.spellsCast;
+  state.rules.previousActiveSpells = state.rules.activePlayer === "self" ? state.rules.spellsCast : state.rules.opponentSpellsCast || 0;
+  state.rules.opponentSpellsCast = 0;
+  state.rules.artifactsSacrificed = 0;
+  state.rules.permanentsSacrificed = 0;
+  state.rules.firstFlyingCreature = false;
   state.rules.instantSorceryCast = 0;
   state.rules.lifeGained = 0;
+  state.rules.lifeLost = 0;
+  state.rules.opponentLifeLost = 0;
+  state.rules.cardsDrawn = 0;
   state.rules.permanentLeft = false;
   state.rules.endStepStarted = false;
   state.rules.extraCombats = 0;
   state.rules.beginCombatStarted = false;
+  state.rules.offeredCrewIds = [];
+  for (const c of state.battlefield) if (c.suppressedKeywords && !c.suppressedBy) { c.automaticAbilities = c.lostAbilitiesOriginal; delete c.lostAbilitiesOriginal; delete c.suppressedKeywords; }
   state.rules.fireMana = 0;
   state.rules.spellsCast = 0;
   state.rules.castCountKnown = true;
   state.rules.landsPlayed = 0;
   state.rules.combat = null;
   for (const card of state.battlefield) { card.temporaryEffects = []; card.damage = 0; card.regeneration = 0; if (card.animated && (card.animated.until == null || card.animated.until <= state.rules.turnSerial + 1)) { card.typeLine = card.animated.originalTypeLine || card.typeLine.replace(/ Creature$/, ""); delete card.animated; card.lane = "other"; } }
-  for (const card of state.battlefield) if (card.copyBase) { Object.assign(card, card.copyBase); delete card.copyBase; card.lane = "land"; }
+  for (const card of state.battlefield) if (card.copyBase && !card.permanentCopy) { Object.assign(card, card.copyBase); delete card.copyBase; card.lane = "land"; }
   for (const card of state.battlefield) if (card.addedArtifactSerial != null) { card.typeLine = card.originalTypeLine; if (card.originalFaces) card.faces = structuredClone(card.originalFaces); delete card.originalTypeLine; delete card.originalFaces; delete card.addedArtifactSerial; }
 }
 
