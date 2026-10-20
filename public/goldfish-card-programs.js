@@ -1,6 +1,6 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-public30a";
-import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-public30a";
-import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-public30a";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-public30b";
+import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261020-public30b";
+import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261020-public30b";
 
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function verifiedGoldfishCard(card) {
@@ -50,6 +50,8 @@ export const ENGINE_RULE_NOTES = {
   "The Ten Rings": "終了時、手札10枚までドロー"
 };
 export const TOKENS = {
+  clue: { name: "Clue", typeLine: "Token Artifact — Clue", power: "", toughness: "", oracleText: "{2}, Sacrifice this token: Draw a card." },
+  scion: { name: "Eldrazi Scion", typeLine: "Token Creature — Eldrazi Scion", power: "1", toughness: "1", oracleText: "Sacrifice this creature: Add {C}." },
   knight: { name: "Human Knight", colors: ["R"], typeLine: "Token Creature — Human Knight", power: "2", toughness: "2", oracleText: "Trample, haste" },
   treefolk: { name: "Treefolk", colors: ["G"], typeLine: "Token Creature — Treefolk", power: "3", toughness: "4", oracleText: "Reach" },
   angel: { name: "Angel", colors: ["W"], typeLine: "Token Creature — Angel", power: "4", toughness: "4", oracleText: "Flying, vigilance" },
@@ -162,7 +164,7 @@ const TARGETS = {
   ,Tear: { zone: "battlefield", types: ["Enchantment"], virtualOpponent: true }
 };
 export function engineSpellProgram(card) {
-  if (!verifiedGoldfishCard(card) || !isType(card, "Instant|Sorcery") && !["Sheltered by Ghosts", "Mox Diamond"].includes(cardName(card))) return null;
+  if (!verifiedGoldfishCard(card) || !isType(card, "Instant|Sorcery") && !["Sheltered by Ghosts", "Meltstrider's Resolve", "Mox Diamond"].includes(cardName(card))) return null;
   const name = cardName(card);
   if (FORMAT_SPELLS[name]) return { id: name, engine: true, ...FORMAT_SPELLS[name], label: "カードの効果を順に解決" };
   if (!SPELLS[name]) return null;
@@ -175,6 +177,7 @@ export function engineCardActions(card) {
   if (!card || card.faceDown || card.automaticAbilities === false) return [];
   const name = cardName(card), result = [];
   if (card.kind === "token") {
+    if (name === "Clue") result.push(ability("clue", "{2}：手掛かりを生け贄にして1枚引く", "{2}", [draw()], { sacrifice: true }));
     if (name === "Blood") result.push(ability("blood-loot", "{1}：1枚捨て、血を生け贄にして1枚引く", "{1}", [draw()], { tap: true, sacrifice: true, costSelect: { zone: "hand", filter: {}, count: 1, destination: "graveyard" } }));
     if (name === "Jace" && card.oracleText === TOKENS.jace.oracleText) {
       result.push(ability("jace-token-surveil", "−1：諜報1", "{0}", [select("諜報1：墓地へ置くか、上に残す", "library", {}, { top: 1, destination: "graveyard" })], { main: true, loyalty: -1 }));

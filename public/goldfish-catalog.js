@@ -7381,5 +7381,91 @@ export const GOLD_FISH_CATALOG = {
     "power": "",
     "toughness": "",
     "loyalty": ""
+  },
+  "Bushwhack": {
+    "oracleText": "Choose one —\n• Search your library for a basic land card, reveal it, put it into your hand, then shuffle.\n• Target creature you control fights target creature you don't control. (Each deals damage equal to its power to the other.)",
+    "manaCost": "{G}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "G"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Esper Origins // Summon: Esper Maduin": {
+    "oracleText": "Surveil 2. You gain 2 life. If this spell was cast from a graveyard, exile it, then put it onto the battlefield transformed under its owner's control with a finality counter on it. (If a creature with a finality counter on it would die, exile it instead.)\nFlashback {3}{G} (You may cast this card from your graveyard for its flashback cost. Then exile it.)\n\n(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Reveal the top card of your library. If it's a permanent card, put it into your hand.\nII — Add {G}{G}.\nIII — Other creatures you control get +2/+2 and gain trample until end of turn.",
+    "manaCost": "{1}{G}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "G"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Esper Origins": {
+    "oracleText": "Surveil 2. You gain 2 life. If this spell was cast from a graveyard, exile it, then put it onto the battlefield transformed under its owner's control with a finality counter on it. (If a creature with a finality counter on it would die, exile it instead.)\nFlashback {3}{G} (You may cast this card from your graveyard for its flashback cost. Then exile it.)",
+    "manaCost": "{1}{G}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "G"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Summon: Esper Maduin": {
+    "oracleText": "(As this Saga enters and after your draw step, add a lore counter. Sacrifice after III.)\nI — Reveal the top card of your library. If it's a permanent card, put it into your hand.\nII — Add {G}{G}.\nIII — Other creatures you control get +2/+2 and gain trample until end of turn.",
+    "manaCost": "",
+    "typeLine": "Enchantment Creature — Saga Elemental",
+    "colors": [
+      "G"
+    ],
+    "power": "4",
+    "toughness": "4",
+    "loyalty": ""
+  },
+  "Meltstrider's Resolve": {
+    "oracleText": "Enchant creature you control\nWhen this Aura enters, enchanted creature fights up to one target creature an opponent controls. (Each deals damage equal to its power to the other.)\nEnchanted creature gets +0/+2 and can't be blocked by more than one creature.",
+    "manaCost": "{G}",
+    "typeLine": "Enchantment — Aura",
+    "colors": [
+      "G"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Origin of Metalbending": {
+    "oracleText": "Choose one —\n• Destroy target artifact or enchantment.\n• Put a +1/+1 counter on target creature you control. It gains indestructible until end of turn. (Damage and effects that say \"destroy\" don't destroy it.)",
+    "manaCost": "{1}{G}",
+    "typeLine": "Instant — Lesson",
+    "colors": [
+      "G"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Wastewood Verge": {
+    "oracleText": "{T}: Add {G}.\n{T}: Add {B}. Activate only if you control a Swamp or a Forest.",
+    "manaCost": "",
+    "typeLine": "Land",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Deadly Precision": {
+    "oracleText": "As an additional cost to cast this spell, pay {4} or sacrifice an artifact or creature.\nDestroy target creature.",
+    "manaCost": "{B}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "B"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
   }
 };

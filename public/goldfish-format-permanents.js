@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30a";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-public30a";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30a";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-public30a";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-public30a";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30a";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-public30a";
-import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261020-public30a";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30b";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-public30b";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30b";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-public30b";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-public30b";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30b";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-public30b";
+import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261020-public30b";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -64,6 +64,7 @@ export function formatPermanentEnter(s, c) {
   if (!active(c)) return false;
   if (hasAbilityExtension(c)) { extensionEnter(s, c); return true; }
   const n = name(c), q = (label, ops, extra) => add(s, c, label, ops, extra);
+  if (n === "Meltstrider's Resolve") { q("装着先と相手のクリーチャーを格闘", [{ op: "meltstrider-fight" }], { targetSpec: { ...creatureTarget, opposingPermanent: true, optional: true, virtualOpponent: true } }); return true; }
   if (n === "Fury") { q("4点をクリーチャー／PWに配分", [{ op: "divided-damage" }], { targetSpec: { zone: "battlefield", types: ["Creature", "Planeswalker"], count: 4, optional: true, virtualOpponent: true, divideDamage: 4 } }); return true; }
   if (n === "Rottenmouth Viper") { q("枯朽カウンターを置き、相手に選択", [{ op: "source-counter", name: "blight", count: 1 }, { op: "fp-viper" }]); return true; }
   if (n === "Dragonhawk, Fate's Tempest") { q("パワー4以上の数だけ衝動ドロー・次の終了時にダメージ", [{ op: "fp-dragonhawk" }]); return true; }

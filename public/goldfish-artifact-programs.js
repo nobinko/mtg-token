@@ -1,9 +1,9 @@
 // Adapters for the actual public UW artifact list. Callers verify full Oracle
 // text; costs, zone changes and triggers still use the shared rules engine.
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30a";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-public30a";
-import { verifiedGoldfishCard, draw, tutor } from "./goldfish-card-programs.js?v=20261020-public30a";
-import { gameManaValue } from "./goldfish-engine.js?v=20261020-public30a";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30b";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-public30b";
+import { verifiedGoldfishCard, draw, tutor } from "./goldfish-card-programs.js?v=20261020-public30b";
+import { gameManaValue } from "./goldfish-engine.js?v=20261020-public30b";
 
 const active = c => c && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);

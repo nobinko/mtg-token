@@ -1,9 +1,9 @@
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30a";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-public30a";
-import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261020-public30a";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30a";
-import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-public30a";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261020-public30a";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30b";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-public30b";
+import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261020-public30b";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30b";
+import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261020-public30b";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261020-public30b";
 
 const put = (ctx, ...ops) => ctx.steps.splice(ctx.step + 1, 0, ...ops);
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };
@@ -56,7 +56,7 @@ export function advancedModes(card, f = {}) {
   if (spree[name(card)]) return spree[name(card)].map((m, i) => ({ ...m, key: `target${i}` })).filter((_, i) => f.modes & (1 << i));
   if (name(card) === "Eldrazi Confluence") return [0, 1, 2].map(i => ({ ...confluence[f[`mode${i}`]], key: `target${i}` }));
   if (name(card) === "Together as One") return [{ spec: player, effect: "converge-draw", key: "player" }, { spec: damageTarget, effect: "converge-damage", key: "damage" }];
-  if (["Hard-Hitting Question", "Tail Swipe", "Reckless Rage"].includes(name(card))) return [
+  if (["Hard-Hitting Question", "Tail Swipe", "Reckless Rage"].includes(name(card)) || name(card) === "Bushwhack" && f.bushwhack === "fight") return [
     { spec: { ...creature, virtualOpponent: false }, effect: "fight-own", key: "own" },
     { spec: { ...creature, opposingPermanent: true, types: name(card) === "Hard-Hitting Question" ? ["Creature", "Planeswalker"] : ["Creature"] }, effect: "fight-other", key: "other" }
   ];
@@ -64,6 +64,10 @@ export function advancedModes(card, f = {}) {
 }
 export function advancedPreflight(s, card, options) {
   const n = name(card), f = options.format || {};
+  if (n === "Bushwhack") {
+    if (!f.bushwhack) return { optionKey: "format", formatField: "bushwhack", kind: "buttons", label: "薮打ち：モード", options: [{ value: "land", label: "基本土地を手札へ" }, { value: "fight", label: "自分と相手のクリーチャーを格闘" }] };
+    if (!["land", "fight"].includes(f.bushwhack)) throw new Error("薮打ちのモードを選び直してください。");
+  }
   if (spree[n]) {
     const list = spree[n], max = (1 << list.length) - 1;
     if (f.modes === undefined) return { optionKey: "format", formatField: "modes", kind: "buttons", label: n === "Avengers Disassembled" ? "1つまたは両方のモードを選ぶ" : "放題：使うモードを選ぶ（表示の追加コストを支払う）", options: Array.from({ length: max }, (_, i) => ({ value: String(i + 1), label: list.filter((_, bit) => (i + 1) & (1 << bit)).map(m => m.label).join(" ＋ ") })) };
@@ -91,6 +95,7 @@ export function advancedPreflight(s, card, options) {
 const discard = (min, max = min, remember = "selected") => ({ op: "select", label: `捨てる手札（${min}〜${max}枚）`, zone: "hand", filter: {}, min, max, destination: "graveyard", remember });
 export const ADVANCED_SPELLS = Object.fromEntries([...Object.keys(spree), "Eldrazi Confluence", "Together as One", "Hard-Hitting Question", "Tail Swipe", "Reckless Rage"].map(n => [n, { steps: [{ op: "advanced-modal" }] }]));
 Object.assign(ADVANCED_SPELLS, {
+  Bushwhack: { steps: [{ op: "bushwhack" }] },
   "Ancestral Recall": { steps: [{ op: "recall" }], target: player },
   "Stoke Genius": { steps: [{ op: "discard-hand" }, { op: "draw", count: 2 }, { op: "adventure-end" }] },
   "Petty Theft": { steps: [{ op: "bounce" }, { op: "adventure-end" }], target: { zone: "battlefield", permanent: true, notTypes: ["Land"], opposingPermanent: true, virtualOpponent: true } },
@@ -113,6 +118,10 @@ Object.assign(ADVANCED_SPELLS, {
 });
 export function advancedStep(s, c, op) {
   const source = find(s, c.source);
+  if (op.op === "bushwhack") {
+    put(c, c.cast.format?.bushwhack === "fight" ? { op: "advanced-modal" } : { op: "select", label: "基本土地を手札へ", zone: "library", filter: { basicLand: true }, min: 0, max: 1, destination: "hand", shuffle: true });
+    return true;
+  }
   if (op.op === "recall") { if (c.target.player === "self") put(c, { op: "draw", count: 3 }); else note(s, "相手は3枚引く"); return true; }
   if (op.op === "discard-hand") { put(c, discard(s.hand.length)); return true; }
   if (op.op === "adventure-end") { c.finishZone = "exile"; c.vars.adventure = true; return true; }
@@ -155,7 +164,10 @@ export function advancedStep(s, c, op) {
       const own = find(s, c.vars.fighter), power = Number(goldfishCharacteristics(s, own).power);
       damage(s, r, c.sourceName === "Reckless Rage" ? 4 : power);
       if (c.sourceName === "Reckless Rage") damage(s, c.vars.fighter, 2);
-      if (c.sourceName === "Tail Swipe") ask(s, c, { kind: "number", label: "格闘する相手クリーチャーのパワー", min: 0, max: 999 });
+      if (["Tail Swipe", "Bushwhack"].includes(c.sourceName)) {
+        if (t) damage(s, c.vars.fighter, Number(goldfishCharacteristics(s, t).power));
+        else if (r?.virtual) ask(s, c, { kind: "number", label: "格闘する相手クリーチャーのパワー", min: 0, max: 999 });
+      }
     }
     if (effect === "copy-stack" || effect === "retarget") {
       if (t) {

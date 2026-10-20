@@ -1,13 +1,13 @@
-import { cloneGoldfishState } from "./goldfish.js?v=20261020-public30a";
-import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30a";
-import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-public30a";
-import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-public30a";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-public30a";
-import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-public30a";
-import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-public30a";
-import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-public30a";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-public30a";
-import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30a";
+import { cloneGoldfishState } from "./goldfish.js?v=20261020-public30b";
+import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30b";
+import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-public30b";
+import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-public30b";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-public30b";
+import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-public30b";
+import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-public30b";
+import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-public30b";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-public30b";
+import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30b";
 
 export function goldfishActionTargets(state, card) {
   return state.battlefield.filter((target) => goldfishCanEquip(state, card, target));

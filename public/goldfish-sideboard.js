@@ -1,4 +1,4 @@
-import { createGoldfishGame } from "./goldfish.js?v=20261020-public30a";
+import { createGoldfishGame } from "./goldfish.js?v=20261020-public30b";
 
 // Registered rows, not cards currently in zones: a Wish, token or stolen card
 // must never become part of the next game's deck.

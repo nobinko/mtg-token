@@ -1,16 +1,16 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-public30a";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30a";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30a";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-public30a";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-public30a";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30a";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30a";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-public30a";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-public30a";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-public30a";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-public30a";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-public30a";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30a";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-public30b";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30b";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30b";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261020-public30b";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261020-public30b";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30b";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30b";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-public30b";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261020-public30b";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261020-public30b";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261020-public30b";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261020-public30b";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30b";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
@@ -46,6 +46,7 @@ export function engineStatAdjustments(state, card) {
   for (const aura of state.battlefield) if (aura.summonedAsBestow && find(state, aura.attachedTo)?.id === card.id) data.boost = (data.boost || 0) + 2;
   for (const aura of state.battlefield) if (aura.kind === "token" && aura.name === "Monster Role" && sameRef(aura.attachedTo, ref(card))) data.boost = (data.boost || 0) + 1;
   for (const aura of state.battlefield) if (name(aura) === "Sheltered by Ghosts" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) data.boostPower = (data.boostPower || 0) + 1;
+  for (const aura of state.battlefield) if (name(aura) === "Meltstrider's Resolve" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) data.boostToughness = (data.boostToughness || 0) + 2;
   if (card.earthbent) data.power = data.toughness = 0;
   if (card.animated?.size != null && (card.animated.until > state.rules.turnSerial || card.animated.serial === state.rules.turnSerial)) data.power = data.toughness = card.animated.size;
   return data;
@@ -58,6 +59,7 @@ export function engineKeywords(state, card) {
   for (const aura of state.battlefield) if (aura.summonedAsBestow && find(state, aura.attachedTo)?.id === card.id) result.push("flying", "haste");
   for (const aura of state.battlefield) if (aura.kind === "token" && aura.name === "Monster Role" && sameRef(aura.attachedTo, ref(card))) result.push("trample");
   for (const aura of state.battlefield) if (name(aura) === "Sheltered by Ghosts" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) result.push("lifelink", "ward {2}");
+  for (const aura of state.battlefield) if (name(aura) === "Meltstrider's Resolve" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) result.push("can't be blocked by more than one creature");
   for (const key of ["flying", "trample", "haste", "vigilance", "lifelink", "hexproof", "indestructible", "deathtouch", "reach", "first strike"]) if (card.counters?.[key] > 0) result.push(key);
   if (has(state, "Scion of Draco")) {
     const colors = has(state, "Leyline of the Guildpact") ? ["W", "U", "B", "R", "G"] : gameColors(card);
@@ -155,6 +157,7 @@ export function engineEnter(state, card) {
   if (card.evoked && !entryTriggersBlocked(state, card)) queueGameAbility(state, card, "想起：生け贄", [{ op: "sacrifice-source" }]);
   if (!verifiedGoldfishCard(card)) return entryTriggersBlocked(state, card);
   const add = (label, steps, extra) => queueGameAbility(state, card, label, steps, extra);
+  if (n === "Summon: Esper Maduin") { card.counters.lore = 1; add("第I章", [{ op: "esper-chapter", chapter: 1 }]); return true; }
   if (n === "Urza's Saga" || n === "The Legend of Roku") { card.sagaChapter = 1; card.counters.lore = 1; add("第I章", n === "Urza's Saga" ? [{ op: "saga", chapter: 1 }] : [{ op: "impulse", count: 3 }]); return true; }
   if (["Pompous Battlemage", "Carnivorous Cultivator"].includes(n)) { card.prepared = true; return true; }
   if (n === "Moonshadow") { card.counters["-1/-1"] = 6; return true; }
@@ -354,6 +357,10 @@ export function engineEndStep(state) {
   }
 }
 export function engineMainStep(state) {
+  for (const card of live(state)) if (name(card) === "Summon: Esper Maduin" && verifiedGoldfishCard(card)) {
+    card.counters.lore = (card.counters.lore || 0) + 1;
+    queueGameAbility(state, card, `第${card.counters.lore}章`, [{ op: "esper-chapter", chapter: card.counters.lore }]);
+  }
   for (const card of live(state).filter(c => verifiedGoldfishCard(c) && ["The Misty Mountains Cold", "Kumano Faces Kakkazan"].includes(name(c)))) {
     card.counters.lore = (card.counters.lore || 0) + 1;
     queueGameAbility(state, card, `第${card.counters.lore}章`, [{ op: name(card) === "Kumano Faces Kakkazan" ? "fp-kumano" : "fp-mountains", chapter: card.counters.lore }]);
@@ -492,6 +499,7 @@ export function continueEngineResolution(state) {
         else if (spec.effect === "destroy" && !r.player) destroy(state, find(state, r));
         else if (spec.effect === "double-strike" && !r.player) find(state, r).temporaryEffects.push({ keywords: ["double strike"], turn: state.turn, label: ctx.sourceName });
         else if (spec.effect === "warg-boost" && !r.player) { const c = find(state, r); addGameCounters(state, c, "+1/+1", 1); c.temporaryEffects.push({ keywords: ["trample", "hexproof"], turn: state.turn, label: ctx.sourceName }); }
+        else if (spec.effect === "metal-protect" && !r.player) { const c = find(state, r); addGameCounters(state, c, "+1/+1", 1); c.temporaryEffects.push({ keywords: ["indestructible"], turn: state.turn, label: ctx.sourceName }); }
         else if (r.virtual) (state.rules.notices ||= []).push({ text: `${ctx.sourceName}：相手の対象を${spec.destination === "hand" ? "手札へ戻す" : "追放"}（相手側の領域は省略）`, serial: state.rules.turnSerial });
         else move(state, r.id, r.zone || "battlefield", spec.destination);
       }
@@ -849,7 +857,7 @@ function applySelection(state, ctx, op, refs, seen) {
   state.rules.movementBatch = state.rules.nextEventId++;
   for (const card of op.destination === "libraryTop" ? selected.toReversed() : selected) if (op.destination) {
     if (op.destination === "battlefield" && name(card) === "Mox Diamond" && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "mox-entry", source: card.ref }]); continue; }
-    if (op.destination === "battlefield" && name(card) === "Sheltered by Ghosts" && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "aura-enter", source: card.ref }]); continue; }
+    if (op.destination === "battlefield" && ["Sheltered by Ghosts", "Meltstrider's Resolve"].includes(name(card)) && verifiedGoldfishCard(card)) { insertSteps(ctx, [{ op: "aura-enter", source: card.ref }]); continue; }
     const moved = move(state, card.id, card.ref.zone, op.destination, op.reason || "");
     const actual = ["battlefield", "hand", "graveyard", "exile", "library"].find(zone => state[zone].includes(moved));
     card.ref = ref(moved, actual || card.ref.zone);

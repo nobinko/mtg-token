@@ -1,12 +1,12 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-public30a";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-public30a";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-public30a";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-public30a";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-public30a";
-import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30a";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-public30b";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-public30b";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-public30b";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-public30b";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-public30b";
+import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30b";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
@@ -334,7 +334,7 @@ export function goldfishCharacteristics(state, card) {
     const derived = engineStatAdjustments(state, card);
     if (!card.powerOverride && derived.power != null) power = String(derived.power);
     if (!card.toughnessOverride && derived.toughness != null) toughness = String(derived.toughness);
-    boostP += (derived.boost || 0) + (derived.boostPower || 0); boostT += derived.boost || 0;
+    boostP += (derived.boost || 0) + (derived.boostPower || 0); boostT += (derived.boost || 0) + (derived.boostToughness || 0);
   }
   if (battlefield) {
     const counters = (card.counters?.["+1/+1"] || 0) - (card.counters?.["-1/-1"] || 0);

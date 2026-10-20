@@ -1,17 +1,17 @@
 // Stateful effects for the cross-format programs. All entry points are gated by
 // the complete Oracle snapshot in the program registry.
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-public30a";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30a";
-import { engineCandidates, gameManaValue, damage, destroy } from "./goldfish-engine.js?v=20261020-public30a";
-import { castGoldfishCard, planGoldfishCastPayment } from "./goldfish-mana.js?v=20261020-public30a";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261020-public30a";
-import { goldfishKeywords, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30a";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261020-public30a";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-public30a";
-import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261020-public30a";
-import { advancedStep, advancedChoose } from "./goldfish-advanced-spells.js?v=20261020-public30a";
-import { formatPermanentStep, chooseFormatPermanentStep } from "./goldfish-format-permanents.js?v=20261020-public30a";
-import { extensionStep, extensionChoose } from "./goldfish-ability-extensions.js?v=20261020-public30a";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261020-public30b";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30b";
+import { engineCandidates, gameManaValue, damage, destroy } from "./goldfish-engine.js?v=20261020-public30b";
+import { castGoldfishCard, planGoldfishCastPayment } from "./goldfish-mana.js?v=20261020-public30b";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261020-public30b";
+import { goldfishKeywords, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30b";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261020-public30b";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-public30b";
+import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261020-public30b";
+import { advancedStep, advancedChoose } from "./goldfish-advanced-spells.js?v=20261020-public30b";
+import { formatPermanentStep, chooseFormatPermanentStep } from "./goldfish-format-permanents.js?v=20261020-public30b";
+import { extensionStep, extensionChoose } from "./goldfish-ability-extensions.js?v=20261020-public30b";
 
 const insert = (ctx, ...steps) => ctx.steps.splice(ctx.step + 1, 0, ...steps);
 const choice = (state, ctx, data) => { state.rules.pendingChoice = { type: "engine-choice", entryId: ctx.entryId, sourceName: ctx.sourceName, ...data }; };
@@ -90,6 +90,37 @@ export function runFormatStep(state, ctx, op) {
   if (formatPermanentStep(state, ctx, op)) return true;
   const source = find(state, ctx.source);
   switch (op.op) {
+    case "esper-surveil":
+      insert(ctx, { op: "select", label: "諜報2：墓地に置くカード", zone: "library", filter: {}, top: 2, min: 0, max: 2, destination: "graveyard" }, { op: "surveil-order", count: Math.min(2, state.library.length) });
+      return true;
+    case "esper-transform":
+      if (ctx.cast.fromZone === "graveyard") {
+        const ex = move(state, ctx.entryId, "stack", "exile");
+        const back = move(state, ex.id, "exile", "battlefield");
+        back.faceIndex = 1; back.lane = "creature"; addGameCounters(state, back, "finality", 1);
+      }
+      return true;
+    case "esper-chapter":
+      if (op.chapter === 1) {
+        const top = state.library.at(-1);
+        if (top) { notice(state, `召喚：マディン：山札の上は${name(top)}`); if (isType(top, "Artifact|Battle|Creature|Enchantment|Land|Planeswalker")) move(state, top.id, "library", "hand"); }
+      } else if (op.chapter === 2) state.manaPool.G += 2;
+      else if (op.chapter === 3 && source) {
+        for (const c of state.battlefield.filter(c => c.id !== source.id && isType(c, "Creature"))) c.temporaryEffects.push({ power: 2, toughness: 2, keywords: ["trample"], turn: state.turn, label: ctx.sourceName });
+        move(state, source.id, "battlefield", "graveyard", "effect-sacrifice");
+      }
+      return true;
+    case "meltstrider-fight": {
+      const fighter = find(state, source?.attachedTo), target = find(state, ctx.target);
+      if (!fighter || !isType(fighter, "Creature") || !ctx.target) return true;
+      ctx.vars.fighter = ref(fighter);
+      const power = Number(goldfishCharacteristics(state, fighter).power);
+      const otherPower = target ? Number(goldfishCharacteristics(state, target).power) : null;
+      damage(state, ctx.target, power);
+      if (target) damage(state, ctx.vars.fighter, otherPower);
+      else if (ctx.target.virtual) choice(state, ctx, { kind: "number", label: "格闘する相手クリーチャーのパワー", min: 0, max: 999 });
+      return true;
+    }
     case "plasma-bolt": damage(state, ctx.target, state.rules.nonlandLeft || state.rules.warpCast ? 3 : 2); return true;
     case "requiting-life": if (ctx.cast.format?.cards?.length) changeLife(state, 2); return true;
     case "teamwork-counter": insert(ctx, { op: "counter-unless", cost: ctx.cast.format?.cards?.length ? "{4}" : "{2}" }); return true;
@@ -327,6 +358,7 @@ export function runFormatStep(state, ctx, op) {
 }
 
 export function chooseFormatStep(state, ctx, op, answer) {
+  if (op.op === "meltstrider-fight") { damage(state, ctx.vars.fighter, answer.value); return true; }
   if (extensionChoose(state, ctx, op, answer)) return true;
   if (advancedChoose(state, ctx, op, answer)) return true;
   if (chooseFormatPermanentStep(state, ctx, op, answer)) return true;
