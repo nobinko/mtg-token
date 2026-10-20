@@ -2,14 +2,17 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import { Miniflare, convertV4MiniflareOptions } from "miniflare";
+import { meleeHostedFixture } from "./fixtures/melee-hosted.mjs";
 
 // Local verification credentials only. Production credentials live in Sites.
 const password = "local-verification-password-only";
+const meleeFixture = meleeHostedFixture();
 const mf = new Miniflare(convertV4MiniflareOptions({ workers: [{
   name: "mtg-token",
   scriptPath: "dist/server/index.js", modules: true,
   compatibilityDate: "2026-10-01", compatibilityFlags: ["nodejs_compat"],
   r2Buckets: { BUCKET: "token-cache" }, d1Databases: { DB: "token-auth" },
+  outboundService: request => meleeFixture.fetch(request),
   bindings: { SITE_PASSWORD_SHA256: createHash("sha256").update(password).digest("hex"), SESSION_SECRET: "local-verification-signing-secret-at-least-32-characters" },
 }] }));
 try {
@@ -31,6 +34,22 @@ try {
   assert.match(await page.text(), /画像付き|deck-dialog/);
   assert.equal((await mf.dispatchFetch(`${origin}/app.js`, { headers })).status, 200);
   assert.equal((await mf.dispatchFetch(`${origin}/tournament-ui.js`, { headers })).status, 200);
+  const catalogResponse = await mf.dispatchFetch(`${origin}/api/melee/tournaments?format=modern&days=90`, { headers });
+  const catalog = await catalogResponse.json();
+  assert.equal(catalogResponse.status, 200, JSON.stringify(catalog));
+  assert.equal(catalog.events.length, 1);
+  assert.equal(catalog.events[0].locationScope, "jp");
+  const acquireResponse = await mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ action: "fetch", url: meleeFixture.tournamentUrl }) });
+  const acquired = await acquireResponse.json();
+  assert.equal(acquireResponse.status, 200, JSON.stringify(acquired));
+  assert.equal(acquired.deckCount, 1);
+  assert.equal(acquired.coverageComplete, true);
+  assert.equal(acquired.decks[0].mainboardCount, 60);
+  assert.equal(acquired.decks[0].sideboardCount, 15);
+  const redirectedResponse = await mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ action: "fetch-api", url: meleeFixture.tournamentUrl, credentials: { id: "verification-only", secret: "not-a-real-credential" } }) });
+  assert.equal(redirectedResponse.status, 502);
+  assert.match((await redirectedResponse.json()).error, /HTTP 302/);
+  assert.ok(meleeFixture.calls.every(url => new URL(url).hostname === "melee.gg"), "Never forward Melee credentials to a redirect target");
   const tournamentUrl = "https://melee.gg/Tournament/View/411350";
   const importResponse = await mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({
     action: "import", url: tournamentUrl, format: "modern", targetDate: "2026-10-03", participants: 537,
@@ -61,7 +80,7 @@ try {
   assert.equal(await bucket.get("cache/pages/hosted-verification.json"), null);
   assert.equal(await (await bucket.get("cache/hosted-state-verification.json")).text(), "persistent-cache-fixture");
   assert.equal((await loadTournament()).status, 410, "Cache clearing must not restore shared tournament access.");
-  console.log("Hosted Worker: login, protected assets/APIs, D1, R2 and tournament imports verified.");
+  console.log("Hosted Worker: login, protected assets/APIs, D1, R2, Melee transport/redirect refusal and tournament imports verified.");
   if (process.argv.includes("--live-search")) {
     const response = await mf.dispatchFetch(`${origin}/api/token-cards`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ format: "modern", targetDate: "2026-10-03", maxChildPages: 20, useCache: true }) });
     const result = await response.json();

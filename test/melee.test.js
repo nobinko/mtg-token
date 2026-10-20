@@ -157,6 +157,24 @@ test("authentication, access denial, rate limits, redirect and TLS errors are ne
   }
 });
 
+test("redirect responses are rejected without following, retrying, or disclosing API credentials", async () => {
+  for (const status of [301, 302, 303, 307, 308]) {
+    let calls = 0;
+    const client = createMeleeClient({
+      sleep: async () => assert.fail("Must not retry a redirect"),
+      fetchImpl: async (url, init) => {
+        calls++;
+        assert.equal(new URL(url).origin, "https://melee.gg");
+        assert.equal(init.redirect, "manual");
+        return new Response("private-upstream-body", { status, headers: { location: "https://redirect-target.invalid/?secret=private" } });
+      }
+    });
+    await assert.rejects(client.acquireApi(eventUrl, { id: "person", secret: "private-key" }), error =>
+      error.status === status && !/private|redirect-target/.test(error.message));
+    assert.equal(calls, 1);
+  }
+});
+
 test("an interrupted deck after the retry limit remains missing rather than complete", async () => {
   let attempts = 0;
   const fixture = publicFixture({ count: 2, sleep: async () => {}, beforeFetch: async url => {
