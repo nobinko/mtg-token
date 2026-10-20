@@ -1,6 +1,6 @@
 {
   "fetchedAt": "2026-10-20T13:26:36.300Z",
-  "source": "Public environment representative lists, captured from the deployed UI on 2026-10-20",
+  "source": "30 real lists used in the public Standard/Legacy/Pioneer top-10 playthroughs, rankings captured 2026-10-20; completed 2026-10-21 JST",
   "decks": [
     {
       "rank": 2,
@@ -2538,6 +2538,1367 @@
       ],
       "title": "Boros Aggro",
       "url": "https://mtgtop8.com/event?e=92555&d=903095&f=ST"
+    },
+    {
+      "format": "legacy",
+      "rank": 10,
+      "title": "Doomsday",
+      "url": "https://mtgtop8.com/event?e=92449&d=902298&f=LE",
+      "meta": "WeareVenom / MTGO Challenge 32 / 2026-10-17",
+      "mainboard": [
+        {
+          "name": "Cavern of Souls",
+          "count": 1
+        },
+        {
+          "name": "Flooded Strand",
+          "count": 1
+        },
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Misty Rainforest",
+          "count": 1
+        },
+        {
+          "name": "Polluted Delta",
+          "count": 4
+        },
+        {
+          "name": "Scalding Tarn",
+          "count": 1
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Undercity Sewers",
+          "count": 1
+        },
+        {
+          "name": "Underground Sea",
+          "count": 4
+        },
+        {
+          "name": "Verdant Catacombs",
+          "count": 1
+        },
+        {
+          "name": "Street Wraith",
+          "count": 4
+        },
+        {
+          "name": "Thassa's Oracle",
+          "count": 1
+        },
+        {
+          "name": "Brainstorm",
+          "count": 4
+        },
+        {
+          "name": "Consider",
+          "count": 1
+        },
+        {
+          "name": "Dark Ritual",
+          "count": 4
+        },
+        {
+          "name": "Daze",
+          "count": 3
+        },
+        {
+          "name": "Doomsday",
+          "count": 4
+        },
+        {
+          "name": "Edge of Autumn",
+          "count": 2
+        },
+        {
+          "name": "Flow State",
+          "count": 2
+        },
+        {
+          "name": "Force of Will",
+          "count": 4
+        },
+        {
+          "name": "Personal Tutor",
+          "count": 3
+        },
+        {
+          "name": "Ponder",
+          "count": 4
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 3
+        },
+        {
+          "name": "Jace, Wielder of Mysteries",
+          "count": 1
+        },
+        {
+          "name": "Lion's Eye Diamond",
+          "count": 1
+        },
+        {
+          "name": "Lotus Petal",
+          "count": 3
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Barrowgoyf",
+          "count": 4
+        },
+        {
+          "name": "Dauthi Voidwalker",
+          "count": 2
+        },
+        {
+          "name": "Duress",
+          "count": 1
+        },
+        {
+          "name": "Fatal Push",
+          "count": 3
+        },
+        {
+          "name": "Flusterstorm",
+          "count": 1
+        },
+        {
+          "name": "Force of Negation",
+          "count": 2
+        },
+        {
+          "name": "Murktide Regent",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 1,
+      "title": "UR Aggro",
+      "url": "https://mtgtop8.com/event?e=92465&d=902416&f=PI",
+      "meta": "taldoitalo / MTGO Challenge 32 / 2026-10-15",
+      "mainboard": [
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Mountain",
+          "count": 2
+        },
+        {
+          "name": "Riverglide Pathway",
+          "count": 2
+        },
+        {
+          "name": "Riverpyre Verge",
+          "count": 3
+        },
+        {
+          "name": "Shivan Reef",
+          "count": 3
+        },
+        {
+          "name": "Spirebluff Canal",
+          "count": 4
+        },
+        {
+          "name": "Steam Vents",
+          "count": 4
+        },
+        {
+          "name": "Emberheart Challenger",
+          "count": 4
+        },
+        {
+          "name": "Monastery Swiftspear",
+          "count": 4
+        },
+        {
+          "name": "Pompous Battlemage",
+          "count": 4
+        },
+        {
+          "name": "Screaming Nemesis",
+          "count": 2
+        },
+        {
+          "name": "Academic Dispute",
+          "count": 4
+        },
+        {
+          "name": "Boomerang Basics",
+          "count": 3
+        },
+        {
+          "name": "Burst Lightning",
+          "count": 3
+        },
+        {
+          "name": "Flow State",
+          "count": 4
+        },
+        {
+          "name": "Monstrous Rage",
+          "count": 1
+        },
+        {
+          "name": "Reckless Rage",
+          "count": 3
+        },
+        {
+          "name": "Sleight of Hand",
+          "count": 4
+        },
+        {
+          "name": "Spell Pierce",
+          "count": 1
+        },
+        {
+          "name": "Stormchaser's Talent",
+          "count": 4
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Accumulate Wisdom",
+          "count": 1
+        },
+        {
+          "name": "Boomerang Basics",
+          "count": 1
+        },
+        {
+          "name": "Firebending Lesson",
+          "count": 1
+        },
+        {
+          "name": "Iroh's Demonstration",
+          "count": 1
+        },
+        {
+          "name": "It'll Quench Ya!",
+          "count": 1
+        },
+        {
+          "name": "Octopus Form",
+          "count": 1
+        },
+        {
+          "name": "Quantum Riddler",
+          "count": 2
+        },
+        {
+          "name": "Redcap Melee",
+          "count": 2
+        },
+        {
+          "name": "Scorching Shot",
+          "count": 2
+        },
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 1
+        },
+        {
+          "name": "Spell Pierce",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 2,
+      "title": "Jund",
+      "url": "https://mtgtop8.com/event?e=92465&d=902418&f=PI",
+      "meta": "Univerce / MTGO Challenge 32 / 2026-10-15",
+      "mainboard": [
+        {
+          "name": "Blackcleave Cliffs",
+          "count": 4
+        },
+        {
+          "name": "Blazemire Verge",
+          "count": 4
+        },
+        {
+          "name": "Blooming Marsh",
+          "count": 4
+        },
+        {
+          "name": "Overgrown Tomb",
+          "count": 4
+        },
+        {
+          "name": "Stomping Ground",
+          "count": 4
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Biotech Specialist",
+          "count": 4
+        },
+        {
+          "name": "Cauldron Familiar",
+          "count": 4
+        },
+        {
+          "name": "Greedy Freebooter",
+          "count": 4
+        },
+        {
+          "name": "Mayhem Devil",
+          "count": 4
+        },
+        {
+          "name": "Shambling Ghast",
+          "count": 4
+        },
+        {
+          "name": "The Sackville-Bagginses",
+          "count": 4
+        },
+        {
+          "name": "Umbral Collar Zealot",
+          "count": 1
+        },
+        {
+          "name": "Ygra, Eater of All",
+          "count": 2
+        },
+        {
+          "name": "Deadly Dispute",
+          "count": 4
+        },
+        {
+          "name": "Lively Dirge",
+          "count": 4
+        },
+        {
+          "name": "Witch's Oven",
+          "count": 4
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 4
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Vision of Love",
+          "count": 3
+        },
+        {
+          "name": "Witherbloom Charm",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 3,
+      "title": "The Rock (Golgari Control)",
+      "url": "https://mtgtop8.com/event?e=92465&d=902407&f=PI",
+      "meta": "Arianne / MTGO Challenge 32 / 2026-10-15",
+      "mainboard": [
+        {
+          "name": "Blooming Marsh",
+          "count": 4
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "count": 1
+        },
+        {
+          "name": "Castle Locthwain",
+          "count": 1
+        },
+        {
+          "name": "Forest",
+          "count": 1
+        },
+        {
+          "name": "Llanowar Wastes",
+          "count": 4
+        },
+        {
+          "name": "Mutavault",
+          "count": 4
+        },
+        {
+          "name": "Overgrown Tomb",
+          "count": 4
+        },
+        {
+          "name": "Restless Cottage",
+          "count": 2
+        },
+        {
+          "name": "Swamp",
+          "count": 2
+        },
+        {
+          "name": "Takenuma, Abandoned Mire",
+          "count": 1
+        },
+        {
+          "name": "Urborg, Tomb of Yawgmoth",
+          "count": 1
+        },
+        {
+          "name": "Badgermole Cub",
+          "count": 4
+        },
+        {
+          "name": "Graveyard Trespasser",
+          "count": 4
+        },
+        {
+          "name": "Sheoldred, the Apocalypse",
+          "count": 3
+        },
+        {
+          "name": "Abrupt Decay",
+          "count": 3
+        },
+        {
+          "name": "Bitter Triumph",
+          "count": 2
+        },
+        {
+          "name": "Culling Ritual",
+          "count": 2
+        },
+        {
+          "name": "Duress",
+          "count": 1
+        },
+        {
+          "name": "Fatal Push",
+          "count": 4
+        },
+        {
+          "name": "Tear Asunder",
+          "count": 1
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Professor Dellian Fel",
+          "count": 3
+        },
+        {
+          "name": "Unholy Annex / Ritual Chamber",
+          "count": 4
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Culling Ritual",
+          "count": 1
+        },
+        {
+          "name": "Duress",
+          "count": 3
+        },
+        {
+          "name": "Go Blank",
+          "count": 2
+        },
+        {
+          "name": "Invoke Despair",
+          "count": 2
+        },
+        {
+          "name": "Nowhere to Run",
+          "count": 1
+        },
+        {
+          "name": "Professor Dellian Fel",
+          "count": 1
+        },
+        {
+          "name": "Strategic Betrayal",
+          "count": 3
+        },
+        {
+          "name": "Unlicensed Hearse",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 4,
+      "title": "Red Deck Wins",
+      "url": "https://mtgtop8.com/event?e=92467&d=902430&f=PI",
+      "meta": "driftingcool / MTGO League / 2026-10-17",
+      "mainboard": [
+        {
+          "name": "Den of the Bugbear",
+          "count": 2
+        },
+        {
+          "name": "Mountain",
+          "count": 15
+        },
+        {
+          "name": "Ramunap Ruins",
+          "count": 2
+        },
+        {
+          "name": "Rockface Village",
+          "count": 2
+        },
+        {
+          "name": "Sokenzan, Crucible of Defiance",
+          "count": 1
+        },
+        {
+          "name": "Emberheart Challenger",
+          "count": 4
+        },
+        {
+          "name": "Monastery Swiftspear",
+          "count": 4
+        },
+        {
+          "name": "Screaming Nemesis",
+          "count": 4
+        },
+        {
+          "name": "Soul-Scar Mage",
+          "count": 4
+        },
+        {
+          "name": "Sunspine Lynx",
+          "count": 2
+        },
+        {
+          "name": "Burst Lightning",
+          "count": 4
+        },
+        {
+          "name": "Lightning Strike",
+          "count": 2
+        },
+        {
+          "name": "Monstrous Rage",
+          "count": 4
+        },
+        {
+          "name": "Reckless Rage",
+          "count": 4
+        },
+        {
+          "name": "Kumano Faces Kakkazan",
+          "count": 4
+        },
+        {
+          "name": "The Legend of Roku",
+          "count": 2
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Magebane Lizard",
+          "count": 3
+        },
+        {
+          "name": "Pyroclasm",
+          "count": 3
+        },
+        {
+          "name": "Redcap Melee",
+          "count": 2
+        },
+        {
+          "name": "Scorching Shot",
+          "count": 2
+        },
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 3
+        },
+        {
+          "name": "Sunspine Lynx",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 6,
+      "title": "Izzet Control",
+      "url": "https://mtgtop8.com/event?e=92227&d=900622&f=PI",
+      "meta": "SorryImSoTilted / MTGO Challenge 32 / 2026-10-12",
+      "mainboard": [
+        {
+          "name": "Island",
+          "count": 4
+        },
+        {
+          "name": "Riverglide Pathway",
+          "count": 2
+        },
+        {
+          "name": "Riverpyre Verge",
+          "count": 3
+        },
+        {
+          "name": "Shivan Reef",
+          "count": 2
+        },
+        {
+          "name": "Spirebluff Canal",
+          "count": 4
+        },
+        {
+          "name": "Steam Vents",
+          "count": 4
+        },
+        {
+          "name": "Eddymurk Crab",
+          "count": 4
+        },
+        {
+          "name": "Hearth Elemental",
+          "count": 4
+        },
+        {
+          "name": "Sunderflock",
+          "count": 4
+        },
+        {
+          "name": "Consider",
+          "count": 4
+        },
+        {
+          "name": "Fading Hope",
+          "count": 1
+        },
+        {
+          "name": "Fiery Impulse",
+          "count": 4
+        },
+        {
+          "name": "Get Out",
+          "count": 3
+        },
+        {
+          "name": "Opt",
+          "count": 4
+        },
+        {
+          "name": "Prismari Charm",
+          "count": 4
+        },
+        {
+          "name": "Sleight of Hand",
+          "count": 4
+        },
+        {
+          "name": "Stubborn Denial",
+          "count": 4
+        },
+        {
+          "name": "Winternight Stories",
+          "count": 1
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Abrade",
+          "count": 1
+        },
+        {
+          "name": "Annul",
+          "count": 2
+        },
+        {
+          "name": "Change the Equation",
+          "count": 2
+        },
+        {
+          "name": "Ral, Crackling Wit",
+          "count": 1
+        },
+        {
+          "name": "Reckoner Bankbuster",
+          "count": 2
+        },
+        {
+          "name": "Redcap Melee",
+          "count": 1
+        },
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 3
+        },
+        {
+          "name": "Stormwing Entity",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 5,
+      "title": "Devotion to Green",
+      "url": "https://mtgtop8.com/event?e=92228&d=900632&f=PI",
+      "meta": "DaruniaX / MTGO League / 2026-10-13",
+      "mainboard": [
+        {
+          "name": "Ba Sing Se",
+          "count": 1
+        },
+        {
+          "name": "Boseiju, Who Endures",
+          "count": 1
+        },
+        {
+          "name": "Forest",
+          "count": 12
+        },
+        {
+          "name": "Hostile Hostel",
+          "count": 1
+        },
+        {
+          "name": "Lair of the Hydra",
+          "count": 2
+        },
+        {
+          "name": "Nykthos, Shrine to Nyx",
+          "count": 4
+        },
+        {
+          "name": "Cavalier of Thorns",
+          "count": 4
+        },
+        {
+          "name": "Elvish Mystic",
+          "count": 4
+        },
+        {
+          "name": "Llanowar Elves",
+          "count": 4
+        },
+        {
+          "name": "Old-Growth Troll",
+          "count": 3
+        },
+        {
+          "name": "Outcaster Trailblazer",
+          "count": 4
+        },
+        {
+          "name": "Polukranos Reborn",
+          "count": 1
+        },
+        {
+          "name": "Ulvenwald Oddity",
+          "count": 2
+        },
+        {
+          "name": "Vibrance",
+          "count": 4
+        },
+        {
+          "name": "Storm the Festival",
+          "count": 4
+        },
+        {
+          "name": "Kiora, Behemoth Beckoner",
+          "count": 4
+        },
+        {
+          "name": "Leyline of the Guildpact",
+          "count": 4
+        },
+        {
+          "name": "Oath of Nissa",
+          "count": 1
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Cityscape Leveler",
+          "count": 1
+        },
+        {
+          "name": "Emrakul, the Promised End",
+          "count": 1
+        },
+        {
+          "name": "Ghost Vacuum",
+          "count": 1
+        },
+        {
+          "name": "Pick Your Poison",
+          "count": 1
+        },
+        {
+          "name": "Prowling Serpopard",
+          "count": 2
+        },
+        {
+          "name": "Scrapshooter",
+          "count": 2
+        },
+        {
+          "name": "Setessan Petitioner",
+          "count": 4
+        },
+        {
+          "name": "Tail Swipe",
+          "count": 2
+        },
+        {
+          "name": "Unlicensed Hearse",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 7,
+      "title": "Greasefang Parhelion",
+      "url": "https://mtgtop8.com/event?e=92467&d=902429&f=PI",
+      "meta": "broflowsky / MTGO League / 2026-10-17",
+      "mainboard": [
+        {
+          "name": "Bleachbone Verge",
+          "count": 2
+        },
+        {
+          "name": "Brightclimb Pathway",
+          "count": 2
+        },
+        {
+          "name": "Concealed Courtyard",
+          "count": 4
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "count": 1
+        },
+        {
+          "name": "Geier Reach Sanitarium",
+          "count": 1
+        },
+        {
+          "name": "Godless Shrine",
+          "count": 4
+        },
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Shadowy Backstreet",
+          "count": 2
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Takenuma, Abandoned Mire",
+          "count": 1
+        },
+        {
+          "name": "The Mycosynth Gardens",
+          "count": 4
+        },
+        {
+          "name": "Urborg, Tomb of Yawgmoth",
+          "count": 1
+        },
+        {
+          "name": "Fleeting Spirit",
+          "count": 4
+        },
+        {
+          "name": "Greasefang, Okiba Boss",
+          "count": 4
+        },
+        {
+          "name": "Guardian of New Benalia",
+          "count": 3
+        },
+        {
+          "name": "Iron-Shield Elf",
+          "count": 3
+        },
+        {
+          "name": "Seasoned Hallowblade",
+          "count": 1
+        },
+        {
+          "name": "Fatal Push",
+          "count": 4
+        },
+        {
+          "name": "Lively Dirge",
+          "count": 1
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Vanishing Verse",
+          "count": 2
+        },
+        {
+          "name": "Monument to Endurance",
+          "count": 4
+        },
+        {
+          "name": "Parhelion II",
+          "count": 4
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "count": 2
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Bitter Triumph",
+          "count": 2
+        },
+        {
+          "name": "Deafening Silence",
+          "count": 2
+        },
+        {
+          "name": "Doorkeeper Thrull",
+          "count": 3
+        },
+        {
+          "name": "Duress",
+          "count": 2
+        },
+        {
+          "name": "Go Blank",
+          "count": 1
+        },
+        {
+          "name": "Pest Control",
+          "count": 2
+        },
+        {
+          "name": "Soul-Guide Lantern",
+          "count": 2
+        },
+        {
+          "name": "Vanishing Verse",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 8,
+      "title": "Dimir Aggro",
+      "url": "https://mtgtop8.com/event?e=92475&d=902471&f=PI",
+      "meta": "ElCucuy / MTGO Challenge 16 / 2026-10-17",
+      "mainboard": [
+        {
+          "name": "Darkslick Shores",
+          "count": 4
+        },
+        {
+          "name": "Gloomlake Verge",
+          "count": 4
+        },
+        {
+          "name": "Island",
+          "count": 2
+        },
+        {
+          "name": "Multiversal Passage",
+          "count": 2
+        },
+        {
+          "name": "Mutavault",
+          "count": 4
+        },
+        {
+          "name": "Otawara, Soaring City",
+          "count": 1
+        },
+        {
+          "name": "Swamp",
+          "count": 2
+        },
+        {
+          "name": "Takenuma, Abandoned Mire",
+          "count": 1
+        },
+        {
+          "name": "Watery Grave",
+          "count": 4
+        },
+        {
+          "name": "Faerie Miscreant",
+          "count": 4
+        },
+        {
+          "name": "Floodpits Drowner",
+          "count": 4
+        },
+        {
+          "name": "Mockingbird",
+          "count": 4
+        },
+        {
+          "name": "Moon-Circuit Hacker",
+          "count": 4
+        },
+        {
+          "name": "Sheoldred, the Apocalypse",
+          "count": 3
+        },
+        {
+          "name": "Bitter Triumph",
+          "count": 2
+        },
+        {
+          "name": "Fatal Push",
+          "count": 4
+        },
+        {
+          "name": "Thoughtseize",
+          "count": 4
+        },
+        {
+          "name": "Kaito, Bane of Nightmares",
+          "count": 4
+        },
+        {
+          "name": "Nowhere to Run",
+          "count": 1
+        },
+        {
+          "name": "Unholy Annex / Ritual Chamber",
+          "count": 2
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Change the Equation",
+          "count": 2
+        },
+        {
+          "name": "Duress",
+          "count": 2
+        },
+        {
+          "name": "Enduring Curiosity",
+          "count": 1
+        },
+        {
+          "name": "Languish",
+          "count": 2
+        },
+        {
+          "name": "Leyline of the Void",
+          "count": 4
+        },
+        {
+          "name": "Path of Peril",
+          "count": 2
+        },
+        {
+          "name": "Tishana's Tidebinder",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 9,
+      "title": "Boros Aggro",
+      "url": "https://mtgtop8.com/event?e=92139&d=899828&f=PI",
+      "meta": "Bawer / MTGO Challenge 16 / 2026-10-11",
+      "mainboard": [
+        {
+          "name": "Battlefield Forge",
+          "count": 1
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "count": 1
+        },
+        {
+          "name": "Inspiring Vantage",
+          "count": 4
+        },
+        {
+          "name": "Mountain",
+          "count": 3
+        },
+        {
+          "name": "Needleverge Pathway",
+          "count": 4
+        },
+        {
+          "name": "Sacred Foundry",
+          "count": 4
+        },
+        {
+          "name": "Sokenzan, Crucible of Defiance",
+          "count": 1
+        },
+        {
+          "name": "Sunbillow Verge",
+          "count": 4
+        },
+        {
+          "name": "Fear of Missing Out",
+          "count": 4
+        },
+        {
+          "name": "Flameblade Adept",
+          "count": 4
+        },
+        {
+          "name": "Guardian of New Benalia",
+          "count": 4
+        },
+        {
+          "name": "Hardened Academic",
+          "count": 4
+        },
+        {
+          "name": "Inti, Seneschal of the Sun",
+          "count": 1
+        },
+        {
+          "name": "Marauding Mako",
+          "count": 4
+        },
+        {
+          "name": "Voldaren Epicure",
+          "count": 2
+        },
+        {
+          "name": "Fiery Temper",
+          "count": 3
+        },
+        {
+          "name": "Practiced Offense",
+          "count": 4
+        },
+        {
+          "name": "Torch the Tower",
+          "count": 3
+        },
+        {
+          "name": "Cool but Rude",
+          "count": 4
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "count": 1
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Abrade",
+          "count": 1
+        },
+        {
+          "name": "Agatha's Soul Cauldron",
+          "count": 2
+        },
+        {
+          "name": "Doorkeeper Thrull",
+          "count": 2
+        },
+        {
+          "name": "Magebane Lizard",
+          "count": 3
+        },
+        {
+          "name": "Monument to Endurance",
+          "count": 3
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "count": 3
+        },
+        {
+          "name": "The Legend of Roku",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "format": "pioneer",
+      "rank": 10,
+      "title": "Azorius Tempo / Spirit Aggro",
+      "url": "https://mtgtop8.com/event?e=92464&d=902399&f=PI",
+      "meta": "Valdemir Andrade / 7º Etapa - Liga Praia 2026.2 / 2026-10-14",
+      "mainboard": [
+        {
+          "name": "Abandoned Air Temple",
+          "count": 1
+        },
+        {
+          "name": "Adarkar Wastes",
+          "count": 2
+        },
+        {
+          "name": "Agna Qel'a",
+          "count": 1
+        },
+        {
+          "name": "Eiganjo, Seat of the Empire",
+          "count": 1
+        },
+        {
+          "name": "Hallowed Fountain",
+          "count": 4
+        },
+        {
+          "name": "Hengegate Pathway",
+          "count": 4
+        },
+        {
+          "name": "Island",
+          "count": 3
+        },
+        {
+          "name": "Petrified Hamlet",
+          "count": 1
+        },
+        {
+          "name": "Plains",
+          "count": 2
+        },
+        {
+          "name": "Seachrome Coast",
+          "count": 4
+        },
+        {
+          "name": "Aang, Swift Savior",
+          "count": 3
+        },
+        {
+          "name": "Bilbo, Thief in the Night",
+          "count": 3
+        },
+        {
+          "name": "Clarion Conqueror",
+          "count": 4
+        },
+        {
+          "name": "Momo, Friendly Flier",
+          "count": 4
+        },
+        {
+          "name": "Quantum Riddler",
+          "count": 4
+        },
+        {
+          "name": "Sage of the Skies",
+          "count": 2
+        },
+        {
+          "name": "Skycoach Conductor",
+          "count": 3
+        },
+        {
+          "name": "Erode",
+          "count": 2
+        },
+        {
+          "name": "Essence Flux",
+          "count": 4
+        },
+        {
+          "name": "Get Lost",
+          "count": 4
+        },
+        {
+          "name": "No More Lies",
+          "count": 4
+        }
+      ],
+      "sideboard": [
+        {
+          "name": "Damping Sphere",
+          "count": 1
+        },
+        {
+          "name": "Dovin's Veto",
+          "count": 2
+        },
+        {
+          "name": "Elesh Norn, Mother of Machines",
+          "count": 1
+        },
+        {
+          "name": "High Noon",
+          "count": 1
+        },
+        {
+          "name": "Knockout Blow",
+          "count": 1
+        },
+        {
+          "name": "Narset, Parter of Veils",
+          "count": 1
+        },
+        {
+          "name": "Rest in Peace",
+          "count": 2
+        },
+        {
+          "name": "Settle the Wreckage",
+          "count": 1
+        },
+        {
+          "name": "Sheltered by Ghosts",
+          "count": 1
+        },
+        {
+          "name": "Surge of Salvation",
+          "count": 2
+        },
+        {
+          "name": "Three Steps Ahead",
+          "count": 1
+        },
+        {
+          "name": "Wan Shi Tong, Librarian",
+          "count": 1
+        }
+      ]
     }
   ],
   "metadata": [
@@ -11645,6 +13006,280 @@
         }
       ],
       "requestedName": "Skycoach Conductor"
+    },
+    {
+      "name": "Hidden Lair",
+      "printedName": "Hidden Lair",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/7/0742ddb6-71ed-444e-91ad-84f876725a4a.jpg?1783902883",
+      "oracleText": "{T}: Add {C}.\n{T}: Add {U} or {B}. Activate only if this land entered this turn or if you control a basic land.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Hidden Lair",
+      "aliases": [
+        "Hidden Lair"
+      ]
+    },
+    {
+      "name": "Soulstone Sanctuary",
+      "printedName": "Soulstone Sanctuary",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/4/642553a7-6d0f-483d-a873-3a703786db42.jpg?1783909088",
+      "oracleText": "{T}: Add {C}.\n{4}: This land becomes a 3/3 creature with vigilance and all creature types. It's still a land.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Soulstone Sanctuary",
+      "aliases": [
+        "Soulstone Sanctuary"
+      ]
+    },
+    {
+      "name": "Dream Beavers",
+      "printedName": "Dream Beavers",
+      "language": "en",
+      "typeLine": "Creature — Beaver Nightmare",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/0/600e3bc1-9777-4057-a11e-4f61582636c6.jpg?1783904107",
+      "oracleText": "Flying\nWhen this creature enters, each opponent loses 1 life and you gain 1 life. Scry 1. (Look at the top card of your library. You may put that card on the bottom.)",
+      "manaCost": "{B}",
+      "power": "1",
+      "toughness": "1",
+      "colors": [
+        "B"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Dream Beavers",
+      "aliases": [
+        "Dream Beavers"
+      ]
+    },
+    {
+      "name": "Spyglass Siren",
+      "printedName": "Spyglass Siren",
+      "language": "en",
+      "typeLine": "Creature — Siren Pirate",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/1/41e54343-95e5-4dc4-9f18-e4a415fe5e0a.jpg?1783913788",
+      "oracleText": "Flying\nWhen this creature enters, create a Map token. (It's an artifact with \"{1}, {T}, Sacrifice this token: Target creature you control explores. Activate only as a sorcery.\")",
+      "manaCost": "{U}",
+      "power": "1",
+      "toughness": "1",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Spyglass Siren",
+      "aliases": [
+        "Spyglass Siren"
+      ]
+    },
+    {
+      "name": "The Wondrous Wasp",
+      "printedName": "The Wondrous Wasp",
+      "language": "en",
+      "typeLine": "Legendary Creature — Human Hero",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/8/484e80a4-1d5f-4c27-98a8-ee2ef9d6cbdc.jpg?1783902947",
+      "oracleText": "Flash\nFlying\nWasp's Sting — When The Wondrous Wasp enters, tap up to one target creature. It loses all abilities for as long as The Wondrous Wasp remains on the battlefield.",
+      "manaCost": "{1}{U}",
+      "power": "2",
+      "toughness": "1",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Wondrous Wasp",
+      "aliases": [
+        "The Wondrous Wasp"
+      ]
+    },
+    {
+      "name": "We Say Thee Nay!",
+      "printedName": "We Say Thee Nay!",
+      "language": "en",
+      "typeLine": "Instant — Arcane",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/3/13b70321-75bd-4d44-b9f6-5f062a5dda0f.jpg?1783902948",
+      "oracleText": "Teamwork 2 (As an additional cost to cast this spell, you may tap any number of creatures you control with total power 2 or more.)\nCounter target spell unless its controller pays {2}. Counter that spell unless its controller pays {4} instead if this spell was cast using teamwork.",
+      "manaCost": "{1}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "We Say Thee Nay!",
+      "aliases": [
+        "We Say Thee Nay!"
+      ]
+    },
+    {
+      "name": "Vren, the Relentless",
+      "printedName": "Vren, the Relentless",
+      "language": "en",
+      "typeLine": "Legendary Creature — Rat Rogue",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/5/6506277d-f031-4db5-9d16-bf2389094785.jpg?1783910791",
+      "oracleText": "Ward {2}\nIf a creature an opponent controls would die, exile it instead.\nAt the beginning of each end step, create X 1/1 black Rat creature tokens with \"This token gets +1/+1 for each other Rat you control,\" where X is the number of creatures that were exiled under your opponents' control this turn.",
+      "manaCost": "{2}{U}{B}",
+      "power": "3",
+      "toughness": "4",
+      "colors": [
+        "B",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Vren, the Relentless",
+      "aliases": [
+        "Vren, the Relentless"
+      ]
+    },
+    {
+      "name": "Impractical Joke",
+      "printedName": "Impractical Joke",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/9/39a816b4-39b8-421c-b828-68db901d34b7.jpg?1783903668",
+      "oracleText": "Damage can't be prevented this turn. Impractical Joke deals 3 damage to up to one target creature or planeswalker.",
+      "manaCost": "{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Impractical Joke",
+      "aliases": [
+        "Impractical Joke"
+      ]
+    },
+    {
+      "name": "Traumatic Critique",
+      "printedName": "Traumatic Critique",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/a/2a812fa7-4599-4e25-97db-20ffc6bc0b26.jpg?1783903626",
+      "oracleText": "Traumatic Critique deals X damage to any target. Draw two cards, then discard a card.",
+      "manaCost": "{X}{U}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Traumatic Critique",
+      "aliases": [
+        "Traumatic Critique"
+      ]
+    },
+    {
+      "name": "Broadside Barrage",
+      "printedName": "Broadside Barrage",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/0/d086e4e5-98fa-437e-85aa-d8849c94ce94.jpg?1783907862",
+      "oracleText": "Broadside Barrage deals 5 damage to target creature or planeswalker. Draw a card, then discard a card.",
+      "manaCost": "{1}{U}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Broadside Barrage",
+      "aliases": [
+        "Broadside Barrage"
+      ]
+    },
+    {
+      "name": "Colorstorm Stallion",
+      "printedName": "Colorstorm Stallion",
+      "language": "en",
+      "typeLine": "Creature — Elemental Horse",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/f/5/f5b54d46-2caf-4d1b-8be1-dbd9e9dce058.jpg?1783903647",
+      "oracleText": "Ward {1}, haste\nOpus — Whenever you cast an instant or sorcery spell, this creature gets +1/+1 until end of turn. If five or more mana was spent to cast that spell, create a token that's a copy of this creature.",
+      "manaCost": "{1}{U}{R}",
+      "power": "3",
+      "toughness": "3",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Colorstorm Stallion",
+      "aliases": [
+        "Colorstorm Stallion"
+      ]
+    },
+    {
+      "name": "Hydro-Man, Fluid Felon",
+      "printedName": "Hydro-Man, Fluid Felon",
+      "language": "en",
+      "typeLine": "Legendary Creature — Elemental Villain",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/5/e53115a4-8959-40fa-b763-931504a1c5a2.jpg?1783905353",
+      "oracleText": "Whenever you cast a blue spell, if Hydro-Man is a creature, he gets +1/+1 until end of turn.\nAt the beginning of your end step, untap Hydro-Man. Until your next turn, he becomes a land and gains \"{T}: Add {U}.\" (He's not a creature during that time.)",
+      "manaCost": "{U}{U}",
+      "power": "2",
+      "toughness": "2",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Hydro-Man, Fluid Felon",
+      "aliases": [
+        "Hydro-Man, Fluid Felon"
+      ]
+    },
+    {
+      "name": "Ill-Timed Explosion",
+      "printedName": "Ill-Timed Explosion",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/b/0b5cdb01-eaa4-4a0a-b42a-332bcf4d6fff.jpg?1783912847",
+      "oracleText": "Draw two cards. Then you may discard two cards. When you do, Ill-Timed Explosion deals X damage to each creature, where X is the greatest mana value among cards discarded this way.",
+      "manaCost": "{2}{U}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R",
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Ill-Timed Explosion",
+      "aliases": [
+        "Ill-Timed Explosion"
+      ]
     }
   ]
 }
