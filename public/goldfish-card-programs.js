@@ -1,6 +1,6 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261021-public30j";
-import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261021-public30j";
-import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261021-public30j";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261021-public30k";
+import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261021-public30k";
+import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261021-public30k";
 
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function verifiedGoldfishCard(card) {
@@ -193,6 +193,7 @@ export function engineCardActions(card) {
   }
   if (!verifiedGoldfishCard(card)) return result;
   const add = (...args) => result.push(ability(...args));
+  if (name === "Nykthos, Shrine to Nyx") add("nykthos", "{2}, {T}：選んだ色の信心分のマナ", "{2}", [{ op: "nykthos" }], { tap: true, manaAbility: true });
   if (name === "Lórien Revealed") add("islandcycling", "島サイクリング {1}", "{1}", [tutor({ types: ["Land"], subtypes: ["Island"] })], { zone: "hand", discardSelf: true });
   if (["Seasoned Hallowblade", "Iron-Shield Elf", "Guardian of New Benalia"].includes(name)) add("discard-indestructible", "1枚捨てる：タップして破壊不能", "{0}", [{ op: "source-keyword", keyword: "indestructible" }, { op: "tap-source" }], { costSelect: { zone: "hand", filter: {}, count: 1, destination: "graveyard" } });
   if (name === "Fleeting Spirit") {

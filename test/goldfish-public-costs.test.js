@@ -9,7 +9,7 @@ import { goldfishCardActions } from "../public/goldfish-action-definitions.js";
 import { goldfishReference as ref, moveGoldfishRuleObject as move } from "../public/goldfish-objects.js";
 import { makeGameToken, cardName } from "../public/goldfish-events.js";
 import { TOKENS } from "../public/goldfish-card-programs.js";
-import { flushEngineEvents } from "../public/goldfish-engine.js";
+import { flushEngineEvents, gameDevotion } from "../public/goldfish-engine.js";
 import { goldfishCharacteristics } from "../public/goldfish-rules.js";
 import { settle } from "./helpers/goldfish-pilot.js";
 const metadata = JSON.parse(fs.readFileSync(new URL("./fixtures/goldfish-public-top30.json", import.meta.url))).metadata;
@@ -27,6 +27,31 @@ const put = (s, n, z = "hand") => {
   return settle(s);
 };
 const reload = s => restoreGoldfishGame(JSON.parse(JSON.stringify(s)));
+
+test("Nykthos pays two using other sources, counts hybrid devotion, and follows Damping Sphere and Blood Moon", () => {
+  let s = game(["Nykthos, Shrine to Nyx", "Forest", "Llanowar Elves", "Old-Growth Troll", "Leyline of the Guildpact", "Damping Sphere", "Blood Moon"]);
+  for (const n of ["Nykthos, Shrine to Nyx", "Forest", "Llanowar Elves", "Old-Growth Troll", "Leyline of the Guildpact"]) s = put(s, n, "battlefield");
+  s = settle(nextGoldfishTurn(s));
+  assert.equal(gameDevotion(s, "G"), 8); assert.equal(gameDevotion(s, "U"), 1);
+  const nyk = get(s, "Nykthos, Shrine to Nyx").id;
+  const paid = settle(activateGoldfishAction(s, nyk, "engine:nykthos"), [], c => c.label?.startsWith("ニクソス") ? { value: "G" } : null);
+  assert.equal(paid.manaPool.G, 8); assert.ok(get(paid, "Nykthos, Shrine to Nyx").tapped);
+  assert.ok(get(paid, "Forest").tapped); assert.ok(get(paid, "Llanowar Elves").tapped);
+  s = put(s, "Damping Sphere", "battlefield");
+  const taxed = settle(activateGoldfishAction(s, nyk, "engine:nykthos"), [], c => c.label?.startsWith("ニクソス") ? { value: "G" } : null);
+  assert.equal(taxed.manaPool.C, 1); assert.equal(taxed.manaPool.G, 0);
+  s = put(s, "Blood Moon", "battlefield");
+  assert.throws(() => activateGoldfishAction(s, nyk, "engine:nykthos"), /血染めの月/);
+});
+
+test("Nykthos cannot tap itself to pay its activation and face-down cards contribute no devotion", () => {
+  let s = put(put(game(["Nykthos, Shrine to Nyx", "Forest", "Old-Growth Troll"]), "Nykthos, Shrine to Nyx", "battlefield"), "Forest", "battlefield");
+  const before = JSON.stringify(s);
+  assert.throws(() => activateGoldfishAction(s, get(s, "Nykthos, Shrine to Nyx").id, "engine:nykthos"), /マナ/);
+  assert.equal(JSON.stringify(s), before);
+  s = put(s, "Old-Growth Troll", "battlefield"); get(s, "Old-Growth Troll").faceDown = true;
+  assert.equal(gameDevotion(s, "G"), 0);
+});
 
 test("Deadly Precision previews sacrifice payment, charges only B, and destroys the selected creature", () => {
   let s = put(put(game(["Deadly Precision", "Biotech Specialist"]), "Deadly Precision"), "Biotech Specialist", "battlefield");

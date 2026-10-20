@@ -1,20 +1,22 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary, goldfishSelfProtected, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30j";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30j";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30j";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30j";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30j";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30j";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30j";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30j";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30j";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30j";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30j";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30j";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30j";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary, goldfishSelfProtected, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30k";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30k";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30k";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30k";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30k";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30k";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30k";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30k";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30k";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30k";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30k";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30k";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30k";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
 export const gameManaValue = card => goldfishManaValue(card);
+export const gameDevotion = (state, color) => state.battlefield.filter(c => !c.faceDown)
+  .reduce((n, c) => n + ((face(c).manaCost || "").match(/\{[^}]+\}/g) || []).filter(symbol => symbol.includes(color)).length, 0);
 export function gameColors(card, state) {
   let colors = card.faceDown || /\bDevoid\b/.test(face(card).oracleText || "") ? [] : face(card).colors?.length ? face(card).colors : [...new Set((face(card).manaCost || "").match(/[WUBRG]/g) || [])];
   if (!state) return colors;
@@ -725,6 +727,9 @@ export function continueEngineResolution(state) {
       if (op.op === "hex") drawGameCards(state, cards.length);
     }
     else if (op.op === "wish") state.rules.wish = state.rules.turnSerial;
+    else if (op.op === "nykthos") {
+      setChoice(state, { kind: "buttons", label: "ニクソス：加えるマナの色", options: Object.entries({ W: "白", U: "青", B: "黒", R: "赤", G: "緑" }).map(([value, label]) => ({ value, label: `${label}：信心${gameDevotion(state, value)}マナ` })) }); return;
+    }
     else if (op.op === "mana-choice") { setChoice(state, { kind: "mana", label: op.sameColor ? `同じ色のマナを${count}点加える` : "加えるマナの色", count, sameColor: !!op.sameColor, colors: op.colors || ["W", "U", "B", "R", "G"] }); return; }
     else if (op.op === "optional-draw-cost") {
       const plan = planGoldfishPayment(state, { manaCost: op.cost });
@@ -988,6 +993,10 @@ export function chooseEngine(state, answer) {
     if (!Array.isArray(values) || values.length !== (choice.multiple || 1) || new Set(values).size !== values.length || values.some(v => !choice.options.some(o => o.value === v))) throw new Error("選択肢を選んでください。");
     const value = values[0];
     chooseFormatStep(state, ctx, op, answer);
+    if (op.op === "nykthos") {
+      const devotion = gameDevotion(state, value), replaced = devotion >= 2 && hasRuleCard(state, "Damping Sphere");
+      state.manaPool[replaced ? "C" : value] += replaced ? 1 : devotion;
+    }
     if (op.op === "veil") { state.rules.uncounterableSerial = state.rules.turnSerial; (state.rules.notices ||= []).push({ text: "このターン、自分と自分のパーマネントは青と黒からの呪禁を得る（相手側の対象選択は省略）", serial: state.rules.turnSerial }); if (value === "yes") insertSteps(ctx, [draw()]); }
     if (op.op === "offense") { const c = find(state, ctx.target); if (c) c.temporaryEffects.push({ keywords: [value], turn: state.turn, label: ctx.sourceName }); }
     if (op.op === "stories-discard") insertSteps(ctx, [select("捨てる手札", "hand", value === "creature" ? { types: ["Creature"] } : {}, { min: value === "creature" ? 1 : 2, max: value === "creature" ? 1 : 2, destination: "graveyard" })]);

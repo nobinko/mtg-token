@@ -1,17 +1,17 @@
 // Stateful effects for the cross-format programs. All entry points are gated by
 // the complete Oracle snapshot in the program registry.
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30j";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30j";
-import { engineCandidates, gameManaValue, damage, destroy } from "./goldfish-engine.js?v=20261021-public30j";
-import { castGoldfishCard, planGoldfishCastPayment } from "./goldfish-mana.js?v=20261021-public30j";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30j";
-import { goldfishKeywords, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30j";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30j";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30j";
-import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261021-public30j";
-import { advancedStep, advancedChoose } from "./goldfish-advanced-spells.js?v=20261021-public30j";
-import { formatPermanentStep, chooseFormatPermanentStep } from "./goldfish-format-permanents.js?v=20261021-public30j";
-import { extensionStep, extensionChoose } from "./goldfish-ability-extensions.js?v=20261021-public30j";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30k";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30k";
+import { engineCandidates, gameManaValue, damage, destroy } from "./goldfish-engine.js?v=20261021-public30k";
+import { castGoldfishCard, planGoldfishCastPayment } from "./goldfish-mana.js?v=20261021-public30k";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30k";
+import { goldfishKeywords, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30k";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30k";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30k";
+import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261021-public30k";
+import { advancedStep, advancedChoose } from "./goldfish-advanced-spells.js?v=20261021-public30k";
+import { formatPermanentStep, chooseFormatPermanentStep } from "./goldfish-format-permanents.js?v=20261021-public30k";
+import { extensionStep, extensionChoose } from "./goldfish-ability-extensions.js?v=20261021-public30k";
 
 const insert = (ctx, ...steps) => ctx.steps.splice(ctx.step + 1, 0, ...steps);
 const choice = (state, ctx, data) => { state.rules.pendingChoice = { type: "engine-choice", entryId: ctx.entryId, sourceName: ctx.sourceName, ...data }; };

@@ -1,7 +1,7 @@
-import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261021-public30j";
-import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261021-public30j";
-import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30j";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30j";
+import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261021-public30k";
+import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261021-public30k";
+import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30k";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30k";
 
 export const EXTRA_COST_SPELLS = new Set(["Demand Answers", "Requiting Hex", "We Say Thee Nay!", "Countersculpt", "Fanatical Offering", "Deadly Dispute", "Stir Up Trouble", "Deadly Precision", "Vicious Rivalry", "Toxic Deluge", "Deadly Cover-Up", "Torch the Tower", "Rottenmouth Viper"]);
 export function extraFormatCostChoice(state, card, format = {}) {
