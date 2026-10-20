@@ -1,11 +1,11 @@
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30c";
-import { cardName, isType } from "./goldfish-events.js?v=20261020-public30c";
-import { engineCandidates } from "./goldfish-engine.js?v=20261020-public30c";
-import { sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30c";
-import { goldfishCastingCost } from "./goldfish-mana.js?v=20261020-public30c";
-import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-public30c";
-import { extraFormatCostChoice } from "./goldfish-extra-costs.js?v=20261020-public30c";
-import { advancedPreflight } from "./goldfish-advanced-spells.js?v=20261020-public30c";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30d";
+import { cardName, isType } from "./goldfish-events.js?v=20261020-public30d";
+import { engineCandidates } from "./goldfish-engine.js?v=20261020-public30d";
+import { sameGoldfishReference } from "./goldfish-objects.js?v=20261020-public30d";
+import { goldfishCastingCost } from "./goldfish-mana.js?v=20261020-public30d";
+import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261020-public30d";
+import { extraFormatCostChoice } from "./goldfish-extra-costs.js?v=20261020-public30d";
+import { advancedPreflight } from "./goldfish-advanced-spells.js?v=20261020-public30d";
 
 // Extra text, modes and additional costs are declared before any payment. The
 // draft is serializable; cancellation never exiles a card or taps a source.

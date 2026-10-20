@@ -1,6 +1,6 @@
-import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261020-public30c";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-public30c";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30c";
+import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261020-public30d";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-public30d";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30d";
 
 export const activeFace = card => card?.faces?.[card.faceIndex || 0] || card || {};
 export const cardType = card => card.faceDown ? "Creature" : [String(activeFace(card).typeLine || ""), ...(card.temporaryEffects || []).flatMap(e => e.types || [])].join(" ");

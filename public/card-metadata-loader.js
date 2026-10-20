@@ -2,8 +2,12 @@ const normalize = name => String(name || "").replace(/\s+/g, " ").trim().toLower
 
 // The gallery and solo table need the same Oracle records. Share completed and
 // pending requests so opening the table while images load does not fetch twice.
-export function createCardMetadataLoader({ request = fetch, now = Date.now, timeoutMs = 20_000 } = {}) {
+export function createCardMetadataLoader({ request = fetch, now = Date.now, timeoutMs = 20_000, bundledCards = [] } = {}) {
   const cache = new Map(), pending = new Map();
+  const bundled = new Map();
+  for (const card of bundledCards) if (!card.unavailable) {
+    for (const name of [card.name, card.requestedName, ...(card.aliases || []), ...(card.faces || []).map(f => f.name)].filter(Boolean)) bundled.set(normalize(name), card);
+  }
   async function fetchBatch(names, language) {
     let lastError;
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -37,9 +41,9 @@ export function createCardMetadataLoader({ request = fetch, now = Date.now, time
     }
     throw lastError;
   }
-  return async function load(names, { language = "en" } = {}) {
+  return async function load(names, { language = "en", refresh = false } = {}) {
     const unique = [...new Set((names || []).map(name => String(name).trim()).filter(Boolean))];
-    const missing = unique.filter(name => (cache.get(`${language}:${normalize(name)}`)?.expires || 0) <= now());
+    const missing = unique.filter(name => refresh || (cache.get(`${language}:${normalize(name)}`)?.expires || 0) <= now() && !(language === "en" && bundled.has(normalize(name))));
     let fetched = [];
     if (missing.length) {
       const key = `${language}:${missing.map(normalize).sort().join("\n")}`;
@@ -47,11 +51,14 @@ export function createCardMetadataLoader({ request = fetch, now = Date.now, time
       fetched = await pending.get(key);
     }
     return unique.map(name => {
-      const hit = cache.get(`${language}:${normalize(name)}`)?.card
+      const live = cache.get(`${language}:${normalize(name)}`)?.card
         || fetched.find(card => normalize(card.requestedName || card.name) === normalize(name));
-      return hit ? { ...hit, requestedName: name } : { name, unavailable: true };
+      const snapshot = language === "en" ? bundled.get(normalize(name)) : null;
+      const hit = live || snapshot;
+      return hit ? { ...hit, requestedName: name, ...(live ? {} : { metadataSource: "bundled" }) } : { name, unavailable: true };
     });
   };
 }
 
-export const loadCardMetadata = createCardMetadataLoader();
+export const loadCardMetadata = createCardMetadataLoader({ bundledCards: GOLDFISH_METADATA });
+import { GOLDFISH_METADATA } from "./goldfish-metadata.js?v=20261020-public30d";

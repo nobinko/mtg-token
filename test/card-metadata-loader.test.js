@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createCardMetadataLoader } from "../public/card-metadata-loader.js";
+import { GOLDFISH_METADATA } from "../public/goldfish-metadata.js";
+import { mergeCardMetadata } from "../public/card-metadata.js";
+import { verifiedGoldfishCard } from "../public/goldfish-card-programs.js";
 
 test("gallery and solo share an in-flight request, including DFC aliases", async () => {
   let release, requests = 0;
@@ -50,4 +53,33 @@ test("a hung request is bounded and unavailable names are not cached", async () 
   assert.equal((await retry(["New Card"]))[0].unavailable, true);
   found = true;
   assert.equal((await retry(["New Card"]))[0].typeLine, "Creature");
+});
+
+test("known English cards start without external requests, retaining complete faces and Oracle verification", async () => {
+  const load = createCardMetadataLoader({ bundledCards: GOLDFISH_METADATA, request: async () => { throw new Error("must not request"); } });
+  const names = ["Great Hall of the Biblioplex", "Ral Zarek, Guest Lecturer", "Esper Origins", "Unholy Annex / Ritual Chamber", "Null Summoner"];
+  const cards = await load(names);
+  assert.ok(cards.every(c => c.metadataSource === "bundled" && !c.unavailable));
+  assert.equal(cards[2].faces.length, 2); assert.ok(cards[2].faces[1].imageUrl);
+  for (const c of mergeCardMetadata(names.map(name => ({ name, count: 1 })), cards)) assert.ok(verifiedGoldfishCard(c), c.name);
+});
+
+test("mixed lists fetch only unknown names; Japanese images and explicit refresh still use the live API", async () => {
+  const calls = [];
+  const load = createCardMetadataLoader({ bundledCards: [{ name: "Known", oracleText: "old", faces: [] }], request: async (_, options) => {
+    const input = JSON.parse(options.body); calls.push(input);
+    return Response.json({ cards: input.names.map(name => ({ name, oracleText: "new", language: input.language })) });
+  }});
+  const cards = await load(["Known", "New"]);
+  assert.deepEqual(calls[0].names, ["New"]); assert.equal(cards[0].oracleText, "old");
+  assert.equal((await load(["Known"], { refresh: true }))[0].oracleText, "new");
+  assert.deepEqual(calls[1].names, ["Known"]);
+  await load(["Known"], { language: "ja" }); assert.equal(calls[2].language, "ja");
+  assert.equal((await load(["Known"]))[0].metadataSource, undefined);
+});
+
+test("a failed explicit refresh remains an error, while the reviewed snapshot is still usable afterward", async () => {
+  const load = createCardMetadataLoader({ bundledCards: [{ name: "Known", oracleText: "reviewed" }], request: async () => new Response("timeout", { status: 504 }) });
+  await assert.rejects(load(["Known"], { refresh: true }));
+  assert.equal((await load(["Known"]))[0].oracleText, "reviewed");
 });
