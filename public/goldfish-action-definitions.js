@@ -1,7 +1,8 @@
 // Complete, bounded ability clauses. Parsing a cost never implies that every
 // other ability on the card is supported.
-import { engineCardActions } from "./goldfish-card-programs.js?v=20261020-solo6";
-import { formatPermanentActions } from "./goldfish-format-permanents.js?v=20261020-solo6";
+import { engineCardActions } from "./goldfish-card-programs.js?v=20261020-solo7";
+import { formatPermanentActions } from "./goldfish-format-permanents.js?v=20261020-solo7";
+import { extensionActions } from "./goldfish-ability-extensions.js?v=20261020-solo7";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const type = (card) => card.faceDown ? "Creature" : String(face(card).typeLine || "");
 const text = (card) => String(face(card).oracleText || "").replace(/\([^)]*\)/g, "");
@@ -12,7 +13,7 @@ export const goldfishPlotReady = (state, card) => card.playPermission?.kind === 
 
 export function goldfishCardActions(card) {
   if (!card || card.faceDown || card.automaticAbilities === false) return [];
-  const result = [...engineCardActions(card), ...formatPermanentActions(card)], oracle = text(card), lines = oracle.split("\n").map((line) => line.trim());
+  const result = [...engineCardActions(card), ...formatPermanentActions(card), ...extensionActions(card)], oracle = text(card), lines = oracle.split("\n").map((line) => line.trim());
   const plot = lines.map((line) => line.match(new RegExp(`^Plot ${mana}$`))).find(Boolean);
   if (plot) result.push({ id: "plot", zone: "hand", cost: plot[1], main: true, label: `計画 ${plot[1]}`, description: "手札から計画して追放。次のターン以降、自分のメインでマナ・コストを払わずに唱えられます。" });
   const cycling = lines.map((line) => line.match(new RegExp(`^Cycling ${mana}$`))).find(Boolean);

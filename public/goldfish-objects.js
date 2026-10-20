@@ -1,6 +1,6 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo6";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo7";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo7";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);
@@ -36,6 +36,9 @@ export function resetGoldfishCardState(card) {
   }
   delete next.ygraFaceTypes;
   delete next.trollLandAbility;
+  delete next.grantedAbilityCards;
+  delete next.usedAbilities;
+  delete next.crimeSerial;
   delete next.exerted;
   for (const key of ["chosenName", "castX", "unearthed", "stationed", "addedArtifactSerial", "monumentSerial", "monumentModes", "suppressedKeywords", "suppressedBy", "lostAbilitiesOriginal", "exileOnDeathSerial", "trollAura", "castFormat", "manaSpent", "impending", "unlockedDoors", "linkedExile", "solved", "scoutSerial"]) delete next[key];
   if (card.originalTypeLine) { next.typeLine = card.originalTypeLine; delete next.originalTypeLine; }

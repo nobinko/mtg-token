@@ -149,6 +149,22 @@ Legacy・大会日2026-10-19で検索した300リストから、前述のempiric
 
 トップ画面に「ひとり回しの続き」を追加。ゲームを閉じる→ページ再読込→同ボタンの1回クリックで、上記のT6・相手ライフ0・手札8・墓地8・山札44の盤面へ復帰した。大会検索をやり直す必要はない。最後に開いたゲームへの参照だけを保存し、複数デッキの保存データは保持する。表示確認後のブラウザー実行エラーは0件。
 
+## 能力単位の追加検証（2026-10-20）
+
+勝ち筋1本が通ることと、採用カードの全能力が動くことは別に確認する。各フォーマット10種類・メイン／サイド後の80本に加え、パイオニアのBoros実リストをサイド変更し、Flameblade Adept → 大釜 → Guardianを捨てる → 大釜で追放 → Adeptが得た能力で捨てる → 戦闘で決着、を通した。途中のカード・マナ・ライフの注入はなく、各操作後に保存形式へ変換して再開している。
+
+`test/goldfish-ability-extensions.test.js` の16件では、次も確認した。
+
+- 大釜の能力継承、マナ能力、＋1/＋1と−1/−1の相殺、継承元や大釜が移動した場合。任意の色で払える効果でも `{C}` の指定は残す。
+- パワーアップの登場ターンの軽減、パワーアップ／消尽の一度だけの制約。起動を打ち消しても使用済み、戦場を離れて戻れば別の使用として扱う。
+- 謀議の非土地判定、悪事の各ターン一度の宝物、3宝物のドラゴン、奇跡とBrainstormの解決順、聖カタリーヌの7枚を戻せない場合。
+- Drop of Honeyの対象を取らない選択、Screaming Nemesisの死亡後の反射と回復禁止、Leatherheadのカウンター除去。
+- Elesh Nornによる登場誘発の追加と、章／死亡誘発を追加しないこと。Oildeep Gearhulkの自分の手札交換とマッドネス。
+
+この確認中、共通命令 `target-counter` に実行処理がなく、対象へのカウンター追加が抜けていた不具合も修正した。追加後の全体試験は **566件成功・失敗0件**（`.cache/tests-solo7-final.log`）。
+
+相手の手札や盤面のカード内容は現在のひとり回しでは保持していない。Oildeepの相手側交換や、相手所有のカードを奪って唱える動きまで再現できたとは扱わない。数量のみ扱う相手の切削も、相手の実カードを持つ対戦処理とは区別する。
+
 ## ルールの参照元
 
 - [Ultimate Masters Release Notes](https://magic.wizards.com/en/news/feature/ultimate-masters-release-notes-2018-11-29): 発掘は各ドローに適用し、途中で切削された発掘カードも次のドローに使用できる。
@@ -168,3 +184,5 @@ Legacy・大会日2026-10-19で検索した300リストから、前述のempiric
 
 - [Tarkir: Dragonstorm Release Notes](https://magic.wizards.com/en/news/feature/tarkir-dragonstorm-release-notes): ウギンの最終能力、無料詠唱でもタイミング制限と追加コストを適用し、Xは0。
 - [Magic Comprehensive Rules](https://magic.wizards.com/en/rules): 連繋、複製、対象の再確認、忠誠度とクリンナップの基本契約。
+- [Warhammer 40,000 Commander Release Notes](https://magic.wizards.com/en/news/feature/warhammer-40000-commander-release-notes-2022-09-19): 聖カタリーヌの追放した7枚の束と、枚数が足りない場合。
+- [Marvel Super Heroes Release Notes](https://magic.wizards.com/en/news/feature/marvel-super-heroes-release-notes): パワーアップの軽減と使用回数。

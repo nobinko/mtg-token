@@ -1,9 +1,10 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo6";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-solo6";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo6";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-solo6";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-solo6";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo6";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo7";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-solo7";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo7";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-solo7";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-solo7";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo7";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-solo7";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -40,6 +41,7 @@ export const FORMAT_PERMANENT_NAMES = new Set([
 ]);
 export function formatPermanentEntryState(s, c) {
   if (!active(c)) return;
+  if (name(c) === "Leatherhead, Swamp Stalker") c.counters.hexproof = 1;
   syncFood(s);
   if (/\bDaybound\b/.test(face(c).oracleText)) { s.rules.dayNight ||= "day"; if (s.rules.dayNight === "night") c.faceIndex = 1; }
   if (name(c) === "Mossborn Hydra") c.counters["+1/+1"] = 1;
@@ -57,6 +59,7 @@ function updateKaito(s, c) {
 }
 export function formatPermanentEnter(s, c) {
   if (!active(c)) return false;
+  if (hasAbilityExtension(c)) { extensionEnter(s, c); return true; }
   const n = name(c), q = (label, ops, extra) => add(s, c, label, ops, extra);
   if (n === "Fury") { q("4点をクリーチャー／PWに配分", [{ op: "divided-damage" }], { targetSpec: { zone: "battlefield", types: ["Creature", "Planeswalker"], count: 4, optional: true, virtualOpponent: true, divideDamage: 4 } }); return true; }
   if (n === "Rottenmouth Viper") { q("枯朽カウンターを置き、相手に選択", [{ op: "source-counter", name: "blight", count: 1 }, { op: "fp-viper" }]); return true; }
@@ -99,6 +102,7 @@ export function formatPermanentEnter(s, c) {
   return true;
 }
 export function formatPermanentEvent(s, e, watchers) {
+  extensionEvent(s, e);
   if (e.kind === "entered") {
     const entered = e.card;
     for (const c of live(s)) {
@@ -165,6 +169,7 @@ export function formatPermanentCast(s, spell) {
   }
 }
 export function formatPermanentUpkeep(s) {
+  extensionUpkeep(s);
   if (s.rules.dayNight) {
     if (s.rules.dayNight === "day" && s.rules.previousActiveSpells === 0) s.rules.dayNight = "night";
     else if (s.rules.dayNight === "night" && s.rules.previousActiveSpells >= 2) s.rules.dayNight = "day";
@@ -204,6 +209,7 @@ export function formatPermanentCombat(s) {
   for (const c of live(s)) if (name(c) === "Eldrazi Linebreaker") add(s, c, "エルドラージの数の強化・速攻", [{ op: "fp-linebreaker" }], { targetSpec: creatureTarget });
 }
 export function formatPermanentState(s) {
+  extensionState(s);
   syncFood(s);
   for (const c of s.battlefield) delete c.trollLandAbility;
   for (const aura of [...s.battlefield].filter(c => c.trollAura)) {
@@ -240,6 +246,7 @@ function syncFood(s) {
 }
 export function formatPermanentAttack(s, c, dealt) {
   if (dealt) {
+    extensionCombatDamage(s, c);
     for (const watcher of live(s).filter(x => name(x) === "Enduring Curiosity")) add(s, watcher, "戦闘ダメージ：1枚引く", [draw()]);
     if (name(c) === "Barrowgoyf" && active(c)) { add(s, c, "任意で切削し、クリーチャー1枚を回収", [{ op: "fp-barrow", count: Number(goldfishCharacteristics(s, c).power) }]); return true; }
     return false;

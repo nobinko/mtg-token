@@ -1,11 +1,12 @@
 // Deterministic rules adapters. These functions mutate only a caller-owned draft;
 // goldfish.js supplies immutable transitions, history and zone operations.
 // No network, DOM, timers or inferred execution of arbitrary Oracle text here.
-import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo6";
-import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo6";
-import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo6";
-import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo6";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo6";
+import { goldfishCardActions, goldfishEquipmentBonus, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo7";
+import { engineEnter, engineCast, engineAttack, engineStatAdjustments, engineKeywords, startEngineResolution, engineUpkeep } from "./goldfish-engine.js?v=20261020-solo7";
+import { verifiedGoldfishCard, ENGINE_RULE_NOTES, engineSpellProgram } from "./goldfish-card-programs.js?v=20261020-solo7";
+import { drawGameCards, emitGameEvent } from "./goldfish-events.js?v=20261020-solo7";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo7";
+import { ABILITY_EXTENSION_NOTES, duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo7";
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const textOf = (card) => String(face(card).oracleText || "");
 const typeOf = (card) => String(face(card).typeLine || "").split(" // ")[0];
@@ -70,6 +71,7 @@ export function goldfishKeywords(state, card) {
 
 export function goldfishRuleCoverage(card) {
   const automatic = [];
+  if (verifiedGoldfishCard(card) && ABILITY_EXTENSION_NOTES[face(card).name]) automatic.push(ABILITY_EXTENSION_NOTES[face(card).name]);
   if (verifiedGoldfishCard(card) && ENGINE_RULE_NOTES[face(card).name]) automatic.push(ENGINE_RULE_NOTES[face(card).name]);
   if (engineSpellProgram(card)) automatic.push("対象・モードを選び、カードの効果を順に解決");
   if (prowessCount(card)) automatic.push("果敢：ターン終了まで +1/+1");
@@ -118,6 +120,11 @@ export function recordGoldfishAttack(state, card, damage = false) {
 }
 
 export function recordGoldfishEnter(state, card) {
+  const start = state.stack.length;
+  recordEnter(state, card);
+  duplicateEnterAbilities(state, start, card);
+}
+function recordEnter(state, card) {
   if (card.faceDown || card.automaticAbilities === false) return;
   if (engineEnter(state, card)) return;
   const self = String(face(card).name || card.name).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -139,6 +146,7 @@ export function recordGoldfishCast(state, spell) {
   rules.spellsCast += 1;
   const firstTrigger = state.stack.length;
   engineCast(state, spell);
+  recordGoldfishTargets(state, [spell.cast?.target, ...(spell.cast?.targets || []), ...(spell.cast?.modeTargets || [])]);
   const batch = rules.nextEventId++;
   const noncreature = !/\bCreature\b/.test(typeOf(spell));
   const triggers = [];

@@ -1,10 +1,11 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261020-solo6";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo6";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
-import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261020-solo6";
-import { drawGameCards } from "./goldfish-events.js?v=20261020-solo6";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261020-solo6";
-import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261020-solo6";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261020-solo7";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo7";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo7";
+import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261020-solo7";
+import { drawGameCards } from "./goldfish-events.js?v=20261020-solo7";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261020-solo7";
+import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261020-solo7";
+import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-solo7";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
@@ -264,6 +265,7 @@ export function chooseGoldfishSpellResolution(state, answer, random = Math.rando
 }
 
 export function canGoldfishAutoResolve(card) {
+  if (hasAbilityExtension(card)) return true;
   if (goldfishSpellProgram(card)) return true;
   const type = face(card).typeLine || "";
   if (verifiedGoldfishCard(card) && FORMAT_ENTERS[face(card).name] && !/\bAura\b/.test(type)) return true;

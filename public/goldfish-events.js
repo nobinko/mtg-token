@@ -1,6 +1,6 @@
-import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261020-solo6";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo6";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
+import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261020-solo7";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo7";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo7";
 
 export const activeFace = card => card?.faces?.[card.faceIndex || 0] || card || {};
 export const cardType = card => card.faceDown ? "Creature" : [String(activeFace(card).typeLine || ""), ...(card.temporaryEffects || []).flatMap(e => e.types || [])].join(" ");
@@ -14,7 +14,7 @@ export function copiableGoldfishValues(card) {
 export const isType = (card, type) => new RegExp(`\\b${type}\\b`).test(cardType(card));
 export function emitGameEvent(state, event) { (state.rules.events ||= []).push(structuredClone(event)); }
 export function changeLife(state, amount, player = "self") {
-  if (amount > 0 && hasRuleCard(state, "Sunspine Lynx")) return;
+  if (amount > 0 && (hasRuleCard(state, "Sunspine Lynx") || state.rules.cannotGainLife?.[player])) return;
   state.players[player].life += amount;
   if (player === "self" && amount > 0) state.rules.lifeGained = (state.rules.lifeGained || 0) + amount;
   if (player === "self" && amount < 0) state.rules.lifeLost = (state.rules.lifeLost || 0) - amount;
@@ -41,9 +41,9 @@ function drawOne(state) {
       else state.rules.emptyDraw = true;
       return false;
     }
-    moveGoldfishRuleObject(state, state.library.at(-1).id, "library", "hand");
+    const card = moveGoldfishRuleObject(state, state.library.at(-1).id, "library", "hand");
     state.rules.cardsDrawn = (state.rules.cardsDrawn || 0) + 1;
-    emitGameEvent(state, { kind: "draw", player: "self", countThisTurn: state.rules.cardsDrawn, watchers: state.battlefield.filter(c => !c.faceDown && c.automaticAbilities !== false) });
+    emitGameEvent(state, { kind: "draw", player: "self", card, countThisTurn: state.rules.cardsDrawn, watchers: state.battlefield.filter(c => !c.faceDown && c.automaticAbilities !== false) });
     return true;
 }
 function continueGameDraw(state) {

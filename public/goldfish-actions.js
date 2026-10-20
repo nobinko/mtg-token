@@ -1,24 +1,34 @@
-import { cloneGoldfishState } from "./goldfish.js?v=20261020-solo6";
-import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo6";
-import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-solo6";
-import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo6";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo6";
-import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo6";
-import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-solo6";
-import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-solo6";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo6";
+import { cloneGoldfishState } from "./goldfish.js?v=20261020-solo7";
+import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo7";
+import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-solo7";
+import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo7";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo7";
+import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo7";
+import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-solo7";
+import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-solo7";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo7";
+import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo7";
 
 export function goldfishActionTargets(state, card) {
   return state.battlefield.filter((target) => goldfishCanEquip(state, card, target));
 }
 export function goldfishActionPayment(state, card, action, options = {}) {
   const discount = action.waterbend ? options.costCards?.length || 0 : action.legendaryDiscount ? state.battlefield.filter(c => goldfishIsLegendary(state, c) && isType(c, "Creature")).length : 0;
-  const cost = action.cost.replace(/\{(\d+)\}/, (_, n) => `{${Math.max(0, Number(n) - discount)}}`);
+  let cost = action.cost.replace(/\{(\d+)\}/, (_, n) => `{${Math.max(0, Number(n) - discount)}}`);
+  if (action.powerUp && card.enteredSerial === state.rules.turnSerial) {
+    const symbols = ((card.faces?.[card.faceIndex || 0] || card).manaCost || "").match(/\{[^}]+\}/g) || [];
+    for (const symbol of symbols) {
+      if (/^\{\d+\}$/.test(symbol)) cost = cost.replace(/\{(\d+)\}/, (_, n) => `{${Math.max(0, Number(n) - Number(symbol.slice(1,-1)))}}`);
+      else cost = cost.replace(symbol, "");
+    }
+  }
   return planGoldfishPayment(state, { manaCost: cost }, { ...options, creatureAbility: isType(card, "Creature"), abilitySource: card, exclude: [...(action.tap ? [card.id] : []), ...(options.costCards || []).map(ref => ref.id)] });
 }
 export function goldfishActionReason(state, card, action) {
   if (state.phase !== "playing") return "初手をキープしてください。";
   const blocked = abilityBlockReason(state, card, action); if (blocked) return blocked;
+  if (action.once && card.usedAbilities?.includes(action.id)) return "この能力はすでに起動済みです。戦場を離れて戻ると再び使えます。";
+  if (action.ownTurn && state.rules.activePlayer !== "self") return "自分のターンに使える能力です。";
   if (action.zone === "battlefield" && isType(card, "Land") && !isType(card, "Basic") && state.battlefield.some(c => cardName(c) === "Blood Moon" && c.automaticAbilities !== false && !c.faceDown)) return "血染めの月により、この土地の能力は失われています。";
   if (action.main && !goldfishMainTiming(state) && !(action.loyalty != null && /\bJace\b/.test((card.faces?.[card.faceIndex || 0] || card).typeLine || "") && state.rules.jaceInstantSerial === state.rules.turnSerial)) return "自分のメインで、スタックが空のときに使えます。";
   if (action.tap && card.tapped) return "この土地をアンタップしてから使ってください。";
@@ -116,6 +126,7 @@ function activateEngineAction(state, card, action, options) {
     next.rules.pendingChoice = { type: "action", card: goldfishReference(card, action.zone), actionId: action.id, sourceName: cardName(card), options: structuredClone(options) }; return next;
   }
   const next = payGoldfishPlan(state, plan), source = goldfishFindObject(next, goldfishReference(card, action.zone));
+  if (action.once) (source.usedAbilities ||= []).push(action.id);
   next.rules.lastAction = `${cardName(card)}：${action.label}を起動しました。`;
   if (action.lifeCost) changeLife(next, -action.lifeCost);
   if (action.tap) source.tapped = true;
@@ -130,6 +141,7 @@ function activateEngineAction(state, card, action, options) {
     else moveGoldfishRuleObject(next, cost.id, cost.zone || "battlefield", action.costSelect.destination, (cost.zone || "battlefield") === "battlefield" && action.costSelect.destination === "graveyard" ? "sacrifice" : "");
   }
   const entry = queueGameAbility(next, card, action.label, action.steps, { activated: true, target: options.target || null, targets: options.targets, targetSpec: action.targetSpec, allocation: structuredClone(options.allocation), costCards: (options.costCards || []).map(r => { const c = goldfishFindObject(state, r); return { ...structuredClone(c), lastKnownToughness: goldfishCharacteristics(state, c).toughness }; }), x: options.x || 0, snapshot: structuredClone(card), source: goldfishReference(card, action.zone) });
+  recordGoldfishTargets(next, [options.target, ...(options.targets || []), ...(options.allocation || []).map(a => a.target)]);
   if (action.manaAbility) startEngineResolution(next, entry);
   if (!next.rules.pendingChoice) applyGoldfishStateActions(next);
   return flushEngineEvents(next);

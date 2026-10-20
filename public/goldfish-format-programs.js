@@ -1,7 +1,7 @@
 // Programs used by the dated Standard, Legacy and Pioneer fixtures. The caller
 // must verify the complete Oracle snapshot before exposing these adapters.
-import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-solo6";
-import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-solo6";
+import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-solo7";
+import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-solo7";
 const creature = { zone: "battlefield", types: ["Creature"], virtualOpponent: true };
 const spell = { zone: "stack", spell: true, virtualOpponent: true };
 const damage = { zone: "battlefield", types: ["Creature", "Planeswalker", "Battle"], players: true };

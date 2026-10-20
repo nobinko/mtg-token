@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo6";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo6";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo6";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo6";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo6";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo6";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo6";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo6";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo6";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo6";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo6";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo6";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo6";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo6";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo6";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261020-solo7";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo7";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261020-solo7";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261020-solo7";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261020-solo7";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261020-solo7";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261020-solo7";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261020-solo7";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo7";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo7";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261020-solo7";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo7";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261020-solo7";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261020-solo7";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261020-solo7";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -178,6 +178,13 @@ export function goldfishLandManaOptions(card, state, context = {}) {
       insert(pool, life, Boolean(match[4]));
     }
   }
+  if (state && !context.inheritedMana) for (const inherited of card.grantedAbilityCards || []) {
+    const borrowed = { ...structuredClone(card), ...inherited.values, faces: [], faceIndex: 0, grantedAbilityCards: [] };
+    delete borrowed.copyRuleName;
+    for (const option of goldfishLandManaOptions(borrowed, state, { ...context, inheritedMana: true })) {
+      if (!result.some(o => JSON.stringify(o) === JSON.stringify(option))) result.push(option);
+    }
+  }
   return result;
 }
 
@@ -242,6 +249,9 @@ export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrex
   const cost = goldfishManaCost(card);
   const parsed = costVariants(cost, x);
   if (parsed.error) return { payable: false, supported: false, cost, reason: parsed.error };
+  if (creatureAbility && hasRuleCard(state, "Agatha's Soul Cauldron")) for (const v of parsed.variants) {
+    for (const color of COLORS.slice(0, 5)) { v.generic += v[color]; v[color] = 0; }
+  }
   const improvise = spell && /\bImprovise\b/.test(faceOf(spell).oracleText || "");
   const sources = autoTap ? state.battlefield.filter((land) => !land.tapped && !exclude.includes(land.id))
     .map((land) => ({ id: land.id, options: [...goldfishLandManaOptions(land, state, { spell, creatureAbility, abilitySource }), ...(improvise && isType(land, "Artifact") ? [{ pool: normalizeGoldfishMana(), life: 0, credit: 1 }] : [])] })).filter((source) => source.options.length) : [];

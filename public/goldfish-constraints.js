@@ -1,4 +1,4 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo6";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo7";
 const face = c => c.faces?.[c.faceIndex || 0] || c;
 const type = (c, t) => new RegExp(`\\b(?:${t})\\b`).test(face(c).typeLine || "");
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
