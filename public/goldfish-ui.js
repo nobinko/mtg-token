@@ -40,27 +40,27 @@ import {
   takeGoldfishCardsFromLibrary,
   toggleGoldfishFaceDown,
   untapGoldfishAll
-} from "./goldfish.js?v=20261021-public30f";
-import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261021-public30f";
-import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261021-public30f";
-import { extraCastChoice } from "./goldfish-modal.js?v=20261021-public30f";
+} from "./goldfish.js?v=20261021-public30g";
+import { goldfishCharacteristics, goldfishRuleCoverage, goldfishGraveyardTypes, isGoldfishBauble } from "./goldfish-rules.js?v=20261021-public30g";
+import { gameLandPlayLimit } from "./goldfish-engine.js?v=20261021-public30g";
+import { extraCastChoice } from "./goldfish-modal.js?v=20261021-public30g";
 import { goldfishLandManaOptions, goldfishLandEntryOptions, goldfishManaCost, goldfishManaText, canPlayGoldfishGraveyard,
-  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261021-public30f";
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30f";
-import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261021-public30f";
-import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30f";
-import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261021-public30f";
-import { goldfishCardOperations } from "./goldfish-effects.js?v=20261021-public30f";
-import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261021-public30f";
-import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261021-public30f";
-import { mergeCardMetadata } from "./card-metadata.js?v=20261021-public30f";
-import { loadCardMetadata } from "./card-metadata-loader.js?v=20261021-public30f";
-import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261021-public30f";
-import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261021-public30f";
+  planGoldfishPayment, planGoldfishCastPayment, goldfishCastingCost, activateGoldfishLand, setGoldfishMana, clearGoldfishMana, castGoldfishCard, chooseGoldfishCast } from "./goldfish-mana.js?v=20261021-public30g";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30g";
+import { renderGoldfishSpellChoice } from "./goldfish-choice-ui.js?v=20261021-public30g";
+import { goldfishCardActions, goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30g";
+import { activateGoldfishAction, chooseGoldfishAction, goldfishActionReason, goldfishActionPayment } from "./goldfish-actions.js?v=20261021-public30g";
+import { goldfishCardOperations } from "./goldfish-effects.js?v=20261021-public30g";
+import { goldfishFetchRule, goldfishFetchTargets, goldfishFetchEntry, resolveGoldfishFetch } from "./goldfish-fetch.js?v=20261021-public30g";
+import { goldfishShortcut } from "./goldfish-shortcuts.js?v=20261021-public30g";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261021-public30g";
+import { loadCardMetadata } from "./card-metadata-loader.js?v=20261021-public30g";
+import { castPreparedGoldfishSpell, goldfishCombos, repeatGoldfishCombo } from "./goldfish-practice.js?v=20261021-public30g";
+import { goldfishAlternativeModes, castGoldfishAlternative, chooseGoldfishAlternative } from "./goldfish-alternatives.js?v=20261021-public30g";
 
-import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261021-public30f";
-import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261021-public30f";
-import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261021-public30f";
+import { sideboardGoldfishGame, goldfishFinish } from "./goldfish-sideboard.js?v=20261021-public30g";
+import { renderSideboardEditor } from "./goldfish-sideboard-ui.js?v=20261021-public30g";
+import { beginGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261021-public30g";
 const ZONES = ["library", "hand", "battlefield", "graveyard", "exile", "sideboard", "command", "stack"];
 const ZONE_LABELS = {
   library: "山札",
@@ -77,7 +77,7 @@ const ZONE_LABELS = {
 };
 const LANE_LABELS = { other: "その他", creature: "クリーチャー", land: "土地" };
 const MAX_TIMELINE = 60;
-import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261021-public30f";
+import { GOLDFISH_SAVE_PREFIX as SAVE_PREFIX, parseGoldfishSave, writeGoldfishSave, rememberGoldfishSession, lastGoldfishSession, deckFromGoldfishSave } from "./goldfish-storage.js?v=20261021-public30g";
 
 function normalizeName(name) {
   return String(name || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();

@@ -1,8 +1,16 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261021-public30f";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261021-public30g";
 const face = c => c.faces?.[c.faceIndex || 0] || c;
-const type = (c, t) => new RegExp(`\\b(?:${t})\\b`).test(face(c).typeLine || "");
+const type = (c, t) => new RegExp(`\\b(?:${t})\\b`).test(`${face(c).typeLine || ""}${c.latticeArtifact ? " Artifact" : ""}`);
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function hasRuleCard(state, name) { return state.battlefield.some(c => !c.faceDown && c.automaticAbilities !== false && face(c).name === name && normalized(face(c).oracleText) === normalized(GOLD_FISH_CATALOG[name]?.oracleText)); }
+// A derived type marker preserves printed/copiable values and other type effects.
+export function syncGoldfishLattice(state) {
+  const active = hasRuleCard(state, "Mycosynth Lattice");
+  for (const card of state.battlefield) {
+    if (active) card.latticeArtifact = true;
+    else delete card.latticeArtifact;
+  }
+}
 export function entryTriggersBlocked(state, card) { return type(card, "Creature") && hasRuleCard(state, "Torpor Orb") || type(card, "Artifact|Creature") && (hasRuleCard(state, "Karn, Argent Defender") || hasRuleCard(state, "Doorkeeper Thrull")); }
 export function abilityBlockReason(state, card, { zone = "battlefield", manaAbility = false } = {}) {
   if (zone === "battlefield" && card.netLocked && card.tapped) return "編まれた網により、タップ状態の間は起動できません。";

@@ -1,11 +1,12 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30f";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30f";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30f";
-import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261021-public30f";
-import { drawGameCards } from "./goldfish-events.js?v=20261021-public30f";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30f";
-import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30f";
-import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30f";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30g";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30g";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { startEngineResolution, gameColors } from "./goldfish-engine.js?v=20261021-public30g";
+import { drawGameCards, cardType } from "./goldfish-events.js?v=20261021-public30g";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30g";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30g";
+import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30g";
+import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30g";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;
@@ -63,7 +64,7 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
   if (!target) return [];
   const candidates = (state[target.zone] || []).filter((item) => {
     const data = target.zone === "graveyard" ? front(item) : face(item);
-    const type = item.faceDown ? "Creature" : data.typeLine || "";
+    const type = target.zone === "battlefield" ? cardType(item) : item.faceDown ? "Creature" : data.typeLine || "";
     if (target.types?.length && !target.types.some((name) => new RegExp(`\\b${name}\\b`).test(type))) return false;
     if (target.nonBasic && /\bBasic\b/.test(type)) return false;
     if (target.opposingPermanent) return false;
@@ -78,10 +79,10 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
     if (target.spell && item.kind === "ability") return false;
     if (target.ability && item.kind !== "ability") return false;
     if (target.spellOrTriggered && item.kind === "ability" && item.ability?.activated) return false;
-    if (target.colorlessSpell && item.kind !== "ability" && gameColors(item).length) return false;
-    if (target.monocolored && gameColors(item).length !== 1) return false;
-    if (target.colorsAny && !gameColors(item).some(c => target.colorsAny.includes(c))) return false;
-    if (target.notColors && gameColors(item).some(c => target.notColors.includes(c))) return false;
+    if (target.colorlessSpell && item.kind !== "ability" && gameColors(item, state).length) return false;
+    if (target.monocolored && gameColors(item, state).length !== 1) return false;
+    if (target.colorsAny && !gameColors(item, state).some(c => target.colorsAny.includes(c))) return false;
+    if (target.notColors && gameColors(item, state).some(c => target.notColors.includes(c))) return false;
     if (target.withoutFlying && goldfishKeywords(state, item).has("flying")) return false;
     if (target.attackingOrBlocking && !state.rules.combat?.attackers?.some(r => r.id === item.id && r.incarnation === item.incarnation)) return false;
     // Shroud disallows our targets too. Opposing permanents are not invented.
@@ -90,7 +91,7 @@ export function goldfishSpellTargets(state, card, options = card.cast || {}) {
   }).map((item) => ({ ref: goldfishReference(item, target.zone), label: item.name, card: item }));
   if (target.players) candidates.unshift({ ref: { player: "opponent" }, label: `相手 — ライフ ${state.players.opponent.life}` }, { ref: { player: "self" }, label: `自分 — ライフ ${state.players.self.life}` });
   if (target.opponentOnly) candidates.unshift({ ref: { player: "opponent" }, label: `相手 — ライフ ${state.players.opponent.life}` });
-  if (target.virtualOpponent && !target.players) candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の対象へ解決（相手側の領域は省略）" });
+  if (target.virtualOpponent && !target.players && !(hasRuleCard(state, "Mycosynth Lattice") && (target.monocolored || target.colorsAny))) candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の対象へ解決（相手側の領域は省略）" });
   return candidates;
 }
 

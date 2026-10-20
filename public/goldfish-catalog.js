@@ -7467,5 +7467,87 @@ export const GOLD_FISH_CATALOG = {
     "power": "",
     "toughness": "",
     "loyalty": ""
+  },
+  "Planar Nexus": {
+    "oracleText": "This land is every nonbasic land type. (Nonbasic land types include Cave, Desert, Gate, Lair, Locus, Mine, Power-Plant, Sphere, Tower, and Urza's.)\n{T}: Add {C}.\n{1}, {T}: Add one mana of any color.",
+    "manaCost": "",
+    "typeLine": "Land",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Thundertrap Trainer": {
+    "oracleText": "Offspring {4} (You may pay an additional {4} as you cast this spell. If you do, when this creature enters, create a 1/1 token copy of it.)\nWhen this creature enters, look at the top four cards of your library. You may reveal a noncreature, nonland card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.",
+    "manaCost": "{1}{U}",
+    "typeLine": "Creature — Otter Wizard",
+    "colors": [
+      "U"
+    ],
+    "power": "1",
+    "toughness": "2",
+    "loyalty": ""
+  },
+  "Cyclonic Rift": {
+    "oracleText": "Return target nonland permanent you don't control to its owner's hand.\nOverload {6}{U} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+    "manaCost": "{1}{U}",
+    "typeLine": "Instant",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Lórien Revealed": {
+    "oracleText": "Draw three cards.\nIslandcycling {1} ({1}, Discard this card: Search your library for an Island card, reveal it, put it into your hand, then shuffle.)",
+    "manaCost": "{3}{U}{U}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "The One Ring": {
+    "oracleText": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.",
+    "manaCost": "{4}",
+    "typeLine": "Legendary Artifact",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Hullbreacher": {
+    "oracleText": "Flash\nIf an opponent would draw a card except the first one they draw in each of their draw steps, instead you create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+    "manaCost": "{2}{U}",
+    "typeLine": "Creature — Merfolk Pirate",
+    "colors": [
+      "U"
+    ],
+    "power": "3",
+    "toughness": "2",
+    "loyalty": ""
+  },
+  "Invasion Submersible": {
+    "oracleText": "When this Vehicle enters, return up to one other target nonland permanent to its owner's hand.\nExhaust — Waterbend {3}: This Vehicle becomes an artifact creature. Put three +1/+1 counters on it. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}. Activate each exhaust ability only once.)",
+    "manaCost": "{2}{U}",
+    "typeLine": "Artifact — Vehicle",
+    "colors": [
+      "U"
+    ],
+    "power": "0",
+    "toughness": "0",
+    "loyalty": ""
+  },
+  "Mycosynth Lattice": {
+    "oracleText": "All permanents are artifacts in addition to their other types.\nAll cards that aren't on the battlefield, spells, and permanents are colorless.\nPlayers may spend mana as though it were mana of any color.",
+    "manaCost": "{6}",
+    "typeLine": "Artifact",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
   }
 };

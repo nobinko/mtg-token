@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30f";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30f";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30f";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30f";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30f";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30f";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30f";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30f";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30f";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30f";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30f";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30f";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30f";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30f";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30f";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30g";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30g";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30g";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30g";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30g";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30g";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30g";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30g";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30g";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30g";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30g";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30g";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30g";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30g";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -57,10 +57,10 @@ export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = f
   for (const c of state.battlefield.filter(c => !c.faceDown && c.automaticAbilities !== false)) {
     if (cardName(c) === "Momo, Friendly Flier" && verifiedGoldfishCard(c) && state.rules.activePlayer === "self" && !state.rules.firstFlyingCreature && isType(card, "Creature") && !isType(card, "Lemur") && /\bFlying\b/i.test(text)) reduction++;
     if (verifiedGoldfishCard(c) && cardName(c) === "Bilbo, Thief in the Night" && (fromExile || fromGraveyard)) reduction++;
-    if (verifiedGoldfishCard(c) && cardName(c) === "It That Heralds the End" && !gameColors(card).length && gameManaValue({ ...card, cast: { x } }) >= 7) reduction++;
-    if (cardName(c) === "Eye of Ugin" && verifiedGoldfishCard(c) && isType(card, "Eldrazi") && !gameColors(card).length) reduction += 2;
-    if (cardName(c) === "Ruby Medallion" && gameColors(card).includes("R")) reduction++;
-    if (cardName(c) === "The Fire Crystal" && verifiedGoldfishCard(c) && gameColors(card).includes("R")) reduction++;
+    if (verifiedGoldfishCard(c) && cardName(c) === "It That Heralds the End" && !gameColors(card, state).length && gameManaValue({ ...card, cast: { x } }) >= 7) reduction++;
+    if (cardName(c) === "Eye of Ugin" && verifiedGoldfishCard(c) && isType(card, "Eldrazi") && !gameColors(card, state).length) reduction += 2;
+    if (cardName(c) === "Ruby Medallion" && gameColors(card, state).includes("R")) reduction++;
+    if (cardName(c) === "The Fire Crystal" && verifiedGoldfishCard(c) && gameColors(card, state).includes("R")) reduction++;
     if (cardName(c) === "Ral, Monsoon Mage" && isType(card, "Instant|Sorcery")) reduction++;
     if (cardName(c) === "Artist's Talent" && c.level >= 2 && !isType(card, "Creature")) reduction++;
     if (cardName(c) === "Krallenhorde Howler" && isType(card, "Creature")) reduction++;
@@ -150,10 +150,10 @@ export function goldfishLandManaOptions(card, state, context = {}) {
   if (["Urza's Mine", "Urza's Power Plant", "Urza's Tower"].includes(n) && ["Urza's Mine", "Urza's Power Plant", "Urza's Tower"].every(required => battlefield.some(c => cardName(c) === required))) { insert(normalizeGoldfishMana({ C: n === "Urza's Tower" ? 3 : 2 })); return result; }
   if (n === "Urza's Saga" && card.sagaAbilities >= 1) insert(normalizeGoldfishMana({ C: 1 }));
   const eldraziUse = context.spell || context.abilitySource;
-  if (n === "Eldrazi Temple" && (!eldraziUse || isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse).length)) insert(normalizeGoldfishMana({ C: 2 }));
+  if (n === "Eldrazi Temple" && (!eldraziUse || isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse, state).length)) insert(normalizeGoldfishMana({ C: 2 }));
   if (n === "Ugin's Labyrinth") insert(normalizeGoldfishMana({ C: card.imprinted && state?.exile.some(c => c.id === card.imprinted.id && c.incarnation === card.imprinted.incarnation) ? 2 : 1 }));
   if (n === "Mox Opal" && battlefield.filter(c => isType(c, "Artifact")).length >= 3) for (const color of COLORS.slice(0, 5)) insert(normalizeGoldfishMana({ [color]: 1 }));
-  if (n === "Chrome Mox" && verifiedGoldfishCard(card)) { const imprinted = goldfishFindObject(state, card.imprinted); if (imprinted) for (const color of gameColors(imprinted)) insert(normalizeGoldfishMana({ [color]: 1 })); }
+  if (n === "Chrome Mox" && verifiedGoldfishCard(card)) { const imprinted = goldfishFindObject(state, card.imprinted); if (imprinted) for (const color of gameColors(imprinted, state)) insert(normalizeGoldfishMana({ [color]: 1 })); }
   if (card.hydroLand && verifiedGoldfishCard(card)) insert(normalizeGoldfishMana({ U: 1 }));
   if (n === "Tablet of Discovery" && verifiedGoldfishCard(card) && (!context.spell || isType(context.spell, "Instant|Sorcery"))) { const i = result.length; insert(normalizeGoldfishMana({ R: 2 })); if (result.length > i) result.at(-1).restriction = "instantSorcery"; }
   if (state && isType(card, "Forest") && battlefield.some(c => c.trollAura && goldfishFindObject(state, c.attachedTo)?.id === card.id)) insert(normalizeGoldfishMana({ G: 2 }));
@@ -277,14 +277,14 @@ export function planGoldfishPayment(state, card, { autoTap = true, x = 0, phyrex
   const cost = goldfishManaCost(card);
   const parsed = costVariants(cost, x);
   if (parsed.error) return { payable: false, supported: false, cost, reason: parsed.error };
-  if (creatureAbility && hasRuleCard(state, "Agatha's Soul Cauldron")) for (const v of parsed.variants) {
+  if (hasRuleCard(state, "Mycosynth Lattice") || creatureAbility && hasRuleCard(state, "Agatha's Soul Cauldron")) for (const v of parsed.variants) {
     for (const color of COLORS.slice(0, 5)) { v.generic += v[color]; v[color] = 0; }
   }
   const improvise = spell && /\bImprovise\b/.test(faceOf(spell).oracleText || "");
   const sources = autoTap ? state.battlefield.filter(land => !exclude.includes(land.id))
     .map(land => ({ id: land.id, options: [...(!land.tapped ? goldfishLandManaOptions(land, state, { spell, creatureAbility, abilitySource }) : []), ...(!reserve.includes(land.id) ? sacrificeManaOptions(land, state) : []), ...(improvise && !land.tapped && isType(land, "Artifact") ? [{ pool: normalizeGoldfishMana(), life: 0, credit: 1 }] : [])] })).filter(source => source.options.length) : [];
   const eldraziUse = spell || abilitySource;
-  const eligible = item => item.restriction === "artifactSpell" ? spell && isType(spell, "Artifact") : item.restriction === "instantSorcery" ? spell && isType(spell, "Instant|Sorcery") : item.restriction === "artifactOrAbility" ? !spell || isType(spell, "Artifact") : item.restriction === "eldrazi" ? eldraziUse && isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse).length : item.restriction === "creatureAbility" ? creatureAbility : item.restriction === "legendary" ? spell && isType(spell, "Legendary") : item.restriction?.startsWith("creature:") ? spell && isType(spell, "Creature") && isType(spell, item.restriction.slice(9)) : true;
+  const eligible = item => item.restriction === "artifactSpell" ? spell && isType(spell, "Artifact") : item.restriction === "instantSorcery" ? spell && isType(spell, "Instant|Sorcery") : item.restriction === "artifactOrAbility" ? !spell || isType(spell, "Artifact") : item.restriction === "eldrazi" ? eldraziUse && isType(eldraziUse, "Eldrazi") && !gameColors(eldraziUse, state).length : item.restriction === "creatureAbility" ? creatureAbility : item.restriction === "legendary" ? spell && isType(spell, "Legendary") : item.restriction?.startsWith("creature:") ? spell && isType(spell, "Creature") && isType(spell, item.restriction.slice(9)) : true;
   for (const source of sources) source.options = source.options.filter(option => !option.restriction || eligible(option));
   const restrictions = structuredClone(state.rules.restrictedMana || []);
   const blocked = restrictions.filter(item => !eligible(item));

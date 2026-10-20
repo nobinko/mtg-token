@@ -1,12 +1,12 @@
-import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261021-public30f";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30f";
-import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30f";
-import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30f";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30f";
-import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261021-public30f";
-import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30f";
-import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30f";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30f";
+import { cloneGoldfishState, moveGoldfishCards, playGoldfishCard } from "./goldfish.js?v=20261021-public30g";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30g";
+import { engineCandidates, gameManaValue, gameColors, flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30g";
+import { cardName, isType, changeLife } from "./goldfish-events.js?v=20261021-public30g";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { planGoldfishPayment, payGoldfishPlan, goldfishCastingCost } from "./goldfish-mana.js?v=20261021-public30g";
+import { validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30g";
+import { goldfishCharacteristics, goldfishGraveyardTypes, assertGoldfishChoiceComplete } from "./goldfish-rules.js?v=20261021-public30g";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30g";
 
 export function goldfishAlternativeModes(card, zone) {
   if (!verifiedGoldfishCard(card)) return [];
@@ -34,10 +34,17 @@ export function planHogaak(state, card) {
   const generic = symbols.filter(s => /^\{\d+\}$/.test(s)).reduce((n, s) => n + Number(s.slice(1, -1)), 0);
   const colored = symbols.filter(s => !/^\{\d+\}$/.test(s));
   const creatures = state.battlefield.filter(c => isType(c, "Creature") && !c.tapped);
-  const matching = creatures.filter(c => gameColors(c).some(x => ["B", "G"].includes(x))).length;
+  const matching = creatures.filter(c => gameColors(c, state).some(x => ["B", "G"].includes(x))).length;
   const grave = state.graveyard.filter(c => c.id !== card.id).length;
   const payable = matching >= colored.length && creatures.length + grave >= generic + colored.length;
-  return { supported: true, payable, cost, generic, colored: colored.length, reason: payable ? "" : `召集に黒／緑のクリーチャー${colored.length}体と、合計${generic + colored.length}枚分の召集・探査が必要です。`, life: 0, activations: [] };
+  const suggestedRefs = [];
+  if (payable) {
+    const ordered = [...creatures].sort((a, b) => Number(goldfishCharacteristics(state, a).power || 0) - Number(goldfishCharacteristics(state, b).power || 0));
+    suggestedRefs.push(...ordered.filter(c => gameColors(c, state).some(x => ["B", "G"].includes(x))).slice(0, colored.length).map(c => ref(c, "battlefield")));
+    suggestedRefs.push(...state.graveyard.filter(c => c.id !== card.id).slice(0, generic).map(c => ref(c, "graveyard")));
+    suggestedRefs.push(...ordered.filter(c => !suggestedRefs.some(r => r.id === c.id)).slice(0, generic + colored.length - suggestedRefs.length).map(c => ref(c, "battlefield")));
+  }
+  return { supported: true, payable, cost, generic, colored: colored.length, suggestedRefs, reason: payable ? "" : `召集に黒／緑のクリーチャー${colored.length}体と、合計${generic + colored.length}枚分の召集・探査が必要です。`, life: 0, activations: [] };
 }
 export function castGoldfishAlternative(state, cardId, modeId, answer = {}) {
   assertGoldfishChoiceComplete(state);
@@ -48,7 +55,7 @@ export function castGoldfishAlternative(state, cardId, modeId, answer = {}) {
   if (mode.id === "force" && state.rules.activePlayer === "self") throw new Error("否定の力の代替コストは相手のターンだけ使えます。");
   if (!answer.refs) {
     const next = cloneGoldfishState(state);
-    next.rules.pendingChoice = { type: "cast-alternative", card: ref(card, zone), sourceName: card.name, modeId };
+    next.rules.pendingChoice = { type: "cast-alternative", card: ref(card, zone), sourceName: card.name, modeId, ...(mode.id === "hogaak" ? { draft: { ids: planHogaak(state, card).suggestedRefs.map(r => r.id) } } : {}) };
     return next;
   }
   const candidates = alternativeCandidates(state, card, mode), refs = answer.refs;
@@ -56,7 +63,7 @@ export function castGoldfishAlternative(state, cardId, modeId, answer = {}) {
   const cards = refs.map(r => find(state, r));
   if (mode.id === "hogaak") {
     const plan = planHogaak(state, card), tapped = refs.filter(r => r.zone === "battlefield"), exiled = refs.filter(r => r.zone === "graveyard");
-    if (tapped.filter(r => gameColors(find(state, r)).some(c => ["B", "G"].includes(c))).length < plan.colored || exiled.length > plan.generic || refs.length !== plan.generic + plan.colored) throw new Error("色マナは黒／緑のクリーチャーで召集し、残りを召集・探査で支払ってください。マナは使えません。");
+    if (tapped.filter(r => gameColors(find(state, r), state).some(c => ["B", "G"].includes(c))).length < plan.colored || exiled.length > plan.generic || refs.length !== plan.generic + plan.colored) throw new Error("色マナは黒／緑のクリーチャーで召集し、残りを召集・探査で支払ってください。マナは使えません。");
     let next = cloneGoldfishState(state);
     for (const r of tapped) find(next, r).tapped = true;
     for (const r of exiled) move(next, r.id, "graveyard", "exile");

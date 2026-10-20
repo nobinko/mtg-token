@@ -1,9 +1,9 @@
-import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30f";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30f";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30f";
+import { moveGoldfishRuleObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30g";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30g";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
 
 export const activeFace = card => card?.faces?.[card.faceIndex || 0] || card || {};
-export const cardType = card => card.faceDown ? "Creature" : [String(activeFace(card).typeLine || ""), ...(card.temporaryEffects || []).flatMap(e => e.types || [])].join(" ");
+export const cardType = card => [card.faceDown ? "Creature" : String(activeFace(card).typeLine || ""), ...(card.temporaryEffects || []).flatMap(e => e.types || []), ...(card.latticeArtifact ? ["Artifact"] : [])].join(" ");
 export const cardName = card => card?.copyRuleName || activeFace(card).name;
 export function copiableGoldfishValues(card) {
   const f = activeFace(card), out = {};

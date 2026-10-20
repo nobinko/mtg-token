@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30f";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30f";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30f";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30f";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30f";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30f";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30f";
-import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261021-public30f";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30g";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30g";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30g";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30g";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30g";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30g";
+import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261021-public30g";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -179,7 +179,7 @@ export function formatPermanentCast(s, spell) {
       add(s, c, "ターン終了までクリーチャーにしてもよい", [{ op: "fp-fantasticar-animate" }]);
       if (s.rules.noncreatureCast === 4) add(s, c, "4つ目の非クリーチャー呪文：構築物4体", [{ op: "fp-fantasticar-sacrifice" }]);
     }
-    if (name(c) === "Hydro-Man, Fluid Felon" && isType(c, "Creature") && gameColors(spell).includes("U")) add(s, c, "青い呪文：＋1/＋1", [{ op: "fp-source-pump", power: 1, toughness: 1 }]);
+    if (name(c) === "Hydro-Man, Fluid Felon" && isType(c, "Creature") && gameColors(spell, s).includes("U")) add(s, c, "青い呪文：＋1/＋1", [{ op: "fp-source-pump", power: 1, toughness: 1 }]);
     if (name(c) === "Colorstorm Stallion" && isType(spell, "Instant|Sorcery")) add(s, c, "＋1/＋1・5マナ以上ならコピー", [{ op: "fp-source-pump", power: 1, toughness: 1 }, ...(spell.cast?.manaSpent >= 5 ? [{ op: "fp-copy-self" }] : [])]);
     if (name(c) === "Ral, Crackling Wit" && !isType(spell, "Creature")) add(s, c, "非クリーチャー呪文：忠誠度＋1", [{ op: "source-counter", name: "loyalty", count: 1 }]);
   }
@@ -374,7 +374,7 @@ export function formatPermanentStats(s, c) {
   }
   if (isType(c, "Ninja")) d.boost = (d.boost || 0) + (s.rules.kaitoEmblems || 0);
   if (isType(c, "Creature")) for (const lord of live(s).filter(x => x.id !== c.id)) {
-    if (["Ulvenwald Behemoth", "Cosmium Kiln"].includes(name(lord)) || name(lord) === "It That Heralds the End" && !gameColors(c).length) d.boost = (d.boost || 0) + 1;
+    if (["Ulvenwald Behemoth", "Cosmium Kiln"].includes(name(lord)) || name(lord) === "It That Heralds the End" && !gameColors(c, s).length) d.boost = (d.boost || 0) + 1;
   }
   if (c.kind === "token" && c.name === "Rat" && c.oracleText === rat.oracleText) d.boost = s.battlefield.filter(x => x.id !== c.id && isType(x, "Rat")).length;
   return d;
@@ -526,7 +526,7 @@ export function formatPermanentStep(s, c, op) {
     }
     case "fp-delver": if (source && s.library.length) yesNo(s, c, `山札の上：${name(s.library.at(-1))}。インスタント／ソーサリーなら公開して変身しますか？`); return true;
     case "fp-tamiyo-transform": if (source && name(source) === "Tamiyo, Inquisitive Student") { const ex = move(s, source.id, "battlefield", "exile"), back = move(s, ex.id, "exile", "battlefield"); back.faceIndex = 1; back.counters.loyalty = 2; back.lane = "other"; } return true;
-    case "fp-tamiyo-return": if (t) { const green = gameColors(t).includes("G"); move(s, t.id, "graveyard", "hand"); if (green) insert(c, { op: "mana-choice", count: 1 }); } return true;
+    case "fp-tamiyo-return": if (t) { const green = gameColors(t, s).includes("G"); move(s, t.id, "graveyard", "hand"); if (green) insert(c, { op: "mana-choice", count: 1 }); } return true;
     case "fp-tamiyo-ultimate": s.rules.noMaximumHandSize = true; insert(c, draw(Math.ceil(s.library.length / 2))); return true;
     case "fp-tamiyo-shield": s.rules.tamiyoShieldUntil = s.rules.turnSerial + 2; note(s, "次の自分のターンまで、自分／自分のPWへの攻撃クリーチャーは−1/−0（相手の攻撃は省略）"); return true;
     case "fp-kaito-emblem": s.rules.kaitoEmblems = (s.rules.kaitoEmblems || 0) + 1; return true;

@@ -1,15 +1,15 @@
-import { mergeCardMetadata } from "./card-metadata.js?v=20261021-public30f";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261021-public30g";
 import { freshGoldfishRules, cloneGoldfishRules, assertGoldfishChoiceComplete, recordGoldfishCast,
-  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261021-public30f";
-import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30f";
-import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261021-public30f";
-import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261021-public30f";
-import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261021-public30f";
-import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261021-public30f";
-import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261021-public30f";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30f";
-import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261021-public30f";
-import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261021-public30f";
+  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261021-public30g";
+import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30g";
+import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261021-public30g";
+import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261021-public30g";
+import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261021-public30g";
+import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261021-public30g";
+import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261021-public30g";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30g";
+import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261021-public30g";
+import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261021-public30g";
 
 export const GOLDFISH_SCHEMA_VERSION = 2;
 export const GOLDFISH_LANES = ["other", "creature", "land"];

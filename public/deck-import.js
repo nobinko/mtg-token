@@ -4,7 +4,7 @@ export function parseSoloDeck(source) {
   if (typeof source !== "string" || !source.trim()) throw new Error("デッキリストを貼り付けてください。");
   if (source.length > 50000) throw new Error("一度に1リスト、50,000文字まで貼り付けられます。");
   let decks;
-  if (/^\s*[\[{]/.test(source) && !/^\s*\[(?:Deck|Main|Sideboard)\]/i.test(source)) {
+  if (/^\s*\{/.test(source) || /^\s*\[\s*(?:\{|\])/.test(source)) {
     try { const data = JSON.parse(source); decks = Array.isArray(data) ? data : data.decks || [data]; }
     catch { throw new Error("JSONを読めません。デッキのテキスト、またはmainboard・sideboardを持つJSONを使ってください。"); }
   } else decks = parseDeckText(source, "手元のデッキ");

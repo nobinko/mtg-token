@@ -1,6 +1,6 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30f";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30f";
+import { hasRuleCard, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30g";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30g";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);
@@ -17,6 +17,7 @@ export function resetGoldfishCardState(card) {
   const next = { ...card, tapped: false, faceDown: false, counters: {}, powerOverride: "", toughnessOverride: "",
     note: "", groupId: "", temporaryEffects: [], attachedTo: null, automaticAbilities: true, damage: 0 };
   delete next.cast;
+  delete next.latticeArtifact;
   delete next.wasCast;
   delete next.castFrom;
   delete next.delvedCards;
@@ -69,7 +70,7 @@ export function moveGoldfishRuleObject(state, id, from, destination, reason = ""
   if (madnessCost) destination = "exile";
   if (from === "battlefield" && ["sacrifice", "effect-sacrifice"].includes(reason)) {
     state.rules.permanentsSacrificed = (state.rules.permanentsSacrificed || 0) + 1;
-    if (/\bArtifact\b/.test(beforeFace.typeLine)) state.rules.artifactsSacrificed = (state.rules.artifactsSacrificed || 0) + 1;
+    if (before.latticeArtifact || /\bArtifact\b/.test(beforeFace.typeLine)) state.rules.artifactsSacrificed = (state.rules.artifactsSacrificed || 0) + 1;
   }
   const discardWatchers = reason === "discard" ? state.battlefield.filter(c => (c.faces?.[c.faceIndex || 0] || c).name === "Monument to Endurance").map(c => structuredClone(c)) : [];
   if (destination === "battlefield" && ["graveyard", "library"].includes(from) && /Creature/.test(beforeFace.typeLine || "") && hasRuleCard(state, "Grafdigger's Cage")) return before;
@@ -91,6 +92,7 @@ export function moveGoldfishRuleObject(state, id, from, destination, reason = ""
     if (destination === "libraryBottom" && actual === "library") state.library.unshift(card);
     else state[actual].push(card);
   }
+  syncGoldfishLattice(state);
   cleanGoldfishAttachments(state);
   if (from !== actual) (state.rules.events ||= []).push({ kind: "move", batch: state.rules.movementBatch ?? state.rules.nextEventId++, from, to: actual, original: structuredClone(original), card: structuredClone(card), ...(reason ? { reason } : {}), ...(madnessCost ? { madnessCost } : {}), ...(discardWatchers.length ? { discardWatchers } : {}), ...(graveyardWatchers.length ? { graveyardWatchers } : {}), ...(sacrificeWatchers.length ? { sacrificeWatchers } : {}) });
   return card;

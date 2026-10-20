@@ -8,6 +8,8 @@ test("solo import reads Arena print suffixes, MTGO blank sideboard, and companio
   assert.equal(arena.sideboard.reduce((n, c) => n + c.count, 0), 15);
   assert.deepEqual(parseSoloDeck("60 Island\n\n4 Negate").sideboard, [{ name: "Negate", count: 4 }]);
   assert.deepEqual(parseSoloDeck("60 Island\nSB: 4 Negate").sideboard, [{ name: "Negate", count: 4 }]);
+  assert.deepEqual(parseSoloDeck("[Main Deck]\n60 Island\n[Sideboard]\n4 Negate").sideboard, [{ name: "Negate", count: 4 }]);
+  assert.equal(parseSoloDeck("[Mainboard]\n60 Island").mainboard[0].count, 60);
 });
 
 test("solo JSON keeps the actual list and source; duplicate rows merge", () => {

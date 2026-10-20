@@ -1,6 +1,6 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261021-public30f";
-import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261021-public30f";
-import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261021-public30f";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261021-public30g";
+import { activeFace as face, cardName, isType } from "./goldfish-events.js?v=20261021-public30g";
+import { FORMAT_SPELLS, FORMAT_NOTES } from "./goldfish-format-programs.js?v=20261021-public30g";
 
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function verifiedGoldfishCard(card) {
@@ -10,6 +10,7 @@ export function verifiedGoldfishCard(card) {
 // These are ability-level descriptions, never a claim of whole-card coverage.
 export const ENGINE_RULE_NOTES = {
   ...FORMAT_NOTES,
+  "Mycosynth Lattice": "全パーマネントのアーティファクト化・全領域の無色化・色マナ支払いの代用（無色マナ要求と使途制限は維持）",
   "Basking Broodscale": "カウンター獲得→落とし子。刃との反復を回数指定",
   "Blade of the Bloodchief": "死亡→装備先のカウンター",
   "Urza's Saga": "章の進行・構築物・第III章の探索と生け贄",

@@ -1,9 +1,9 @@
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30f";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30f";
-import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261021-public30f";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30f";
-import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30f";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30f";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30g";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30g";
+import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261021-public30g";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30g";
+import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30g";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30g";
 
 const put = (ctx, ...ops) => ctx.steps.splice(ctx.step + 1, 0, ...ops);
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };
@@ -210,7 +210,7 @@ export function advancedStep(s, c, op) {
   if (op.op === "redcap") {
     const t = find(s, c.target);
     damage(s, c.target, 4);
-    if (t && !gameColors(t).includes("R")) put(c, { op: "redcap-land" });
+    if (t && !gameColors(t, s).includes("R")) put(c, { op: "redcap-land" });
     else if (c.target.virtual) ask(s, c, { kind: "buttons", label: "ダメージを与えた相手のパーマネントは赤ですか？", options: [{ value: "red", label: "赤" }, { value: "nonred", label: "赤ではない：土地を生け贄" }] });
     return true;
   }

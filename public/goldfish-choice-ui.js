@@ -1,12 +1,12 @@
-import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30f";
-import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30f";
-import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261021-public30f";
-import { goldfishAttackers } from "./goldfish-combat.js?v=20261021-public30f";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30f";
-import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261021-public30f";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30f";
-import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261021-public30f";
-import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30f";
+import { goldfishSpellProgram, goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30g";
+import { goldfishFindObject, goldfishReference } from "./goldfish-objects.js?v=20261021-public30g";
+import { goldfishFlashbackSacrifices } from "./goldfish-mana.js?v=20261021-public30g";
+import { goldfishAttackers } from "./goldfish-combat.js?v=20261021-public30g";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30g";
+import { goldfishActionTargets, goldfishActionPayment, engineActionOptions } from "./goldfish-actions.js?v=20261021-public30g";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30g";
+import { goldfishAlternativeModes, alternativeCandidates } from "./goldfish-alternatives.js?v=20261021-public30g";
+import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30g";
 
 // Render only explicit choices. This module never changes game state itself.
 export function renderGoldfishSpellChoice({ state, choice, content, title, action, paragraph, imageUrl, answer, saveDraft }) {
@@ -27,7 +27,8 @@ export function renderGoldfishSpellChoice({ state, choice, content, title, actio
     let ids = choice.draft?.ids || [], target = choice.draft?.target || null, x = choice.draft?.x || 0;
     const candidates = alternativeCandidates(state, card, mode), list = document.createElement("div"); list.className = "goldfish-choice-targets"; content.append(list);
     const persist = () => saveDraft({ ids, target, x });
-    const render = () => { list.replaceChildren(); for (const option of candidates) { const selected = ids.includes(option.ref.id); list.append(cardTile(option.card, () => { ids = selected ? ids.filter(id => id !== option.ref.id) : [...ids, option.ref.id]; persist(); render(); }, (selected ? "✓ " : "") + option.label)); } };
+    if (mode.id === "hogaak") paragraph(ids.length ? "支払える組み合わせを選択済みです。召集するクリーチャーと追放する墓地のカードを確認・変更できます。" : "黒／緑のクリーチャー2体と、残りの召集・探査に使うカードを選んでください。");
+    const render = () => { list.replaceChildren(); for (const option of candidates) { const selected = ids.includes(option.ref.id); const zone = mode.id === "hogaak" ? (option.ref.zone === "battlefield" ? "召集： " : "探査： ") : ""; const tile = cardTile(option.card, () => { ids = selected ? ids.filter(id => id !== option.ref.id) : [...ids, option.ref.id]; persist(); render(); }, (selected ? "✓ " : "") + zone + option.label); tile.setAttribute("aria-pressed", String(selected)); list.append(tile); } };
     render();
     if (mode.target) {
       paragraph("授与先を選ぶ");

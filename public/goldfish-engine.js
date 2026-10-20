@@ -1,21 +1,30 @@
-import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30f";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30f";
-import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30f";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30f";
-import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30f";
-import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30f";
-import { entryTriggersBlocked, hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261021-public30f";
-import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30f";
-import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30f";
-import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30f";
-import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30f";
-import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30f";
-import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30f";
+import { activeFace as face, cardName as name, cardType, isType, emitGameEvent, changeLife, drawGameCards, addGameCounters, makeGameToken, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30g";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as sameRef, untapGoldfishObject } from "./goldfish-objects.js?v=20261021-public30g";
+import { verifiedGoldfishCard, engineSpellProgram, TOKENS, select, tutor, look, discard, draw, token, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30g";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes, recordGoldfishEnter, recordGoldfishCast } from "./goldfish-rules.js?v=20261021-public30g";
+import { goldfishSpellProgram, goldfishSpellTargets, sameGoldfishTarget, goldfishManaValue } from "./goldfish-spells.js?v=20261021-public30g";
+import { planGoldfishPayment, goldfishCastingCost, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30g";
+import { entryTriggersBlocked, hasRuleCard, castBlockReason, syncGoldfishLattice } from "./goldfish-constraints.js?v=20261021-public30g";
+import { FORMAT_ENTERS, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30g";
+import { runFormatStep, chooseFormatStep, distinctCardTypes, chooseCombatCrew } from "./goldfish-format-runtime.js?v=20261021-public30g";
+import { formatPermanentEntryState, formatPermanentEnter, formatPermanentEvent, formatPermanentCast, formatPermanentUpkeep, formatPermanentEnd, formatPermanentCombat, formatPermanentAttack, formatPermanentStats, formatPermanentKeywords, formatPermanentState } from "./goldfish-format-permanents.js?v=20261021-public30g";
+import { offerEntryCopy, chooseEntryCopy } from "./goldfish-entry-copies.js?v=20261021-public30g";
+import { formatPermanentAttackGroup } from "./goldfish-format-permanents.js?v=20261021-public30g";
+import { duplicateEnterAbilities, recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261021-public30g";
 
 const live = state => state.battlefield.filter(card => !card.faceDown && card.automaticAbilities !== false);
 const has = (state, cardName) => live(state).some(card => name(card) === cardName);
 export const gameManaValue = card => goldfishManaValue(card);
-export function gameColors(card) { return card.faceDown || /\bDevoid\b/.test(face(card).oracleText || "") ? [] : face(card).colors?.length ? face(card).colors : [...new Set((face(card).manaCost || "").match(/[WUBRG]/g) || [])]; }
+export function gameColors(card, state) {
+  let colors = card.faceDown || /\bDevoid\b/.test(face(card).oracleText || "") ? [] : face(card).colors?.length ? face(card).colors : [...new Set((face(card).manaCost || "").match(/[WUBRG]/g) || [])];
+  if (!state) return colors;
+  const onBattlefield = state.battlefield.some(c => c.id === card.id && (c.incarnation || 0) === (card.incarnation || 0));
+  for (const source of live(state).filter(verifiedGoldfishCard)) {
+    if (name(source) === "Mycosynth Lattice") colors = [];
+    if (name(source) === "Leyline of the Guildpact" && onBattlefield && !isType(card, "Land")) colors = ["W", "U", "B", "R", "G"];
+  }
+  return colors;
+}
 export function gameLandTypes(state, card) {
   if (!isType(card, "Land")) return [];
   let types = cardType(card).match(/\b(?:Plains|Island|Swamp|Mountain|Forest)\b/g) || [];
@@ -62,7 +71,7 @@ export function engineKeywords(state, card) {
   for (const aura of state.battlefield) if (name(aura) === "Meltstrider's Resolve" && verifiedGoldfishCard(aura) && sameRef(aura.attachedTo, ref(card))) result.push("can't be blocked by more than one creature");
   for (const key of ["flying", "trample", "haste", "vigilance", "lifelink", "hexproof", "indestructible", "deathtouch", "reach", "first strike"]) if (card.counters?.[key] > 0) result.push(key);
   if (has(state, "Scion of Draco")) {
-    const colors = has(state, "Leyline of the Guildpact") ? ["W", "U", "B", "R", "G"] : gameColors(card);
+    const colors = gameColors(card, state);
     for (const [color, keyword] of Object.entries({ W: "vigilance", U: "hexproof", B: "lifelink", R: "first strike", G: "trample" })) if (colors.includes(color)) result.push(keyword);
   }
   return result;
@@ -88,17 +97,17 @@ export function engineCandidates(state, operation, context = {}) {
       if (f.smallCreature && !(Number(goldfishCharacteristics(state, card).power) <= 1 || Number(goldfishCharacteristics(state, card).toughness) <= 1)) return false;
       if (f.subtypes?.length && !f.subtypes.some(type => zone === "battlefield" && isType(card, "Land") ? gameLandTypes(state, card).includes(type) : new RegExp(`\\b${type}\\b`).test(cardType(card)))) return false;
       if (f.permanent && !isType(card, "Creature|Artifact|Enchantment|Land|Planeswalker|Battle")) return false;
-      if (f.colorless && gameColors(card).length) return false;
-      if (f.colored && !gameColors(card).length) return false;
-      if (f.monocolored && gameColors(card).length !== 1) return false;
+      if (f.colorless && gameColors(card, state).length) return false;
+      if (f.colored && !gameColors(card, state).length) return false;
+      if (f.monocolored && gameColors(card, state).length !== 1) return false;
       if (f.basicLand && (!isType(card, "Basic") || !isType(card, "Land"))) return false;
       if (f.bargain && card.kind !== "token" && !isType(card, "Artifact|Enchantment")) return false;
       if (f.keywords?.some(k => !goldfishKeywords(state, card).has(k))) return false;
       if (f.withoutFlying && goldfishKeywords(state, card).has("flying")) return false;
       if (f.attackingOrBlocking && !state.rules.combat?.attackers?.some(r => sameRef(r, ref(card)))) return false;
-      if (f.notColors && gameColors(card).some(c => f.notColors.includes(c))) return false;
-      if (f.color && !gameColors(card).includes(f.color)) return false;
-      if (f.colorsAny && !gameColors(card).some(c => f.colorsAny.includes(c))) return false;
+      if (f.notColors && gameColors(card, state).some(c => f.notColors.includes(c))) return false;
+      if (f.color && !gameColors(card, state).includes(f.color)) return false;
+      if (f.colorsAny && !gameColors(card, state).some(c => f.colorsAny.includes(c))) return false;
       if (f.maxManaValue != null && gameManaValue(card) > f.maxManaValue) return false;
       if (f.minManaValue != null && gameManaValue(card) < f.minManaValue) return false;
       if (f.maxX && gameManaValue(card) > x) return false;
@@ -237,12 +246,12 @@ export function engineCast(state, spell) {
   for (const card of live(state)) {
     if (!verifiedGoldfishCard(card)) continue;
     const add = (label, steps, extra) => queueGameAbility(state, card, label, steps, extra);
-    if (name(card) === "Glaring Fleshraker" && !gameColors(spell).length) add("無色の呪文：落とし子を生成", [token("spawn")]);
+    if (name(card) === "Glaring Fleshraker" && !gameColors(spell, state).length) add("無色の呪文：落とし子を生成", [token("spawn")]);
     if (name(card) === "Song of Creation") add("呪文を唱えた：2枚引く", [draw(2)]);
     if (name(card) === "Pinnacle Emissary" && isType(spell, "Artifact")) add("ドローン生成", [token("drone")]);
     if (name(card) === "Stormchaser's Talent" && card.level >= 3 && isType(spell, "Instant|Sorcery")) add("カワウソ生成", [token("otter")]);
     if (name(card) === "Artist's Talent" && !isType(spell, "Creature")) add("任意で手札交換", [discard(1, { min: 0, remember: "selected" }), { op: "draw-selected" }]);
-    if (name(card) === "Ugin, Eye of the Storms" && !gameColors(spell).length) add("有色パーマネントを追放", [{ op: "move-target", destination: "exile" }], { targetSpec: { zone: "battlefield", permanent: true, colored: true, optional: true, virtualOpponent: true } });
+    if (name(card) === "Ugin, Eye of the Storms" && !gameColors(spell, state).length) add("有色パーマネントを追放", [{ op: "move-target", destination: "exile" }], { targetSpec: { zone: "battlefield", permanent: true, colored: true, optional: true, virtualOpponent: true } });
     if (name(card) === "Ral, Monsoon Mage" && state.rules.activePlayer === "self" && isType(spell, "Instant|Sorcery")) add("コイン投げ", [{ op: "ral-flip" }]);
     if (name(card) === "Vexing Bauble" && spell.cast?.manaSpent === 0) add("マナを使わず唱えた呪文を打ち消す", [{ op: "counter-spell", target: ref(spell, "stack") }]);
     if (name(card) === "Chalice of the Void" && (card.counters.charge || 0) === gameManaValue(spell)) add("虚空の杯：打ち消し", [{ op: "counter-spell", target: ref(spell, "stack") }]);
@@ -251,6 +260,7 @@ export function engineCast(state, spell) {
 }
 
 export function flushEngineEvents(state) {
+  syncGoldfishLattice(state);
   if (state.rules.automation || state.rules.resolution || state.rules.drawing) return state;
   for (let pass = 0; state.rules.events?.length && pass < 50; pass++) {
     const events = state.rules.events; state.rules.events = [];
@@ -290,7 +300,7 @@ export function flushEngineEvents(state) {
           const n = name(watcher), add = (label, steps) => queueGameAbility(state, watcher, label, steps);
           if (n === "Earthbender Ascension" && isType(entering, "Land")) add("上陸：探索カウンター", [{ op: "ascension-quest" }]);
           if (n === "Sapling Nursery" && isType(entering, "Land")) add("上陸：ツリーフォーク生成", [token("treefolk")]);
-          if (n === "Glaring Fleshraker" && watcher.id !== entering.id && isType(entering, "Creature") && !gameColors(entering).length) add("他の無色クリーチャー：相手に1点", [{ op: "damage", amount: 1, player: "opponent" }]);
+          if (n === "Glaring Fleshraker" && watcher.id !== entering.id && isType(entering, "Creature") && !gameColors(entering, state).length) add("他の無色クリーチャー：相手に1点", [{ op: "damage", amount: 1, player: "opponent" }]);
           if (n === "Guide of Souls" && watcher.id !== entering.id && isType(entering, "Creature")) add("1点回復・エネルギー1", [{ op: "life", amount: 1 }, { op: "energy", count: 1 }]);
           if (n === "Haliya, Guided by Light" && isType(entering, "Creature|Artifact")) add("1点回復", [{ op: "life", amount: 1 }]);
           if (n === "Kappa Cannoneer" && isType(entering, "Artifact")) add("+1/+1・ブロックされない", [{ op: "source-counter", name: "+1/+1", count: 1 }, { op: "source-keyword", keyword: "unblockable" }]);
@@ -325,7 +335,7 @@ function prepareEngineTargets(state) {
   const spec = entry.ability.targetSpec, candidates = engineCandidates(state, { ...spec, filter: spec, target: true }, { source: entry.ability.source });
   if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
   else if (spec.opponentOnly) candidates.unshift({ ref: { player: "opponent" }, label: "相手" });
-  if (spec.virtualOpponent) for (let i = 0; i < (spec.count || 1); i++) candidates.unshift({ ref: { id: `virtual-${i}`, player: "opponent", virtual: true }, label: `相手の対象${spec.count ? i + 1 : ""}（領域は省略）` });
+  if (spec.virtualOpponent && !(hasRuleCard(state, "Mycosynth Lattice") && (spec.colored || spec.color || spec.colorsAny || spec.monocolored))) for (let i = 0; i < (spec.count || 1); i++) candidates.unshift({ ref: { id: `virtual-${i}`, player: "opponent", virtual: true }, label: `相手の対象${spec.count ? i + 1 : ""}（領域は省略）` });
   if (!candidates.length) { entry.ability.target = null; entry.ability.noTarget = true; prepareEngineTargets(state); return; }
   if (spec.divideDamage) {
     state.rules.pendingChoice = { type: "engine-target", kind: "division", divideDamage: spec.divideDamage, maxTargets: spec.count, sourceName: entry.name, entryId: entry.id,
@@ -492,7 +502,7 @@ export function continueEngineResolution(state) {
       const spec = formatTargetSpec(ctx.sourceName, ctx.cast), candidates = spec ? engineCandidates(state, { ...spec, target: true }) : [];
       for (const r of ctx.cast.modeTargets || []) {
         if (!spec || !r.player && !candidates.some(c => sameRef(c.ref, r))) continue;
-        if (spec.conditionalColor && !r.player && !gameColors(find(state, r)).includes(spec.conditionalColor)) continue;
+        if (spec.conditionalColor && !r.player && !gameColors(find(state, r), state).includes(spec.conditionalColor)) continue;
         if (spec.effect === "counter") counterTarget(state, { ...ctx, target: r });
         else if (spec.effect === "counter-unless") { ctx.target = r; insertSteps(ctx, [{ op: "counter-unless", cost: spec.cost }]); }
         else if (spec.effect === "shrink") { const c = find(state, r); if (c) c.temporaryEffects.push({ power: -2, toughness: -2, turn: state.turn, label: ctx.sourceName }); }
@@ -648,9 +658,9 @@ export function continueEngineResolution(state) {
     else if (op.op === "target-controller-life" && !ctx.target?.virtual) changeLife(state, op.amount);
     else if (op.op === "opponent-effect") (state.rules.notices ||= []).push({ text: op.text + "（相手側の領域は省略）", serial: state.rules.turnSerial });
     else if (op.op === "damage-sweep") for (const { card } of engineCandidates(state, { zone: "battlefield", filter: op.filter }, ctx)) damage(state, ref(card), op.amount);
-    else if (op.op === "deluge") for (const c of state.battlefield.filter(c => isType(c, "Creature"))) { const n = gameColors(c).some(color => ["G", "W"].includes(color)) ? -3 : -1; c.temporaryEffects.push({ power: n, toughness: n, turn: state.turn, label: ctx.sourceName }); }
+    else if (op.op === "deluge") for (const c of state.battlefield.filter(c => isType(c, "Creature"))) { const n = gameColors(c, state).some(color => ["G", "W"].includes(color)) ? -3 : -1; c.temporaryEffects.push({ power: n, toughness: n, turn: state.turn, label: ctx.sourceName }); }
     else if (op.op === "divided-damage") for (const a of ctx.allocation) damage(state, a.target, a.amount);
-    else if (op.op === "ral-draw" && live(state).some(c => c.id !== ctx.source.id && (gameColors(c).includes("U") || has(state, "Leyline of the Guildpact") && !isType(c, "Land")))) drawGameCards(state, 1);
+    else if (op.op === "ral-draw" && live(state).some(c => c.id !== ctx.source.id && (gameColors(c, state).includes("U") || has(state, "Leyline of the Guildpact") && !isType(c, "Land")))) drawGameCards(state, 1);
     else if (op.op === "converge-exile" && target && !isType(target, "Land") && gameManaValue(target) <= (ctx.cast.colorsSpent || []).length) move(state, target.id, "battlefield", "exile");
     else if (op.op === "fuse-destroy") for (const [targets, type] of [[ctx.cast.fuseArtifact, "Artifact"], [ctx.cast.fuseEnchantment, "Enchantment"]]) { const c = find(state, targets?.[0]); if (c && isType(c, type) && !goldfishKeywords(state, c).has("shroud")) destroy(state, c); }
     else if (op.op === "brotherhood") insertSteps(ctx, ctx.cast.mode === "damage" ? [{ op: "damage-sweep", amount: 3, filter: { types: ["Creature", "Planeswalker"] } }] : [{ op: "sweep", filter: { types: ["Artifact"], maxManaValue: 3 } }]);
@@ -761,7 +771,7 @@ export function continueEngineResolution(state) {
     else if (op.op === "endurance" && ctx.target?.player === "self") insertSteps(ctx, [select("自分の墓地を山札の下へ置く（全カード）", "graveyard", {}, { min: state.graveyard.length, max: "all", destination: "libraryBottom" })]);
     else if (op.op === "endurance" && ctx.target?.player === "opponent") insertSteps(ctx, [{ op: "opponent-effect", text: "相手は墓地を好きな順序で山札の一番下に置く" }]);
     else if (op.op === "pummeler") { const creatures = state.battlefield.filter(c => isType(c, "Creature")), size = Math.max(0, ...creatures.map(c => Number(goldfishCharacteristics(state, c).power) || 0)); for (const c of creatures) c.temporaryEffects.push({ power: size, toughness: size, turn: state.turn, label: ctx.sourceName }); }
-    else if (op.op === "ajani-damage" && live(state).some(c => c.id !== source?.id && gameColors(c).includes("R"))) queueGameAbility(state, source || ctx.snapshot, "アジャニ：クリーチャー数分のダメージ", [{ op: "damage", amount: "creatures" }], { targetSpec: damageTarget });
+    else if (op.op === "ajani-damage" && live(state).some(c => c.id !== source?.id && gameColors(c, state).includes("R"))) queueGameAbility(state, source || ctx.snapshot, "アジャニ：クリーチャー数分のダメージ", [{ op: "damage", amount: "creatures" }], { targetSpec: damageTarget });
     else if (op.op === "ocelot" && state.rules.lifeGained > 0) {
       makeGameToken(state, TOKENS.cat);
       if (state.battlefield.length >= 10 && has(state, "Ocelot Pride")) state.rules.cityBlessing = true;
