@@ -1,10 +1,10 @@
-import { createGoldfishController } from "./goldfish-ui.js?v=20261021-public30i";
-import { parseSoloDeck } from "./deck-import.js?v=20261021-public30i";
+import { createGoldfishController } from "./goldfish-ui.js?v=20261021-public30j";
+import { parseSoloDeck } from "./deck-import.js?v=20261021-public30j";
 import { objectKey, objectCharacteristics, migrateCheckedObjects, preparationKey, preparedRecord, setPrepared, migratePreparedRecords } from "./object-identity.js?v=20261017-auxiliary";
-import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30i";
-import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30i";
-import { createTournamentController } from "./tournament-ui.js?v=20261021-public30i";
-import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30i";
+import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30j";
+import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30j";
+import { createTournamentController } from "./tournament-ui.js?v=20261021-public30j";
+import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30j";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");

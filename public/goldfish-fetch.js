@@ -1,8 +1,8 @@
-import { cloneGoldfishState, moveGoldfishCards, setGoldfishCardsTapped, setGoldfishTracker, shuffleGoldfishLibrary } from "./goldfish.js?v=20261021-public30i";
-import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30i";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30i";
-import { recordGoldfishEnter } from "./goldfish-rules.js?v=20261021-public30i";
-import { flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30i";
+import { cloneGoldfishState, moveGoldfishCards, setGoldfishCardsTapped, setGoldfishTracker, shuffleGoldfishLibrary } from "./goldfish.js?v=20261021-public30j";
+import { moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30j";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30j";
+import { recordGoldfishEnter } from "./goldfish-rules.js?v=20261021-public30j";
+import { flushEngineEvents } from "./goldfish-engine.js?v=20261021-public30j";
 
 const basicTypes = ["Plains", "Island", "Swamp", "Mountain", "Forest"];
 const escapeRegExp = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

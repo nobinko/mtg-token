@@ -1,11 +1,11 @@
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30i";
-import { cardName, isType } from "./goldfish-events.js?v=20261021-public30i";
-import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30i";
-import { sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30i";
-import { goldfishCastingCost } from "./goldfish-mana.js?v=20261021-public30i";
-import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30i";
-import { extraFormatCostChoice } from "./goldfish-extra-costs.js?v=20261021-public30i";
-import { advancedPreflight } from "./goldfish-advanced-spells.js?v=20261021-public30i";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30j";
+import { cardName, isType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30j";
+import { engineCandidates } from "./goldfish-engine.js?v=20261021-public30j";
+import { sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30j";
+import { goldfishCastingCost } from "./goldfish-mana.js?v=20261021-public30j";
+import { FORMAT_MODES, formatTargetSpec } from "./goldfish-format-programs.js?v=20261021-public30j";
+import { extraFormatCostChoice } from "./goldfish-extra-costs.js?v=20261021-public30j";
+import { advancedPreflight } from "./goldfish-advanced-spells.js?v=20261021-public30j";
 
 // Extra text, modes and additional costs are declared before any payment. The
 // draft is serializable; cancellation never exiles a card or taps a source.
@@ -23,7 +23,7 @@ export function extraCastChoice(state, card, options) {
     ]) {
       const candidates = engineCandidates(state, { ...spec, target: true }, ctx).map(({ ref, label }) => ({ ref, label }));
       candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の適正な対象（領域は省略）" });
-      if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+      if (spec.players) candidates.unshift(...goldfishPlayerTargets(state));
       if (options[key] === undefined) return { optionKey: key, kind: "cards", label, min: 1, max: 1, candidates };
       if (!Array.isArray(options[key]) || options[key].length !== 1 || !candidates.some(c => JSON.stringify(c.ref) === JSON.stringify(options[key][0]))) throw new Error("適正な対象を選び直してください。");
     }
@@ -33,11 +33,12 @@ export function extraCastChoice(state, card, options) {
     if (options.mode === undefined) return { optionKey: "mode", kind: "buttons", label: "モードを選ぶ", options: modes };
     if (!modes.some(m => m.value === options.mode)) throw new Error("適正なモードを選んでください。");
   }
+  if (name === "Cyclonic Rift" && options.mode === "overload" && (state.rules.effectCast || options.fromGraveyard || options.fromExile && (card.playPermission?.free || card.playPermission?.kind === "plot"))) throw new Error("別の代替コストと超過を同時に使うことはできません。");
   const spec = formatTargetSpec(name, options);
   if (spec) {
     const candidates = engineCandidates(state, { ...spec, target: true }, ctx).map(({ ref, label }) => ({ ref, label }));
     if (spec.virtualOpponent) candidates.unshift({ ref: { player: "opponent", virtual: true }, label: "相手の適正な対象（領域は省略）" });
-    if (spec.players) candidates.unshift({ ref: { player: "opponent" }, label: "相手" }, { ref: { player: "self" }, label: "自分" });
+    if (spec.players) candidates.unshift(...goldfishPlayerTargets(state));
     if (candidates.length < spec.min) throw new Error("このモードの適正な対象がありません。コストは支払っていません。");
     if (options.modeTargets === undefined) return { optionKey: "modeTargets", kind: "cards", label: `対象を${spec.min}〜${spec.max}つ選ぶ`, min: spec.min, max: Math.min(spec.max, candidates.length), candidates };
     const refs = options.modeTargets;

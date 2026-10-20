@@ -1,4 +1,4 @@
-import { goldfishSideboardPool } from "./goldfish-sideboard.js?v=20261021-public30i";
+import { goldfishSideboardPool } from "./goldfish-sideboard.js?v=20261021-public30j";
 
 export function renderSideboardEditor(container, state, apply) {
   const pool = goldfishSideboardPool(state);

@@ -1,10 +1,10 @@
-import { activeFace as face, cardName as name, isType, copiableGoldfishValues, addGameCounters, makeGameToken, queueGameAbility as queue, changeLife } from "./goldfish-events.js?v=20261021-public30i";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30i";
-import { verifiedGoldfishCard, TOKENS, draw, discard } from "./goldfish-card-programs.js?v=20261021-public30i";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30i";
-import { goldfishCharacteristics, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30i";
-import { damage } from "./goldfish-engine.js?v=20261021-public30i";
-import { ARTIFACT_NOTES, artifactEnter, artifactActions, artifactEvent, artifactStep, artifactChoose } from "./goldfish-artifact-programs.js?v=20261021-public30i";
+import { activeFace as face, cardName as name, isType, copiableGoldfishValues, addGameCounters, makeGameToken, queueGameAbility as queue, changeLife } from "./goldfish-events.js?v=20261021-public30j";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30j";
+import { verifiedGoldfishCard, TOKENS, draw, discard } from "./goldfish-card-programs.js?v=20261021-public30j";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30j";
+import { goldfishCharacteristics, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30j";
+import { damage } from "./goldfish-engine.js?v=20261021-public30j";
+import { ARTIFACT_NOTES, artifactEnter, artifactActions, artifactEvent, artifactStep, artifactChoose } from "./goldfish-artifact-programs.js?v=20261021-public30j";
 
 const live = s => s.battlefield.filter(c => verifiedGoldfishCard(c));
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };

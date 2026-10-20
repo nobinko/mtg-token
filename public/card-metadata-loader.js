@@ -61,4 +61,4 @@ export function createCardMetadataLoader({ request = fetch, now = Date.now, time
 }
 
 export const loadCardMetadata = createCardMetadataLoader({ bundledCards: GOLDFISH_METADATA });
-import { GOLDFISH_METADATA } from "./goldfish-metadata.js?v=20261021-public30i";
+import { GOLDFISH_METADATA } from "./goldfish-metadata.js?v=20261021-public30j";

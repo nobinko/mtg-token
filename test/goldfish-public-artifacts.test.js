@@ -38,6 +38,10 @@ test("The One Ring grants cast-only protection, draws burden cards and loses lif
   assert.ok(!goldfishSpellTargets(s, card(s, "Lightning Bolt", "hand")).some(t => t.ref.player === "self"));
   const before = s.life, hand = s.hand.length, id = card(s, "The One Ring").id;
   damage(s, { player: "self" }, 4); assert.equal(s.life, before);
+  s.rules.noPreventionSerial = s.rules.turnSerial;
+  damage(s, { player: "self" }, 1); assert.equal(s.life, before - 1);
+  assert.equal(goldfishLandManaOptions(card(s, "Ancient Tomb"), s)[0].life, 2);
+  delete s.rules.noPreventionSerial; changeLife(s, 1);
   changeLife(s, -2); assert.equal(s.life, before - 2, "life loss is not damage");
   s = settle(activateGoldfishAction(s, id, "engine:artifact-ring"));
   assert.equal(card(s, "The One Ring").counters.burden, 1); assert.equal(s.hand.length, hand + 1);
@@ -88,6 +92,30 @@ test("Thundertrap Trainer selects only a noncreature nonland, including a separa
   const offspring = trainers.find(c => c.kind === "token");
   assert.equal(goldfishCharacteristics(s, offspring).toughness, "1");
   assert.ok(s.hand.length >= before, "each trigger may take a card, without taking a land");
+});
+
+test("Cyclonic Rift normal mode excludes own permanents; overload pays seven and never bounces our board", () => {
+  let s = position({ "Cyclonic Rift": 1, "Thundertrap Trainer": 1 });
+  s = put(put(s, "Cyclonic Rift"), "Thundertrap Trainer", "battlefield");
+  assert.throws(() => castGoldfishCard(funds(s), card(s, "Cyclonic Rift", "hand").id, { mode: "normal", modeTargets: [ref(card(s, "Thundertrap Trainer"))] }), /対象/);
+  const normal = settle(castGoldfishCard(funds(s), card(s, "Cyclonic Rift", "hand").id, { mode: "normal", modeTargets: [{ player: "opponent", virtual: true }] }));
+  assert.ok(card(normal, "Thundertrap Trainer")); assert.ok(card(normal, "Cyclonic Rift", "graveyard"));
+  let paid = setGoldfishMana(setGoldfishMana(s, "U", 1), "C", 6);
+  paid = settle(castGoldfishCard(paid, card(paid, "Cyclonic Rift", "hand").id, { mode: "overload" }));
+  assert.equal(paid.manaPool.U + paid.manaPool.C, 0);
+  assert.ok(card(paid, "Thundertrap Trainer")); assert.match(paid.rules.notices.at(-1).text, /相手の非土地.*すべて/);
+});
+
+test("Lórien Revealed draws three normally or discards to find a nonbasic Island without drawing", () => {
+  let s = position({ "Lórien Revealed": 1, "Underground Sea": 1 });
+  s = put(s, "Lórien Revealed");
+  const hand = s.hand.length;
+  const drawn = cast(s, "Lórien Revealed");
+  assert.equal(drawn.hand.length, hand + 2);
+  s = settle(activateGoldfishAction(funds(s), card(s, "Lórien Revealed", "hand").id, "engine:islandcycling"), [], c =>
+    c.type === "engine-choice" && c.candidates?.some(c => c.label === "Underground Sea") ? { refs: [c.candidates.find(c => c.label === "Underground Sea").ref] } : null);
+  assert.ok(card(s, "Lórien Revealed", "graveyard")); assert.ok(card(s, "Underground Sea", "hand"));
+  assert.equal(s.hand.length, hand); assert.equal(s.rules.spellsCast, 0);
 });
 
 test("public UW: Synthesizer triggers from another MV3+ artifact, including a second Synthesizer, never itself or its zero-MV token", () => {

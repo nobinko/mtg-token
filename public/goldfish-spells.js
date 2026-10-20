@@ -1,12 +1,12 @@
-import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30i";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30i";
-import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30i";
-import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30i";
-import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30i";
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30i";
-import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30i";
-import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30i";
-import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30i";
+import { goldfishCharacteristics, goldfishGraveyardTypes, goldfishKeywords } from "./goldfish-rules.js?v=20261021-public30j";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, goldfishIsLegendary } from "./goldfish-objects.js?v=20261021-public30j";
+import { engineSpellProgram, verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30j";
+import { startEngineResolution, gameColors, damage } from "./goldfish-engine.js?v=20261021-public30j";
+import { drawGameCards, cardType, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30j";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261021-public30j";
+import { FORMAT_ENTERS } from "./goldfish-format-programs.js?v=20261021-public30j";
+import { FORMAT_PERMANENT_NAMES } from "./goldfish-format-permanents.js?v=20261021-public30j";
+import { hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30j";
 
 const face = (card) => card.faces?.[card.faceIndex || 0] || card;
 const front = (card) => card.faces?.[0] || card;

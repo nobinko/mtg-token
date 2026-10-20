@@ -1,17 +1,17 @@
 // Stateful effects for the cross-format programs. All entry points are gated by
 // the complete Oracle snapshot in the program registry.
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30i";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30i";
-import { engineCandidates, gameManaValue, damage, destroy } from "./goldfish-engine.js?v=20261021-public30i";
-import { castGoldfishCard, planGoldfishCastPayment } from "./goldfish-mana.js?v=20261021-public30i";
-import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30i";
-import { goldfishKeywords, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30i";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30i";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30i";
-import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261021-public30i";
-import { advancedStep, advancedChoose } from "./goldfish-advanced-spells.js?v=20261021-public30i";
-import { formatPermanentStep, chooseFormatPermanentStep } from "./goldfish-format-permanents.js?v=20261021-public30i";
-import { extensionStep, extensionChoose } from "./goldfish-ability-extensions.js?v=20261021-public30i";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, shuffleGameLibrary } from "./goldfish-events.js?v=20261021-public30j";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30j";
+import { engineCandidates, gameManaValue, damage, destroy } from "./goldfish-engine.js?v=20261021-public30j";
+import { castGoldfishCard, planGoldfishCastPayment } from "./goldfish-mana.js?v=20261021-public30j";
+import { castBlockReason } from "./goldfish-constraints.js?v=20261021-public30j";
+import { goldfishKeywords, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30j";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30j";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261021-public30j";
+import { activateGoldfishAction, goldfishActionReason } from "./goldfish-actions.js?v=20261021-public30j";
+import { advancedStep, advancedChoose } from "./goldfish-advanced-spells.js?v=20261021-public30j";
+import { formatPermanentStep, chooseFormatPermanentStep } from "./goldfish-format-permanents.js?v=20261021-public30j";
+import { extensionStep, extensionChoose } from "./goldfish-ability-extensions.js?v=20261021-public30j";
 
 const insert = (ctx, ...steps) => ctx.steps.splice(ctx.step + 1, 0, ...steps);
 const choice = (state, ctx, data) => { state.rules.pendingChoice = { type: "engine-choice", entryId: ctx.entryId, sourceName: ctx.sourceName, ...data }; };
@@ -137,6 +137,11 @@ export function runFormatStep(state, ctx, op) {
     }
     case "format-modal": {
       const n = ctx.sourceName, m = ctx.cast.mode;
+      if (n === "Cyclonic Rift") {
+        if (m === "overload") notice(state, "サイクロンの裂け目：相手の非土地パーマネントをすべて手札へ戻す（相手側の領域は省略）。自分のパーマネントには影響しません。");
+        else insert(ctx, { op: "format-targets" });
+        return true;
+      }
       if (["Abrade", "Hydroblast", "Pyroblast", "Warg Tactics", "Change the Equation"].includes(n) || n === "Boros Charm" && m !== "protect" || ["Iroh's Demonstration", "Witherbloom Charm"].includes(n) && m === "destroy" || n === "Iroh's Demonstration" && m === "damage") insert(ctx, { op: "format-targets" });
       else if (n === "Boros Charm") for (const c of state.battlefield) c.temporaryEffects.push({ keywords: ["indestructible"], turn: state.turn, label: n });
       else if (n === "Witherbloom Charm" && m === "life") changeLife(state, 5);

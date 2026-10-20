@@ -212,4 +212,4 @@ export function createDeckGallery(dialog, preview) {
     }
   };
 }
-import { loadCardMetadata } from "./card-metadata-loader.js?v=20261021-public30i";
+import { loadCardMetadata } from "./card-metadata-loader.js?v=20261021-public30j";

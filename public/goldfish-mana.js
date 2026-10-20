@@ -1,19 +1,19 @@
 import { cloneGoldfishState, moveGoldfishCards, GOLDFISH_MANA_TYPES as COLORS, normalizeGoldfishMana,
-  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30i";
-import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30i";
-import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30i";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30i";
-import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30i";
-import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30i";
-import { cardName, isType, changeLife, goldfishSelfProtected } from "./goldfish-events.js?v=20261021-public30i";
-import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30i";
-import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30i";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30i";
-import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30i";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30i";
-import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30i";
-import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30i";
-import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30i";
+  playGoldfishCard, goldfishPlayDestination } from "./goldfish.js?v=20261021-public30j";
+import { assertGoldfishChoiceComplete, goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30j";
+import { goldfishSpellProgram, goldfishSpellTargets, validateGoldfishSpellTarget } from "./goldfish-spells.js?v=20261021-public30j";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject } from "./goldfish-objects.js?v=20261021-public30j";
+import { goldfishPlotReady } from "./goldfish-action-definitions.js?v=20261021-public30j";
+import { gameDomain, gameLandTypes, gameColors, canTapCreature, gameManaValue } from "./goldfish-engine.js?v=20261021-public30j";
+import { cardName, isType, changeLife, goldfishSelfProtected } from "./goldfish-events.js?v=20261021-public30j";
+import { commandCastChoice, extraCastChoice } from "./goldfish-modal.js?v=20261021-public30j";
+import { hasRuleCard, castBlockReason, abilityBlockReason } from "./goldfish-constraints.js?v=20261021-public30j";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261021-public30j";
+import { effectCastPermission, completeEffectCast } from "./goldfish-format-runtime.js?v=20261021-public30j";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261021-public30j";
+import { castGoldfishAlternative, planHogaak } from "./goldfish-alternatives.js?v=20261021-public30j";
+import { EXTRA_COST_SPELLS, formatAdditionalMana, payFormatExtraCosts } from "./goldfish-extra-costs.js?v=20261021-public30j";
+import { advancedMana } from "./goldfish-advanced-spells.js?v=20261021-public30j";
 
 const BASIC = { Plains: "W", Island: "U", Swamp: "B", Mountain: "R", Forest: "G" };
 const faceOf = (card) => card.faces?.[card.faceIndex || 0] || card;
@@ -37,6 +37,7 @@ export function goldfishCastingCost(card, { fromExile = false, fromGraveyard = f
   if (cardName(card) === "Lively Dirge" && verifiedGoldfishCard(card)) cost += `{${mode === "both" ? 3 : mode === "return" ? 2 : 1}}`;
   if (cardName(card) === "Fire Magic" && verifiedGoldfishCard(card)) cost += `{${mode === "firaga" ? 5 : mode === "fira" ? 2 : 0}}`;
   if (cardName(card) === "Path of Peril" && mode === "cleave" && verifiedGoldfishCard(card)) cost = "{4}{W}{B}";
+  if (cardName(card) === "Cyclonic Rift" && mode === "overload" && verifiedGoldfishCard(card)) cost = "{6}{U}";
   if (verifiedGoldfishCard(card)) cost += formatAdditionalMana(card, format) + advancedMana(card, format);
   if (!state || !cost) return cost;
   let reduction = cardName(card) === "March of Otherworldly Light" ? pitch.length * 2 : 0;
@@ -140,7 +141,7 @@ export function goldfishLandManaOptions(card, state, context = {}) {
     if (state && isType(card, "Land") && hasRuleCard(state, "Damping Sphere") && total(pool) >= 2) pool = normalizeGoldfishMana({ C: 1 });
     if (state && isType(card, "Creature")) pool.G += battlefield.filter(c => ["Leyline of Abundance", "Badgermole Cub"].includes(cardName(c)) && !c.faceDown).length;
     if (tapDamage) { life += Number(tapDamage[1]); damage = true; }
-    if (damage && state && goldfishSelfProtected(state)) life = 0;
+    if (damage && state && goldfishSelfProtected(state) && state.rules.noPreventionSerial !== state.rules.turnSerial) life = 0;
     if (!result.some((item) => JSON.stringify(item.pool) === JSON.stringify(pool) && item.life === life && item.damage === damage)) result.push({ pool, life, damage });
   };
   for (const [subtype, color] of Object.entries(BASIC)) {

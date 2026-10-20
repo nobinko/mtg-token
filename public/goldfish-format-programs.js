@@ -1,13 +1,15 @@
 // Programs used by the dated Standard, Legacy and Pioneer fixtures. The caller
 // must verify the complete Oracle snapshot before exposing these adapters.
-import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261021-public30i";
-import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261021-public30i";
+import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261021-public30j";
+import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261021-public30j";
 const creature = { zone: "battlefield", types: ["Creature"], virtualOpponent: true };
 const spell = { zone: "stack", spell: true, virtualOpponent: true };
 const damage = { zone: "battlefield", types: ["Creature", "Planeswalker", "Battle"], players: true };
 const select = (label, zone, filter, rest) => ({ op: "select", label, zone, filter, min: 0, max: 1, ...rest });
 const look = (count, take) => select(`上${count}枚から${take}枚を手札へ`, "library", {}, { top: count, min: take, max: take, destination: "hand", remainder: "libraryBottom" });
 export const FORMAT_SPELLS = {
+  "Lórien Revealed": { steps: [{ op: "draw", count: 3 }] },
+  "Cyclonic Rift": { steps: [{ op: "format-modal" }] },
   ...SIDEBOARD_SPELLS,
   ...ADVANCED_SPELLS,
   "Esper Origins": { steps: [{ op: "esper-surveil" }, { op: "life", amount: 2 }, { op: "esper-transform" }], flashback: "{3}{G}" },
@@ -122,6 +124,7 @@ export const FORMAT_NOTES = {
 // Modal targets are declared before payment and revalidated at resolution.
 // A mode with no target (e.g. Dirge's search) deliberately has no target spec.
 export const FORMAT_MODES = {
+  "Cyclonic Rift": [{ value: "normal", label: "通常{1}{U}：相手の非土地1つを戻す" }, { value: "overload", label: "超過{6}{U}：相手の非土地をすべて戻す" }],
   "Origin of Metalbending": [{ value: "destroy", label: "アーティファクトかエンチャントを破壊" }, { value: "protect", label: "自分のクリーチャーにカウンター・破壊不能" }],
   Abrade: [{ value: "damage", label: "クリーチャーに3点" }, { value: "destroy", label: "アーティファクトを破壊" }],
   Hydroblast: [{ value: "counter", label: "赤の呪文なら打ち消す" }, { value: "destroy", label: "赤のパーマネントなら破壊" }],
@@ -145,6 +148,7 @@ export const FORMAT_MODES = {
 };
 export function formatTargetSpec(name, options = {}) {
   const mode = options.mode, one = spec => ({ min: 1, max: 1, ...spec });
+  if (name === "Cyclonic Rift") return mode === "overload" ? null : one({ zone: "battlefield", permanent: true, notTypes: ["Land"], opposingPermanent: true, virtualOpponent: true, destination: "hand" });
   if (name === "Origin of Metalbending") return one(mode === "destroy" ? { zone: "battlefield", types: ["Artifact", "Enchantment"], virtualOpponent: true, effect: "destroy" } : { zone: "battlefield", types: ["Creature"], effect: "metal-protect" });
   if (name === "Abrade") return one(mode === "damage" ? { ...creature, effect: "damage", amount: 3 } : { zone: "battlefield", types: ["Artifact"], virtualOpponent: true, effect: "destroy" });
   if (["Hydroblast", "Pyroblast"].includes(name)) return one({ zone: mode === "counter" ? "stack" : "battlefield", ...(mode === "counter" ? { spell: true } : { permanent: true }), virtualOpponent: true, effect: mode === "counter" ? "counter" : "destroy", conditionalColor: name === "Hydroblast" ? "R" : "U" });
