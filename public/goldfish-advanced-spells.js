@@ -1,9 +1,9 @@
-import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30h";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30h";
-import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261021-public30h";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30h";
-import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30h";
-import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30h";
+import { activeFace as face, cardName as name, isType, changeLife, makeGameToken, addGameCounters, queueGameAbility, copiableGoldfishValues, goldfishPlayerTargets } from "./goldfish-events.js?v=20261021-public30i";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261021-public30i";
+import { engineCandidates, damage, destroy, gameManaValue, gameColors } from "./goldfish-engine.js?v=20261021-public30i";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30i";
+import { goldfishSpellTargets } from "./goldfish-spells.js?v=20261021-public30i";
+import { TOKENS } from "./goldfish-card-programs.js?v=20261021-public30i";
 
 const put = (ctx, ...ops) => ctx.steps.splice(ctx.step + 1, 0, ...ops);
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };

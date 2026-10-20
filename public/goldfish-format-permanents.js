@@ -1,11 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30h";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30h";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30h";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30h";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30h";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30h";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30h";
-import { artifactEntryState, artifactEnd, artifactUpkeep } from "./goldfish-artifact-programs.js?v=20261021-public30h";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261021-public30i";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261021-public30i";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261021-public30i";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261021-public30i";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261021-public30i";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261021-public30i";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261021-public30i";
+import { artifactEntryState, artifactEnd, artifactUpkeep } from "./goldfish-artifact-programs.js?v=20261021-public30i";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -27,6 +27,7 @@ function typeAs(c, type) {
   c.typeLine = type;
 }
 export const FORMAT_PERMANENT_NAMES = new Set([
+  "Thundertrap Trainer",
   "Death to Our Enemies", "The Fantasticar", "Null Summoner", "Ral Zarek, Guest Lecturer", "Great Hall of the Biblioplex",
   "Chrome Mox", "Sand Scout", "Orcish Bowmasters", "Tamiyo, Inquisitive Student", "Tamiyo, Seasoned Scholar", "Delver of Secrets", "Sneak Attack", "Emrakul, the Aeons Torn", "Kaito, Bane of Nightmares",
   "Mossborn Hydra", "Sazh's Chocobo", "Mightform Harmonizer", "Icetill Explorer", "Mole Man, Moloid Master", "Sandman, Shifting Scoundrel", "Barrowgoyf",
@@ -74,7 +75,10 @@ export function formatPermanentEnter(s, c) {
   if (n === "Dragonhawk, Fate's Tempest") { q("パワー4以上の数だけ衝動ドロー・次の終了時にダメージ", [{ op: "fp-dragonhawk" }]); return true; }
   if (n === "Scrapshooter") { if (c.castFormat?.gift === "yes") q("贈り物・相手のアーティファクト／エンチャントを破壊", [{ op: "fp-opponent-draw" }, { op: "destroy-target" }], { targetSpec: { zone: "battlefield", types: ["Artifact", "Enchantment"], opposingPermanent: true, virtualOpponent: true } }); return true; }
   if (n === "Nowhere to Run") { q("相手のクリーチャーに−3/−3", [{ op: "opponent-effect", text: "相手の対象のクリーチャーはターン終了まで−3/−3" }], { targetSpec: { ...creatureTarget, opposingPermanent: true, virtualOpponent: true } }); return true; }
-  if (n === "Starscape Cleric" && c.castFormat?.offspring === "yes") q("新生：1/1コピー", [{ op: "fp-offspring" }]);
+  if (["Starscape Cleric", "Thundertrap Trainer"].includes(n) && c.castFormat?.offspring === "yes") q("新生：1/1コピー", [{ op: "fp-offspring" }]);
+  if (n === "Thundertrap Trainer") { q("上4枚から非クリーチャー・非土地を1枚まで", [
+    select("上4枚から非クリーチャー・非土地を1枚まで", "library", { notTypes: ["Creature", "Land"] }, { top: 4, destination: "hand", remainder: "libraryBottom", randomRemainder: true }),
+  ]); return true; }
   if (n === "Overlord of the Balemurk") { q("4枚切削・非アバターのクリーチャー／PWを回収", [{ op: "mill", count: 4 }, select("墓地から手札へ（任意）", "graveyard", { types: ["Creature", "Planeswalker"], notSubtypes: ["Avatar"] }, { destination: "hand" })]); return true; }
   if (n === "Emptiness") {
     if ((c.castManaByColor?.W || 0) >= 2) q("白白：墓地からクリーチャーを戻す", [{ op: "move-target", destination: "battlefield" }], { targetSpec: { zone: "graveyard", types: ["Creature"], maxManaValue: 3 } });

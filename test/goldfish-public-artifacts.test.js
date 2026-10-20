@@ -68,6 +68,28 @@ test("The One Ring blink does not renew protection; a removed source uses its la
   assert.equal(s.hand.length, hand + 2, "cannot put a counter on the absent Ring, but still draws its last count");
 });
 
+test("Thundertrap Trainer selects only a noncreature nonland, including a separate selection from its offspring", () => {
+  let s = position({ "Thundertrap Trainer": 1, "Lightning Bolt": 4, "Stock Up": 4 });
+  s = put(s, "Thundertrap Trainer");
+  for (const c of s.library.filter(c => ["Lightning Bolt", "Stock Up"].includes(c.name))) {
+    s.library.splice(s.library.indexOf(c), 1); s.library.push(c);
+  }
+  const before = s.hand.length;
+  let selections = 0;
+  s = settle(castGoldfishCard(funds(s), card(s, "Thundertrap Trainer", "hand").id, { format: { offspring: "yes" } }), [], c => {
+    if (!c.label?.startsWith("上4枚から非クリーチャー")) return null;
+    selections++;
+    assert.ok(c.candidates.every(x => ["Lightning Bolt", "Stock Up"].includes(x.label)));
+    return { refs: c.candidates.slice(0, 1).map(x => x.ref) };
+  });
+  assert.equal(selections, 2);
+  const trainers = s.battlefield.filter(c => c.name === "Thundertrap Trainer");
+  assert.equal(trainers.length, 2);
+  const offspring = trainers.find(c => c.kind === "token");
+  assert.equal(goldfishCharacteristics(s, offspring).toughness, "1");
+  assert.ok(s.hand.length >= before, "each trigger may take a card, without taking a land");
+});
+
 test("public UW: Synthesizer triggers from another MV3+ artifact, including a second Synthesizer, never itself or its zero-MV token", () => {
   let s = position({ "Simulacrum Synthesizer": 2, "Perilous Snare": 1, "Cryogen Relic": 1 });
   s = cast(put(s, "Simulacrum Synthesizer"), "Simulacrum Synthesizer");

@@ -1,7 +1,7 @@
-import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261021-public30h";
-import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261021-public30h";
-import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30h";
-import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30h";
+import { cardName, isType, addGameCounters, changeLife } from "./goldfish-events.js?v=20261021-public30i";
+import { engineCandidates, gameManaValue, gameLandTypes } from "./goldfish-engine.js?v=20261021-public30i";
+import { goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference } from "./goldfish-objects.js?v=20261021-public30i";
+import { goldfishCharacteristics } from "./goldfish-rules.js?v=20261021-public30i";
 
 export const EXTRA_COST_SPELLS = new Set(["Demand Answers", "Requiting Hex", "We Say Thee Nay!", "Countersculpt", "Fanatical Offering", "Deadly Dispute", "Stir Up Trouble", "Deadly Precision", "Vicious Rivalry", "Toxic Deluge", "Deadly Cover-Up", "Torch the Tower", "Rottenmouth Viper"]);
 export function extraFormatCostChoice(state, card, format = {}) {
@@ -25,6 +25,7 @@ export function extraFormatCostChoice(state, card, format = {}) {
   const extras = {
     "Overlord of the Balemurk": ["impending", "兆候5で唱える {1}{B}", "通常のコスト {3}{B}{B}"],
     "Starscape Cleric": ["offspring", "新生の追加{2}{B}を払う", "新生を使わない"],
+    "Thundertrap Trainer": ["offspring", "新生の追加{4}を払う", "新生を使わない"],
     "Scrapshooter": ["gift", "相手にカード1枚を贈り、登場時に破壊", "贈り物を約束しない"]
   };
   if (extras[name]) {
@@ -63,6 +64,7 @@ export function extraFormatCostChoice(state, card, format = {}) {
 export function formatAdditionalMana(card, format = {}) {
   const name = cardName(card);
   if (name === "Starscape Cleric" && format.offspring === "yes") return "{2}{B}";
+  if (name === "Thundertrap Trainer" && format.offspring === "yes") return "{4}";
   if (name === "Countersculpt" && !format.cards?.length) return "{1}";
   if (["Stir Up Trouble", "Deadly Precision"].includes(name) && !format.cards?.length) return "{4}";
   return "";
