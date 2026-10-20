@@ -1,0 +1,730 @@
+{
+  "fetchedAt": "2026-10-20T13:26:36.300Z",
+  "source": "Public environment representative lists, captured from the deployed UI on 2026-10-20",
+  "decks": [
+    {
+      "rank": 2,
+      "format": "standard",
+      "mainboard": [
+        {
+          "name": "Castle Doom",
+          "count": 4
+        },
+        {
+          "name": "Floodfarm Verge",
+          "count": 4
+        },
+        {
+          "name": "Gleaming Bastion",
+          "count": 2
+        },
+        {
+          "name": "Hallowed Fountain",
+          "count": 4
+        },
+        {
+          "name": "Island",
+          "count": 2
+        },
+        {
+          "name": "Meticulous Archive",
+          "count": 1
+        },
+        {
+          "name": "Petrified Hamlet",
+          "count": 1
+        },
+        {
+          "name": "Plains",
+          "count": 5
+        },
+        {
+          "name": "Erode",
+          "count": 1
+        },
+        {
+          "name": "United Battlefront",
+          "count": 4
+        },
+        {
+          "name": "Braided Net",
+          "count": 2
+        },
+        {
+          "name": "Candy Trail",
+          "count": 1
+        },
+        {
+          "name": "Clay-Fired Bricks",
+          "count": 2
+        },
+        {
+          "name": "Cryogen Relic",
+          "count": 3
+        },
+        {
+          "name": "Perilous Snare",
+          "count": 4
+        },
+        {
+          "name": "Pinnacle Starcage",
+          "count": 3
+        },
+        {
+          "name": "Repurposing Bay",
+          "count": 3
+        },
+        {
+          "name": "Seam Rip",
+          "count": 1
+        },
+        {
+          "name": "Simulacrum Synthesizer",
+          "count": 4
+        },
+        {
+          "name": "Spring-Loaded Sawblades",
+          "count": 2
+        },
+        {
+          "name": "The Fire Crystal",
+          "count": 1
+        },
+        {
+          "name": "The Irencrag",
+          "count": 2
+        },
+        {
+          "name": "The Mind Stone",
+          "count": 3
+        },
+        {
+          "name": "White Auracite",
+          "count": 1
+        }
+      ],
+      "meta": "取得できた完全リスト同士の枚数差が最小の実在リスト使用者: TheWitchKling / 大会: MTGO League / 順位: 4 / 日付: 2026-10-19原リストを開く — UW Control - TheWitchKling @ mtgtop8.com",
+      "sideboard": [
+        {
+          "name": "Day of Judgment",
+          "count": 2
+        },
+        {
+          "name": "Pinnacle Starcage",
+          "count": 1
+        },
+        {
+          "name": "Rest in Peace",
+          "count": 1
+        },
+        {
+          "name": "Seam Rip",
+          "count": 3
+        },
+        {
+          "name": "Spell Pierce",
+          "count": 2
+        },
+        {
+          "name": "Torpor Orb",
+          "count": 2
+        },
+        {
+          "name": "Voice of Victory",
+          "count": 4
+        }
+      ],
+      "title": "UW Control",
+      "url": "https://mtgtop8.com/event?e=92555&d=903092&f=ST"
+    }
+  ],
+  "metadata": [
+    {
+      "name": "Castle Doom",
+      "printedName": "Castle Doom",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/b/6b39d7a6-ca2d-4376-a18e-efd0138e83bc.jpg?1783902886",
+      "oracleText": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast an artifact spell.\n{3}, {T}, Sacrifice an artifact: Create a 3/3 colorless Robot Villain artifact creature token named Doombot. Activate only as a sorcery.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Castle Doom"
+    },
+    {
+      "name": "Floodfarm Verge",
+      "printedName": "Floodfarm Verge",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/5/d53ed0db-1199-44b3-8eda-8189dfcf53d1.jpg?1783909428",
+      "oracleText": "{T}: Add {W}.\n{T}: Add {U}. Activate only if you control a Plains or an Island.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Floodfarm Verge"
+    },
+    {
+      "name": "Gleaming Bastion",
+      "printedName": "Gleaming Bastion",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/c/9/c9131bf5-17e3-4aa6-97ed-ed6426b247d0.jpg?1783902884",
+      "oracleText": "{T}: Add {C}.\n{T}: Add {W} or {U}. Activate only if this land entered this turn or if you control a basic land.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Gleaming Bastion"
+    },
+    {
+      "name": "Hallowed Fountain",
+      "printedName": "Hallowed Fountain",
+      "language": "en",
+      "typeLine": "Land — Plains Island",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/7/b7285986-7e08-4969-86ef-452dc5bfdd9f.jpg?1784036830",
+      "oracleText": "({T}: Add {W} or {U}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Hallowed Fountain"
+    },
+    {
+      "name": "Island",
+      "printedName": "Island",
+      "language": "en",
+      "typeLine": "Basic Land — Island",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/3/1335d293-3dd2-4f13-bd2c-22181f4528ee.jpg?1791578424",
+      "oracleText": "({T}: Add {U}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Island"
+    },
+    {
+      "name": "Meticulous Archive",
+      "printedName": "Meticulous Archive",
+      "language": "en",
+      "typeLine": "Land — Plains Island",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/5/652236c2-84ef-45e4-b5fc-ed6170bc3d6c.jpg?1783912824",
+      "oracleText": "({T}: Add {W} or {U}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Meticulous Archive"
+    },
+    {
+      "name": "Petrified Hamlet",
+      "printedName": "Petrified Hamlet",
+      "language": "en",
+      "typeLine": "Land",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/5/355dd460-b0e9-41f2-a058-b7f7e39ac387.jpg?1783903620",
+      "oracleText": "When this land enters, choose a land card name.\nActivated abilities of sources with the chosen name can't be activated unless they're mana abilities.\nLands with the chosen name have \"{T}: Add {C}.\"\n{T}: Add {C}.",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Petrified Hamlet"
+    },
+    {
+      "name": "Plains",
+      "printedName": "Plains",
+      "language": "en",
+      "typeLine": "Basic Land — Plains",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/9/09ac862f-0a51-44dd-b86f-9412b8218b13.jpg?1791578423",
+      "oracleText": "({T}: Add {W}.)",
+      "manaCost": "",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Plains"
+    },
+    {
+      "name": "Erode",
+      "printedName": "Erode",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/3/2/32e670da-7563-4f6a-a7db-4c126a440eb8.jpg?1783903705",
+      "oracleText": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+      "manaCost": "{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Erode"
+    },
+    {
+      "name": "United Battlefront",
+      "printedName": "United Battlefront",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/f/dff398be-4ba4-4976-9acc-be99d2e07a61.jpg?1783907400",
+      "oracleText": "Look at the top seven cards of your library. Put up to two noncreature, nonland permanent cards with mana value 3 or less from among them onto the battlefield. Put the rest on the bottom of your library in a random order.",
+      "manaCost": "{3}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "United Battlefront"
+    },
+    {
+      "name": "Braided Net // Braided Quipu",
+      "printedName": "Braided Net // Braided Quipu",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "transform",
+      "imageUrl": "https://cards.scryfall.io/normal/front/6/8/68a6ede0-6d57-4e29-9e3b-3569ab7f0bcd.jpg?1783951764",
+      "oracleText": "This artifact enters with three net counters on it.\n{T}, Remove a net counter from this artifact: Tap another target nonland permanent. Its activated abilities can't be activated for as long as it remains tapped.\nCraft with artifact {1}{U}\n\n{3}{U}, {T}: Draw a card for each artifact you control, then put this artifact into its owner's library third from the top.",
+      "manaCost": "{2}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [
+        {
+          "name": "Braided Net",
+          "printedName": "Braided Net",
+          "typeLine": "Artifact",
+          "oracleText": "This artifact enters with three net counters on it.\n{T}, Remove a net counter from this artifact: Tap another target nonland permanent. Its activated abilities can't be activated for as long as it remains tapped.\nCraft with artifact {1}{U}",
+          "manaCost": "{2}{U}",
+          "imageUrl": "https://cards.scryfall.io/normal/front/6/8/68a6ede0-6d57-4e29-9e3b-3569ab7f0bcd.jpg?1783951764",
+          "power": "",
+          "toughness": "",
+          "colors": [
+            "U"
+          ],
+          "loyalty": ""
+        },
+        {
+          "name": "Braided Quipu",
+          "printedName": "Braided Quipu",
+          "typeLine": "Artifact",
+          "oracleText": "{3}{U}, {T}: Draw a card for each artifact you control, then put this artifact into its owner's library third from the top.",
+          "manaCost": "",
+          "imageUrl": "https://cards.scryfall.io/normal/back/6/8/68a6ede0-6d57-4e29-9e3b-3569ab7f0bcd.jpg?1783951764",
+          "power": "",
+          "toughness": "",
+          "colors": [
+            "U"
+          ],
+          "loyalty": ""
+        }
+      ],
+      "requestedName": "Braided Net"
+    },
+    {
+      "name": "Candy Trail",
+      "printedName": "Candy Trail",
+      "language": "en",
+      "typeLine": "Artifact — Food Clue",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/1/a/1a860925-d912-49e5-9ddc-41ab26916bb3.jpg?1783915060",
+      "oracleText": "When this artifact enters, scry 2.\n{2}, {T}, Sacrifice this artifact: You gain 3 life and draw a card.",
+      "manaCost": "{1}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Candy Trail"
+    },
+    {
+      "name": "Clay-Fired Bricks // Cosmium Kiln",
+      "printedName": "Clay-Fired Bricks // Cosmium Kiln",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "transform",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/a/8aece300-656b-4e0d-a45f-aa7feaff0a4e.jpg?1783913819",
+      "oracleText": "When this artifact enters, search your library for a basic Plains card, reveal it, put it into your hand, then shuffle. You gain 2 life.\nCraft with artifact {5}{W}{W} ({5}{W}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)\n\nWhen this artifact enters, create two 1/1 colorless Gnome artifact creature tokens.\nCreatures you control get +1/+1.",
+      "manaCost": "{1}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [
+        {
+          "name": "Clay-Fired Bricks",
+          "printedName": "Clay-Fired Bricks",
+          "typeLine": "Artifact",
+          "oracleText": "When this artifact enters, search your library for a basic Plains card, reveal it, put it into your hand, then shuffle. You gain 2 life.\nCraft with artifact {5}{W}{W} ({5}{W}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+          "manaCost": "{1}{W}",
+          "imageUrl": "https://cards.scryfall.io/normal/front/8/a/8aece300-656b-4e0d-a45f-aa7feaff0a4e.jpg?1783913819",
+          "power": "",
+          "toughness": "",
+          "colors": [
+            "W"
+          ],
+          "loyalty": ""
+        },
+        {
+          "name": "Cosmium Kiln",
+          "printedName": "Cosmium Kiln",
+          "typeLine": "Artifact",
+          "oracleText": "When this artifact enters, create two 1/1 colorless Gnome artifact creature tokens.\nCreatures you control get +1/+1.",
+          "manaCost": "",
+          "imageUrl": "https://cards.scryfall.io/normal/back/8/a/8aece300-656b-4e0d-a45f-aa7feaff0a4e.jpg?1783913819",
+          "power": "",
+          "toughness": "",
+          "colors": [
+            "W"
+          ],
+          "loyalty": ""
+        }
+      ],
+      "requestedName": "Clay-Fired Bricks"
+    },
+    {
+      "name": "Cryogen Relic",
+      "printedName": "Cryogen Relic",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/7/b/7bfb33b6-e2bf-498f-8c58-ae21a840cf75.jpg?1783905984",
+      "oracleText": "When this artifact enters or leaves the battlefield, draw a card.\n{1}{U}, Sacrifice this artifact: Put a stun counter on up to one target tapped creature. (If a permanent with a stun counter would become untapped, remove one from it instead.)",
+      "manaCost": "{1}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Cryogen Relic"
+    },
+    {
+      "name": "Perilous Snare",
+      "printedName": "Perilous Snare",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/4/7/47f7e468-2196-4960-a612-37ab326e2a17.jpg?1783907916",
+      "oracleText": "Start your engines! (If you have no speed, it starts at 1. It increases once on each of your turns when an opponent loses life. Max speed is 4.)\nWhen this artifact enters, exile target nonland permanent an opponent controls until this artifact leaves the battlefield.\nMax speed — {T}: Put a +1/+1 counter on target creature or Vehicle you control. Activate only as a sorcery.",
+      "manaCost": "{2}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Perilous Snare"
+    },
+    {
+      "name": "Pinnacle Starcage",
+      "printedName": "Pinnacle Starcage",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/b/1/b1f40c4c-a955-4d9c-8225-251fa4159124.jpg?1783905992",
+      "oracleText": "When this artifact enters, exile all artifacts and creatures with mana value 2 or less until this artifact leaves the battlefield.\n{6}{W}{W}: Put each card exiled with this artifact into its owner's graveyard, then create a 2/2 colorless Robot artifact creature token for each card put into a graveyard this way. Sacrifice this artifact.",
+      "manaCost": "{1}{W}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Pinnacle Starcage"
+    },
+    {
+      "name": "Repurposing Bay",
+      "printedName": "Repurposing Bay",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/0/c/0cf1ace1-b7f5-4bd9-a494-ee7cb6c1f854.jpg?1783907906",
+      "oracleText": "{2}, {T}, Sacrifice another artifact: Search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put that card onto the battlefield, then shuffle. Activate only as a sorcery.",
+      "manaCost": "{2}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Repurposing Bay"
+    },
+    {
+      "name": "Seam Rip",
+      "printedName": "Seam Rip",
+      "language": "en",
+      "typeLine": "Enchantment",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/d/9d298847-2d02-4593-b4d3-c5b722edac1e.jpg?1783905989",
+      "oracleText": "When this enchantment enters, exile target nonland permanent an opponent controls with mana value 2 or less until this enchantment leaves the battlefield.",
+      "manaCost": "{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Seam Rip"
+    },
+    {
+      "name": "Simulacrum Synthesizer",
+      "printedName": "Simulacrum Synthesizer",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/a/a/aaa05ad1-5cda-4edd-b6bf-562ae3e5011a.jpg?1783912002",
+      "oracleText": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+      "manaCost": "{2}{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Simulacrum Synthesizer"
+    },
+    {
+      "name": "Spring-Loaded Sawblades // Bladewheel Chariot",
+      "printedName": "Spring-Loaded Sawblades // Bladewheel Chariot",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "transform",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/4/24417388-f2bb-4783-bdce-264774531838.jpg?1783913808",
+      "oracleText": "Flash\nWhen this artifact enters, it deals 5 damage to target tapped creature an opponent controls.\nCraft with artifact {3}{W} ({3}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)\n\nTap two other untapped artifacts you control: This Vehicle becomes an artifact creature until end of turn.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+      "manaCost": "{1}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [
+        {
+          "name": "Spring-Loaded Sawblades",
+          "printedName": "Spring-Loaded Sawblades",
+          "typeLine": "Artifact",
+          "oracleText": "Flash\nWhen this artifact enters, it deals 5 damage to target tapped creature an opponent controls.\nCraft with artifact {3}{W} ({3}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+          "manaCost": "{1}{W}",
+          "imageUrl": "https://cards.scryfall.io/normal/front/2/4/24417388-f2bb-4783-bdce-264774531838.jpg?1783913808",
+          "power": "",
+          "toughness": "",
+          "colors": [
+            "W"
+          ],
+          "loyalty": ""
+        },
+        {
+          "name": "Bladewheel Chariot",
+          "printedName": "Bladewheel Chariot",
+          "typeLine": "Artifact — Vehicle",
+          "oracleText": "Tap two other untapped artifacts you control: This Vehicle becomes an artifact creature until end of turn.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+          "manaCost": "",
+          "imageUrl": "https://cards.scryfall.io/normal/back/2/4/24417388-f2bb-4783-bdce-264774531838.jpg?1783913808",
+          "power": "5",
+          "toughness": "5",
+          "colors": [
+            "W"
+          ],
+          "loyalty": ""
+        }
+      ],
+      "requestedName": "Spring-Loaded Sawblades"
+    },
+    {
+      "name": "The Fire Crystal",
+      "printedName": "The Fire Crystal",
+      "language": "en",
+      "typeLine": "Legendary Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/a/ea430b17-2014-4b8e-b53f-43bcfc06f7cd.jpg?1783906605",
+      "oracleText": "Red spells you cast cost {1} less to cast.\nCreatures you control have haste.\n{4}{R}{R}, {T}: Create a token that's a copy of target creature you control. Sacrifice it at the beginning of the next end step.",
+      "manaCost": "{2}{R}{R}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "R"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Fire Crystal"
+    },
+    {
+      "name": "The Irencrag",
+      "printedName": "The Irencrag",
+      "language": "en",
+      "typeLine": "Legendary Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/0/8051c5ec-54a6-45a8-8945-fb93c5feaa39.jpg?1783915058",
+      "oracleText": "{T}: Add {C}.\nWhenever a legendary creature you control enters, you may have The Irencrag become a legendary Equipment artifact named Everflame, Heroes' Legacy. If you do, it gains equip {3} and \"Equipped creature gets +3/+3\" and loses all other abilities.",
+      "manaCost": "{2}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Irencrag"
+    },
+    {
+      "name": "The Mind Stone",
+      "printedName": "The Mind Stone",
+      "language": "en",
+      "typeLine": "Legendary Artifact — Infinity Stone",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/7/87f1e69a-6d74-4982-afda-82613637799a.jpg?1783902972",
+      "oracleText": "Indestructible\n{T}: Add {W}.\n{5}{W}, {T}: Harness The Mind Stone. (Once harnessed, its ∞ ability is active.)\n∞ — At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.",
+      "manaCost": "{1}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "The Mind Stone"
+    },
+    {
+      "name": "White Auracite",
+      "printedName": "White Auracite",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/2/d/2df6f515-9d21-4769-b1c4-c219611bccbb.jpg?1783906641",
+      "oracleText": "When this artifact enters, exile target nonland permanent an opponent controls until this artifact leaves the battlefield.\n{T}: Add {W}.",
+      "manaCost": "{2}{W}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "White Auracite"
+    },
+    {
+      "name": "Day of Judgment",
+      "printedName": "Day of Judgment",
+      "language": "en",
+      "typeLine": "Sorcery",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/9/6/96e84bdc-8a9a-4c58-ba8b-9f052fd60069.jpg?1783909086",
+      "oracleText": "Destroy all creatures.",
+      "manaCost": "{2}{W}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Day of Judgment"
+    },
+    {
+      "name": "Rest in Peace",
+      "printedName": "Rest in Peace",
+      "language": "en",
+      "typeLine": "Enchantment",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/1/d108c2b1-236e-4b8d-8445-d9749ccc4fea.jpg?1783912003",
+      "oracleText": "When this enchantment enters, exile all graveyards.\nIf a card or token would be put into a graveyard from anywhere, exile it instead.",
+      "manaCost": "{1}{W}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Rest in Peace"
+    },
+    {
+      "name": "Spell Pierce",
+      "printedName": "Spell Pierce",
+      "language": "en",
+      "typeLine": "Instant",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/8/d/8dd4374f-0301-4b2e-bc99-2cd19568cb3b.jpg?1783907902",
+      "oracleText": "Counter target noncreature spell unless its controller pays {2}.",
+      "manaCost": "{U}",
+      "power": "",
+      "toughness": "",
+      "colors": [
+        "U"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Spell Pierce"
+    },
+    {
+      "name": "Torpor Orb",
+      "printedName": "Torpor Orb",
+      "language": "en",
+      "typeLine": "Artifact",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/d/b/dbf02a38-d10d-463e-ab99-e7fd848a1bd3.jpg?1784634333",
+      "oracleText": "Creatures entering don't cause abilities to trigger.",
+      "manaCost": "{2}",
+      "power": "",
+      "toughness": "",
+      "colors": [],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Torpor Orb"
+    },
+    {
+      "name": "Voice of Victory",
+      "printedName": "Voice of Victory",
+      "language": "en",
+      "typeLine": "Creature — Human Bard",
+      "layout": "normal",
+      "imageUrl": "https://cards.scryfall.io/normal/front/e/c/ec3de5f4-bb55-4ab9-995f-f3e0dc22c1bb.jpg?1783907401",
+      "oracleText": "Mobilize 2 (Whenever this creature attacks, create two tapped and attacking 1/1 red Warrior creature tokens. Sacrifice them at the beginning of the next end step.)\nYour opponents can't cast spells during your turn.",
+      "manaCost": "{1}{W}",
+      "power": "1",
+      "toughness": "3",
+      "colors": [
+        "W"
+      ],
+      "loyalty": "",
+      "faces": [],
+      "requestedName": "Voice of Victory"
+    }
+  ]
+}

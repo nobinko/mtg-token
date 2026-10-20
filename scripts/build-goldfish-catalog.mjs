@@ -1,5 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
-const files = ['goldfish-top10.json', ...['standard', 'legacy', 'pioneer'].map(format => `goldfish-${format}-top10.json`), 'goldfish-public-20261020.json'];
+const files = ['goldfish-top10.json', ...['standard', 'legacy', 'pioneer'].map(format => `goldfish-${format}-top10.json`), 'goldfish-public-20261020.json', 'goldfish-public-top30.json'];
 const fixtures = await Promise.all(files.map(async file => JSON.parse(await readFile(new URL(`../test/fixtures/${file}`, import.meta.url), 'utf8'))));
 const cards = {};
 for (const card of fixtures.flatMap(fixture => fixture.metadata).filter(card => !card.unavailable).flatMap(card => [card, ...(card.faces || [])])) {

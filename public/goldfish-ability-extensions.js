@@ -1,13 +1,15 @@
-import { activeFace as face, cardName as name, isType, copiableGoldfishValues, addGameCounters, makeGameToken, queueGameAbility as queue, changeLife } from "./goldfish-events.js?v=20261020-solo10";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-solo10";
-import { verifiedGoldfishCard, TOKENS, draw, discard } from "./goldfish-card-programs.js?v=20261020-solo10";
-import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-solo10";
-import { goldfishCharacteristics, goldfishKeywords } from "./goldfish-rules.js?v=20261020-solo10";
-import { damage } from "./goldfish-engine.js?v=20261020-solo10";
+import { activeFace as face, cardName as name, isType, copiableGoldfishValues, addGameCounters, makeGameToken, queueGameAbility as queue, changeLife } from "./goldfish-events.js?v=20261020-public30a";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move } from "./goldfish-objects.js?v=20261020-public30a";
+import { verifiedGoldfishCard, TOKENS, draw, discard } from "./goldfish-card-programs.js?v=20261020-public30a";
+import { goldfishCardActions } from "./goldfish-action-definitions.js?v=20261020-public30a";
+import { goldfishCharacteristics, goldfishKeywords } from "./goldfish-rules.js?v=20261020-public30a";
+import { damage } from "./goldfish-engine.js?v=20261020-public30a";
+import { ARTIFACT_NOTES, artifactEnter, artifactActions, artifactEvent, artifactStep, artifactChoose } from "./goldfish-artifact-programs.js?v=20261020-public30a";
 
 const live = s => s.battlefield.filter(c => verifiedGoldfishCard(c));
 const ask = (s, c, data) => { s.rules.pendingChoice = { type: "engine-choice", entryId: c.entryId, sourceName: c.sourceName, ...data }; };
 export const ABILITY_EXTENSION_NOTES = {
+  ...ARTIFACT_NOTES,
   "Agatha's Soul Cauldron": "墓地追放→別の誘発でカウンター。追放したクリーチャーの起動型能力を継承し、クリーチャーの起動に任意の色のマナを使える",
   "Triumph of Saint Katherine": "各ターン最初のドローの奇跡・死亡時の6枚と自身の山札への戻し方",
   "Captain Marvel, Earth's Protector": "パワーアップの登場ターンの軽減・1回限りの起動・カウンター",
@@ -22,12 +24,13 @@ export const ABILITY_EXTENSION_NOTES = {
 };
 export function hasAbilityExtension(c) { return verifiedGoldfishCard(c) && Boolean(ABILITY_EXTENSION_NOTES[name(c)]); }
 export function extensionEnter(s, c) {
+  if (artifactEnter(s, c)) return;
   if (verifiedGoldfishCard(c) && name(c) === "Oildeep Gearhulk")
     queue(s, c, "手札を見て、任意で1枚を捨てて引き直す", [{ op: "ext-oildeep" }], { targetSpec: { zone: "none", players: true } });
 }
 
 export function extensionActions(c) {
-  const actions = [], act = (id, label, cost, steps, extra = {}) => actions.push({ id: `engine:ext-${id}`, zone: "battlefield", cost, label, description: label, steps, ...extra });
+  const actions = [...artifactActions(c)], act = (id, label, cost, steps, extra = {}) => actions.push({ id: `engine:ext-${id}`, zone: "battlefield", cost, label, description: label, steps, ...extra });
   if (verifiedGoldfishCard(c)) {
     const n = name(c);
     if (n === "Agatha's Soul Cauldron") act("cauldron", "{T}：墓地を追放・クリーチャーなら＋1/＋1", "{0}", [{ op: "ext-cauldron" }], { tap: true, targetSpec: { zone: "graveyard" } });
@@ -68,6 +71,7 @@ export function extensionState(s) {
 }
 
 export function extensionEvent(s, e) {
+  artifactEvent(s, e);
   if (e.kind === "draw" && e.countThisTurn === 1 && e.card && verifiedGoldfishCard(e.card)) {
     const cost = face(e.card).oracleText.match(/\bMiracle ((?:\{[^}]+\})+)/)?.[1];
     if (cost) queue(s, e.card, `最初のドローを公開：奇跡 ${cost}`, [{ op: "effect-cast", card: ref(e.card, "hand"), cost }]);
@@ -93,6 +97,7 @@ export function recordGoldfishTargets(s, targets = []) {
 }
 
 export function extensionStep(s, c, op) {
+  if (artifactStep(s, c, op)) return true;
   const source = find(s, c.source), target = find(s, c.target);
   switch (op.op) {
     case "ext-token": makeGameToken(s, op.token); return true;
@@ -164,6 +169,7 @@ export function duplicateEnterAbilities(s, start, enteringCard) {
   if (s.rules.pendingChoice?.type === "order") s.rules.pendingChoice.entryIds = s.stack.slice(start).toReversed().map(e => e.id);
 }
 export function extensionChoose(s, c, op, a) {
+  if (artifactChoose(s, c, op, a)) return true;
   if (op.op === "ext-oildeep") {
     const card = find(s, a.refs[0]);
     if (card) {

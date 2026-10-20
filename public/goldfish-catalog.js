@@ -7158,5 +7158,228 @@ export const GOLD_FISH_CATALOG = {
     "power": "",
     "toughness": "",
     "loyalty": "3"
+  },
+  "Castle Doom": {
+    "oracleText": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast an artifact spell.\n{3}, {T}, Sacrifice an artifact: Create a 3/3 colorless Robot Villain artifact creature token named Doombot. Activate only as a sorcery.",
+    "manaCost": "",
+    "typeLine": "Land",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Gleaming Bastion": {
+    "oracleText": "{T}: Add {C}.\n{T}: Add {W} or {U}. Activate only if this land entered this turn or if you control a basic land.",
+    "manaCost": "",
+    "typeLine": "Land",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "United Battlefront": {
+    "oracleText": "Look at the top seven cards of your library. Put up to two noncreature, nonland permanent cards with mana value 3 or less from among them onto the battlefield. Put the rest on the bottom of your library in a random order.",
+    "manaCost": "{3}{W}",
+    "typeLine": "Sorcery",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Braided Net // Braided Quipu": {
+    "oracleText": "This artifact enters with three net counters on it.\n{T}, Remove a net counter from this artifact: Tap another target nonland permanent. Its activated abilities can't be activated for as long as it remains tapped.\nCraft with artifact {1}{U}\n\n{3}{U}, {T}: Draw a card for each artifact you control, then put this artifact into its owner's library third from the top.",
+    "manaCost": "{2}{U}",
+    "typeLine": "Artifact",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Braided Net": {
+    "oracleText": "This artifact enters with three net counters on it.\n{T}, Remove a net counter from this artifact: Tap another target nonland permanent. Its activated abilities can't be activated for as long as it remains tapped.\nCraft with artifact {1}{U}",
+    "manaCost": "{2}{U}",
+    "typeLine": "Artifact",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Braided Quipu": {
+    "oracleText": "{3}{U}, {T}: Draw a card for each artifact you control, then put this artifact into its owner's library third from the top.",
+    "manaCost": "",
+    "typeLine": "Artifact",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Candy Trail": {
+    "oracleText": "When this artifact enters, scry 2.\n{2}, {T}, Sacrifice this artifact: You gain 3 life and draw a card.",
+    "manaCost": "{1}",
+    "typeLine": "Artifact — Food Clue",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Clay-Fired Bricks // Cosmium Kiln": {
+    "oracleText": "When this artifact enters, search your library for a basic Plains card, reveal it, put it into your hand, then shuffle. You gain 2 life.\nCraft with artifact {5}{W}{W} ({5}{W}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)\n\nWhen this artifact enters, create two 1/1 colorless Gnome artifact creature tokens.\nCreatures you control get +1/+1.",
+    "manaCost": "{1}{W}",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Clay-Fired Bricks": {
+    "oracleText": "When this artifact enters, search your library for a basic Plains card, reveal it, put it into your hand, then shuffle. You gain 2 life.\nCraft with artifact {5}{W}{W} ({5}{W}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+    "manaCost": "{1}{W}",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Cosmium Kiln": {
+    "oracleText": "When this artifact enters, create two 1/1 colorless Gnome artifact creature tokens.\nCreatures you control get +1/+1.",
+    "manaCost": "",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Cryogen Relic": {
+    "oracleText": "When this artifact enters or leaves the battlefield, draw a card.\n{1}{U}, Sacrifice this artifact: Put a stun counter on up to one target tapped creature. (If a permanent with a stun counter would become untapped, remove one from it instead.)",
+    "manaCost": "{1}{U}",
+    "typeLine": "Artifact",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Perilous Snare": {
+    "oracleText": "Start your engines! (If you have no speed, it starts at 1. It increases once on each of your turns when an opponent loses life. Max speed is 4.)\nWhen this artifact enters, exile target nonland permanent an opponent controls until this artifact leaves the battlefield.\nMax speed — {T}: Put a +1/+1 counter on target creature or Vehicle you control. Activate only as a sorcery.",
+    "manaCost": "{2}{W}",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Repurposing Bay": {
+    "oracleText": "{2}, {T}, Sacrifice another artifact: Search your library for an artifact card with mana value equal to 1 plus the sacrificed artifact's mana value, put that card onto the battlefield, then shuffle. Activate only as a sorcery.",
+    "manaCost": "{2}{U}",
+    "typeLine": "Artifact",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Simulacrum Synthesizer": {
+    "oracleText": "When this artifact enters, scry 2.\nWhenever another artifact you control with mana value 3 or greater enters, create a 0/0 colorless Construct artifact creature token with \"This token gets +1/+1 for each artifact you control.\"",
+    "manaCost": "{2}{U}",
+    "typeLine": "Artifact",
+    "colors": [
+      "U"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Spring-Loaded Sawblades // Bladewheel Chariot": {
+    "oracleText": "Flash\nWhen this artifact enters, it deals 5 damage to target tapped creature an opponent controls.\nCraft with artifact {3}{W} ({3}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)\n\nTap two other untapped artifacts you control: This Vehicle becomes an artifact creature until end of turn.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+    "manaCost": "{1}{W}",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Spring-Loaded Sawblades": {
+    "oracleText": "Flash\nWhen this artifact enters, it deals 5 damage to target tapped creature an opponent controls.\nCraft with artifact {3}{W} ({3}{W}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+    "manaCost": "{1}{W}",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "Bladewheel Chariot": {
+    "oracleText": "Tap two other untapped artifacts you control: This Vehicle becomes an artifact creature until end of turn.\nCrew 1 (Tap any number of creatures you control with total power 1 or more: This Vehicle becomes an artifact creature until end of turn.)",
+    "manaCost": "",
+    "typeLine": "Artifact — Vehicle",
+    "colors": [
+      "W"
+    ],
+    "power": "5",
+    "toughness": "5",
+    "loyalty": ""
+  },
+  "The Fire Crystal": {
+    "oracleText": "Red spells you cast cost {1} less to cast.\nCreatures you control have haste.\n{4}{R}{R}, {T}: Create a token that's a copy of target creature you control. Sacrifice it at the beginning of the next end step.",
+    "manaCost": "{2}{R}{R}",
+    "typeLine": "Legendary Artifact",
+    "colors": [
+      "R"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "The Irencrag": {
+    "oracleText": "{T}: Add {C}.\nWhenever a legendary creature you control enters, you may have The Irencrag become a legendary Equipment artifact named Everflame, Heroes' Legacy. If you do, it gains equip {3} and \"Equipped creature gets +3/+3\" and loses all other abilities.",
+    "manaCost": "{2}",
+    "typeLine": "Legendary Artifact",
+    "colors": [],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "The Mind Stone": {
+    "oracleText": "Indestructible\n{T}: Add {W}.\n{5}{W}, {T}: Harness The Mind Stone. (Once harnessed, its ∞ ability is active.)\n∞ — At the beginning of your end step, exile up to one other target nonland permanent you control, then return that card to the battlefield under its owner's control.",
+    "manaCost": "{1}{W}",
+    "typeLine": "Legendary Artifact — Infinity Stone",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
+  },
+  "White Auracite": {
+    "oracleText": "When this artifact enters, exile target nonland permanent an opponent controls until this artifact leaves the battlefield.\n{T}: Add {W}.",
+    "manaCost": "{2}{W}{W}",
+    "typeLine": "Artifact",
+    "colors": [
+      "W"
+    ],
+    "power": "",
+    "toughness": "",
+    "loyalty": ""
   }
 };

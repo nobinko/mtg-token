@@ -1,7 +1,7 @@
 // Programs used by the dated Standard, Legacy and Pioneer fixtures. The caller
 // must verify the complete Oracle snapshot before exposing these adapters.
-import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-solo10";
-import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-solo10";
+import { SIDEBOARD_SPELLS } from "./goldfish-sideboard-programs.js?v=20261020-public30a";
+import { ADVANCED_SPELLS } from "./goldfish-advanced-spells.js?v=20261020-public30a";
 const creature = { zone: "battlefield", types: ["Creature"], virtualOpponent: true };
 const spell = { zone: "stack", spell: true, virtualOpponent: true };
 const damage = { zone: "battlefield", types: ["Creature", "Planeswalker", "Battle"], players: true };
@@ -10,6 +10,7 @@ const look = (count, take) => select(`上${count}枚から${take}枚を手札へ
 export const FORMAT_SPELLS = {
   ...SIDEBOARD_SPELLS,
   ...ADVANCED_SPELLS,
+  "United Battlefront": { steps: [select("上7枚からマナ総量3以下の非クリーチャー・非土地パーマネントを2枚まで", "library", { permanent: true, notTypes: ["Creature", "Land"], maxManaValue: 3 }, { top: 7, max: 2, destination: "battlefield", remainder: "libraryBottom", randomRemainder: true })] },
   "Demand Answers": { steps: [{ op: "draw", count: 2 }] },
   Boltwave: { steps: [{ op: "damage", player: "opponent", amount: 3 }] },
   "Plasma Bolt": { steps: [{ op: "plasma-bolt" }], target: damage },

@@ -1,10 +1,11 @@
-import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-solo10";
+import { GOLD_FISH_CATALOG } from "./goldfish-catalog.js?v=20261020-public30a";
 const face = c => c.faces?.[c.faceIndex || 0] || c;
 const type = (c, t) => new RegExp(`\\b(?:${t})\\b`).test(face(c).typeLine || "");
 const normalized = text => String(text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
 export function hasRuleCard(state, name) { return state.battlefield.some(c => !c.faceDown && c.automaticAbilities !== false && face(c).name === name && normalized(face(c).oracleText) === normalized(GOLD_FISH_CATALOG[name]?.oracleText)); }
 export function entryTriggersBlocked(state, card) { return type(card, "Creature") && hasRuleCard(state, "Torpor Orb") || type(card, "Artifact|Creature") && (hasRuleCard(state, "Karn, Argent Defender") || hasRuleCard(state, "Doorkeeper Thrull")); }
 export function abilityBlockReason(state, card, { zone = "battlefield", manaAbility = false } = {}) {
+  if (zone === "battlefield" && card.netLocked && card.tapped) return "編まれた網により、タップ状態の間は起動できません。";
   if (zone === "battlefield" && type(card, "Land") && !type(card, "Basic") && hasRuleCard(state, "Blood Moon") && !manaAbility) return "血染めの月により、この土地の能力は失われています。";
   if (zone === "battlefield" && type(card, "Creature") && hasRuleCard(state, "Cursed Totem")) return "呪われたトーテム像がクリーチャーの起動を禁止しています。";
   if (zone === "battlefield" && type(card, "Artifact") && hasRuleCard(state, "Null Rod")) return "無のロッドがアーティファクトの起動を禁止しています。";

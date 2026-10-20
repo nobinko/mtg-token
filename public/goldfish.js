@@ -1,15 +1,15 @@
-import { mergeCardMetadata } from "./card-metadata.js?v=20261020-solo10";
+import { mergeCardMetadata } from "./card-metadata.js?v=20261020-public30a";
 import { freshGoldfishRules, cloneGoldfishRules, assertGoldfishChoiceComplete, recordGoldfishCast,
-  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-solo10";
-import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-solo10";
-import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-solo10";
-import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-solo10";
-import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo10";
-import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-solo10";
-import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261020-solo10";
-import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-solo10";
-import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-solo10";
-import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-solo10";
+  resolveGoldfishAbilityDraft, chooseGoldfishRuleDraft, resetGoldfishTurnRules, recordGoldfishEnter, isGoldfishBauble, recordGoldfishBauble, recordGoldfishUpkeep } from "./goldfish-rules.js?v=20261020-public30a";
+import { resetGoldfishCardState, goldfishReference, goldfishFindObject, moveGoldfishRuleObject, cleanGoldfishAttachments, untapGoldfishObject } from "./goldfish-objects.js?v=20261020-public30a";
+import { hasRuleCard, castBlockReason } from "./goldfish-constraints.js?v=20261020-public30a";
+import { beginGoldfishCombatDraft, declareGoldfishAttackersDraft, resolveGoldfishCombatDraft } from "./goldfish-combat.js?v=20261020-public30a";
+import { goldfishSpellProgram, validateGoldfishSpellTarget, startGoldfishSpellResolution, chooseGoldfishSpellResolution, canGoldfishAutoResolve, applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-public30a";
+import { flushEngineEvents, chooseEngine, engineEndStep, engineMainStep, engineBeginningCombat, beginEngineOpening, gameLandPlayLimit } from "./goldfish-engine.js?v=20261020-public30a";
+import { drawGameCards, chooseGameDraw, queueGameAbility, cardName } from "./goldfish-events.js?v=20261020-public30a";
+import { continueEngineResolution } from "./goldfish-engine.js?v=20261020-public30a";
+import { continueGoldfishSpellResolution } from "./goldfish-spells.js?v=20261020-public30a";
+import { stepGoldfishSacrificeSequence } from "./goldfish-batch.js?v=20261020-public30a";
 
 export const GOLDFISH_SCHEMA_VERSION = 2;
 export const GOLDFISH_LANES = ["other", "creature", "land"];
@@ -316,7 +316,9 @@ export function setGoldfishCardsTapped(state, cardIds, tapped) {
   next.battlefield = next.battlefield.map((card) => {
     if (!selected.has(card.id)) return card;
     changed += 1;
-    return { ...card, tapped: typeof tapped === "boolean" ? tapped : !card.tapped };
+    const next = { ...card, tapped: typeof tapped === "boolean" ? tapped : !card.tapped };
+    if (!next.tapped) delete next.netLocked;
+    return next;
   });
   if (!changed) throw new Error("戦場のカードだけをタップできます。");
   return next;
@@ -509,7 +511,7 @@ export function moveGoldfishCards(state, cardIds, destination, { lane, index } =
     if (zone !== targetZone) cloned.incarnation += 1;
     if (zone === "battlefield" && destination === "battlefield") return cloned;
     const moved = resetBattlefieldState(cloned);
-    if (destination === "battlefield") moved.enteredTurn = state.turn;
+    if (destination === "battlefield") { moved.enteredTurn = state.turn; moved.enteredSerial = state.rules.turnSerial; }
     return moved;
   });
   if (flashbackIds.size) {

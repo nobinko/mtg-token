@@ -1,13 +1,13 @@
-import { cloneGoldfishState } from "./goldfish.js?v=20261020-solo10";
-import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-solo10";
-import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-solo10";
-import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-solo10";
-import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-solo10";
-import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-solo10";
-import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-solo10";
-import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-solo10";
-import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-solo10";
-import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-solo10";
+import { cloneGoldfishState } from "./goldfish.js?v=20261020-public30a";
+import { assertGoldfishChoiceComplete, recordGoldfishActivation, goldfishGraveyardTypes, goldfishCharacteristics } from "./goldfish-rules.js?v=20261020-public30a";
+import { planGoldfishPayment, payGoldfishPlan } from "./goldfish-mana.js?v=20261020-public30a";
+import { goldfishCardActions, goldfishMainTiming, goldfishCanEquip } from "./goldfish-action-definitions.js?v=20261020-public30a";
+import { goldfishReference, goldfishFindObject, moveGoldfishRuleObject, sameGoldfishReference, goldfishIsLegendary } from "./goldfish-objects.js?v=20261020-public30a";
+import { applyGoldfishStateActions } from "./goldfish-spells.js?v=20261020-public30a";
+import { engineCandidates, canTapCreature, flushEngineEvents, startEngineResolution } from "./goldfish-engine.js?v=20261020-public30a";
+import { queueGameAbility, addGameCounters, changeLife, isType, cardName } from "./goldfish-events.js?v=20261020-public30a";
+import { abilityBlockReason } from "./goldfish-constraints.js?v=20261020-public30a";
+import { recordGoldfishTargets } from "./goldfish-ability-extensions.js?v=20261020-public30a";
 
 export function goldfishActionTargets(state, card) {
   return state.battlefield.filter((target) => goldfishCanEquip(state, card, target));
@@ -39,6 +39,8 @@ export function goldfishActionReason(state, card, action) {
   if (action.delirium && goldfishGraveyardTypes(state).length < 4) return "昂揚には墓地のカード・タイプ4種類が必要です。";
   if (action.loyalty != null && (card.loyaltyUsed === state.rules.turnSerial || (card.counters.loyalty || 0) + action.loyalty < 0)) return "忠誠度が不足しているか、このターンは起動済みです。";
   if (action.lifeCost && state.players.self.life < action.lifeCost) return "支払うライフが足りません。";
+  if (action.minSpeed && (state.rules.speed || 0) < action.minSpeed) return `速度${action.minSpeed}になってから使えます（現在${state.rules.speed || 0}）。`;
+  if (action.counterCost?.amount < 0 && (card.counters[action.counterCost.name] || 0) < -action.counterCost.amount) return "コストにするカウンターが足りません。";
   if (action.target && !goldfishActionTargets(state, card).length) return "装備できる自分のクリーチャーがいません。";
   if (action.cards && state[action.cards.zone].length < action.cards.count) return `${action.cards.zone === "hand" ? "手札" : "墓地"}の枚数が足りません。`;
   return "";
@@ -135,12 +137,12 @@ function activateEngineAction(state, card, action, options) {
   if (action.loyalty != null) { source.counters.loyalty += action.loyalty; source.loyaltyUsed = next.rules.turnSerial; }
   if (action.sacrifice) moveGoldfishRuleObject(next, card.id, "battlefield", "graveyard", "sacrifice");
   if (action.discardSelf) moveGoldfishRuleObject(next, card.id, "hand", "graveyard");
-  if (action.exileSelf) moveGoldfishRuleObject(next, card.id, action.zone, "exile");
+  const exiledSource = action.exileSelf ? moveGoldfishRuleObject(next, card.id, action.zone, "exile") : null;
   for (const cost of options.costCards || []) {
     if (action.costSelect.destination === "tap") goldfishFindObject(next, cost).tapped = true;
     else moveGoldfishRuleObject(next, cost.id, cost.zone || "battlefield", action.costSelect.destination, (cost.zone || "battlefield") === "battlefield" && action.costSelect.destination === "graveyard" ? "sacrifice" : "");
   }
-  const entry = queueGameAbility(next, card, action.label, action.steps, { activated: true, target: options.target || null, targets: options.targets, targetSpec: action.targetSpec, allocation: structuredClone(options.allocation), costCards: (options.costCards || []).map(r => { const c = goldfishFindObject(state, r); return { ...structuredClone(c), lastKnownToughness: goldfishCharacteristics(state, c).toughness }; }), x: options.x || 0, snapshot: structuredClone(card), source: goldfishReference(card, action.zone) });
+  const entry = queueGameAbility(next, card, action.label, action.steps, { activated: true, target: options.target || null, targets: options.targets, targetSpec: action.targetSpec, allocation: structuredClone(options.allocation), costCards: (options.costCards || []).map(r => { const c = goldfishFindObject(state, r); return { ...structuredClone(c), lastKnownToughness: goldfishCharacteristics(state, c).toughness }; }), x: options.x || 0, snapshot: structuredClone(card), source: action.craft ? goldfishReference(exiledSource, "exile") : goldfishReference(card, action.zone) });
   recordGoldfishTargets(next, [options.target, ...(options.targets || []), ...(options.allocation || []).map(a => a.target)]);
   if (action.manaAbility) startEngineResolution(next, entry);
   if (!next.rules.pendingChoice) applyGoldfishStateActions(next);

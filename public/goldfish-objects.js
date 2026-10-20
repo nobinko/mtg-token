@@ -1,6 +1,6 @@
 // Shared object lifetime rules for manual zone moves and automatic effects.
-import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-solo10";
-import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-solo10";
+import { hasRuleCard } from "./goldfish-constraints.js?v=20261020-public30a";
+import { verifiedGoldfishCard } from "./goldfish-card-programs.js?v=20261020-public30a";
 export const goldfishReference = (card, zone) => ({ id: card.id, incarnation: card.incarnation || 0, ...(zone ? { zone } : {}) });
 export const goldfishFindObject = (state, ref) => (state[ref?.zone || "battlefield"] || [])
   .find((card) => card.id === ref?.id && (card.incarnation || 0) === ref.incarnation);
@@ -8,7 +8,7 @@ export const sameGoldfishReference = (a, b) => a?.player || b?.player ? a?.playe
 export function untapGoldfishObject(card) {
   if (!card.tapped) return;
   if (card.counters?.stun > 0) card.counters.stun--;
-  else card.tapped = false;
+  else { card.tapped = false; delete card.netLocked; }
 }
 export const goldfishIsLegendary = (state, card) => /\bLegendary\b/.test((card.faces?.[card.faceIndex || 0] || card).typeLine || "") || Boolean(state.rules.ringBearer && sameGoldfishReference(state.rules.ringBearer, goldfishReference(card)));
 
@@ -39,6 +39,9 @@ export function resetGoldfishCardState(card) {
   delete next.grantedAbilityCards;
   delete next.usedAbilities;
   delete next.crimeSerial;
+  delete next.netLocked;
+  delete next.harnessed;
+  delete next.artifactExiledOpponent;
   delete next.exerted;
   for (const key of ["chosenName", "castX", "unearthed", "stationed", "addedArtifactSerial", "monumentSerial", "monumentModes", "suppressedKeywords", "suppressedBy", "lostAbilitiesOriginal", "exileOnDeathSerial", "trollAura", "castFormat", "manaSpent", "impending", "unlockedDoors", "linkedExile", "solved", "scoutSerial"]) delete next[key];
   if (card.originalTypeLine) { next.typeLine = card.originalTypeLine; delete next.originalTypeLine; }

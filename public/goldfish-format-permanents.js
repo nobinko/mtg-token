@@ -1,10 +1,11 @@
-import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-solo10";
-import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-solo10";
-import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-solo10";
-import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-solo10";
-import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-solo10";
-import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-solo10";
-import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-solo10";
+import { activeFace as face, cardName as name, isType, queueGameAbility as queue, makeGameToken, changeLife, addGameCounters, shuffleGameLibrary, copiableGoldfishValues } from "./goldfish-events.js?v=20261020-public30a";
+import { goldfishReference as ref, goldfishFindObject as find, moveGoldfishRuleObject as move, sameGoldfishReference as same } from "./goldfish-objects.js?v=20261020-public30a";
+import { verifiedGoldfishCard, TOKENS, select, draw, discard, token, tutor, look, damageTarget } from "./goldfish-card-programs.js?v=20261020-public30a";
+import { engineCandidates, gameManaValue, gameColors, damage, destroy } from "./goldfish-engine.js?v=20261020-public30a";
+import { goldfishCharacteristics, goldfishKeywords, goldfishGraveyardTypes } from "./goldfish-rules.js?v=20261020-public30a";
+import { planGoldfishPayment, payGoldfishPlanDraft } from "./goldfish-mana.js?v=20261020-public30a";
+import { extensionState, extensionEvent, extensionUpkeep, extensionCombatDamage, extensionEnter, hasAbilityExtension } from "./goldfish-ability-extensions.js?v=20261020-public30a";
+import { artifactEntryState, artifactEnd } from "./goldfish-artifact-programs.js?v=20261020-public30a";
 
 const active = c => c && !c.faceDown && c.automaticAbilities !== false && verifiedGoldfishCard(c);
 const live = s => s.battlefield.filter(active);
@@ -42,6 +43,7 @@ export const FORMAT_PERMANENT_NAMES = new Set([
 ]);
 export function formatPermanentEntryState(s, c) {
   if (!active(c)) return;
+  artifactEntryState(s, c);
   if (name(c) === "Leatherhead, Swamp Stalker") c.counters.hexproof = 1;
   syncFood(s);
   if (/\bDaybound\b/.test(face(c).oracleText)) { s.rules.dayNight ||= "day"; if (s.rules.dayNight === "night") c.faceIndex = 1; }
@@ -192,6 +194,7 @@ export function formatPermanentUpkeep(s) {
   }
 }
 export function formatPermanentEnd(s) {
+  artifactEnd(s);
   for (const c of s.exile) if (c.playPermission?.untilEndStep && c.playPermission.expires === s.rules.turnSerial) delete c.playPermission;
   for (const d of s.rules.dragonhawkCards || []) if (d.endSerial === s.rules.turnSerial) queue(s, d.source, "ドラゴンホーク：残った追放カードに応じたダメージ", [{ op: "fp-dragonhawk-end", refs: d.refs }]);
   s.rules.dragonhawkCards = (s.rules.dragonhawkCards || []).filter(d => d.endSerial > s.rules.turnSerial);
@@ -357,7 +360,7 @@ export function formatPermanentStats(s, c) {
   }
   if (isType(c, "Ninja")) d.boost = (d.boost || 0) + (s.rules.kaitoEmblems || 0);
   if (isType(c, "Creature")) for (const lord of live(s).filter(x => x.id !== c.id)) {
-    if (name(lord) === "Ulvenwald Behemoth" || name(lord) === "It That Heralds the End" && !gameColors(c).length) d.boost = (d.boost || 0) + 1;
+    if (["Ulvenwald Behemoth", "Cosmium Kiln"].includes(name(lord)) || name(lord) === "It That Heralds the End" && !gameColors(c).length) d.boost = (d.boost || 0) + 1;
   }
   if (c.kind === "token" && c.name === "Rat" && c.oracleText === rat.oracleText) d.boost = s.battlefield.filter(x => x.id !== c.id && isType(x, "Rat")).length;
   return d;
@@ -367,6 +370,7 @@ export function formatPermanentKeywords(s, c) {
   if (name(c) === "Keen-Eyed Curator" && active(c) && goldfishGraveyardTypes({ graveyard: (c.linkedExile || []).map(r => find(s, r)).filter(Boolean) }).length >= 4) out.push("trample");
   if (name(c) === "Kaito, Bane of Nightmares" && active(c) && s.rules.activePlayer === "self" && c.counters.loyalty > 0) out.push("hexproof");
   if (isType(c, "Creature") && live(s).some(x => x.id !== c.id && name(x) === "Ulvenwald Behemoth")) out.push("haste", "trample");
+  if (isType(c, "Creature") && live(s).some(x => name(x) === "The Fire Crystal")) out.push("haste");
   return out;
 }
 export function formatPermanentStep(s, c, op) {
