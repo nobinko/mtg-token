@@ -5,6 +5,7 @@ import { createDeckGallery } from "./deck-gallery.js?v=20261021-public30n";
 import { decksForToken, sourcesForDeck, boardCount, deckDisplayName } from "./token-decks.js?v=20261021-public30n";
 import { createTournamentController } from "./tournament-ui.js?v=20261021-public30n";
 import { searchIssues, searchCoverageMessage, searchCoverageBasis } from "./search-feedback.js?v=20261021-public30n";
+import { readApiResponse } from "./http-response.js?v=20261021-privacy";
 
 const form = document.querySelector("#search-form");
 const formatSelect = document.querySelector("#format");
@@ -1799,7 +1800,7 @@ async function enrichCurrentAssets(runId) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ logRunId, ...payload })
       });
-      const data = await response.json();
+      const data = await readApiResponse(response);
       if (!response.ok) throw new Error(data.error || "画像補完に失敗しました。");
       if (runId !== searchRunId) return;
       mergeEnrichedAssets(data);
@@ -1884,7 +1885,7 @@ async function runSearch(event) {
         preparation: !tournamentUI.isActive() && preparationMode.checked ? { setCode: preparationSet.value.trim(), startsAt: preparationDate.value } : null
       })
     });
-    const data = await response.json();
+    const data = await readApiResponse(response);
     if (!response.ok) throw new Error(data.error || "検索に失敗しました。");
     if (runId !== searchRunId) return;
 

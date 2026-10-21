@@ -295,16 +295,24 @@ app.post("/api/card-metadata", async (c) => {
 
 app.get("/api/logs", (c) => {
   return streamSSE(c, async (stream) => {
-    const unsubscribe = requestLogs.subscribe(c.get("sessionScope"), entry => stream.writeSSE({ data: JSON.stringify(entry) }));
-    stream.onAbort(unsubscribe);
-    try {
-      // Heartbeats also end streams when the session expires or is revoked.
-      while (!stream.aborted && await c.get("sessionActive")()) {
-        await stream.writeSSE({ event: "ping", data: "" });
-        await stream.sleep(15_000);
+    let cursor = 0, nextCheck = 0;
+    // Pull from this request's own context. A search request must never write
+    // another request's stream: Workers forbid cross-request I/O.
+    while (!stream.aborted) {
+      let heartbeat = false;
+      if (Date.now() >= nextCheck) {
+        if (!await c.get("sessionActive")()) break;
+        nextCheck = Date.now() + 15_000;
+        heartbeat = true;
       }
-    } finally {
-      unsubscribe();
+      for (const item of requestLogs.since(c.get("sessionScope"), cursor)) {
+        await stream.writeSSE({ data: JSON.stringify(item.entry) });
+        cursor = item.id;
+      }
+      if (heartbeat) {
+        await stream.writeSSE({ event: "ping", data: "" });
+      }
+      await stream.sleep(500);
     }
   });
 });

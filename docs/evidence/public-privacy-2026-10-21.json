@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-10-21T12:58:42.076Z",
+  "url": "https://mtg-token-finder-nobinko.nobinko.chatgpt.site",
+  "checks": [
+    "anonymous pages, assets and APIs denied",
+    "release SHA, security headers and independent secure cookies verified",
+    "internal files unavailable after login",
+    "unsafe URL inputs rejected without reflecting their contents",
+    "cross-origin writes denied",
+    "synthetic private import excludes account fields and cannot be loaded by another session",
+    "other session log replay excludes private import data",
+    "logout revokes the old cookie, preserves the other session and requests device cleanup",
+    "old shared public-page cache cleared"
+  ],
+  "commitSha": "3de260f7f0eb05d47e89379fc0c0328dc3942559",
+  "siteVersion": 33,
+  "deploymentId": "appgdep_6ad8b6d155cc81919d465a3beda8d227",
+  "unitTests": {
+    "passed": 651,
+    "failed": 0
+  },
+  "dependencyAudit": {
+    "knownVulnerabilities": 0,
+    "includesDevelopment": true
+  },
+  "productionEnvironment": {
+    "revision": 2,
+    "keys": [
+      "AUTH_REQUIRED",
+      "SESSION_SECRET",
+      "SITE_PASSWORD_SHA256"
+    ],
+    "meleeCredentialsConfigured": false
+  }
+}

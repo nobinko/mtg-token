@@ -88,6 +88,18 @@ try {
   const firstLog = new TextDecoder().decode((await reader.read()).value);
   assert.doesNotMatch(firstLog, /Local Verification|private-upstream-body|verification-only|not-a-real-credential/);
   await reader.cancel();
+  // A live progress stream must be written by its own Worker request, not by
+  // the request producing a log (cross-request I/O is forbidden by Workers).
+  const ownStream = await mf.dispatchFetch(`${origin}/api/logs`, { headers });
+  const ownReader = ownStream.body.getReader();
+  await ownReader.read();
+  const invalidEnrich = await mf.dispatchFetch(`${origin}/api/enrich-card-assets`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ sourceCards: [null] }) });
+  assert.equal(invalidEnrich.status, 500);
+  let timer;
+  try {
+    const live = await Promise.race([ownReader.read(), new Promise((_, reject) => { timer = setTimeout(() => reject(new Error("Live Worker logs did not reach their owning session")), 2500); })]);
+    assert.match(new TextDecoder().decode(live.value), /processing failed/);
+  } finally { clearTimeout(timer); await ownReader.cancel(); }
   const version = await (await mf.dispatchFetch(`${origin}/api/version`, { headers })).json();
   const buildInfo = JSON.parse(await readFile("dist/build-info.json", "utf8"));
   assert.equal(version.commitSha, buildInfo.commitSha);
