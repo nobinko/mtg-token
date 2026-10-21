@@ -10,9 +10,7 @@ test("fetchCardMetadata batches names and returns public playtest metadata", asy
   let request;
   globalThis.fetch = async (url, options) => {
     request = { url, options };
-    return {
-      ok: true,
-      json: async () => ({
+    return Response.json({
         data: [{
           name: "Dryad Arbor",
           layout: "normal",
@@ -24,8 +22,7 @@ test("fetchCardMetadata batches names and returns public playtest metadata", asy
           toughness: "1"
         }],
         not_found: [{ name: "Definitely Missing" }]
-      })
-    };
+      });
   };
 
   try {

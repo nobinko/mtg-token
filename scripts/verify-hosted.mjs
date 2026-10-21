@@ -29,11 +29,24 @@ try {
   const login = await mf.dispatchFetch(`${origin}/login`, { method: "POST", headers: { origin, "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ password }).toString(), redirect: "manual" });
   assert.equal(login.status, 303);
   const headers = { cookie: login.headers.get("set-cookie").split(";")[0], origin };
+  const loginB = await mf.dispatchFetch(`${origin}/login`, { method: "POST", headers: { origin, "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ password }).toString(), redirect: "manual" });
+  const headersB = { cookie: loginB.headers.get("set-cookie").split(";")[0], origin };
+  assert.notEqual(headers.cookie, headersB.cookie);
   const page = await mf.dispatchFetch(`${origin}/`, { headers });
   assert.equal(page.status, 200);
+  assert.match(page.headers.get("content-security-policy"), /script-src 'self';/);
+  assert.equal(page.headers.get("referrer-policy"), "same-origin");
   assert.match(await page.text(), /画像付き|deck-dialog/);
   assert.equal((await mf.dispatchFetch(`${origin}/app.js`, { headers })).status, 200);
   assert.equal((await mf.dispatchFetch(`${origin}/tournament-ui.js`, { headers })).status, 200);
+  for (const path of ["/.env", "/.git/config", "/lib/auth.js", "/.cache/tournaments.json", "/%2e%2e%5c.env"]) assert.equal((await mf.dispatchFetch(`${origin}${path}`, { headers })).status, 404);
+  for (const url of ["https://127.0.0.1/private", "https://mtgtop8.com/?token=private-fixture"]) {
+    const before = meleeFixture.calls.length;
+    const denied = await mf.dispatchFetch(`${origin}/api/token-cards`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ sources: [url] }) });
+    assert.equal(denied.status, 400);
+    assert.equal(meleeFixture.calls.length, before, "Invalid sources must cause no external requests");
+    assert.doesNotMatch(await denied.text(), /private-fixture|127\.0\.0\.1/);
+  }
   const catalogResponse = await mf.dispatchFetch(`${origin}/api/melee/tournaments?format=modern&days=90`, { headers });
   const catalog = await catalogResponse.json();
   assert.equal(catalogResponse.status, 200, JSON.stringify(catalog));
@@ -67,6 +80,14 @@ try {
   const deniedLoad = await loadTournament();
   assert.equal(deniedLoad.status, 410, "A tournament URL must not expose another browser's lists.");
   assert.equal((await deniedLoad.json()).decks, undefined);
+  const deniedOther = await mf.dispatchFetch(`${origin}/api/tournament`, { method: "POST", headers: { ...headersB, "content-type": "application/json" }, body: JSON.stringify({ action: "load", url: tournamentUrl }) });
+  assert.equal(deniedOther.status, 410);
+  assert.doesNotMatch(await deniedOther.text(), /Local Verification|Island/);
+  const logResponse = await mf.dispatchFetch(`${origin}/api/logs`, { headers: headersB });
+  const reader = logResponse.body.getReader();
+  const firstLog = new TextDecoder().decode((await reader.read()).value);
+  assert.doesNotMatch(firstLog, /Local Verification|private-upstream-body|verification-only|not-a-real-credential/);
+  await reader.cancel();
   const version = await (await mf.dispatchFetch(`${origin}/api/version`, { headers })).json();
   const buildInfo = JSON.parse(await readFile("dist/build-info.json", "utf8"));
   assert.equal(version.commitSha, buildInfo.commitSha);
@@ -80,7 +101,12 @@ try {
   assert.equal(await bucket.get("cache/pages/hosted-verification.json"), null);
   assert.equal(await (await bucket.get("cache/hosted-state-verification.json")).text(), "persistent-cache-fixture");
   assert.equal((await loadTournament()).status, 410, "Cache clearing must not restore shared tournament access.");
-  console.log("Hosted Worker: login, protected assets/APIs, D1, R2, Melee transport/redirect refusal and tournament imports verified.");
+  const logout = await mf.dispatchFetch(`${origin}/logout?clear=1`, { method: "POST", headers: headersB, redirect: "manual" });
+  assert.equal(logout.status, 303);
+  assert.equal(logout.headers.get("clear-site-data"), '"cache", "storage"');
+  assert.equal((await mf.dispatchFetch(`${origin}/api/formats`, { headers: headersB })).status, 401);
+  assert.equal((await mf.dispatchFetch(`${origin}/api/formats`, { headers })).status, 200);
+  console.log("Hosted Worker: auth, session revocation/isolation, security headers, private import/R2 isolation, unsafe URL rejection and Melee redirect refusal verified.");
   if (process.argv.includes("--live-search")) {
     const response = await mf.dispatchFetch(`${origin}/api/token-cards`, { method: "POST", headers: { ...headers, "content-type": "application/json" }, body: JSON.stringify({ format: "modern", targetDate: "2026-10-03", maxChildPages: 20, useCache: true }) });
     const result = await response.json();

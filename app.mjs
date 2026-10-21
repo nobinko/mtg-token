@@ -1,4 +1,3 @@
-import { AsyncLocalStorage } from "node:async_hooks";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { bodyLimit } from "hono/body-limit";
@@ -7,6 +6,8 @@ import { importTournament, restoreTournament, tournamentSummary, meleeTournament
 import { fetchTournamentCards } from "./lib/scryfall.js";
 import { maxMatchedCards, seedPageMaxAgeMs } from "./lib/config.js";
 import { passwordGate } from "./lib/auth.js";
+import { logContext, requestLogs, redactLog } from "./lib/request-logs.js";
+import { publicSourceUrl, SourceUrlError } from "./lib/public-fetch.js";
 import { hostedRuntime } from "./lib/runtime.js";
 import { buildInfo } from "./lib/build-info.js";
 import { defaultSources, formatOptions, normalizeFormat } from "./lib/data.js";
@@ -30,12 +31,6 @@ import { crawlSources } from "./lib/crawl.js";
 import { extractDeckEntries } from "./lib/deck.js";
 import { chooseRepresentativeDeck, extractMtgTop8ArchetypeDeckLinks, normalizeMtgTop8ArchetypeUrl, representativeAsOfDate } from "./lib/meta.js";
 
-// ---- ログブロードキャスト ----
-const sseClients = new Set();
-const logBuffer = [];
-const LOG_BUFFER_MAX = 600;
-const logContext = new AsyncLocalStorage();
-
 const _origLog = console.log;
 const _origError = console.error;
 
@@ -54,32 +49,25 @@ function normalizeLogRunId(value) {
 }
 
 function broadcast(line) {
-  const entry = {
-    line,
-    runId: logContext.getStore()?.runId || "",
-    at: new Date().toISOString()
-  };
-  logBuffer.push(entry);
-  if (logBuffer.length > LOG_BUFFER_MAX) logBuffer.shift();
-  for (const writer of sseClients) {
-    try { writer(entry); } catch { sseClients.delete(writer); }
-  }
+  requestLogs.publish(logContext.getStore(), line);
 }
 
 console.log = (...args) => {
   if (logContext.getStore()?.privateTournament) return;
-  _origLog(...args);
+  if (!logContext.getStore()) _origLog(redactLog(args.map(serializeLogArg).join(" ")));
   broadcast(args.map(serializeLogArg).join(" "));
 };
 
 console.error = (...args) => {
   if (logContext.getStore()?.privateTournament) return;
-  _origError(...args);
+  if (!logContext.getStore()) _origError(redactLog(args.map(serializeLogArg).join(" ")));
   broadcast("[ERROR] " + args.map(serializeLogArg).join(" "));
 };
 
 export const app = new Hono();
 app.use("*", passwordGate());
+app.use("*", (c, next) => logContext.run({ sessionScope: c.get("sessionScope"), sessionExpires: c.get("sessionExpires") }, next));
+app.use("/api/*", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => c.json({ error: "送信データがサイズ上限を超えています。" }, 413) }));
 app.get("/api/session", c => c.json({ protected: Boolean(hostedRuntime()) || process.env.AUTH_REQUIRED === "true" }));
 app.get("/api/version", c => c.json(buildInfo));
 app.use("/api/*", async (c, next) => {
@@ -164,7 +152,7 @@ app.post("/api/tournament", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => 
   c.header("Cache-Control", "private, no-store");
   if (["fetch", "fetch-api"].includes(body.action)) {
     try {
-      const result = await logContext.run({ privateTournament: true }, () => body.action === "fetch-api" ? meleeClient.acquireApi(url, body.credentials) : meleeClient.acquire(url));
+      const result = await logContext.run({ ...logContext.getStore(), privateTournament: true }, () => body.action === "fetch-api" ? meleeClient.acquireApi(url, body.credentials) : meleeClient.acquire(url));
       return c.json(result);
     } catch (error) { return c.json({ error: error.message }, [401, 403, 429, 504].includes(error.status) ? error.status : 502); }
   }
@@ -183,7 +171,7 @@ app.post("/api/tournament", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => 
 app.post("/api/meta-deck", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const logRunId = normalizeLogRunId(body.logRunId);
-  return logContext.run({ runId: logRunId }, async () => {
+  return logContext.run({ ...logContext.getStore(), runId: logRunId }, async () => {
     const format = String(body.format || "").toLowerCase();
     if (!["standard", "pioneer", "modern", "legacy"].includes(format)) return c.json({ error: "フォーマットが不正です。" }, 400);
     const targetDate = toIsoDate(body.targetDate) || new Date().toISOString().slice(0, 10);
@@ -307,22 +295,16 @@ app.post("/api/card-metadata", async (c) => {
 
 app.get("/api/logs", (c) => {
   return streamSSE(c, async (stream) => {
-    // 既存バッファを一括送信
-    for (const entry of logBuffer) {
-      await stream.writeSSE({ data: JSON.stringify(entry) });
-    }
-    const writer = async (entry) => {
-      try { await stream.writeSSE({ data: JSON.stringify(entry) }); } catch { /* disconnected */ }
-    };
-    sseClients.add(writer);
+    const unsubscribe = requestLogs.subscribe(c.get("sessionScope"), entry => stream.writeSSE({ data: JSON.stringify(entry) }));
+    stream.onAbort(unsubscribe);
     try {
-      // ping で接続を維持（15秒ごと）
-      while (true) {
-        await stream.sleep(15_000);
+      // Heartbeats also end streams when the session expires or is revoked.
+      while (!stream.aborted && await c.get("sessionActive")()) {
         await stream.writeSSE({ event: "ping", data: "" });
+        await stream.sleep(15_000);
       }
     } finally {
-      sseClients.delete(writer);
+      unsubscribe();
     }
   });
 });
@@ -335,7 +317,7 @@ app.post("/api/cache/clear", async (c) => {
 app.post("/api/token-cards", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c => c.json({ error: "大会リストのサイズ上限を超えています。元のファイルを確認してください。" }, 413) }), async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const logRunId = normalizeLogRunId(body.logRunId);
-  return logContext.run({ runId: logRunId, privateTournament: body.sourceMode === "tournament" }, async () => {
+  return logContext.run({ ...logContext.getStore(), runId: logRunId, privateTournament: body.sourceMode === "tournament" }, async () => {
   const format = normalizeFormat(body.format);
   const tournamentMode = body.sourceMode === "tournament";
   let tournament = null;
@@ -346,9 +328,15 @@ app.post("/api/token-cards", bodyLimit({ maxSize: 5 * 1024 * 1024, onError: c =>
     c.header("Cache-Control", "private, no-store");
   }
   if (tournament && (tournament.format !== format || tournament.targetDate !== body.targetDate || tournament.fetchedAt !== body.tournamentRevision)) return c.json({ error: "読み込んだ大会の条件またはリストが変更されています。大会をもう一度読み込んで確認してください。" }, 409);
-  const sourceUrls = tournament ? [tournament.url] : Array.isArray(body.sources) && body.sources.length
+  let sourceUrls = tournament ? [tournament.url] : Array.isArray(body.sources) && body.sources.length
     ? body.sources
     : defaultSources[format] ?? defaultSources.standard;
+  if (!tournament) {
+    try {
+      if (sourceUrls.length > 20) throw new SourceUrlError();
+      sourceUrls = sourceUrls.map(url => publicSourceUrl(url));
+    } catch (error) { return c.json({ error: error.message }, 400); }
+  }
   const maxChildPages = tournament ? tournament.decks.length : normalizeRequestedDeckCount(body.maxChildPages);
   const useCache = body.useCache !== false;
   const refreshCache = body.refreshCache === true;
@@ -541,7 +529,7 @@ app.post("/api/token-alternatives", async (c) => {
 app.post("/api/enrich-card-assets", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const logRunId = normalizeLogRunId(body.logRunId);
-  return logContext.run({ runId: logRunId }, async () => {
+  return logContext.run({ ...logContext.getStore(), runId: logRunId }, async () => {
   const sourceCards = Array.isArray(body.sourceCards) ? body.sourceCards.slice(0, 120) : [];
   const objects = Array.isArray(body.objects) ? body.objects.slice(0, 160) : [];
   const sourceInputByName = new Map(sourceCards.map((source) => [String(source.name || ""), source]));
@@ -607,7 +595,8 @@ app.post("/api/enrich-card-assets", async (c) => {
 });
 
 app.onError((err, c) => {
-  console.error(err?.stack || err?.message || err);
-  return c.json({ error: err.message }, 500);
+  // Error objects can include upstream URLs, request bodies or local paths.
+  console.error("[request] processing failed");
+  return c.json({ error: "処理を完了できませんでした。入力を確認し、時間をおいて再試行してください。" }, 500);
 });
 

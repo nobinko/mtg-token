@@ -9,7 +9,7 @@
     <link rel="icon" href="/favicon.svg?v=20261003-redesign">
     <script src="/theme.js?v=20261003-redesign"></script>
     <script type="module" src="/session.js"></script>
-    <link rel="stylesheet" href="/styles.css?v=20261021-public30n">
+    <link rel="stylesheet" href="/styles.css?v=20261021-privacy">
     <link rel="stylesheet" href="/goldfish.css?v=20261021-public30n">
   </head>
   <body>
@@ -37,7 +37,7 @@
             <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
             <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
           </button>
-          <form id="logout-form" action="/logout" method="post" hidden><button type="submit" class="ghost-button">ログアウト</button></form>
+          <form id="logout-form" action="/privacy.html" method="get" hidden><button type="submit" class="ghost-button">ログアウト</button></form>
         </div>
       </header>
 
@@ -94,6 +94,7 @@
                   <p id="preparation-help" class="field-help" hidden>直前環境の実績と新セットの追加準備候補を別々に表示します。構築適用日は発売日と異なる場合があります。新セット情報が未公開・未収録なら候補は未完備です。</p>
                   <label for="sources" class="field-label">巡回元URL</label>
                   <textarea id="sources" spellcheck="false"></textarea>
+                  <p class="tournament-note">晴れる屋・MTGO・MTGTop8・Wizards公式の公開URLに対応。認証情報や限定公開トークン付きのURLは取得しません。</p>
                   <p class="field-help">発生源カードは選択フォーマットで使用可能な紙のカードを対象にします。通常セットに加え、モダンでは指輪物語・モダンホライゾン等も準備表に並びます。同じ仕様のものが見つからない場合は「別途用意するもの」に残します。</p>
                 </div>
               </details>
@@ -623,6 +624,6 @@
       <div id="log-content" class="log-content" aria-live="polite"></div>
     </div>
 
-    <script src="/app.js?v=20261021-public30n" type="module"></script>
+    <script src="/app.js?v=20261021-privacy" type="module"></script>
   </body>
 </html>

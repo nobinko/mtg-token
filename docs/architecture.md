@@ -31,6 +31,8 @@
 
 `POST /api/token-cards`の`sourceMode: tournament`はブラウザから送られた`tournamentSnapshot`を`restoreTournament()`で再検証します。カード構成・参加総数から件数と網羅性を再計算し、クライアントの集計値を信用しません。大会URLが不一致なら400、フォーマット・大会日・取り込み日時がUI確認時と一致しなければ409を返します。大会検索ログは共有SSEバッファ・標準出力へ配信しません。Melee通常ログインのCookieや、管理者の認証情報を他の利用者へ流用しません。
 
+検索ログは`lib/request-logs.js`で署名済みセッションのハッシュに分離し、15分・計600行を上限にメモリーへ保持します。run IDは画面の検索識別だけに使い、閲覧権限を与えません。ログアウト時はD1の`revoked_sessions`で期限まで失効させます。公開ページ取得は`lib/public-fetch.js`で初期URLと各転送先を完全一致の許可ホストへ制限し、認証情報・限定公開URLを共有キャッシュへ入れません。共用端末の退出は`public/privacy.html`で保存継続と削除を選択します。詳しい境界と検査は[プライバシー点検記録](privacy-security-review-2026-10-21.md)を参照してください。
+
 大会モードはScryfall collection APIへ提出カード名を75件ずつ送って直接照合し、環境候補キャッシュと他大会の巡回に依存しません。その後は既存の発生源照合・現物生成・全採用URLの保持・画像付きデッキ表示を共有します。採用率の母数は読み込めたリスト数、参加人数不明時は網羅性未確認です。UIの入口は`public/tournament-ui.js`、入力書式とMelee側の取得制限は[melee-tournaments.md](melee-tournaments.md)を参照してください。
 
 ```text

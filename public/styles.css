@@ -163,6 +163,11 @@ body {
 
 h1, h2, h3, h4, p { margin: 0; }
 a { color: var(--accent-text); text-underline-offset: 3px; }
+.app.privacy-page { max-width: 680px; padding-top: 10vh; }
+.privacy-panel { padding: 28px; display: grid; gap: 20px; }
+.privacy-panel h1 { font-size: 28px; }
+.privacy-panel form { display: grid; gap: 12px; }
+.privacy-panel button { width: 100%; min-height: 50px; white-space: normal; }
 ::selection { background: rgba(217, 179, 108, 0.34); }
 * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 

@@ -7,9 +7,15 @@ import { withHostedRuntime } from "../lib/runtime.js";
 
 const password = "test-only-password-very-long";
 const config = { hash: createHash("sha256").update(password).digest("hex"), key: "test-only-session-secret-at-least-32-characters" };
-const env = () => ({ SITE_PASSWORD_SHA256: config.hash, SESSION_SECRET: config.key, DB: {
-  prepare(sql) { return { bind() { return { first: async () => ({ attempts: sql.startsWith("INSERT") ? 1 : 0 }), run: async () => ({ success: true }) }; } }; }
-} });
+const env = () => {
+  const revoked = new Map();
+  return { SITE_PASSWORD_SHA256: config.hash, SESSION_SECRET: config.key, DB: {
+    prepare(sql) { return { bind(key, expiry) { return {
+      first: async () => sql.startsWith("SELECT") ? (revoked.has(key) ? { token_hash: key } : null) : { attempts: 1 },
+      run: async () => { if (sql.startsWith("INSERT OR IGNORE")) revoked.set(key, expiry); return { success: true }; }
+    }; } }; }
+  } };
+};
 function fixture(bindings = env()) {
   const app = new Hono();
   app.use("*", passwordGate());
@@ -50,6 +56,25 @@ test("password login issues a secure cookie, unlocks requests, rejects forgery a
   assert.equal((await fetcher(new Request("https://test.local/login", { method: "POST", headers: { origin: "https://other.local" }, body: new URLSearchParams({ password }) }))).status, 403);
   const logout = await fetcher(new Request("https://test.local/logout", { method: "POST", headers: { cookie: cookie.split(";")[0], origin: "https://test.local" } }));
   assert.match(logout.headers.get("set-cookie"), /Max-Age=0/);
+  assert.equal((await fetcher(authenticated.clone())).status, 303, "A copied cookie is invalid after logout");
+});
+
+test("logout revokes only that session and clearing device storage is explicit", async () => {
+  const fetcher = fixture();
+  const login = async () => {
+    const response = await fetcher(new Request("https://test.local/login", { method: "POST", body: new URLSearchParams({ password }) }));
+    return response.headers.get("set-cookie").split(";")[0];
+  };
+  const a = await login(), b = await login();
+  assert.notEqual(a, b);
+  const response = await fetcher(new Request("https://test.local/logout?clear=1", { method: "POST", headers: { cookie: a } }));
+  assert.equal(response.headers.get("clear-site-data"), '"cache", "storage"');
+  assert.equal((await fetcher(new Request("https://test.local/api/logs", { headers: { cookie: a } }))).status, 401);
+  const other = await fetcher(new Request("https://test.local/", { headers: { cookie: b } }));
+  assert.equal(other.status, 200);
+  assert.match(other.headers.get("content-security-policy"), /script-src 'self';/);
+  assert.equal(other.headers.get("referrer-policy"), "same-origin");
+  assert.equal(other.headers.get("clear-site-data"), null);
 });
 
 test("sessions expire, fail after password rotation, and login attempts are throttled", async () => {
@@ -63,4 +88,10 @@ test("sessions expire, fail after password rotation, and login attempts are thro
   const response = await fixture(bindings)(new Request("https://test.local/login", { method: "POST", body: new URLSearchParams({ password }) }));
   assert.equal(response.status, 429);
   assert.equal(response.headers.get("retry-after"), "600");
+});
+
+test("malformed Unicode session signatures fail closed without throwing", () => {
+  const token = issueSession(config).split(".");
+  token[2] = "あ".repeat(43);
+  assert.equal(validSession(token.join("."), config), false);
 });
