@@ -101,6 +101,30 @@
       },
       "autoDetected": true,
       "note": "2026-09-07に公式発表本文で対象カードと2026-08-10の適用日を確認。自動検知の履歴は保持。"
+    },
+    {
+      "date": "2026-10-12",
+      "type": "banned-restricted",
+      "title": "Banned and Restricted Announcement - October 12, 2026",
+      "sourceUrl": "https://magic.wizards.com/en/news/announcements/banned-and-restricted-october-12-2026",
+      "announcedAt": "2026-10-12",
+      "effectiveDate": "2026-10-12",
+      "nextAnnouncementDate": "2026-11-30",
+      "confirmed": true,
+      "formatsAffected": [],
+      "formatsUnchanged": [
+        "standard",
+        "pioneer",
+        "modern",
+        "legacy"
+      ],
+      "changes": {
+        "standard": "No changes.",
+        "pioneer": "No changes.",
+        "modern": "No changes.",
+        "legacy": "No changes."
+      },
+      "note": "2026-10-24に公式発表本文で発表日・同日発効・対応4形式の変更なし・次回2026-11-30を確認。改定対象のCompetitive Brawlは本アプリの対応外。全期間の網羅確認は未実施。"
     }
   ]
 }
