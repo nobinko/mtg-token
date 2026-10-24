@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { candidateQueryVersion, finderCandidateQueries } from "../lib/scryfall.js";
-import { buildBulkObjects, expectsTokenCreation, objectsForSource, tokenHints } from "../lib/tokens.js";
+import { candidateQueryVersion, finderCandidateQueries, fetchJapaneseName, japaneseObjectNameFromText } from "../lib/scryfall.js";
+import { buildBulkObjects, expectsTokenCreation, objectsForSource, tokenHints, japaneseNameFromTypeLine } from "../lib/tokens.js";
 
 // Minimal mechanic fixtures; live set dumps stay in the ignored .cache directory.
 // Rules/names: https://magic.wizards.com/en/news/feature/reality-fracture-mechanics
@@ -24,15 +24,20 @@ const jace = makeToken("fra-test-jace", "Jace", "Token Planeswalker — Jace", {
 const heartwood = makeToken("fra-test-heartwood", "Heartwood", "Token Artifact — Heartwood", {
   colors: ["R", "G"], oracle_text: "{T}: Add {R} or {G}."
 });
+const jaceEmblem = makeToken("fra-test-jace-emblem", "Jace, Unraveler of Secrets Emblem", "Emblem — Jace", {
+  set: "tsoi", released_at: "2016-04-08"
+});
 const part = token => ({ id: token.id, name: token.name, type_line: token.type_line, component: "token", uri: `https://api.scryfall.com/cards/${token.id}` });
 function mockPhysicalCards(t) {
-  const cards = new Map([jace, heartwood].map(card => [card.id, card]));
+  const cards = new Map([jace, heartwood, jaceEmblem].map(card => [card.id, card]));
   t.mock.method(globalThis, "fetch", async input => {
     const url = new URL(input);
     assert.equal(url.origin, "https://api.scryfall.com");
     if (url.pathname === "/sets") return Response.json({ data: [
       { code: "fra", name: "Reality Fracture", set_type: "expansion", released_at: "2026-10-02", digital: false },
-      { code: "tfra", set_type: "token", parent_set_code: "fra" }
+      { code: "tfra", set_type: "token", parent_set_code: "fra" },
+      { code: "soi", name: "Shadows over Innistrad", set_type: "expansion", released_at: "2016-04-08", digital: false },
+      { code: "tsoi", set_type: "token", parent_set_code: "soi" }
     ] });
     const card = cards.get(url.pathname.replace(/^\/cards\//, ""));
     assert.ok(card, `unexpected request: ${input}`);
@@ -124,4 +129,62 @@ test("Behold alone does not promise Treasure, while an actual Treasure creation 
   assert.ok(tokenHints(sanctum).includes("トークン生成"));
   assert.ok(tokenHints(sanctum).every(hint => !/Treasure|宝物/.test(hint)));
   assert.ok(tokenHints({ ...raw, oracle_text: `${behold}\nCreate a Treasure token.` }).includes("Treasure"));
+});
+
+test("the initial bulk result distinguishes an existing Jace emblem from the FRA token without Japanese enrichment", async t => {
+  mockPhysicalCards(t);
+  const oldJace = { name: "Jace, Unraveler of Secrets", oracle_text: "You get an emblem.", all_parts: [{ ...part(jaceEmblem), component: "emblem" }] };
+  const warnings = [];
+  const objects = await buildBulkObjects([
+    { ...source(oldJace), set: "SOI", releasedAt: "2016-04-08" },
+    source({ ...empowerSources[0], all_parts: [part(jace)] })
+  ], { ...stockOptions, warnings });
+  assert.equal(objects.length, 2);
+  const emblem = objects.find(item => item.kind === "Emblem");
+  assert.equal(emblem.japaneseName, "紋章");
+  assert.equal(emblem.category, "紋章");
+  assert.equal(emblem.set, "SOI");
+  assert.equal(emblem.stockStatus, "available");
+  assert.equal(objects.find(item => item.kind === "Token").japaneseName, "ジェイス");
+  assert.deepEqual(warnings, []);
+});
+
+test("FRA exact token names do not translate emblems or full planeswalker names through subtype lookup", () => {
+  for (const name of ["Jace", "Jace, Unraveler of Secrets Emblem"]) {
+    assert.equal(japaneseNameFromTypeLine({ name, typeLine: "Emblem — Jace", kind: "Emblem" }), "");
+  }
+  assert.equal(japaneseNameFromTypeLine({ name: "Jace, Reality Sculptor", typeLine: "Legendary Planeswalker — Jace" }), "");
+  assert.equal(japaneseNameFromTypeLine({ name: "Jace, Reality Sculptor", typeLine: "Token Legendary Planeswalker — Jace", kind: "Token" }), "");
+  assert.equal(japaneseObjectNameFromText("青のジェイス・プレインズウォーカー・トークンを生成する。", jace), "ジェイス");
+  assert.equal(japaneseObjectNameFromText("魂木・トークンを生成する。", heartwood), "魂木");
+});
+
+test("Japanese name lookup keeps exact token names but resolves full card and emblem names independently", async t => {
+  const printedNames = new Map([
+    ["Jace, Unraveler of Secrets", "ジェイスのフルカード名（検証用）"],
+    ["Heartwood Storyteller", "魂木とは異なるカード名（検証用）"]
+  ]);
+  const queries = [];
+  t.mock.method(globalThis, "fetch", async input => {
+    const url = new URL(input);
+    assert.equal(url.pathname, "/cards/search");
+    const query = url.searchParams.get("q");
+    queries.push(query);
+    const name = query.match(/^!"([^"]+)" lang:ja$/)?.[1];
+    assert.ok(printedNames.has(name) || ["Jace, the Mind Sculptor", "Jace, Architect of Thought"].includes(name), query);
+    if (name === "Jace, Architect of Thought") return new Response("Japanese lookup unavailable", { status: 404 });
+    return Response.json({ data: printedNames.has(name) ? [{ name, lang: "ja", printed_name: printedNames.get(name) }] : [] });
+  });
+  assert.equal(await fetchJapaneseName("Jace"), "ジェイス");
+  assert.equal(await fetchJapaneseName("Heartwood"), "魂木");
+  assert.deepEqual(queries, []);
+  for (const [name, printedName] of printedNames) assert.equal(await fetchJapaneseName(name), printedName);
+  assert.equal(await fetchJapaneseName("Jace, Unraveler of Secrets Emblem"), `${printedNames.get("Jace, Unraveler of Secrets")}の紋章`);
+  assert.equal(await fetchJapaneseName("Jace, the Mind Sculptor"), "", "unavailable Japanese metadata must not become the short token name");
+  assert.equal(await fetchJapaneseName("Jace, Architect of Thought"), "", "a failed Japanese lookup must not become the short token name");
+  const requestCount = queries.length;
+  assert.equal(requestCount, 4);
+  assert.equal(await fetchJapaneseName("Jace, Unraveler of Secrets"), printedNames.get("Jace, Unraveler of Secrets"));
+  assert.equal(await fetchJapaneseName("Jace"), "ジェイス");
+  assert.equal(queries.length, requestCount, "full names and exact token names retain separate cache entries");
 });
