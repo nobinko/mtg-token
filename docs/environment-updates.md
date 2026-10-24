@@ -39,3 +39,7 @@
 候補カードはScryfall取得時点の使用可否です。過去大会の完全再現や将来の使用可否は保証せず、検索結果にこの制約を表示します。セット発売のフォーマット分類は既存方式を継続します。新ルールのデータ化は引き続き本体の実装修正が必要です。公開版の本体は[GitHub mainからの自動公開](github-deployment.md)で反映し、ローカル版は更新版の入手が必要です。
 
 2026-08-10改定は2026-09-07に[公式発表](https://magic.wizards.com/en/news/announcements/banned-and-restricted-august-10-2026)で対象カード、同日適用、次回2026-10-12を確認しました。全期間の網羅確認は未実施なのでverifiedThroughはnullです。
+
+2026-10-12告知は2026-10-24に[公式発表](https://magic.wizards.com/en/news/announcements/banned-and-restricted-october-12-2026)で発表日・同日発効・次回2026-11-30を確認しました。Standard・Pioneer・Modern・Legacyはすべて変更なしです。改定対象は本アプリの対応外のCompetitive Brawlなので、対応4形式は`formatsUnchanged`に記録し、環境開始日をリセットしません。8月告知の次回予定日は当時の履歴として保持しています。
+
+更新版では「確認済みイベント最終日」が2026-10-12となり、10月12日超過の警告が解消します。次回告知日の11月30日を過ぎても新たな確認済み告知がなければ再び警告します。今回確認したのは10月12日の告知であり、全期間・全イベントの網羅確認は未実施なので`verifiedThrough`は引き続きnullです。この境界と変更なし告知が環境開始日を動かさないことは`test/updates.test.js`と`test/environment.test.js`で検証します。

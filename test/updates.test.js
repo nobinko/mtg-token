@@ -17,6 +17,30 @@ const pack = {
 };
 const deps = { fetchSets: async () => [{ date: "2026-05-01" }], fetchCandidates: async () => [{ name: "Candidate" }] };
 
+test("bundled October announcement clears the old warning until the next announcement deadline", async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), "mtg-update-test-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-10-11T23:59:59Z") });
+  const store = createUpdateStore({ path: join(directory, "active.json") });
+  const { pack: bundled } = await store.read();
+  const announcement = bundled.events.find((event) => event.date === "2026-10-12");
+  assert.equal(announcement.announcedAt, "2026-10-12");
+  assert.equal(announcement.effectiveDate, "2026-10-12");
+  assert.equal(announcement.nextAnnouncementDate, "2026-11-30");
+  assert.equal((await store.status()).lastEvent, "2026-09-25");
+
+  for (const date of ["2026-10-12T00:00:00Z", "2026-10-24T00:00:00Z", "2026-11-30T23:59:59Z"]) {
+    t.mock.timers.setTime(Date.parse(date));
+    const status = await store.status();
+    assert.equal(status.announcementOverdue, false, date);
+    assert.equal(status.lastEvent, "2026-10-12");
+    assert.equal(status.verifiedThrough, null, "One verified announcement is not a full-history audit");
+    assert.deepEqual(status.pending, []);
+  }
+  t.mock.timers.setTime(Date.parse("2026-12-01T00:00:00Z"));
+  assert.equal((await store.status()).announcementOverdue, true);
+});
+
 test("old ZIP reader loads complete history, uses effective date, persists across restart", async (t) => {
   const directory = await mkdtemp(join(tmpdir(), "mtg-update-test-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
