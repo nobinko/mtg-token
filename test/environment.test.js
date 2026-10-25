@@ -3,6 +3,8 @@ import test from "node:test";
 
 import { mergeEnvironmentEvents, resolveEnvironmentFromEvents } from "../lib/environment.js";
 import { setReleaseEventsFromSets } from "../lib/set-events.js";
+import { confirmedEvents } from "../lib/updates.js";
+import bundledPack from "../data/environment-events.json" with { type: "json" };
 
 const banEvent = {
   date: "2026-06-29",
@@ -71,6 +73,24 @@ test("resolveEnvironmentFromEvents refuses to resolve without an affecting event
   const result = resolveEnvironmentFromEvents([banEvent], "modern", "2026-07-18");
   assert.equal(result.resolved, false);
   assert.equal(result.startDate, "");
+});
+
+test("October 12 no-change announcement adds context without resetting any supported format", () => {
+  const events = confirmedEvents(bundledPack);
+  for (const format of ["standard", "pioneer", "modern", "legacy"]) {
+    for (const targetDate of ["2026-10-11", "2026-10-12", "2026-10-24"]) {
+      const environment = resolveEnvironmentFromEvents(events, format, targetDate);
+      assert.equal(environment.startDate, "2026-09-25", `${format} on ${targetDate}`);
+      assert.equal(environment.resetEvent.setCode, "fra");
+      const announcement = environment.contextEvents.find((event) => event.date === "2026-10-12");
+      assert.equal(Boolean(announcement), targetDate >= "2026-10-12");
+      if (announcement) {
+        assert.equal(announcement.affectsFormat, false);
+        assert.equal(announcement.reason, "No changes.");
+        assert.equal(announcement.confirmed, true);
+      }
+    }
+  }
 });
 
 test("MBC sales date does not erase recent Legacy lists before its official constructed date", () => {
